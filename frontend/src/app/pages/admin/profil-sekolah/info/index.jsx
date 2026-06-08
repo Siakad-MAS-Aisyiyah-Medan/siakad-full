@@ -1,0 +1,277 @@
+import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import { getProfilSekolah, updateProfilSekolah } from '@app/shared/services/profilSekolah.service';
+
+export default function InfoProfilPage() {
+  const [formData, setFormData] = useState({
+    nama_sekolah: '',
+    hero_subtitle: '',
+    tentang_kami: '',
+    alamat: '',
+    kata_sambutan: '',
+    nama_kepsek: '',
+    visi: '',
+    misi: ''
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    fetchProfil();
+  }, []);
+
+  const fetchProfil = async () => {
+    try {
+      setLoading(true);
+      const response = await getProfilSekolah();
+      if (response?.data) {
+        setFormData(response.data);
+      }
+    } catch (error) {
+      console.error('Gagal mengambil profil:', error);
+      Swal.fire('Error', 'Gagal memuat data profil sekolah', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setSaving(true);
+      await updateProfilSekolah(formData);
+      Swal.fire('Berhasil', 'Profil sekolah berhasil diperbarui', 'success');
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Gagal memperbarui profil:', error);
+      Swal.fire('Error', 'Gagal menyimpan perubahan', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    // Reset to original data
+    fetchProfil();
+    setIsEditing(false);
+  };
+
+  if (loading) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Memuat data profil...</div>;
+  }
+
+  // --- VIEW MODE ---
+  if (!isEditing) {
+    return (
+      <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Informasi Profil Sekolah</h2>
+          <button
+            onClick={() => setIsEditing(true)}
+            style={{
+              padding: '0.5rem 1.5rem',
+              backgroundColor: 'var(--color-primary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            Edit Profil
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Nama Sekolah</p>
+              <p style={{ fontSize: '1.1rem' }}>{formData.nama_sekolah || '-'}</p>
+            </div>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Slogan / Subtitle Singkat</p>
+              <p style={{ fontSize: '1.1rem' }}>{formData.hero_subtitle || '-'}</p>
+            </div>
+          </div>
+
+          <div>
+            <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Tentang Kami</p>
+            <p style={{ fontSize: '1rem', whiteSpace: 'pre-line' }}>{formData.tentang_kami || '-'}</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Visi</p>
+              <p style={{ fontSize: '1rem', whiteSpace: 'pre-line' }}>{formData.visi || '-'}</p>
+            </div>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Misi</p>
+              <p style={{ fontSize: '1rem', whiteSpace: 'pre-line' }}>{formData.misi || '-'}</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Nama Kepala Sekolah</p>
+              <p style={{ fontSize: '1rem' }}>{formData.nama_kepsek || '-'}</p>
+            </div>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Alamat Lengkap</p>
+              <p style={{ fontSize: '1rem', whiteSpace: 'pre-line' }}>{formData.alamat || '-'}</p>
+            </div>
+          </div>
+
+          <div>
+            <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Kata Sambutan Kepala Sekolah</p>
+            <p style={{ fontSize: '1rem', whiteSpace: 'pre-line' }}>{formData.kata_sambutan || '-'}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- EDIT MODE ---
+  return (
+    <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+      <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Edit Profil Sekolah</h2>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Nama Sekolah</label>
+            <input
+              type="text"
+              name="nama_sekolah"
+              value={formData.nama_sekolah || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+              placeholder="Contoh: MAS Aisyiyah Medan"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Slogan / Subtitle Singkat</label>
+            <input
+              type="text"
+              name="hero_subtitle"
+              value={formData.hero_subtitle || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+              placeholder="Contoh: Sekolah Berbasis Islam Modern"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Tentang Kami</label>
+          <textarea
+            name="tentang_kami"
+            value={formData.tentang_kami || ''}
+            onChange={handleChange}
+            rows="3"
+            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+            placeholder="Deskripsi singkat tentang sekolah"
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Visi</label>
+            <textarea
+              name="visi"
+              value={formData.visi || ''}
+              onChange={handleChange}
+              rows="4"
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Misi</label>
+            <textarea
+              name="misi"
+              value={formData.misi || ''}
+              onChange={handleChange}
+              rows="4"
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Nama Kepala Sekolah</label>
+            <input
+              type="text"
+              name="nama_kepsek"
+              value={formData.nama_kepsek || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Alamat Lengkap</label>
+            <textarea
+              name="alamat"
+              value={formData.alamat || ''}
+              onChange={handleChange}
+              rows="2"
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Kata Sambutan Kepala Sekolah</label>
+          <textarea
+            name="kata_sambutan"
+            value={formData.kata_sambutan || ''}
+            onChange={handleChange}
+            rows="4"
+            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+          <button
+            type="button"
+            onClick={handleCancel}
+            disabled={saving}
+            style={{
+              padding: '0.75rem 2rem',
+              backgroundColor: '#e2e8f0',
+              color: '#475569',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: saving ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            style={{
+              padding: '0.75rem 2rem',
+              backgroundColor: 'var(--color-primary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: saving ? 'not-allowed' : 'pointer',
+              opacity: saving ? 0.7 : 1
+            }}
+          >
+            {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  );
+}
