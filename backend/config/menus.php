@@ -94,12 +94,7 @@ return [
         'label' => 'Laporan',
         'path' => '/admin/laporan',
     ],
-    [
-        'permission' => 'manage_absensi_guru',
-        'iconKey' => 'BarChart3',
-        'label' => 'Absensi Guru',
-        'path' => '/admin/absensi-guru',
-    ],
+
     [
         'permission' => 'view_dashboard_guru',
         'iconKey' => 'LayoutDashboard',

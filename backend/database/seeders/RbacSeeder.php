@@ -108,7 +108,7 @@ class RbacSeeder extends Seeder
             ['permission_key' => 'manage_users', 'icon_key' => 'Settings', 'label' => 'Akun & Hak Akses', 'path' => '/admin/hak-akses', 'sort_order' => 120],
             ['permission_key' => 'manage_all', 'icon_key' => 'Shield', 'label' => 'Audit Log', 'path' => '/admin/audit-logs', 'sort_order' => 125],
             ['permission_key' => 'view_laporan', 'icon_key' => 'FileText', 'label' => 'Laporan', 'path' => '/admin/laporan', 'sort_order' => 130],
-            ['permission_key' => 'manage_absensi_guru', 'icon_key' => 'BarChart3', 'label' => 'Absensi Guru', 'path' => '/admin/absensi-guru', 'sort_order' => 140],
+
             ['permission_key' => 'view_dashboard_kepsek', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/kepsek/dashboard', 'sort_order' => 10],
             ['permission_key' => 'view_data_siswa', 'icon_key' => 'Users', 'label' => 'Data Murid & Guru', 'path' => '/kepsek/data', 'sort_order' => 20],
             ['permission_key' => 'view_laporan', 'icon_key' => 'BarChart3', 'label' => 'Laporan Absensi Guru', 'path' => '/kepsek/absensi-guru', 'sort_order' => 30],

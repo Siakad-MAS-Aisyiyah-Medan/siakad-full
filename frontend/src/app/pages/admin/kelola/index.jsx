@@ -26,24 +26,34 @@ export default function GuruPage() {
 
   return (
     <AdminPageShell>
-      <div className="flex gap-4 mb-6 border-b border-slate-200/50 pb-2">
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid #e2e8f0', marginBottom: '2rem' }}>
         <button
           onClick={() => setActiveTab('data')}
-          className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${
-            activeTab === 'data' 
-              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' 
-              : 'text-slate-600 hover:bg-white/50'
-          }`}
+          style={{
+            padding: '0.75rem 1.5rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'data' ? '3px solid var(--color-primary)' : '3px solid transparent',
+            color: activeTab === 'data' ? 'var(--color-primary)' : '#64748b',
+            fontWeight: activeTab === 'data' ? 'bold' : 'normal',
+            cursor: 'pointer',
+            fontSize: '1rem'
+          }}
         >
           Data Guru & Pegawai
         </button>
         <button
           onClick={() => setActiveTab('absensi')}
-          className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${
-            activeTab === 'absensi' 
-              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' 
-              : 'text-slate-600 hover:bg-white/50'
-          }`}
+          style={{
+            padding: '0.75rem 1.5rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'absensi' ? '3px solid var(--color-primary)' : '3px solid transparent',
+            color: activeTab === 'absensi' ? 'var(--color-primary)' : '#64748b',
+            fontWeight: activeTab === 'absensi' ? 'bold' : 'normal',
+            cursor: 'pointer',
+            fontSize: '1rem'
+          }}
         >
           Absensi Guru
         </button>

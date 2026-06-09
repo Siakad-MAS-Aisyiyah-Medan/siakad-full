@@ -112,6 +112,7 @@ export function getMenuItems() {
   const menus = getStoredMenus();
   const items = menus?.length > 0 ? menus : getMenuForRole(getStoredUser()?.role);
   return items.filter((item) => {
+    if (item.label === 'Absensi Guru') return false;
     if (item.permission) return hasPermission(item.permission);
     return true;
   });

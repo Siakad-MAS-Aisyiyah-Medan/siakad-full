@@ -28,3 +28,5 @@ yarn-error.log
 /composer.phar
 /composer-temp.phar
 /composer-setup.php
+
+.vercel
