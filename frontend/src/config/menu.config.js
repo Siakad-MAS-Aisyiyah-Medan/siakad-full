@@ -10,7 +10,6 @@ export const menuByRole = {
     { iconKey: 'Users', label: 'Data Guru', path: '/admin/guru' },
     { iconKey: 'GraduationCap', label: 'Data Murid', path: '/admin/murid' },
     { iconKey: 'BookOpen', label: 'Data Kelas', path: '/admin/kelas' },
-    { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/admin/mapel' },
     { iconKey: 'Calendar', label: 'Jadwal Pelajaran', path: '/admin/jadwal' },
     { iconKey: 'UserCheck', label: 'Verifikasi PPDB', path: '/admin/ppdb' },
     { iconKey: 'Settings', label: 'Akun & Hak Akses', path: '/admin/hak-akses' },

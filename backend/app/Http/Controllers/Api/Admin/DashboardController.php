@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $totalMapel = Mapel::count();
         $totalKelas = Kelas::count();
 
-        $auditLogs = AuditLog::with('user:id,name,role')
+        $auditLogs = AuditLog::with('user:id_user,name,role')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get()

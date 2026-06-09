@@ -18,7 +18,6 @@ export default function HakAksesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -56,7 +55,7 @@ export default function HakAksesPage() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: '', username: '', email: '', password: '', confirmPassword: '', role: 'admin' });
+    setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'admin' });
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
@@ -73,6 +72,11 @@ export default function HakAksesPage() {
       // Send without confirmPassword
       const submitData = { ...formData };
       delete submitData.confirmPassword;
+
+      // Auto-generate username from email since backend requires it
+      const baseUsername = formData.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      submitData.username = `${baseUsername}${randomSuffix}`;
 
       await createAdminAkun(submitData);
       Swal.fire('Sukses', 'Akun baru berhasil ditambahkan', 'success');
@@ -189,23 +193,15 @@ export default function HakAksesPage() {
 
             {/* Form Content */}
             <div className="overflow-y-auto p-8">
-              <form id="addAccountForm" onSubmit={handleSubmit} className="space-y-6">
-                {/* Row 1: Nama & Username */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form id="addAccountForm" onSubmit={handleSubmit} className="flex flex-col gap-6">
+                {/* Row 1: Nama Lengkap */}
+                <div className="grid grid-cols-1 gap-6">
                   <FormInput 
                     label="Nama Lengkap"
                     icon={User}
                     placeholder="Mis: Budi Santoso"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                  />
-                  <FormInput 
-                    label="Username"
-                    icon={AtSign}
-                    placeholder="Mis: budi.santoso"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
                     required
                   />
                 </div>
@@ -231,7 +227,6 @@ export default function HakAksesPage() {
                       { value: 'admin', label: 'Administrator' },
                       { value: 'kepsek', label: 'Kepala Sekolah' },
                       { value: 'guru', label: 'Guru' },
-                      { value: 'wali_kelas', label: 'Wali Kelas' },
                       { value: 'siswa', label: 'Siswa' },
                       { value: 'calon_siswa', label: 'Calon Siswa' }
                     ]}
@@ -292,11 +287,11 @@ export default function HakAksesPage() {
             </div>
 
             {/* Footer Actions */}
-            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 items-center">
+            <div className="flex justify-end items-center gap-[12px] px-[40px] py-[20px] bg-[#F8FAFC] border-t border-[#E5E7EB]">
               <button 
                 type="button" 
                 onClick={handleCloseModal} 
-                className="px-6 py-2.5 text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 rounded-full font-semibold transition-all shadow-sm text-[14px]"
+                className="flex items-center justify-center h-[44px] min-w-[96px] px-[18px] rounded-xl bg-[#FFFFFF] border border-[#CBD5E1] text-[#334155] font-semibold hover:bg-[#F1F5F9] hover:border-[#94A3B8] transition-all text-[14px]"
               >
                 Batal
               </button>
@@ -304,7 +299,7 @@ export default function HakAksesPage() {
                 type="submit" 
                 form="addAccountForm"
                 disabled={isSubmitting} 
-                className="px-6 py-2.5 text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 active:scale-[0.98] shadow-md shadow-emerald-500/25 rounded-full font-semibold transition-all flex items-center gap-2 text-[14px]"
+                className="flex items-center justify-center gap-[8px] h-[44px] min-w-[150px] px-[20px] rounded-xl bg-[#059669] text-white font-bold whitespace-nowrap hover:bg-[#047857] transition-all text-[14px]"
               >
                 {isSubmitting ? (
                   <>

@@ -101,7 +101,6 @@ class RbacSeeder extends Seeder
             ['permission_key' => 'manage_guru', 'icon_key' => 'Users', 'label' => 'Data Guru', 'path' => '/admin/guru', 'sort_order' => 50],
             ['permission_key' => 'manage_murid', 'icon_key' => 'GraduationCap', 'label' => 'Data Murid', 'path' => '/admin/murid', 'sort_order' => 60],
             ['permission_key' => 'manage_kelas', 'icon_key' => 'BookOpen', 'label' => 'Data Kelas', 'path' => '/admin/kelas', 'sort_order' => 70],
-            ['permission_key' => 'manage_mapel', 'icon_key' => 'ClipboardList', 'label' => 'Mata Pelajaran', 'path' => '/admin/mapel', 'sort_order' => 80],
             ['permission_key' => 'manage_jadwal', 'icon_key' => 'Calendar', 'label' => 'Jadwal Pelajaran', 'path' => '/admin/jadwal', 'sort_order' => 90],
             ['permission_key' => 'manage_ekskul', 'icon_key' => 'Star', 'label' => 'Ekstrakurikuler', 'path' => '/admin/ekskul', 'sort_order' => 100],
             ['permission_key' => 'manage_ppdb', 'icon_key' => 'UserCheck', 'label' => 'Verifikasi PPDB', 'path' => '/admin/ppdb', 'sort_order' => 110],

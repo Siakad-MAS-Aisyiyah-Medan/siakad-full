@@ -13,6 +13,7 @@ export default function JadwalMatrixUI({
   onCancel,
   onChangeCell,
   onSave,
+  readOnly = false,
 }) {
   const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
@@ -42,18 +43,20 @@ export default function JadwalMatrixUI({
             </div>
           </div>
 
-          <button
-            onClick={onSave}
-            disabled={loading}
-            className="flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-slate-900 font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
-          >
-            {loading ? (
-              <span className="w-5 h-5 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
-            ) : (
-              <Save size={18} />
-            )}
-            Simpan Jadwal
-          </button>
+          {!readOnly && (
+            <button
+              onClick={onSave}
+              disabled={loading}
+              className="flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-slate-900 font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
+            >
+              {loading ? (
+                <span className="w-5 h-5 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
+              ) : (
+                <Save size={18} />
+              )}
+              Simpan Jadwal
+            </button>
+          )}
         </div>
       </div>
 
@@ -134,10 +137,11 @@ export default function JadwalMatrixUI({
                                   <select
                                     value={cell.id_mapel || ''}
                                     onChange={(e) => onChangeCell(w.id_waktu, hari, 'id_mapel', e.target.value)}
-                                    className={`w-full text-sm p-2.5 rounded-xl border-2 appearance-none outline-none transition-all cursor-pointer font-medium
+                                    className={`w-full text-sm p-2.5 rounded-xl border-2 appearance-none outline-none transition-all ${!readOnly ? 'cursor-pointer' : 'cursor-default bg-slate-100'} font-medium
                                       ${cell.id_mapel 
                                         ? 'border-emerald-200 bg-emerald-50 text-emerald-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10' 
-                                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 focus:border-emerald-500 focus:bg-white'}`}
+                                        : 'border-slate-200 bg-slate-50 text-slate-600 focus:border-emerald-500'} ${!readOnly && !cell.id_mapel ? 'hover:border-slate-300 focus:bg-white' : ''}`}
+                                    disabled={readOnly}
                                   >
                                     <option value="">-- Pilih Mapel --</option>
                                     {mapelData.map((m) => (
@@ -154,10 +158,11 @@ export default function JadwalMatrixUI({
                                   <select
                                     value={cell.id_guru || ''}
                                     onChange={(e) => onChangeCell(w.id_waktu, hari, 'id_guru', e.target.value)}
-                                    className={`w-full text-sm p-2.5 rounded-xl border-2 appearance-none outline-none transition-all cursor-pointer font-medium
+                                    className={`w-full text-sm p-2.5 rounded-xl border-2 appearance-none outline-none transition-all ${!readOnly ? 'cursor-pointer' : 'cursor-default bg-slate-100'} font-medium
                                       ${cell.id_guru 
                                         ? 'border-blue-200 bg-blue-50 text-blue-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10' 
-                                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 focus:border-blue-500 focus:bg-white'}`}
+                                        : 'border-slate-200 bg-slate-50 text-slate-600 focus:border-blue-500'} ${!readOnly && !cell.id_guru ? 'hover:border-slate-300 focus:bg-white' : ''}`}
+                                    disabled={readOnly}
                                   >
                                     <option value="">-- Pilih Guru --</option>
                                     {guruData.map((g) => (

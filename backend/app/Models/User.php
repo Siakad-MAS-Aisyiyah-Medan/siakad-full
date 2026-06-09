@@ -17,12 +17,10 @@ class User extends Authenticatable
     /** Role akun — data PPDB terpisah di tabel pendaftaran (hanya untuk calon_siswa yang mulai PPDB). */
     public const ROLES = [
         'admin',
-        'operator',
         'calon_siswa',
         'guru',
         'siswa',
         'kepsek',
-        'wali_kelas',
     ];
 
     public const STATUS_AKUN = ['aktif', 'pending', 'nonaktif', 'diblokir'];
