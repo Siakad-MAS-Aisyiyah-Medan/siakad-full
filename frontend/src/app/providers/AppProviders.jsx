@@ -1,5 +1,5 @@
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 export function AppProviders({ children }) {
-  return <BrowserRouter>{children}</BrowserRouter>;
+  return <HashRouter>{children}</HashRouter>;
 }
