@@ -355,7 +355,15 @@ export default function TahunAjaranPage() {
                 <BookOpen size={22} strokeWidth={2} />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Tahun Ajaran</h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">Tahun Ajaran</h2>
+                  {aktif && (
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-2 border border-emerald-200/60 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Aktif: {aktif.tahun_ajaran} ({aktif.semester})
+                    </span>
+                  )}
+                </div>
                 <p className="text-slate-500 text-sm mt-0.5 font-medium">Kelola siklus akademik, semester, dan status berjalan.</p>
               </div>
             </div>
@@ -363,47 +371,7 @@ export default function TahunAjaranPage() {
           {/* Add Button removed from here, moved to Riwayat header */}
         </div>
 
-        {/* Card Tahun Ajaran Aktif */}
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-          {aktif ? (
-            <div className="relative bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl shadow-slate-200/50">
-              <div>
-                {/* Info Utama */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Tahun Ajaran Aktif
-                    </span>
-                  </div>
-                  <h3 className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-2">{aktif.tahun_ajaran}</h3>
-                  <div className="text-lg text-emerald-600 font-bold mb-4">Semester {aktif.semester}</div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-slate-500 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100 inline-flex">
-                    <Calendar size={16} className="text-slate-400" />
-                    {formatDate(aktif.tanggal_mulai)} <span className="mx-1 text-slate-300">—</span> {formatDate(aktif.tanggal_selesai)}
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Navigation removed as requested */}
-
-            </div>
-          ) : (
-            <div className="relative bg-white/90 backdrop-blur-xl border border-amber-200 rounded-3xl p-8 flex items-center gap-4 shadow-xl shadow-amber-100/50">
-              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                <AlertCircle size={24} className="text-amber-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-amber-900">Sistem Menunggu Konfigurasi</h3>
-                <p className="text-sm text-amber-700 mt-1 font-medium">
-                  Belum ada tahun ajaran yang aktif. Silakan tambah tahun ajaran baru atau aktifkan dari riwayat di bawah.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Active Card Removed */}
 
         {/* Tabel Riwayat */}
         <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm mt-8">
