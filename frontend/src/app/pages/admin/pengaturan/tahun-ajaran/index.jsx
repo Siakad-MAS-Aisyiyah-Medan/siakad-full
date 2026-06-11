@@ -280,142 +280,166 @@ export default function TahunAjaranPage() {
 
   return (
     <AdminPageShell>
-      <div className="data-panel view-list">
-
-        {/* Header */}
-        <div className="panel-header glass mb-6 py-4 px-6 rounded-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/admin/pengaturan')}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 transition-colors"
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <div className="flex gap-3 items-center">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shrink-0">
-                  <BookOpen size={18} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-slate-800">Tahun Ajaran</h2>
-                  <p className="text-slate-500 text-sm">Kelola tahun ajaran dan semester yang sedang digunakan sistem.</p>
-                </div>
+      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="flex items-center gap-5">
+            <button
+              onClick={() => navigate('/admin/pengaturan')}
+              className="w-11 h-11 flex items-center justify-center rounded-2xl border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition-all shadow-sm group"
+            >
+              <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+            <div className="flex gap-4 items-center">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
+                <BookOpen size={22} strokeWidth={2} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Tahun Ajaran</h2>
+                <p className="text-slate-500 text-sm mt-0.5 font-medium">Kelola siklus akademik, semester, dan status berjalan.</p>
               </div>
             </div>
-            <button
-              onClick={openAdd}
-              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-xl transition-colors shadow-sm shadow-emerald-500/20 shrink-0 whitespace-nowrap"
-            >
-              <Plus size={16} />
-              Tambah Tahun Ajaran
-            </button>
           </div>
+          <button
+            onClick={openAdd}
+            className="group flex items-center gap-2.5 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-2xl transition-all shadow-xl shadow-slate-900/20 shrink-0"
+          >
+            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+            Tambah Baru
+          </button>
         </div>
 
         {/* Card Tahun Ajaran Aktif */}
-        {aktif ? (
-          <div className="bg-white border border-emerald-200 rounded-2xl p-6 mb-8 relative shadow-sm">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500 rounded-t-2xl" />
-            <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
-              
-              {/* Info Kiri */}
-              <div className="flex gap-4 items-start flex-1">
-                <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-                  <Calendar size={28} strokeWidth={1.5} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tahun Ajaran Aktif</span>
-                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+          {aktif ? (
+            <div className="relative bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl shadow-slate-200/50">
+              <div className="flex flex-col xl:flex-row gap-8 items-start xl:items-center justify-between">
+                
+                {/* Info Kiri */}
+                <div className="flex gap-6 items-start">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-50/80 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/50 ring-4 ring-emerald-50/50">
+                    <Calendar size={32} strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-3xl font-black text-slate-800 mb-1">{aktif.tahun_ajaran}</h3>
-                  <div className="flex items-center gap-3 text-sm text-slate-600 font-medium mb-4">
-                    <span className="px-2.5 py-1 bg-slate-100 rounded-lg">Semester {aktif.semester}</span>
-                    <span className="text-slate-300">•</span>
-                    <span>{formatDate(aktif.tanggal_mulai)} — {formatDate(aktif.tanggal_selesai)}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-slate-400 mr-1">Digunakan oleh:</span>
-                    {['Data Murid', 'Data Kelas', 'Jadwal', 'PPDB', 'Laporan'].map((m) => (
-                      <span key={m} className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded-md text-[11px] font-bold shadow-sm">
-                        {m}
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Aktif Saat Ini
                       </span>
-                    ))}
+                    </div>
+                    <h3 className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-3">{aktif.tahun_ajaran}</h3>
+                    
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 font-medium mb-5">
+                      <span className="px-3 py-1.5 bg-slate-100/80 text-slate-700 rounded-xl font-bold border border-slate-200/50 shadow-sm">
+                        Semester {aktif.semester}
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="flex items-center gap-2">
+                        <Calendar size={14} className="text-slate-400" />
+                        {formatDate(aktif.tanggal_mulai)} <span className="text-slate-400 mx-1">—</span> {formatDate(aktif.tanggal_selesai)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="text-xs font-semibold text-slate-400 mr-1 uppercase tracking-wider">Modul Terhubung:</span>
+                      {['Data Murid', 'Data Kelas', 'Jadwal', 'PPDB', 'Laporan'].map((m) => (
+                        <span key={m} className="px-2.5 py-1 bg-white border border-slate-200/60 text-slate-500 rounded-lg text-[11px] font-bold shadow-sm">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Aksi Kanan */}
-              <div className="flex flex-col gap-2 w-full md:w-auto shrink-0">
-                <button
-                  onClick={handleUbahSemester}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-medium rounded-xl transition-colors border border-emerald-100"
-                >
-                  <Pencil size={16} /> Ubah Semester
-                </button>
-                <div className="grid grid-cols-2 gap-2">
+                {/* Aksi Kanan */}
+                <div className="flex flex-col sm:flex-row xl:flex-col gap-3 w-full xl:w-auto shrink-0 mt-6 xl:mt-0 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
                   <button
-                    onClick={() => openEdit(aktif)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl transition-colors"
+                    onClick={handleUbahSemester}
+                    className="flex-1 xl:flex-none flex items-center justify-center gap-2.5 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-emerald-500/20"
                   >
-                    Edit Detail
+                    <Pencil size={16} /> Ganti Semester
                   </button>
-                  <button
-                    onClick={handleNonaktifkan}
-                    className="flex items-center justify-center gap-2 px-4 py-2 border border-red-200 hover:bg-red-50 text-red-600 text-sm font-medium rounded-xl transition-colors"
-                  >
-                    Nonaktifkan
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => openEdit(aktif)}
+                      className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm"
+                    >
+                      Edit Detail
+                    </button>
+                    <button
+                      onClick={handleNonaktifkan}
+                      className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-white border border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 text-sm font-bold rounded-xl transition-all shadow-sm"
+                    >
+                      Nonaktifkan
+                    </button>
+                  </div>
                 </div>
-              </div>
 
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6 flex items-center gap-3">
-            <AlertCircle size={20} className="text-amber-600 shrink-0" />
-            <p className="text-sm text-amber-700">
-              Belum ada tahun ajaran yang aktif. Silakan tambah atau aktifkan tahun ajaran.
-            </p>
-          </div>
-        )}
+          ) : (
+            <div className="relative bg-white/90 backdrop-blur-xl border border-amber-200 rounded-3xl p-8 flex items-center gap-4 shadow-xl shadow-amber-100/50">
+              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <AlertCircle size={24} className="text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-amber-900">Sistem Menunggu Konfigurasi</h3>
+                <p className="text-sm text-amber-700 mt-1 font-medium">
+                  Belum ada tahun ajaran yang aktif. Silakan tambah tahun ajaran baru atau aktifkan dari riwayat di bawah.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Tabel Riwayat */}
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <h3 className="text-sm font-bold text-slate-700">Riwayat Tahun Ajaran</h3>
-            <span className="text-xs text-slate-400">{data.length} data</span>
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+          <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+            <div>
+              <h3 className="text-lg font-bold text-slate-800">Riwayat Akademik</h3>
+              <p className="text-xs text-slate-500 font-medium mt-1">Total {data.length} data tersimpan dalam sistem</p>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-slate-50 border-y border-slate-200">
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tahun Ajaran</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Semester</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tanggal Mulai</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tanggal Selesai</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                <tr className="bg-white border-b border-slate-200">
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]">Tahun Ajaran</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Semester</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[20%]">Masa Periode</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Status</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]">Tindakan</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100/80">
                 {data.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-slate-800">{row.tahun_ajaran}</td>
-                    <td className="px-6 py-4 text-slate-600 font-medium">{row.semester}</td>
-                    <td className="px-6 py-4 text-slate-600">{formatDate(row.tanggal_mulai)}</td>
-                    <td className="px-6 py-4 text-slate-600">{formatDate(row.tanggal_selesai)}</td>
-                    <td className="px-6 py-4"><StatusBadge status={row.status} /></td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-end gap-2">
+                  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors group">
+                    <td className="px-8 py-5">
+                      <span className="font-bold text-slate-800 text-base">{row.tahun_ajaran}</span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200/60">
+                        {row.semester}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium text-slate-700">{formatDate(row.tanggal_mulai)}</span>
+                        <span className="text-xs font-medium text-slate-400">s/d {formatDate(row.tanggal_selesai)}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5"><StatusBadge status={row.status} /></td>
+                    <td className="px-8 py-5">
+                      <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openEdit(row)}
-                          className="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-                          title="Edit"
+                          className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 border border-slate-200 hover:bg-white hover:text-emerald-600 hover:border-emerald-200 hover:shadow-sm transition-all"
+                          title="Edit Detail"
                         >
-                          <Pencil size={14} />
+                          <Pencil size={15} />
                         </button>
                         {row.status !== 'Aktif' && (
                           <button
@@ -426,10 +450,10 @@ export default function TahunAjaranPage() {
                                 ).map((d) => d.id === row.id ? { ...d, status: 'Aktif' } : d)
                               )
                             }
-                            className="flex items-center gap-1.5 px-3 py-1 border border-emerald-200 text-emerald-700 bg-white hover:bg-emerald-50 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                            title="Aktifkan"
+                            className="flex items-center gap-2 px-4 py-2 border border-emerald-200 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-50 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                            title="Aktifkan sebagai Tahun Ajaran Saat Ini"
                           >
-                            <CheckCircle size={14} />
+                            <CheckCircle size={15} />
                             Aktifkan
                           </button>
                         )}
