@@ -413,24 +413,7 @@ export default function TahunAjaranPage() {
 
               </div>
 
-              {/* Modul Terhubung - Quick Navigation */}
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Modul Terhubung (Navigasi Cepat)</div>
-                <div className="flex flex-wrap gap-3">
-                  <button onClick={() => navigate('/admin/akademik/kelas')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
-                    <BookOpen size={16} className="text-blue-500" /> Data Kelas
-                  </button>
-                  <button onClick={() => navigate('/admin/akademik/murid')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
-                    <Users size={16} className="text-emerald-500" /> Data Murid
-                  </button>
-                  <button onClick={() => navigate('/admin/jadwal')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
-                    <Calendar size={16} className="text-amber-500" /> Jadwal
-                  </button>
-                  <button onClick={() => navigate('/admin/laporan')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
-                    <FileText size={16} className="text-purple-500" /> Laporan
-                  </button>
-                </div>
-              </div>
+              {/* Quick Navigation removed as requested */}
 
             </div>
           ) : (
