@@ -40,6 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/kelas', [KelasController::class, 'index']);
+    Route::get('/kelas/stats', [KelasController::class, 'stats']);
     Route::middleware('permission:manage_kelas')->group(function () {
         Route::post('/kelas', [KelasController::class, 'store']);
         Route::put('/kelas/{id}', [KelasController::class, 'update']);
