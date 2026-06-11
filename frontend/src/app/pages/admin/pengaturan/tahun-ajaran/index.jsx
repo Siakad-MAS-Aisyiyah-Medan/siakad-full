@@ -285,10 +285,10 @@ export default function TahunAjaranPage() {
 
   return (
     <AdminPageShell>
-      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
         {/* Header Section */}
-        <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-100 shadow-sm">
           <div className="flex items-center gap-5">
             <button
               onClick={() => navigate('/admin/pengaturan')}
@@ -310,7 +310,7 @@ export default function TahunAjaranPage() {
         </div>
 
         {/* Card Tahun Ajaran Aktif */}
-        <div className="relative group mb-10 mt-10">
+        <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
           {aktif ? (
             <div className="relative bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl shadow-slate-200/50">
@@ -391,7 +391,7 @@ export default function TahunAjaranPage() {
         </div>
 
         {/* Tabel Riwayat */}
-        <div className="mt-10 bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-8 py-6 border-b border-slate-100 bg-slate-50/50">
             <div>
               <h3 className="text-lg font-bold text-slate-800">Riwayat Tahun Ajaran</h3>
