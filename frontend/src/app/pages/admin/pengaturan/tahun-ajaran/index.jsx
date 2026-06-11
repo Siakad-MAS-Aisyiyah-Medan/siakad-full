@@ -435,8 +435,11 @@ export default function TahunAjaranPage() {
         </div>
 
         {/* Tabel Riwayat */}
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm mt-8">
+          <div 
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-b border-slate-100 bg-slate-50/50"
+            style={{ paddingLeft: '2rem', paddingRight: '2rem' }}
+          >
             <div>
               <h3 className="text-xl font-bold text-slate-800 tracking-tight">Riwayat Tahun Ajaran</h3>
               <p className="text-sm text-slate-500 font-medium mt-1">Total {data.length} data tersimpan dalam sistem</p>
@@ -450,36 +453,36 @@ export default function TahunAjaranPage() {
             </button>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/50">
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-white border-b border-slate-200">
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]">Tahun Ajaran</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Semester</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[20%]">Masa Periode</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Status</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]">Tindakan</th>
+                  <th className="py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]" style={{ paddingLeft: '2rem' }}>Tahun Ajaran</th>
+                  <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Semester</th>
+                  <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[20%]">Masa Periode</th>
+                  <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Status</th>
+                  <th className="py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]" style={{ paddingRight: '2rem' }}>Tindakan</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100/80">
                 {data.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-5">
+                    <td className="py-5" style={{ paddingLeft: '2rem' }}>
                       <span className="font-bold text-slate-800 text-base">{row.tahun_ajaran}</span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-4 py-5">
                       <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200/60">
                         {row.semester}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-4 py-5">
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-medium text-slate-700">{formatDate(row.tanggal_mulai)}</span>
                         <span className="text-xs font-medium text-slate-400">s/d {formatDate(row.tanggal_selesai)}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-5"><StatusBadge status={row.status} /></td>
-                    <td className="px-6 py-5">
+                    <td className="px-4 py-5"><StatusBadge status={row.status} /></td>
+                    <td className="py-5" style={{ paddingRight: '2rem' }}>
                       <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openEdit(row)}
