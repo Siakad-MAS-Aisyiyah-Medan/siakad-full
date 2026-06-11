@@ -56,41 +56,10 @@ class PermissionService
 
     public function menusForUser(User $user): array
     {
-        $items = Cache::remember('rbac.menu_items.active', self::CACHE_TTL, function () {
-            return MenuItem::where('is_active', true)
-                ->orderBy('sort_order')
-                ->get();
-        });
-
-        $filtered = [];
-        $seen = [];
-
-        $pathPrefixes = $this->menuPathPrefixesForRole($user->role);
-
-        foreach ($items as $item) {
-            if (!$this->userCan($user, $item->permission_key)) {
-                continue;
-            }
-            if ($pathPrefixes && !$this->pathMatchesPrefixes($item->path, $pathPrefixes)) {
-                continue;
-            }
-            if (isset($seen[$item->path])) {
-                continue;
-            }
-            $seen[$item->path] = true;
-            $filtered[] = [
-                'iconKey' => $item->icon_key,
-                'label' => $item->label,
-                'path' => $item->path,
-                'permission' => $item->permission_key,
-            ];
-        }
-
-        if ($filtered !== []) {
-            return array_values($filtered);
-        }
-
-        return $this->menusFromConfig($user);
+        // Bypass database menus and return empty.
+        // This forces the frontend to use its local `menu.config.js`,
+        // making it infinitely easier to add/remove menus without dealing with DB and Cache.
+        return [];
     }
 
     public function redirectPathForRole(string $roleKey): string
