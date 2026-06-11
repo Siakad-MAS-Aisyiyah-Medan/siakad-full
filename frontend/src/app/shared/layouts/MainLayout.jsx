@@ -70,11 +70,10 @@ export default function MainLayout({ children, role, name }) {
 
 function MotionUserInfo({ name, roleLabel }) {
   return (
-    <div className="user-info flex flex-col items-end text-right">
+    <div className="user-info flex flex-col items-end text-right justify-center">
       <span className="font-bold text-slate-800 text-sm">
         {name && name !== 'Pengguna' ? name : roleLabel}
       </span>
-      <span className="text-xs text-slate-500 mt-0.5">Terakhir login hari ini</span>
     </div>
   );
 }
