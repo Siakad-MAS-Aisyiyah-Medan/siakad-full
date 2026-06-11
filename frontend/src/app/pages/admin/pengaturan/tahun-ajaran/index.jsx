@@ -71,12 +71,20 @@ function formatDate(dateStr) {
 
 function StatusBadge({ status }) {
   const map = {
-    Aktif: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Selesai: 'bg-slate-50 text-slate-500 border-slate-200',
-    'Tidak Aktif': 'bg-amber-50 text-amber-700 border-amber-200',
+    Aktif: 'bg-emerald-50 text-emerald-700 border-emerald-200/60 shadow-sm',
+    Selesai: 'bg-slate-50 text-slate-600 border-slate-200/60',
+    'Tidak Aktif': 'bg-amber-50 text-amber-700 border-amber-200/60 shadow-sm',
   };
+  
+  const dotMap = {
+    Aktif: 'bg-emerald-500 animate-pulse',
+    Selesai: 'bg-slate-400',
+    'Tidak Aktif': 'bg-amber-500',
+  };
+
   return (
-    <span className={`px-2.5 py-1 rounded text-xs font-semibold border ${map[status] || map['Tidak Aktif']}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border transition-colors ${map[status] || map['Tidak Aktif']}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${dotMap[status] || dotMap['Tidak Aktif']}`}></span>
       {status}
     </span>
   );
@@ -468,7 +476,12 @@ export default function TahunAjaranPage() {
                 {data.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="py-5" style={{ paddingLeft: '2rem' }}>
-                      <span className="font-bold text-slate-800 text-base">{row.tahun_ajaran}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                          <Calendar size={14} />
+                        </div>
+                        <span className="font-bold text-slate-800 text-base">{row.tahun_ajaran}</span>
+                      </div>
                     </td>
                     <td className="px-4 py-5">
                       <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200/60">
@@ -477,13 +490,16 @@ export default function TahunAjaranPage() {
                     </td>
                     <td className="px-4 py-5">
                       <div className="flex flex-col gap-1">
-                        <span className="text-sm font-medium text-slate-700">{formatDate(row.tanggal_mulai)}</span>
-                        <span className="text-xs font-medium text-slate-400">s/d {formatDate(row.tanggal_selesai)}</span>
+                        <span className="text-sm font-bold text-slate-700">{formatDate(row.tanggal_mulai)}</span>
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                          <ArrowRight size={12} className="text-slate-300" />
+                          <span>{formatDate(row.tanggal_selesai)}</span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-5"><StatusBadge status={row.status} /></td>
                     <td className="py-5" style={{ paddingRight: '2rem' }}>
-                      <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-3 opacity-30 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openEdit(row)}
                           className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 border border-slate-200 hover:bg-white hover:text-emerald-600 hover:border-emerald-200 hover:shadow-sm transition-all"
