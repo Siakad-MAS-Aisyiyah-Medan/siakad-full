@@ -371,47 +371,20 @@ export default function TahunAjaranPage() {
               <div className="flex flex-col xl:flex-row gap-8 justify-between">
                 
                 {/* Info Kiri & Tengah */}
-                <div className="flex-1 flex flex-col md:flex-row gap-8">
-                  {/* Bagian Utama (Tahun) */}
-                  <div className="flex-1 border-b md:border-b-0 md:border-r border-slate-200/60 pb-6 md:pb-0 md:pr-8">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Tahun Ajaran Aktif
-                      </span>
-                    </div>
-                    <h3 className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-2">{aktif.tahun_ajaran}</h3>
-                    <div className="text-lg text-emerald-600 font-bold mb-4">Semester {aktif.semester}</div>
-                    
-                    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      <Calendar size={16} className="text-slate-400" />
-                      {formatDate(aktif.tanggal_mulai)} <span className="mx-1 text-slate-300">—</span> {formatDate(aktif.tanggal_selesai)}
-                    </div>
+                {/* Info Kiri */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Tahun Ajaran Aktif
+                    </span>
                   </div>
-
-                  {/* Progres Waktu Semester */}
-                  <div className="flex-1 flex flex-col justify-center gap-3 md:pl-4 xl:pl-8">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                        <Clock size={16} className="text-blue-500" /> Progres Waktu
-                      </div>
-                      <div className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                        {calculateProgress(aktif.tanggal_mulai, aktif.tanggal_selesai).percent}%
-                      </div>
-                    </div>
-                    
-                    <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full relative transition-all duration-1000 ease-out"
-                        style={{ width: `${calculateProgress(aktif.tanggal_mulai, aktif.tanggal_selesai).percent}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-xs font-medium text-slate-500 mt-1">
-                      {calculateProgress(aktif.tanggal_mulai, aktif.tanggal_selesai).text}
-                    </div>
+                  <h3 className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-2">{aktif.tahun_ajaran}</h3>
+                  <div className="text-lg text-emerald-600 font-bold mb-4">Semester {aktif.semester}</div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-slate-500 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100 inline-flex">
+                    <Calendar size={16} className="text-slate-400" />
+                    {formatDate(aktif.tanggal_mulai)} <span className="mx-1 text-slate-300">—</span> {formatDate(aktif.tanggal_selesai)}
                   </div>
                 </div>
 
