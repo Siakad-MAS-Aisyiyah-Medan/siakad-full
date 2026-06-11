@@ -435,22 +435,22 @@ export default function TahunAjaranPage() {
         </div>
 
         {/* Tabel Riwayat */}
-        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-6 border-b border-slate-100 bg-slate-50/50">
+        <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
-              <h3 className="text-lg font-bold text-slate-800">Riwayat Tahun Ajaran</h3>
-              <p className="text-xs text-slate-500 font-medium mt-1">Total {data.length} data tersimpan dalam sistem</p>
+              <h3 className="text-xl font-bold text-slate-800 tracking-tight">Riwayat Tahun Ajaran</h3>
+              <p className="text-sm text-slate-500 font-medium mt-1">Total {data.length} data tersimpan dalam sistem</p>
             </div>
             <button
               onClick={openAdd}
-              className="group flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm shrink-0"
+              className="group flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition-all shadow-md shrink-0"
             >
-              <Plus size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+              <Plus size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" />
               Tambah Tahun Ajaran
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/50">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-white border-b border-slate-200">
