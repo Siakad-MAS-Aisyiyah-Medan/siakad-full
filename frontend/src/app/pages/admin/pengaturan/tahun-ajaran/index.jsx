@@ -93,26 +93,38 @@ function StatusBadge({ status }) {
 // ─── Modal Form ───────────────────────────────────────────────────────────────
 function FormModal({ mode, form, onChange, onSubmit, onClose }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
+        
         {/* Header modal */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h3 className="text-base font-bold text-slate-800">
-            {mode === 'add' ? 'Tambah Tahun Ajaran' : 'Edit Tahun Ajaran'}
-          </h3>
+        <div 
+          className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50"
+          style={{ padding: '1.25rem 1.5rem' }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm text-emerald-600">
+              <Calendar size={18} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+                {mode === 'add' ? 'Tambah Tahun Ajaran' : 'Edit Tahun Ajaran'}
+              </h3>
+              <p className="text-xs font-medium text-slate-500 mt-0.5">Konfigurasi data periode akademik</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 space-y-4">
+        <div className="space-y-5" style={{ padding: '1.5rem' }}>
           {/* Tahun Ajaran */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label className="block text-sm font-bold text-slate-700 mb-2">
               Tahun Ajaran <span className="text-red-500">*</span>
             </label>
             <input
@@ -121,13 +133,14 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
               value={form.tahun_ajaran}
               onChange={onChange}
               placeholder="contoh: 2027/2028"
-              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
+              className="w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 bg-slate-50 focus:bg-white font-semibold text-slate-800 placeholder:font-normal transition-all"
+              style={{ padding: '0.75rem 1rem' }}
             />
           </div>
 
           {/* Semester */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label className="block text-sm font-bold text-slate-700 mb-2">
               Semester <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -135,19 +148,20 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
                 name="semester"
                 value={form.semester}
                 onChange={onChange}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 appearance-none bg-white transition-all"
+                className="w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 appearance-none bg-slate-50 focus:bg-white font-semibold text-slate-800 transition-all cursor-pointer"
+                style={{ padding: '0.75rem 1rem' }}
               >
                 <option value="Ganjil">Ganjil</option>
                 <option value="Genap">Genap</option>
               </select>
-              <ChevronDown size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
 
           {/* Tanggal Mulai & Selesai */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="block text-sm font-bold text-slate-700 mb-2">
                 Tanggal Mulai <span className="text-red-500">*</span>
               </label>
               <input
@@ -155,11 +169,12 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
                 name="tanggal_mulai"
                 value={form.tanggal_mulai}
                 onChange={onChange}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
+                className="w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 bg-slate-50 focus:bg-white font-semibold text-slate-800 transition-all"
+                style={{ padding: '0.75rem 1rem' }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="block text-sm font-bold text-slate-700 mb-2">
                 Tanggal Selesai <span className="text-red-500">*</span>
               </label>
               <input
@@ -167,53 +182,63 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
                 name="tanggal_selesai"
                 value={form.tanggal_selesai}
                 onChange={onChange}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
+                className="w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 bg-slate-50 focus:bg-white font-semibold text-slate-800 transition-all"
+                style={{ padding: '0.75rem 1rem' }}
               />
             </div>
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Status Akademik</label>
             <div className="relative">
               <select
                 name="status"
                 value={form.status}
                 onChange={onChange}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 appearance-none bg-white transition-all"
+                className="w-full border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 appearance-none bg-slate-50 focus:bg-white font-semibold text-slate-800 transition-all cursor-pointer"
+                style={{ padding: '0.75rem 1rem' }}
               >
                 <option value="Aktif">Aktif</option>
                 <option value="Tidak Aktif">Tidak Aktif</option>
                 <option value="Selesai">Selesai</option>
               </select>
-              <ChevronDown size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
 
           {/* Info hanya 1 aktif */}
           {form.status === 'Aktif' && (
-            <div className="flex gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-              <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-700">
-                Mengaktifkan tahun ajaran ini akan otomatis menonaktifkan tahun ajaran yang sedang aktif.
+            <div 
+              className="flex gap-3 bg-amber-50 border border-amber-200/60 rounded-2xl"
+              style={{ padding: '1rem' }}
+            >
+              <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-xs font-bold text-amber-800 leading-relaxed">
+                Peringatan: Mengaktifkan tahun ajaran ini akan secara otomatis menonaktifkan tahun ajaran yang sedang aktif saat ini.
               </p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50">
+        <div 
+          className="flex gap-3 border-t border-slate-100 bg-slate-50/50"
+          style={{ padding: '1.25rem 1.5rem' }}
+        >
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-white transition-colors"
+            className="flex-1 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-white hover:text-slate-800 transition-all shadow-sm"
+            style={{ padding: '0.875rem' }}
           >
             Batal
           </button>
           <button
             onClick={onSubmit}
-            className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors"
+            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-500/20"
+            style={{ padding: '0.875rem' }}
           >
-            {mode === 'add' ? 'Tambah' : 'Simpan Perubahan'}
+            {mode === 'add' ? 'Simpan Data Baru' : 'Simpan Perubahan'}
           </button>
         </div>
       </div>
