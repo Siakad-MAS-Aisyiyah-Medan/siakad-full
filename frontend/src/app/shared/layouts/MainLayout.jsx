@@ -20,11 +20,12 @@ export default function MainLayout({ children, role, name }) {
       cancelButtonColor: '#dc3545',
       confirmButtonText: 'Ya, Keluar!',
       cancelButtonText: 'Batal',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        logout();
-        Swal.fire({ icon: 'success', title: 'Berhasil Logout', showConfirmButton: false, timer: 1500 });
-        setTimeout(() => navigate('/login'), 1500);
+        Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        await logout();
+        Swal.close();
+        navigate('/login', { replace: true });
       }
     });
   };

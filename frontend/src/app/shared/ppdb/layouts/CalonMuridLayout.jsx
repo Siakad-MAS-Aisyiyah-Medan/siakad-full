@@ -26,10 +26,12 @@ export default function CalonMuridLayout({ children }) {
       cancelButtonColor: '#64748b',
       confirmButtonText: 'Ya, Keluar',
       cancelButtonText: 'Batal',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        logout();
-        navigate('/login');
+        Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        await logout();
+        Swal.close();
+        navigate('/login', { replace: true });
       }
     });
   };
