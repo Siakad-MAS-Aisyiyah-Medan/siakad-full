@@ -445,8 +445,8 @@ export default function TahunAjaranPage() {
         {/* Tabel Riwayat */}
         <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm mt-8">
           <div 
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-b border-slate-100 bg-slate-50/50"
-            style={{ paddingLeft: '2rem', paddingRight: '2rem' }}
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50"
+            style={{ padding: '1.5rem 2rem' }}
           >
             <div>
               <h3 className="text-xl font-bold text-slate-800 tracking-tight">Riwayat Tahun Ajaran</h3>
@@ -454,7 +454,8 @@ export default function TahunAjaranPage() {
             </div>
             <button
               onClick={openAdd}
-              className="group flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition-all shadow-md shrink-0"
+              className="group flex items-center justify-center gap-2 px-5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition-all shadow-md shrink-0"
+              style={{ padding: '0.75rem 1.25rem' }}
             >
               <Plus size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" />
               Tambah Tahun Ajaran
@@ -465,17 +466,17 @@ export default function TahunAjaranPage() {
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-white border-b border-slate-200">
-                  <th className="py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]" style={{ paddingLeft: '2rem' }}>Tahun Ajaran</th>
-                  <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Semester</th>
-                  <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[20%]">Masa Periode</th>
-                  <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Status</th>
-                  <th className="py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]" style={{ paddingRight: '2rem' }}>Tindakan</th>
+                  <th className="text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]" style={{ padding: '1.25rem 2rem' }}>Tahun Ajaran</th>
+                  <th className="text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]" style={{ padding: '1.25rem 1rem' }}>Semester</th>
+                  <th className="text-[11px] font-black text-slate-400 uppercase tracking-widest w-[20%]" style={{ padding: '1.25rem 1rem' }}>Masa Periode</th>
+                  <th className="text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]" style={{ padding: '1.25rem 1rem' }}>Status</th>
+                  <th className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]" style={{ padding: '1.25rem 2rem' }}>Tindakan</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100/80">
                 {data.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="py-5" style={{ paddingLeft: '2rem' }}>
+                    <td style={{ padding: '1.25rem 2rem' }}>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                           <Calendar size={14} />
@@ -483,12 +484,12 @@ export default function TahunAjaranPage() {
                         <span className="font-bold text-slate-800 text-base">{row.tahun_ajaran}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-5">
+                    <td style={{ padding: '1.25rem 1rem' }}>
                       <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200/60">
                         {row.semester}
                       </span>
                     </td>
-                    <td className="px-4 py-5">
+                    <td style={{ padding: '1.25rem 1rem' }}>
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-bold text-slate-700">{formatDate(row.tanggal_mulai)}</span>
                         <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
@@ -497,8 +498,8 @@ export default function TahunAjaranPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-5"><StatusBadge status={row.status} /></td>
-                    <td className="py-5" style={{ paddingRight: '2rem' }}>
+                    <td style={{ padding: '1.25rem 1rem' }}><StatusBadge status={row.status} /></td>
+                    <td style={{ padding: '1.25rem 2rem' }}>
                       <div className="flex items-center justify-end gap-3 opacity-30 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openEdit(row)}
