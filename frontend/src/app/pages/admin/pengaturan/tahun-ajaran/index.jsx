@@ -368,10 +368,8 @@ export default function TahunAjaranPage() {
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
           {aktif ? (
             <div className="relative bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl shadow-slate-200/50">
-              <div className="flex flex-col xl:flex-row gap-8 justify-between">
-                
-                {/* Info Kiri & Tengah */}
-                {/* Info Kiri */}
+              <div>
+                {/* Info Utama */}
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
                     <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
@@ -387,39 +385,6 @@ export default function TahunAjaranPage() {
                     {formatDate(aktif.tanggal_mulai)} <span className="mx-1 text-slate-300">—</span> {formatDate(aktif.tanggal_selesai)}
                   </div>
                 </div>
-
-                {/* Aksi Kanan (Vertical Layout) */}
-                <div className="flex flex-col gap-3 w-full xl:w-64 shrink-0 bg-slate-50/50 p-5 rounded-2xl border border-slate-100 justify-center">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">Aksi Manajemen</div>
-                  
-                  <button
-                    onClick={handleUbahSemester}
-                    className="w-full flex items-center justify-between gap-2 px-5 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-emerald-500/20 group"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <ArrowRight size={16} /> Ganti Semester
-                    </span>
-                  </button>
-                  
-                  <button
-                    onClick={() => openEdit(aktif)}
-                    className="w-full flex items-center justify-between gap-2 px-5 py-3.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <Pencil size={16} className="text-slate-400" /> Edit Data
-                    </span>
-                  </button>
-                  
-                  <button
-                    onClick={handleNonaktifkan}
-                    className="w-full flex items-center justify-between gap-2 px-5 py-3.5 bg-white border border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 text-sm font-bold rounded-xl transition-all shadow-sm"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <XCircle size={16} className="text-red-400" /> Nonaktifkan
-                    </span>
-                  </button>
-                </div>
-
               </div>
 
               {/* Quick Navigation removed as requested */}
