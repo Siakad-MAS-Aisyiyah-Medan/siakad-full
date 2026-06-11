@@ -75,7 +75,7 @@ function StatusBadge({ status }) {
     Selesai: 'bg-slate-50 text-slate-600 border-slate-200/60',
     'Tidak Aktif': 'bg-amber-50 text-amber-700 border-amber-200/60 shadow-sm',
   };
-  
+
   const dotMap = {
     Aktif: 'bg-emerald-500 animate-pulse',
     Selesai: 'bg-slate-400',
@@ -95,9 +95,9 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
-        
+
         {/* Header modal */}
-        <div 
+        <div
           className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50"
           style={{ padding: '1.25rem 1.5rem' }}
         >
@@ -209,7 +209,7 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
 
           {/* Info hanya 1 aktif */}
           {form.status === 'Aktif' && (
-            <div 
+            <div
               className="flex gap-3 bg-amber-50 border border-amber-200/60 rounded-2xl"
               style={{ padding: '1rem' }}
             >
@@ -222,7 +222,7 @@ function FormModal({ mode, form, onChange, onSubmit, onClose }) {
         </div>
 
         {/* Footer */}
-        <div 
+        <div
           className="flex gap-3 border-t border-slate-100 bg-slate-50/50"
           style={{ padding: '1.25rem 1.5rem' }}
         >
@@ -320,7 +320,7 @@ export default function TahunAjaranPage() {
     const startDate = new Date(start);
     const endDate = new Date(end);
     const today = new Date();
-    
+
     if (today < startDate) {
       const diffTime = Math.abs(startDate - today);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -340,7 +340,7 @@ export default function TahunAjaranPage() {
   return (
     <AdminPageShell>
       <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        
+
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-100 shadow-sm">
           <div className="flex items-center gap-5">
@@ -375,7 +375,7 @@ export default function TahunAjaranPage() {
 
         {/* Tabel Riwayat */}
         <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm mt-8">
-          <div 
+          <div
             className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50"
             style={{ padding: '1.5rem 2rem' }}
           >
