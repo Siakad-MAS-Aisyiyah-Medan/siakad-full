@@ -13,6 +13,11 @@ class UpdatePengumumanRequest extends FormRequest
 
     public function rules(): array
     {
-        return (new StorePengumumanRequest())->rules();
+        return [
+            'judul' => 'sometimes|string|max:255',
+            'isi' => 'sometimes|string',
+            'tanggal_publikasi' => 'nullable|date',
+            'akses' => 'sometimes|in:umum,internal',
+        ];
     }
 }

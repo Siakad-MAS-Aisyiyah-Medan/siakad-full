@@ -13,6 +13,7 @@ import {
   School,
   Star,
   Upload,
+  Settings2,
 } from 'lucide-react';
 
 export const menuIcons = {
@@ -30,6 +31,7 @@ export const menuIcons = {
   School,
   Star,
   Upload,
+  Settings2,
 };
 
 export function renderMenuIcon(iconKey, size = 20) {

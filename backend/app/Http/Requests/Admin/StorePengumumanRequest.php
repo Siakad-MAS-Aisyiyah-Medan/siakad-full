@@ -17,7 +17,7 @@ class StorePengumumanRequest extends FormRequest
             'judul' => 'required|string|max:255',
             'isi' => 'required|string',
             'tanggal_publikasi' => 'nullable|date',
-            'is_published' => 'sometimes|boolean',
+            'akses' => 'required|in:umum,internal',
         ];
     }
 }

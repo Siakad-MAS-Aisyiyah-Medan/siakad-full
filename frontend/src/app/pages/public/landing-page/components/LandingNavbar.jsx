@@ -42,7 +42,7 @@ export default function LandingNavbar({
 
           <div className="lp-navbar__actions">
             <Link to="/login" className="lp-btn lp-btn--outline" style={{ marginRight: '8px' }}>
-              Login Staff
+              Login
             </Link>
 
             <DaftarSekarangButton
@@ -79,7 +79,7 @@ export default function LandingNavbar({
           ))}
           <div className="lp-mobile-drawer__actions">
             <Link to="/login" className="lp-btn lp-btn--outline lp-btn--block" onClick={onCloseMenu}>
-              Login Staff
+              Login
             </Link>
 
             <DaftarSekarangButton

@@ -6,8 +6,11 @@ import { usePengumuman } from '@app/shared/pengumuman/hooks/usePengumuman';
 export default function PengumumanPage() {
   const {
     view,
+    items,
     searchQuery,
     setSearchQuery,
+    filterAkses,
+    setFilterAkses,
     filteredData,
     formData,
     loading,
@@ -24,9 +27,12 @@ export default function PengumumanPage() {
     <AdminPageShell>
       {view === 'list' && (
         <PengumumanTable
+          items={items}
           filteredData={filteredData}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          filterAkses={filterAkses}
+          setFilterAkses={setFilterAkses}
           onAdd={openAdd}
           onEdit={openEdit}
           onDelete={removeItem}

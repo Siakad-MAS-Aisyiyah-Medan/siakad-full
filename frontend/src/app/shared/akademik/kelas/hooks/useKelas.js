@@ -1,15 +1,18 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { fetchKelasList, createKelas, updateKelas, deleteKelas } from '../services/kelas.service';
+import { fetchKelasList, fetchKelasStats, createKelas, updateKelas, deleteKelas } from '../services/kelas.service';
 import { fetchGuruList } from '@app/shared/akademik/guru/services/guru.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
-const emptyForm = { nama_kelas: '', id_wali_kelas: '' };
+const emptyForm = { nama_kelas: '', tingkat: '', jurusan: '', id_wali_kelas: '' };
 
 export function useKelas() {
   const [view, setView] = useState('list');
   const [kelasData, setKelasData] = useState([]);
+  const [stats, setStats] = useState(null);
   const [guruData, setGuruData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterTingkat, setFilterTingkat] = useState('Semua');
+  const [filterJurusan, setFilterJurusan] = useState('Semua');
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [currentId, setCurrentId] = useState(null);
@@ -18,18 +21,25 @@ export function useKelas() {
   const loadData = useCallback(async () => {
     setIsFetching(true);
     try {
-      const [kelas, guru] = await Promise.all([
-        fetchKelasList(),
+      const params = {};
+      if (searchQuery) params.search = searchQuery;
+      if (filterTingkat !== 'Semua') params.tingkat = filterTingkat;
+      if (filterJurusan !== 'Semua') params.jurusan = filterJurusan;
+
+      const [kelas, statsData, guru] = await Promise.all([
+        fetchKelasList(params),
+        fetchKelasStats(),
         fetchGuruList({ role: 'wali_kelas', per_page: 100 }),
       ]);
       setKelasData(kelas);
+      setStats(statsData);
       setGuruData(guru);
     } catch (error) {
       console.error('Error fetching kelas:', error);
     } finally {
       setIsFetching(false);
     }
-  }, []);
+  }, [searchQuery, filterTingkat, filterJurusan]);
 
   useEffect(() => {
     loadData();
@@ -49,6 +59,8 @@ export function useKelas() {
     setCurrentId(kelas.id_kelas);
     setFormData({
       nama_kelas: kelas.nama_kelas,
+      tingkat: kelas.tingkat || '',
+      jurusan: kelas.jurusan || '',
       id_wali_kelas: kelas.id_wali_kelas || '',
     });
     setView('edit');
@@ -68,6 +80,8 @@ export function useKelas() {
     setLoading(true);
     const payload = {
       nama_kelas: formData.nama_kelas,
+      tingkat: formData.tingkat,
+      jurusan: formData.jurusan,
       id_wali_kelas: formData.id_wali_kelas ? Number(formData.id_wali_kelas) : null,
     };
     try {
@@ -108,7 +122,12 @@ export function useKelas() {
     view,
     searchQuery,
     setSearchQuery,
+    filterTingkat,
+    setFilterTingkat,
+    filterJurusan,
+    setFilterJurusan,
     filteredData,
+    stats,
     guruData,
     formData,
     loading,

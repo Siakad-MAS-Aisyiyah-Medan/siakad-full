@@ -14,7 +14,12 @@ class PengumumanResource extends JsonResource
             'judul' => $this->judul,
             'isi' => $this->isi,
             'tanggal_publikasi' => $this->tanggal_publikasi,
-            'is_published' => (bool) $this->is_published,
+            'akses' => $this->akses,
+            'penulis_id' => $this->penulis_id,
+            'penulis' => $this->whenLoaded('penulis', fn () => [
+                'id' => $this->penulis->id,
+                'name' => $this->penulis->name,
+            ]),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

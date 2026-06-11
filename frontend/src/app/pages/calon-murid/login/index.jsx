@@ -76,7 +76,7 @@ export default function LoginCalonMurid() {
       const { user, profile, token, permissions, menus, redirect_path } = result;
 
       if (user.role !== 'calon_siswa') {
-        setError('Akun ini bukan calon siswa. Gunakan halaman login staff.');
+        setError('Akun ini bukan calon siswa. Gunakan halaman login.');
         return;
       }
 

@@ -488,3 +488,12 @@ body {
     display: block;
   }
 }
+
+/* Fallback Classes to bypass Tailwind compiler cache issues */
+.safe-p-5 {
+  padding: 20px !important;
+}
+
+.kelas-table th, .kelas-table td {
+  padding: 16px 24px !important;
+}

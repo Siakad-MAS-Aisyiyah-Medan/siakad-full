@@ -19,10 +19,35 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
             name="nama_kelas"
             value={formData.nama_kelas}
             onChange={onChange}
-            placeholder="Contoh: X-IPA 1"
+            placeholder="Contoh: X IPA 1"
             required
             autoFocus
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 full">
+          <div className="input-group full m-0">
+            <label htmlFor="tingkat">
+              Tingkat <span className="text-red-500">*</span>
+            </label>
+            <select id="tingkat" name="tingkat" value={formData.tingkat} onChange={onChange} required>
+              <option value="">-- Pilih Tingkat --</option>
+              <option value="X">Kelas X</option>
+              <option value="XI">Kelas XI</option>
+              <option value="XII">Kelas XII</option>
+            </select>
+          </div>
+
+          <div className="input-group full m-0">
+            <label htmlFor="jurusan">
+              Jurusan <span className="text-red-500">*</span>
+            </label>
+            <select id="jurusan" name="jurusan" value={formData.jurusan} onChange={onChange} required>
+              <option value="">-- Pilih Jurusan --</option>
+              <option value="IPA">IPA</option>
+              <option value="IPS">IPS</option>
+            </select>
+          </div>
         </div>
 
         <div className="input-group full">

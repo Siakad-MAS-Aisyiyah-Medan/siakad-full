@@ -19,6 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Api\Admin\DashboardController::class, 'index']);
 
     Route::middleware('permission:manage_murid')->group(function () {
+        Route::get('/murid/stats', [MuridController::class, 'stats']);
         Route::get('/murid', [MuridController::class, 'index']);
         Route::put('/murid/{id}', [MuridController::class, 'update']);
         Route::post('/murid/{id}/enroll', [MuridController::class, 'enroll']);
@@ -38,15 +39,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/guru/{id}', [GuruController::class, 'destroy']);
     });
 
+    Route::get('/kelas', [KelasController::class, 'index']);
     Route::middleware('permission:manage_kelas')->group(function () {
-        Route::get('/kelas', [KelasController::class, 'index']);
         Route::post('/kelas', [KelasController::class, 'store']);
         Route::put('/kelas/{id}', [KelasController::class, 'update']);
         Route::delete('/kelas/{id}', [KelasController::class, 'destroy']);
     });
 
+    Route::get('/mapel', [MapelController::class, 'index']);
     Route::middleware('permission:manage_mapel')->group(function () {
-        Route::get('/mapel', [MapelController::class, 'index']);
         Route::post('/mapel', [MapelController::class, 'store']);
         Route::put('/mapel/{id}', [MapelController::class, 'update']);
         Route::delete('/mapel/{id}', [MapelController::class, 'destroy']);
@@ -93,6 +94,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('permission:manage_all')->group(function () {
         Route::get('/akun', [\App\Http\Controllers\Api\Admin\AkunController::class, 'index']);
         Route::post('/akun', [\App\Http\Controllers\Api\Admin\AkunController::class, 'store']);
+        Route::delete('/akun/{id}', [\App\Http\Controllers\Api\Admin\AkunController::class, 'destroy']);
         Route::get('/audit-logs', [AuditLogController::class, 'index']);
         
         Route::get('/profil-sekolah', [ProfilSekolahController::class, 'show']);

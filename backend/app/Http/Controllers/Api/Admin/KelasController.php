@@ -18,11 +18,17 @@ class KelasController extends Controller
     public function index(Request $request)
     {
         $paginator = $this->kelasService->list(
-            $request->query('search'),
+            $request->only(['search', 'tingkat', 'jurusan']),
             (int) $request->query('per_page', 15)
         );
 
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data kelas');
+    }
+
+    public function stats()
+    {
+        $stats = $this->kelasService->getStats();
+        return ApiResponse::success($stats, 'Berhasil mengambil statistik kelas');
     }
 
     public function store(StoreKelasRequest $request)

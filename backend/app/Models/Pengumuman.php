@@ -9,17 +9,22 @@ class Pengumuman extends Model
     protected $table = 'pengumumen';
 
     protected $fillable = [
+        'penulis_id',
         'judul',
         'isi',
+        'akses',
         'tanggal_publikasi',
-        'is_published',
     ];
 
     protected function casts(): array
     {
         return [
             'tanggal_publikasi' => 'date',
-            'is_published' => 'boolean',
         ];
+    }
+
+    public function penulis()
+    {
+        return $this->belongsTo(User::class, 'penulis_id');
     }
 }

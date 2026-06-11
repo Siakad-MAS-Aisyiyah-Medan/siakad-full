@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, X, UserPlus, User, AtSign, Mail, Shield, Lock, Eye, EyeOff, Info, Check } from 'lucide-react';
+import { Plus, X, UserPlus, User, AtSign, Mail, Shield, Lock, Eye, EyeOff, Info, Check, Search, Filter, Trash2, Edit2, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
 import FormInput from '@app/shared/components/FormInput';
-import { useAuditLogs } from '@app/shared/akademik/audit-logs/hooks/useAuditLogs';
-import { fetchAdminAkunList, createAdminAkun } from '@app/shared/services/akun.service';
+import { fetchAdminAkunList, createAdminAkun, deleteAdminAkun } from '@app/shared/services/akun.service';
 
 export default function HakAksesPage() {
-  const { items, meta, loading, search, setSearch, action, setAction, reload } = useAuditLogs();
-  
   const [akunData, setAkunData] = useState([]);
   const [stats, setStats] = useState({ total_akun: '-', role_aktif: '-' });
   const [isAkunLoading, setIsAkunLoading] = useState(true);
+  
+  // Filters & Pagination
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ last_page: 1, total: 0 });
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,16 +31,19 @@ export default function HakAksesPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const loadAkun = async () => {
+  const loadAkun = async (page = currentPage, search = searchQuery, role = roleFilter, status = statusFilter) => {
     setIsAkunLoading(true);
     try {
-      const data = await fetchAdminAkunList();
+      const data = await fetchAdminAkunList({ page, search, role, status });
+      console.log('API Response data:', data);
       if (data) {
-        setAkunData(data.users || []);
+        const usersArray = Array.isArray(data.users) ? data.users : (data.users ? Object.values(data.users) : []);
+        setAkunData(usersArray);
         setStats({
           total_akun: data.total_akun,
           role_aktif: data.role_aktif,
         });
+        if (data.pagination) setPagination(data.pagination);
       }
     } catch (error) {
       console.error('Failed to load accounts:', error);
@@ -46,8 +53,32 @@ export default function HakAksesPage() {
   };
 
   useEffect(() => {
-    loadAkun();
-  }, []);
+    const timer = setTimeout(() => loadAkun(currentPage, searchQuery, roleFilter, statusFilter), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, roleFilter, statusFilter, currentPage]);
+
+  const handleDelete = async (id, name) => {
+    const result = await Swal.fire({
+      title: 'Hapus Akun?',
+      text: `Anda yakin ingin menghapus akun ${name}? Tindakan ini tidak dapat dibatalkan.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteAdminAkun(id);
+        Swal.fire('Terhapus!', 'Akun berhasil dihapus.', 'success');
+        loadAkun();
+      } catch (error) {
+        Swal.fire('Gagal', error.message || 'Gagal menghapus akun', 'error');
+      }
+    }
+  };
 
   const handleAdd = () => {
     setIsModalOpen(true);
@@ -107,65 +138,166 @@ export default function HakAksesPage() {
         </div>
 
         <div className="stats-info-grid mt-6">
-          <div className="stat-box glass border-blue">
+          <div className="stat-box glass border-blue flex gap-4 items-center p-5 safe-p-5">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Users size={24} strokeWidth={2} />
+            </div>
             <div className="stat-content">
-              <div className="stat-value">{isAkunLoading ? '...' : stats.total_akun}</div>
-              <div className="stat-label">Total Akun</div>
+              <div className="stat-value text-2xl font-bold">{isAkunLoading ? '...' : stats.total_akun}</div>
+              <div className="stat-label text-sm text-slate-500">Total Akun Terdaftar</div>
             </div>
           </div>
-          <div className="stat-box glass border-green">
+          <div className="stat-box glass border-green flex gap-4 items-center p-5 safe-p-5">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <Shield size={24} strokeWidth={2} />
+            </div>
             <div className="stat-content">
-              <div className="stat-value">{isAkunLoading ? '...' : stats.role_aktif}</div>
-              <div className="stat-label">Role Aktif</div>
+              <div className="stat-value text-2xl font-bold">{isAkunLoading ? '...' : stats.role_aktif}</div>
+              <div className="stat-label text-sm text-slate-500">Jenis Role Digunakan</div>
             </div>
           </div>
         </div>
 
-        <div className="table-container glass mt-6">
-          <table className="data-table">
+        {/* Filters */}
+        <div className="glass mt-6 p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-white rounded-2xl border border-slate-200">
+          <div className="search-box w-full md:w-auto md:min-w-[300px]">
+            <Search size={18} className="text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Cari username, email, NIP/NISN..." 
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              className="w-full bg-transparent border-none outline-none text-sm"
+            />
+          </div>
+          <div className="flex flex-wrap gap-3 w-full md:w-auto">
+            <div className="relative min-w-[170px]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Filter size={16} className="text-slate-400" />
+              </div>
+              <select 
+                value={roleFilter} 
+                onChange={(e) => { setRoleFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full appearance-none bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-medium rounded-xl pl-10 pr-10 py-2.5 outline-none transition-all cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500"
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+              >
+                <option value="">Semua Role</option>
+                <option value="admin">Administrator</option>
+                <option value="kepsek">Kepala Sekolah</option>
+                <option value="guru">Guru</option>
+                <option value="siswa">Siswa</option>
+                <option value="calon_siswa">Calon Siswa</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+
+            <div className="relative min-w-[170px]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Filter size={16} className="text-slate-400" />
+              </div>
+              <select 
+                value={statusFilter} 
+                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full appearance-none bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-medium rounded-xl pl-10 pr-10 py-2.5 outline-none transition-all cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500"
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+              >
+                <option value="">Semua Status</option>
+                <option value="aktif">Aktif</option>
+                <option value="nonaktif">Nonaktif</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="table-container glass mt-4 overflow-hidden rounded-2xl border border-slate-200">
+          <table className="data-table w-full text-left border-collapse kelas-table">
             <thead>
-              <tr>
-                <th>No</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Aksi</th>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama / Username</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">NIP/NISN</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-white divide-y divide-slate-100">
               {isAkunLoading ? (
                 <tr>
-                  <td colSpan="5" className="text-center p-6">Memuat data akun...</td>
+                  <td colSpan="6" className="text-center p-8 text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm">Memuat data akun...</span>
+                    </div>
+                  </td>
                 </tr>
               ) : akunData.length > 0 ? (
-                akunData.map((akun, index) => (
-                  <tr key={akun.id}>
-                    <td>{index + 1}</td>
-                    <td className="font-medium">{akun.username}</td>
-                    <td>
+                akunData.map((akun) => (
+                  <tr key={akun.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-slate-800">{akun.name}</div>
+                      <div className="text-xs text-slate-500">@{akun.username}</div>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-slate-600">{akun.nip_nisn || '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">{akun.email}</td>
+                    <td className="px-6 py-4">
                       <span className="badge badge-success" style={{ background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)' }}>
                         {akun.role.replace('_', ' ').toUpperCase()}
                       </span>
                     </td>
-                    <td>
+                    <td className="px-6 py-4">
                       <span className={`badge ${akun.status === 'aktif' ? 'badge-success' : 'badge-pending'}`}>
                         {akun.status === 'aktif' ? 'Aktif' : 'Nonaktif'}
                       </span>
                     </td>
-                    <td>
-                      <button className="btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => Swal.fire('Info', 'Fitur edit akun sedang dalam pengembangan', 'info')}>
-                        Edit
-                      </button>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => Swal.fire('Info', 'Fitur edit akun sedang dalam pengembangan', 'info')} title="Edit">
+                          <Edit2 size={16} />
+                        </button>
+                        <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={() => handleDelete(akun.id, akun.name)} title="Hapus">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center p-6 text-secondary">Belum ada data akun</td>
+                  <td colSpan="6" className="text-center p-8 text-slate-500 text-sm">Tidak ada data akun yang ditemukan</td>
                 </tr>
               )}
             </tbody>
           </table>
+          
+          {/* Pagination */}
+          {pagination.last_page > 1 && (
+            <div className="px-6 py-4 bg-white border-t border-slate-100 flex items-center justify-between">
+              <span className="text-sm text-slate-500">
+                Total {pagination.total} akun
+              </span>
+              <div className="flex gap-1">
+                {[...Array(pagination.last_page)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === i + 1
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

@@ -7,6 +7,11 @@ export async function fetchMuridList(params = {}) {
   return items;
 }
 
+export async function fetchMuridStats() {
+  const response = await apiClient.get('/murid/stats');
+  return response.data?.data;
+}
+
 export async function updateMurid(id, payload) {
   const response = await apiClient.put(`/murid/${id}`, payload);
   return response.data;

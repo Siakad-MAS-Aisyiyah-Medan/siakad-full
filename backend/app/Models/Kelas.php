@@ -11,7 +11,7 @@ class Kelas extends Model
 
     protected $table = 'kelas';
     protected $primaryKey = 'id_kelas';
-    protected $fillable = ['nama_kelas', 'id_wali_kelas'];
+    protected $fillable = ['nama_kelas', 'id_wali_kelas', 'tingkat', 'jurusan'];
 
     public function waliKelas()
     {
@@ -21,5 +21,10 @@ class Kelas extends Model
     public function jadwal()
     {
         return $this->hasMany(JadwalPelajaran::class, 'id_kelas', 'id_kelas');
+    }
+
+    public function siswa()
+    {
+        return $this->hasMany(Siswa::class, 'id_kelas', 'id_kelas');
     }
 }

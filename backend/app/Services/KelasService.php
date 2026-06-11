@@ -11,12 +11,21 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class KelasService
 {
     use AuditsAdminActions;
-    public function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Kelas::with(['waliKelas.guru'])->withCount('jadwal');
+        $query = Kelas::with(['waliKelas.guru'])->withCount(['jadwal', 'siswa']);
 
-        if ($term = SearchInput::escape($search)) {
+        if (!empty($filters['search'])) {
+            $term = SearchInput::escape($filters['search']);
             $query->where('nama_kelas', 'like', "%{$term}%");
+        }
+
+        if (!empty($filters['tingkat']) && $filters['tingkat'] !== 'Semua') {
+            $query->where('tingkat', $filters['tingkat']);
+        }
+
+        if (!empty($filters['jurusan']) && $filters['jurusan'] !== 'Semua') {
+            $query->where('jurusan', $filters['jurusan']);
         }
 
         $paginator = $query->orderBy('nama_kelas')->paginate($perPage);
@@ -25,6 +34,16 @@ class KelasService
         );
 
         return $paginator;
+    }
+
+    public function getStats(): array
+    {
+        return [
+            'total_kelas' => Kelas::count(),
+            'ipa' => Kelas::where('jurusan', 'IPA')->count(),
+            'ips' => Kelas::where('jurusan', 'IPS')->count(),
+            'belum_ada_wali' => Kelas::whereNull('id_wali_kelas')->count(),
+        ];
     }
 
     public function create(array $data): array

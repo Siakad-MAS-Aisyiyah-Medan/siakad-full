@@ -15,6 +15,8 @@ import AdminMapel from '@app/pages/admin/kelola-mapel';
 import AdminJadwal from '@app/pages/admin/jadwal';
 import AdminHakAkses from '@app/pages/admin/hak-akses';
 import AdminLaporan from '@app/pages/admin/laporan';
+import AdminPengaturan from '@app/pages/admin/pengaturan';
+import AdminTahunAjaran from '@app/pages/admin/pengaturan/tahun-ajaran';
 import AdminAbsensiGuru from '@app/pages/admin/absensi';
 import AdminAuditLogs from '@app/pages/admin/audit-logs';
 
@@ -70,6 +72,8 @@ export const roleRoutes = (
     <Route path="/admin/pengajuan" element={<Navigate to="/admin/ppdb" replace />} />
     <Route path="/admin/hak-akses" element={wrapPerm('/admin/hak-akses', <AdminHakAkses />)} />
     <Route path="/admin/roles" element={<Navigate to="/admin/hak-akses" replace />} />
+    <Route path="/admin/pengaturan" element={wrapPerm('/admin/pengaturan', <AdminPengaturan />)} />
+    <Route path="/admin/pengaturan/tahun-ajaran" element={wrapPerm('/admin/pengaturan', <AdminTahunAjaran />)} />
     <Route path="/admin/laporan" element={wrapPerm('/admin/laporan', <AdminLaporan />)} />
     <Route path="/admin/absensi-guru" element={wrapPerm('/admin/absensi-guru', <AdminAbsensiGuru />)} />
     <Route path="/admin/audit-logs" element={wrapPerm('/admin/audit-logs', <AdminAuditLogs />)} />

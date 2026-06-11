@@ -13,6 +13,7 @@ export const menuByRole = {
     { iconKey: 'Calendar', label: 'Jadwal Pelajaran', path: '/admin/jadwal' },
     { iconKey: 'UserCheck', label: 'Verifikasi PPDB', path: '/admin/ppdb' },
     { iconKey: 'Settings', label: 'Akun & Hak Akses', path: '/admin/hak-akses' },
+    { iconKey: 'Settings2', label: 'Pengaturan Sistem', path: '/admin/pengaturan' },
     { iconKey: 'FileText', label: 'Laporan', path: '/admin/laporan' },
   ],
   kepsek: [

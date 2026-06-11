@@ -13,13 +13,14 @@ const emptyForm = {
   judul: '',
   isi: '',
   tanggal_publikasi: today,
-  is_published: true,
+  akses: 'umum',
 };
 
 export function usePengumuman() {
   const [view, setView] = useState('list');
   const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterAkses, setFilterAkses] = useState('semua');
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [currentId, setCurrentId] = useState(null);
@@ -42,11 +43,21 @@ export function usePengumuman() {
   }, [loadData]);
 
   const filteredData = useMemo(() => {
-    const q = searchQuery.toLowerCase();
-    return items.filter(
-      (p) => p.judul?.toLowerCase().includes(q) || p.isi?.toLowerCase().includes(q)
-    );
-  }, [items, searchQuery]);
+    let result = items;
+    
+    if (filterAkses !== 'semua') {
+        result = result.filter(p => p.akses === filterAkses);
+    }
+    
+    if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(
+            (p) => p.judul?.toLowerCase().includes(q) || p.isi?.toLowerCase().includes(q)
+        );
+    }
+    
+    return result;
+  }, [items, searchQuery, filterAkses]);
 
   const openAdd = () => {
     setFormData({ ...emptyForm, tanggal_publikasi: today });
@@ -59,7 +70,7 @@ export function usePengumuman() {
       judul: item.judul || '',
       isi: item.isi || '',
       tanggal_publikasi: item.tanggal_publikasi?.slice?.(0, 10) || item.tanggal_publikasi || today,
-      is_published: Boolean(item.is_published),
+      akses: item.akses || 'umum',
     });
     setView('edit');
   };
@@ -111,10 +122,13 @@ export function usePengumuman() {
     }
   };
 
-  return {
+    return {
     view,
+    items,
     searchQuery,
     setSearchQuery,
+    filterAkses,
+    setFilterAkses,
     filteredData,
     formData,
     loading,

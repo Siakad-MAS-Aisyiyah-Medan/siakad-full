@@ -32,6 +32,16 @@ class MuridService
         return $query->orderByDesc('id_user')->paginate($perPage);
     }
 
+    public function getStats(): array
+    {
+        return [
+            'total_murid' => User::whereIn('role', ['siswa', 'calon_siswa'])->count(),
+            'siswa_aktif' => User::where('role', 'siswa')->count(),
+            'calon_siswa' => User::where('role', 'calon_siswa')->count(),
+            'alumni' => User::where('role', 'alumni')->count(),
+        ];
+    }
+
     public function updateMurid(int $id, array $data): User
     {
         $user = User::findOrFail($id);

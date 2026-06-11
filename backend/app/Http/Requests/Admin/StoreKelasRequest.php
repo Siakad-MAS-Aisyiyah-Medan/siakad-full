@@ -23,6 +23,8 @@ class StoreKelasRequest extends FormRequest
     {
         return [
             'nama_kelas' => 'required|string|max:50',
+            'tingkat' => 'required|in:X,XI,XII',
+            'jurusan' => 'required|in:IPA,IPS',
             'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser()],
         ];
     }

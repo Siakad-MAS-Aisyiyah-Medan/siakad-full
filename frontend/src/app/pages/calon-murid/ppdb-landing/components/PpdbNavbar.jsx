@@ -43,7 +43,7 @@ export default function PpdbNavbar() {
 
           <div className="pp-navbar__actions">
             <Link to="/login" className="pp-btn pp-btn--outline" style={{ marginRight: '8px' }}>
-              Login Staff
+              Login
             </Link>
 
             <DaftarSekarangButton
@@ -79,7 +79,7 @@ export default function PpdbNavbar() {
               className="pp-btn pp-btn--outline pp-btn--block"
               onClick={closeMenu}
             >
-              Login Staff
+              Login
             </Link>
 
             <DaftarSekarangButton

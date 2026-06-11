@@ -1,4 +1,4 @@
-import { Trash2, ShieldCheck, UserSearch } from 'lucide-react';
+import { Trash2, ShieldCheck, UserSearch, Edit2, Eye } from 'lucide-react';
 
 const PPDB_LABELS = {
   draft: 'Draft',
@@ -17,12 +17,12 @@ export default function MuridTable({ data, onPromote, onDelete, isFetching = fal
       <table className="data-table">
         <thead>
           <tr>
-            <th style={{ width: '60px' }}>No</th>
-            <th>NISN / Username</th>
-            <th>Nama</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th className="text-right">Aksi</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[5%]">No</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[25%]">Nama Lengkap</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">NISN / NIS</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[15%]">Kelas</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Status</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right w-[15%]">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -52,63 +52,65 @@ export default function MuridTable({ data, onPromote, onDelete, isFetching = fal
                 !murid.siswa;
 
               return (
-                <tr key={murid.id_user}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <strong>{murid.username}</strong>
-                    {murid.siswa?.nis && (
-                      <div className="text-secondary" style={{ fontSize: '0.75rem' }}>
-                        NIS: {murid.siswa.nis}
-                      </div>
-                    )}
+                <tr key={murid.id_user} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-slate-800">{nama}</span>
+                      <span className="text-xs text-slate-500 mt-0.5">{murid.email || '-'}</span>
+                    </div>
                   </td>
-                  <td>{nama}</td>
-                  <td>
-                    <span className="text-secondary">{murid.email}</span>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-slate-700">{murid.siswa?.nisn || '-'}</span>
+                      {murid.siswa?.nis && (
+                        <span className="text-xs text-slate-500 mt-0.5">NIS: {murid.siswa.nis}</span>
+                      )}
+                    </div>
                   </td>
-                  <td>
+                  <td className="px-6 py-4 text-sm font-semibold text-slate-700">
+                    {murid.siswa?.kelas?.nama_kelas || '-'}
+                  </td>
+                  <td className="px-6 py-4">
                     {murid.role === 'siswa' ? (
-                      <span className="badge text-green-500 bg-green-500 bg-opacity-10">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                         Siswa Aktif
                       </span>
                     ) : (
-                      <>
-                        <span className="badge badge-pending">Calon Siswa</span>
-                        {ppdbStatus && (
-                          <span
-                            className="badge badge-pending"
-                            style={{ marginLeft: '0.25rem', fontSize: '0.7rem' }}
-                          >
-                            {PPDB_LABELS[ppdbStatus] || ppdbStatus}
-                          </span>
-                        )}
-                      </>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                        {ppdbStatus && !['diterima', 'daftar_ulang', 'menjadi_murid'].includes(ppdbStatus) 
+                          ? 'Belum Diverifikasi' 
+                          : 'Calon Siswa'}
+                      </span>
                     )}
                   </td>
-                  <td className="actions-cell">
-                    {canPromote && (
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid">
+                        <Eye size={16} />
+                      </button>
+                      <button className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data">
+                        <Edit2 size={16} />
+                      </button>
+                      {canPromote && (
+                        <button
+                          type="button"
+                          onClick={() => onPromote(murid)}
+                          className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                          title="Jadikan Siswa Aktif"
+                        >
+                          <ShieldCheck size={16} />
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={() => onPromote(murid)}
-                        className="btn-icon"
-                        title="Jadikan Siswa"
-                        style={{
-                          background: 'rgba(59, 130, 246, 0.1)',
-                          borderColor: 'var(--primary)',
-                          color: 'var(--primary)',
-                        }}
+                        onClick={() => onDelete(murid.id_user)}
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Hapus Permanen"
                       >
-                        <ShieldCheck size={16} />
+                        <Trash2 size={16} />
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => onDelete(murid.id_user)}
-                      className="btn-icon delete"
-                      title="Hapus Permanen"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    </div>
                   </td>
                 </tr>
               );

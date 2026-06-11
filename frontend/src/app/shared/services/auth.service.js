@@ -111,9 +111,31 @@ export function getRedirectPathForRole(role) {
 export function getMenuItems() {
   const menus = getStoredMenus();
   const items = menus?.length > 0 ? menus : getMenuForRole(getStoredUser()?.role);
-  return items.filter((item) => {
+  const finalItems = items.filter((item) => {
     if (item.label === 'Absensi Guru') return false;
     if (item.permission) return hasPermission(item.permission);
     return true;
   });
+
+  // Force inject Pengaturan Sistem for admin if it's missing from DB/Cache
+  if (getStoredUser()?.role === 'admin' && !finalItems.some(i => i.path === '/admin/pengaturan')) {
+    const insertIndex = finalItems.findIndex(i => i.path === '/admin/hak-akses');
+    if (insertIndex !== -1) {
+      finalItems.splice(insertIndex + 1, 0, {
+        iconKey: 'Settings2',
+        label: 'Pengaturan Sistem',
+        path: '/admin/pengaturan',
+        permission: 'manage_all'
+      });
+    } else {
+      finalItems.push({
+        iconKey: 'Settings2',
+        label: 'Pengaturan Sistem',
+        path: '/admin/pengaturan',
+        permission: 'manage_all'
+      });
+    }
+  }
+
+  return finalItems;
 }

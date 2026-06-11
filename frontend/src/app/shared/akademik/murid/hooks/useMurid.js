@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { fetchMuridList, enrollMurid, deleteMurid } from '../services/murid.service';
+import { fetchMuridList, fetchMuridStats, enrollMurid, deleteMurid } from '../services/murid.service';
 import { fetchKelasList } from '@app/shared/akademik/kelas/services/kelas.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 import Swal from 'sweetalert2';
 
 export function useMurid() {
   const [muridData, setMuridData] = useState([]);
+  const [stats, setStats] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
@@ -13,8 +14,12 @@ export function useMurid() {
   const loadMurid = useCallback(async () => {
     setIsFetching(true);
     try {
-      const data = await fetchMuridList({ search: searchQuery || undefined });
+      const [data, statsData] = await Promise.all([
+        fetchMuridList({ search: searchQuery || undefined }),
+        fetchMuridStats()
+      ]);
       setMuridData(data);
+      setStats(statsData);
     } catch (error) {
       console.error('Error fetching murid:', error);
     } finally {
@@ -122,6 +127,7 @@ export function useMurid() {
     searchQuery,
     setSearchQuery,
     filteredData,
+    stats,
     loading,
     isFetching,
     promoteMurid,

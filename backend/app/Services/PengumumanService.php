@@ -13,7 +13,7 @@ class PengumumanService
     use AuditsAdminActions;
     public function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
-        $query = Pengumuman::query()->orderByDesc('tanggal_publikasi')->orderByDesc('id');
+        $query = Pengumuman::query()->with('penulis')->orderByDesc('tanggal_publikasi')->orderByDesc('id');
 
         if ($term = SearchInput::escape($search)) {
             $query->where(function ($q) use ($term) {
@@ -32,12 +32,13 @@ class PengumumanService
 
     public function find(int $id): array
     {
-        return (new PengumumanResource(Pengumuman::findOrFail($id)))->resolve();
+        return (new PengumumanResource(Pengumuman::with('penulis')->findOrFail($id)))->resolve();
     }
 
     public function create(array $data): array
     {
         $data['tanggal_publikasi'] = $data['tanggal_publikasi'] ?? now()->toDateString();
+        $data['penulis_id'] = auth()->id();
         $item = Pengumuman::create($data);
         $this->auditAdmin('pengumuman.create', $item, ['judul' => $item->judul]);
 

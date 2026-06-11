@@ -54,8 +54,11 @@ export default function MainLayout({ children, role, name }) {
         </button>
       </aside>
       <main className="dashboard-content">
-        <header className="content-header">
-          <h1>Sistem Informasi Akademik</h1>
+        <header className="content-header flex justify-between items-center px-8 py-4 bg-white border-b border-slate-100">
+          <div className="flex flex-col">
+            <h1 className="text-lg font-bold text-slate-800 m-0 flex items-center gap-2">🏫 Sistem Informasi Akademik</h1>
+            <span className="text-sm text-slate-500 font-medium ml-7">MAS Aisyiyah Medan</span>
+          </div>
           <MotionUserInfo name={name} roleLabel={roleLabel} />
         </header>
         {children}
@@ -66,11 +69,11 @@ export default function MainLayout({ children, role, name }) {
 
 function MotionUserInfo({ name, roleLabel }) {
   return (
-    <div className="user-info">
-      <span>
-        Halo, <strong>{name}</strong>
+    <div className="user-info flex flex-col items-end text-right">
+      <span className="font-bold text-slate-800 text-sm">
+        {name && name !== 'Pengguna' ? name : roleLabel}
       </span>
-      <span className="role-badge">{roleLabel}</span>
+      <span className="text-xs text-slate-500 mt-0.5">Terakhir login hari ini</span>
     </div>
   );
 }

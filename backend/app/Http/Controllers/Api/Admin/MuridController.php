@@ -26,6 +26,12 @@ class MuridController extends Controller
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data murid');
     }
 
+    public function stats()
+    {
+        $stats = $this->muridService->getStats();
+        return ApiResponse::success($stats, 'Berhasil mengambil statistik murid');
+    }
+
     public function update(UpdateMuridRequest $request, $id)
     {
         try {

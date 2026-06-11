@@ -1,10 +1,15 @@
 import apiClient from '@app/shared/services/apiClient';
 import { unwrapPaginated } from '@app/shared/services/apiHelpers';
 
-export async function fetchKelasList() {
-  const response = await apiClient.get('/kelas');
+export async function fetchKelasList(params = {}) {
+  const response = await apiClient.get('/kelas', { params });
   const { items } = unwrapPaginated(response);
   return items;
+}
+
+export async function fetchKelasStats() {
+  const response = await apiClient.get('/kelas/stats');
+  return response.data?.data;
 }
 
 export async function createKelas(payload) {
