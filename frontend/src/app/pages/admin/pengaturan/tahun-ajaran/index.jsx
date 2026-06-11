@@ -12,6 +12,11 @@ import {
   ChevronDown,
   X,
   AlertCircle,
+  Users,
+  GraduationCap,
+  FileText,
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 
 // ─── Data dummy (siap diganti dengan API) ────────────────────────────────────
@@ -301,13 +306,7 @@ export default function TahunAjaranPage() {
               </div>
             </div>
           </div>
-          <button
-            onClick={openAdd}
-            className="group flex items-center gap-2.5 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-2xl transition-all shadow-xl shadow-slate-900/20 shrink-0"
-          >
-            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-            Tambah Baru
-          </button>
+          {/* Add Button removed from here, moved to Riwayat header */}
         </div>
 
         {/* Card Tahun Ajaran Aktif */}
@@ -315,69 +314,124 @@ export default function TahunAjaranPage() {
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
           {aktif ? (
             <div className="relative bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl shadow-slate-200/50">
-              <div className="flex flex-col xl:flex-row gap-8 items-start xl:items-center justify-between">
+              <div className="flex flex-col xl:flex-row gap-8 justify-between">
                 
-                {/* Info Kiri */}
-                <div className="flex gap-6 items-start">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-50/80 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/50 ring-4 ring-emerald-50/50">
-                    <Calendar size={32} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
+                {/* Info Kiri & Tengah */}
+                <div className="flex-1 flex flex-col md:flex-row gap-8">
+                  {/* Bagian Utama (Tahun) */}
+                  <div className="flex-1 border-b md:border-b-0 md:border-r border-slate-200/60 pb-6 md:pb-0 md:pr-8">
+                    <div className="flex items-center gap-3 mb-4">
                       <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Aktif Saat Ini
+                        Tahun Ajaran Aktif
                       </span>
                     </div>
-                    <h3 className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-3">{aktif.tahun_ajaran}</h3>
+                    <h3 className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-2">{aktif.tahun_ajaran}</h3>
+                    <div className="text-lg text-emerald-600 font-bold mb-4">Semester {aktif.semester}</div>
                     
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 font-medium mb-5">
-                      <span className="px-3 py-1.5 bg-slate-100/80 text-slate-700 rounded-xl font-bold border border-slate-200/50 shadow-sm">
-                        Semester {aktif.semester}
-                      </span>
-                      <span className="text-slate-300">•</span>
-                      <span className="flex items-center gap-2">
-                        <Calendar size={14} className="text-slate-400" />
-                        {formatDate(aktif.tanggal_mulai)} <span className="text-slate-400 mx-1">—</span> {formatDate(aktif.tanggal_selesai)}
-                      </span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <Calendar size={16} className="text-slate-400" />
+                      {formatDate(aktif.tanggal_mulai)} <span className="mx-1 text-slate-300">—</span> {formatDate(aktif.tanggal_selesai)}
                     </div>
-                    
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <span className="text-xs font-semibold text-slate-400 mr-1 uppercase tracking-wider">Modul Terhubung:</span>
-                      {['Data Murid', 'Data Kelas', 'Jadwal', 'PPDB', 'Laporan'].map((m) => (
-                        <span key={m} className="px-2.5 py-1 bg-white border border-slate-200/60 text-slate-500 rounded-lg text-[11px] font-bold shadow-sm">
-                          {m}
-                        </span>
-                      ))}
+                  </div>
+
+                  {/* Bagian Tengah (Statistik & Modul) */}
+                  <div className="flex-1 flex flex-col justify-center gap-6">
+                    {/* Statistik Dummy */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                          <Users size={20} />
+                        </div>
+                        <div>
+                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">486</div>
+                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Siswa Aktif</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                          <BookOpen size={20} />
+                        </div>
+                        <div>
+                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">12</div>
+                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Kelas Aktif</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                          <GraduationCap size={20} />
+                        </div>
+                        <div>
+                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">34</div>
+                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Guru Pengajar</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                          <Clock size={20} />
+                        </div>
+                        <div>
+                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">217</div>
+                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Jadwal Kelas</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Aksi Kanan */}
-                <div className="flex flex-col sm:flex-row xl:flex-col gap-3 w-full xl:w-auto shrink-0 mt-6 xl:mt-0 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                {/* Aksi Kanan (Vertical Layout) */}
+                <div className="flex flex-col gap-3 w-full xl:w-64 shrink-0 bg-slate-50/50 p-5 rounded-2xl border border-slate-100 justify-center">
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">Aksi Manajemen</div>
+                  
                   <button
                     onClick={handleUbahSemester}
-                    className="flex-1 xl:flex-none flex items-center justify-center gap-2.5 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-emerald-500/20"
+                    className="w-full flex items-center justify-between gap-2 px-5 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-emerald-500/20 group"
                   >
-                    <Pencil size={16} /> Ganti Semester
+                    <span className="flex items-center gap-2.5">
+                      <ArrowRight size={16} /> Ganti Semester
+                    </span>
                   </button>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => openEdit(aktif)}
-                      className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm"
-                    >
-                      Edit Detail
-                    </button>
-                    <button
-                      onClick={handleNonaktifkan}
-                      className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-white border border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 text-sm font-bold rounded-xl transition-all shadow-sm"
-                    >
-                      Nonaktifkan
-                    </button>
-                  </div>
+                  
+                  <button
+                    onClick={() => openEdit(aktif)}
+                    className="w-full flex items-center justify-between gap-2 px-5 py-3.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <Pencil size={16} className="text-slate-400" /> Edit Data
+                    </span>
+                  </button>
+                  
+                  <button
+                    onClick={handleNonaktifkan}
+                    className="w-full flex items-center justify-between gap-2 px-5 py-3.5 bg-white border border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 text-sm font-bold rounded-xl transition-all shadow-sm"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <XCircle size={16} className="text-red-400" /> Nonaktifkan
+                    </span>
+                  </button>
                 </div>
 
               </div>
+
+              {/* Modul Terhubung - Quick Navigation */}
+              <div className="mt-8 pt-6 border-t border-slate-100">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Modul Terhubung (Navigasi Cepat)</div>
+                <div className="flex flex-wrap gap-3">
+                  <button onClick={() => navigate('/admin/akademik/kelas')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
+                    <BookOpen size={16} className="text-blue-500" /> Data Kelas
+                  </button>
+                  <button onClick={() => navigate('/admin/akademik/murid')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
+                    <Users size={16} className="text-emerald-500" /> Data Murid
+                  </button>
+                  <button onClick={() => navigate('/admin/jadwal')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
+                    <Calendar size={16} className="text-amber-500" /> Jadwal
+                  </button>
+                  <button onClick={() => navigate('/admin/laporan')} className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
+                    <FileText size={16} className="text-purple-500" /> Laporan
+                  </button>
+                </div>
+              </div>
+
             </div>
           ) : (
             <div className="relative bg-white/90 backdrop-blur-xl border border-amber-200 rounded-3xl p-8 flex items-center gap-4 shadow-xl shadow-amber-100/50">
@@ -396,11 +450,18 @@ export default function TahunAjaranPage() {
 
         {/* Tabel Riwayat */}
         <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-          <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-8 py-6 border-b border-slate-100 bg-slate-50/50">
             <div>
-              <h3 className="text-lg font-bold text-slate-800">Riwayat Akademik</h3>
+              <h3 className="text-lg font-bold text-slate-800">Riwayat Tahun Ajaran</h3>
               <p className="text-xs text-slate-500 font-medium mt-1">Total {data.length} data tersimpan dalam sistem</p>
             </div>
+            <button
+              onClick={openAdd}
+              className="group flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm shrink-0"
+            >
+              <Plus size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+              Tambah Tahun Ajaran
+            </button>
           </div>
 
           <div className="overflow-x-auto">
