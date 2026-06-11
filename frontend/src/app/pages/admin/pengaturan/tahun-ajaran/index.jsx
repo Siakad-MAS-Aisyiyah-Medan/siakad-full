@@ -335,48 +335,7 @@ export default function TahunAjaranPage() {
                     </div>
                   </div>
 
-                  {/* Bagian Tengah (Statistik & Modul) */}
-                  <div className="flex-1 flex flex-col justify-center gap-6">
-                    {/* Statistik Dummy */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                          <Users size={20} />
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">486</div>
-                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Siswa Aktif</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                          <BookOpen size={20} />
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">12</div>
-                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Kelas Aktif</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                          <GraduationCap size={20} />
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">34</div>
-                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Guru Pengajar</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                          <Clock size={20} />
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-slate-800 leading-none mb-1">217</div>
-                          <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Jadwal Kelas</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Statistik removed as requested */}
                 </div>
 
                 {/* Aksi Kanan (Vertical Layout) */}
