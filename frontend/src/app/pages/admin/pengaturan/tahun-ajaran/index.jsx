@@ -392,7 +392,7 @@ export default function TahunAjaranPage() {
 
         {/* Tabel Riwayat */}
         <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-6 border-b border-slate-100 bg-slate-50/50">
             <div>
               <h3 className="text-lg font-bold text-slate-800">Riwayat Tahun Ajaran</h3>
               <p className="text-xs text-slate-500 font-medium mt-1">Total {data.length} data tersimpan dalam sistem</p>
@@ -410,17 +410,17 @@ export default function TahunAjaranPage() {
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-white border-b border-slate-200">
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]">Tahun Ajaran</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[25%]">Tahun Ajaran</th>
                   <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Semester</th>
                   <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[20%]">Masa Periode</th>
                   <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest w-[15%]">Status</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]">Tindakan</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right w-[25%]">Tindakan</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100/80">
                 {data.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-8 py-5">
+                    <td className="px-6 py-5">
                       <span className="font-bold text-slate-800 text-base">{row.tahun_ajaran}</span>
                     </td>
                     <td className="px-6 py-5">
@@ -435,7 +435,7 @@ export default function TahunAjaranPage() {
                       </div>
                     </td>
                     <td className="px-6 py-5"><StatusBadge status={row.status} /></td>
-                    <td className="px-8 py-5">
+                    <td className="px-6 py-5">
                       <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openEdit(row)}
