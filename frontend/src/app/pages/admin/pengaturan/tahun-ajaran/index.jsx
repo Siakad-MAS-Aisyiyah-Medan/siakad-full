@@ -283,6 +283,27 @@ export default function TahunAjaranPage() {
     );
   }
 
+  const calculateProgress = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const today = new Date();
+    
+    if (today < startDate) {
+      const diffTime = Math.abs(startDate - today);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return { status: 'upcoming', text: `Dimulai dalam ${diffDays} hari`, percent: 0 };
+    } else if (today > endDate) {
+      return { status: 'completed', text: 'Semester telah berakhir', percent: 100 };
+    } else {
+      const totalDuration = endDate - startDate;
+      const elapsed = today - startDate;
+      const percent = Math.round((elapsed / totalDuration) * 100);
+      const diffTime = Math.abs(endDate - today);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return { status: 'ongoing', text: `Sisa waktu ${diffDays} hari`, percent };
+    }
+  };
+
   return (
     <AdminPageShell>
       <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -335,7 +356,30 @@ export default function TahunAjaranPage() {
                     </div>
                   </div>
 
-                  {/* Statistik removed as requested */}
+                  {/* Progres Waktu Semester */}
+                  <div className="flex-1 flex flex-col justify-center gap-3 md:pl-4 xl:pl-8">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
+                        <Clock size={16} className="text-blue-500" /> Progres Waktu
+                      </div>
+                      <div className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                        {calculateProgress(aktif.tanggal_mulai, aktif.tanggal_selesai).percent}%
+                      </div>
+                    </div>
+                    
+                    <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full relative transition-all duration-1000 ease-out"
+                        style={{ width: `${calculateProgress(aktif.tanggal_mulai, aktif.tanggal_selesai).percent}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-xs font-medium text-slate-500 mt-1">
+                      {calculateProgress(aktif.tanggal_mulai, aktif.tanggal_selesai).text}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Aksi Kanan (Vertical Layout) */}
