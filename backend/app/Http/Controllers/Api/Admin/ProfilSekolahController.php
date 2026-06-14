@@ -46,6 +46,8 @@ class ProfilSekolahController extends Controller
             'alamat' => 'nullable|string',
             'kata_sambutan' => 'nullable|string',
             'nama_kepsek' => 'nullable|string|max:255',
+            'no_hp' => 'nullable|string|max:25',
+            'foto_kepsek' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'visi' => 'nullable|string',
             'misi' => 'nullable|string',
         ]);
@@ -59,7 +61,16 @@ class ProfilSekolahController extends Controller
             $profil = new ProfilSekolah();
         }
 
-        $profil->fill($request->all());
+        $data = $request->except('foto_kepsek');
+
+        if ($request->hasFile('foto_kepsek')) {
+            if ($profil->foto_kepsek) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($profil->foto_kepsek);
+            }
+            $data['foto_kepsek'] = $request->file('foto_kepsek')->store('profil_sekolah', 'public');
+        }
+
+        $profil->fill($data);
         $profil->save();
 
         return ApiResponse::success($profil, 'Profil Sekolah berhasil diperbarui');

@@ -165,12 +165,12 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 1. STATISTIK CARDS - Menggunakan gap-8 (32px) agar lebar menyamping tidak sesak */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
                     {stats.map((stat, index) => (
                         <div key={index} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 group cursor-default">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-500 mb-2">{stat.label}</p>
+                            <div className="flex justify-between items-start mb-6 gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-semibold text-slate-500 mb-2 truncate">{stat.label}</p>
                                     <h3 className="text-4xl font-bold text-slate-800 tracking-tight">
                                         {isLoading ? (
                                             <div className="w-8 h-8 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin my-1"></div>
@@ -188,84 +188,6 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     ))}
-                </div>
-
-                {/* 2. MIDDLE SECTION: CHART & AGENDA - Menggunakan gap-10 antar kolom */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    {/* Chart Section */}
-                    <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                        <div className="flex justify-between items-center mb-8">
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-800">Tren Pendaftaran Siswa Baru</h2>
-                                <p className="text-sm text-slate-500 mt-1.5">Statistik pendaftaran 6 bulan terakhir</p>
-                            </div>
-                            <div className="p-2.5 bg-slate-50 rounded-xl">
-                                <TrendingUp className="w-5 h-5 text-emerald-500" />
-                            </div>
-                        </div>
-                        
-                        {/* Mock Chart Visualization */}
-                        <div className="mt-10 flex flex-col justify-end h-56 border-l border-b border-slate-100 pl-4 pb-2 relative">
-                            {/* Grid lines */}
-                            <div className="absolute w-full border-t border-slate-100 border-dashed top-0 left-0"></div>
-                            <div className="absolute w-full border-t border-slate-100 border-dashed top-1/3 left-0"></div>
-                            <div className="absolute w-full border-t border-slate-100 border-dashed top-2/3 left-0"></div>
-                            
-                            <div className="flex items-end justify-between gap-6 h-full w-full z-10 px-4">
-                                {[35, 45, 60, 50, 85, 100].map((val, i) => {
-                                    const count = val * 12;
-                                    return (
-                                        <div key={i} className="w-full bg-emerald-100 hover:bg-emerald-200 rounded-t-lg relative group transition-colors duration-300 flex justify-center" style={{ height: `${val}%` }}>
-                                            {/* Number above bar */}
-                                            <div className="absolute -top-7 text-xs font-bold text-slate-600">
-                                                {count}
-                                            </div>
-                                            <div className="w-full bg-emerald-500 rounded-t-lg absolute bottom-0 transition-all duration-500" style={{ height: '4px' }}></div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                        <div className="flex justify-between mt-4 text-sm font-medium text-slate-400 px-8">
-                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>Mei</span><span>Jun</span>
-                        </div>
-                    </div>
-
-                    {/* Agenda Section */}
-                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col">
-                        <div className="flex justify-between items-start mb-8">
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-800">Agenda Hari Ini</h2>
-                                <p className="text-sm text-slate-500 mt-1 font-medium bg-blue-50 text-blue-600 inline-block px-2.5 py-1 rounded mt-2">Total agenda: 3 kegiatan</p>
-                            </div>
-                            <div className="p-2.5 bg-slate-50 rounded-xl">
-                                <Calendar className="w-5 h-5 text-blue-500" />
-                            </div>
-                        </div>
-
-                        <div className="space-y-6 flex-grow">
-                            {mockAgenda.map((agenda) => (
-                                <div key={agenda.id} className="flex gap-5 group cursor-pointer">
-                                    <div className="flex flex-col items-center">
-                                        <div className={`w-3.5 h-3.5 rounded-full ${agenda.color} ring-4 ring-blue-50 mt-1`}></div>
-                                        <div className="w-0.5 h-full bg-slate-100 mt-2 group-last:hidden"></div>
-                                    </div>
-                                    <div className="pb-5 group-last:pb-0">
-                                        <h4 className="text-sm font-bold text-slate-800 mb-1.5 group-hover:text-blue-600 transition-colors">{agenda.title}</h4>
-                                        <div className="flex items-center text-xs font-medium text-slate-500">
-                                            <Clock className="w-3.5 h-3.5 mr-1.5" />
-                                            {agenda.time}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <button className="w-full mt-8 py-3.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-sm font-bold transition-colors flex items-center justify-center gap-2">
-                            Lihat Semua Kalender
-                            <ChevronRight className="w-4 h-4" />
-                        </button>
-                    </div>
                 </div>
 
                 {/* 3. AUDIT LOG (TIMELINE ACTIVITY FEED) */}
@@ -361,7 +283,85 @@ export default function AdminDashboard() {
                         )}
                     </div>
                 </div>
-            </div>
+{/* 2. MIDDLE SECTION: CHART & AGENDA - Menggunakan gap-10 antar kolom */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    {/* Chart Section */}
+                    <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                        <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-800">Tren Pendaftaran Siswa Baru</h2>
+                                <p className="text-sm text-slate-500 mt-1.5">Statistik pendaftaran 6 bulan terakhir</p>
+                            </div>
+                            <div className="p-2.5 bg-slate-50 rounded-xl">
+                                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                            </div>
+                        </div>
+                        
+                        {/* Mock Chart Visualization */}
+                        <div className="mt-10 flex flex-col justify-end h-56 border-l border-b border-slate-100 pl-4 pb-2 relative">
+                            {/* Grid lines */}
+                            <div className="absolute w-full border-t border-slate-100 border-dashed top-0 left-0"></div>
+                            <div className="absolute w-full border-t border-slate-100 border-dashed top-1/3 left-0"></div>
+                            <div className="absolute w-full border-t border-slate-100 border-dashed top-2/3 left-0"></div>
+                            
+                            <div className="flex items-end justify-between gap-6 h-full w-full z-10 px-4">
+                                {[35, 45, 60, 50, 85, 100].map((val, i) => {
+                                    const count = val * 12;
+                                    return (
+                                        <div key={i} className="w-full bg-emerald-100 hover:bg-emerald-200 rounded-t-lg relative group transition-colors duration-300 flex justify-center" style={{ height: `${val}%` }}>
+                                            {/* Number above bar */}
+                                            <div className="absolute -top-7 text-xs font-bold text-slate-600">
+                                                {count}
+                                            </div>
+                                            <div className="w-full bg-emerald-500 rounded-t-lg absolute bottom-0 transition-all duration-500" style={{ height: '4px' }}></div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div className="flex justify-between mt-4 text-sm font-medium text-slate-400 px-8">
+                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>Mei</span><span>Jun</span>
+                        </div>
+                    </div>
+
+                    {/* Agenda Section */}
+                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col">
+                        <div className="flex justify-between items-start mb-8">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-800">Agenda Hari Ini</h2>
+                                <p className="text-sm text-slate-500 mt-1 font-medium bg-blue-50 text-blue-600 inline-block px-2.5 py-1 rounded mt-2">Total agenda: 3 kegiatan</p>
+                            </div>
+                            <div className="p-2.5 bg-slate-50 rounded-xl">
+                                <Calendar className="w-5 h-5 text-blue-500" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-6 flex-grow">
+                            {mockAgenda.map((agenda) => (
+                                <div key={agenda.id} className="flex gap-5 group cursor-pointer">
+                                    <div className="flex flex-col items-center">
+                                        <div className={`w-3.5 h-3.5 rounded-full ${agenda.color} ring-4 ring-blue-50 mt-1`}></div>
+                                        <div className="w-0.5 h-full bg-slate-100 mt-2 group-last:hidden"></div>
+                                    </div>
+                                    <div className="pb-5 group-last:pb-0">
+                                        <h4 className="text-sm font-bold text-slate-800 mb-1.5 group-hover:text-blue-600 transition-colors">{agenda.title}</h4>
+                                        <div className="flex items-center text-xs font-medium text-slate-500">
+                                            <Clock className="w-3.5 h-3.5 mr-1.5" />
+                                            {agenda.time}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <button className="w-full mt-8 py-3.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                            Lihat Semua Kalender
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+
+                            </div>
         </AdminPageShell>
     );
 }

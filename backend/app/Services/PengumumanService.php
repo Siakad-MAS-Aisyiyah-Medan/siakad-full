@@ -37,6 +37,11 @@ class PengumumanService
 
     public function create(array $data): array
     {
+        if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
+            $path = $data['thumbnail']->store('pengumuman', 'public');
+            $data['thumbnail'] = '/storage/' . $path;
+        }
+
         $data['tanggal_publikasi'] = $data['tanggal_publikasi'] ?? now()->toDateString();
         $data['penulis_id'] = auth()->id();
         $item = Pengumuman::create($data);
@@ -48,6 +53,16 @@ class PengumumanService
     public function update(int $id, array $data): array
     {
         $item = Pengumuman::findOrFail($id);
+
+        if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($item->thumbnail) {
+                $oldPath = str_replace('/storage/', '', $item->thumbnail);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $path = $data['thumbnail']->store('pengumuman', 'public');
+            $data['thumbnail'] = '/storage/' . $path;
+        }
+
         $item->update($data);
         $this->auditAdmin('pengumuman.update', $item, ['judul' => $item->judul]);
 

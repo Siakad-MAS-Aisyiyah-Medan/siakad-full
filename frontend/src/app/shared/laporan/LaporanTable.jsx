@@ -34,7 +34,7 @@ export default function LaporanTable({ jenis, items, meta, loading, onPageChange
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length + 1} className="text-center p-6 text-secondary">
+              <td colSpan={columns.length + 1} className="text-center py-16 text-secondary">
                 Tidak ada data untuk filter ini.
               </td>
             </tr>

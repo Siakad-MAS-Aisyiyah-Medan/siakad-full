@@ -14,6 +14,8 @@ const emptyForm = {
   isi: '',
   tanggal_publikasi: today,
   akses: 'umum',
+  kategori: '',
+  thumbnail: null,
 };
 
 export function usePengumuman() {
@@ -52,7 +54,7 @@ export function usePengumuman() {
     if (searchQuery) {
         const q = searchQuery.toLowerCase();
         result = result.filter(
-            (p) => p.judul?.toLowerCase().includes(q) || p.isi?.toLowerCase().includes(q)
+            (p) => p.judul?.toLowerCase().includes(q) || p.isi?.toLowerCase().includes(q) || p.kategori?.toLowerCase().includes(q)
         );
     }
     
@@ -71,6 +73,8 @@ export function usePengumuman() {
       isi: item.isi || '',
       tanggal_publikasi: item.tanggal_publikasi?.slice?.(0, 10) || item.tanggal_publikasi || today,
       akses: item.akses || 'umum',
+      kategori: item.kategori || '',
+      thumbnail: null, // Keep it null so it doesn't upload a string
     });
     setView('edit');
   };
@@ -81,8 +85,12 @@ export function usePengumuman() {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    const { name, value, type, checked, files } = e.target;
+    if (type === 'file') {
+      setFormData((prev) => ({ ...prev, [name]: files[0] || null }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    }
   };
 
   const submitForm = async (e) => {

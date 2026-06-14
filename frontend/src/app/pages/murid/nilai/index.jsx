@@ -146,7 +146,7 @@ export default function SiswaNilaiPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center p-6 text-secondary">
+                    <td colSpan="7" className="text-center py-16 text-secondary">
                       Belum ada nilai tervalidasi.
                     </td>
                   </tr>

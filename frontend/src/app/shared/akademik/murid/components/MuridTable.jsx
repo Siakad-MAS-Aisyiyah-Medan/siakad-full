@@ -11,7 +11,7 @@ const PPDB_LABELS = {
   menjadi_murid: 'Menjadi Murid',
 };
 
-export default function MuridTable({ data, onPromote, onDelete, isFetching = false }) {
+export default function MuridTable({ data, onPromote, onDelete, onEdit, isFetching = false }) {
   return (
     <div className="table-container glass mt-6">
       <table className="data-table">
@@ -28,9 +28,11 @@ export default function MuridTable({ data, onPromote, onDelete, isFetching = fal
         <tbody>
           {isFetching ? (
             <tr>
-              <td colSpan="6" className="text-center p-6 text-secondary">
-                <div style={{ display: 'inline-block', width: '2rem', height: '2rem', border: '3px solid #e2e8f0', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                <p className="mt-2">Memuat data murid...</p>
+              <td colSpan="8" className="py-16 text-secondary">
+                <div className="flex flex-col items-center justify-center w-full">
+                  <div style={{ display: 'inline-block', width: '2rem', height: '2rem', border: '3px solid #e2e8f0', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                  <p className="mt-2 text-center">Memuat data murid...</p>
+                </div>
                 <style>
                   {`
                     @keyframes spin {
@@ -89,7 +91,11 @@ export default function MuridTable({ data, onPromote, onDelete, isFetching = fal
                       <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid">
                         <Eye size={16} />
                       </button>
-                      <button className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data">
+                      <button 
+                        type="button"
+                        onClick={() => onEdit(murid)}
+                        className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data"
+                      >
                         <Edit2 size={16} />
                       </button>
                       {canPromote && (
@@ -117,7 +123,7 @@ export default function MuridTable({ data, onPromote, onDelete, isFetching = fal
             })
           ) : (
             <tr>
-              <td colSpan="6" className="text-center p-6 text-secondary">
+              <td colSpan="6" className="text-center py-16 text-secondary">
                 <UserSearch size={48} className="mx-auto mb-2 opacity-50" />
                 Data murid tidak ditemukan.
               </td>

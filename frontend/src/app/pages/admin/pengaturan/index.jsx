@@ -1,205 +1,258 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
-import {
-  BookOpen,
-  FileText,
-  Settings,
-  ShieldCheck,
-  Database,
-  Code,
-  Shield,
-} from 'lucide-react';
+import { Settings, Save, Check, X, AlertCircle, Loader2, ShieldCheck, User as UserIcon, Mail, Lock } from 'lucide-react';
+import { fetchMe } from '@app/shared/services/auth.service';
+import { updateAdminProfile } from '@app/shared/services/akun.service';
 
-// ─── Data konfigurasi tiap card ────────────────────────────────────────────
-const SETTING_CARDS = [
-  {
-    id: 'tahun-ajaran',
-    icon: BookOpen,
-    title: 'Tahun Ajaran Aktif',
-    description: 'Atur tahun ajaran dan semester yang sedang berjalan.',
-    preview: (
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Tahun Ajaran</span>
-          <span className="text-sm font-semibold text-emerald-600">2026/2027</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Semester</span>
-          <span className="text-sm font-medium text-slate-700">Ganjil</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Digunakan oleh</span>
-          <span className="text-sm font-medium text-slate-700">Murid, Kelas, Jadwal</span>
-        </div>
-      </div>
-    ),
-    buttonLabel: 'Kelola Tahun Ajaran',
-    path: '/admin/pengaturan/tahun-ajaran',
-  },
-  {
-    id: 'ppdb',
-    icon: FileText,
-    title: 'Pengaturan PPDB',
-    description: 'Konfigurasi pendaftaran peserta didik baru.',
-    preview: (
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Status</span>
-          <span className="text-sm font-semibold text-emerald-600">Dibuka</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Periode</span>
-          <span className="text-sm font-medium text-slate-700">1 Jan – 30 Jun 2026</span>
-        </div>
-      </div>
-    ),
-    buttonLabel: 'Kelola PPDB',
-    path: '/admin/ppdb',
-  },
-  {
-    id: 'hak-akses',
-    icon: ShieldCheck,
-    title: 'Hak Akses Sistem',
-    description: 'Kelola izin menu dan fitur untuk setiap role pengguna.',
-    preview: (
-      <div className="space-y-2">
-        <span className="text-sm text-slate-500 block">Role terdaftar:</span>
-        <div className="flex flex-wrap gap-2">
-          {['Admin', 'Kepsek', 'Guru', 'Siswa', 'Calon Siswa'].map((role) => (
-            <span
-              key={role}
-              className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded text-xs font-medium"
-            >
-              {role}
-            </span>
-          ))}
-        </div>
-      </div>
-    ),
-    buttonLabel: 'Kelola Hak Akses',
-    path: '/admin/hak-akses',
-  },
-  {
-    id: 'akademik',
-    icon: Settings,
-    title: 'Pengaturan Akademik',
-    description: 'Atur parameter akademik yang digunakan sistem.',
-    preview: (
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Maks. Siswa/Kelas</span>
-          <span className="text-sm font-medium text-slate-700">36</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Jurusan IPA</span>
-          <span className="text-sm font-semibold text-emerald-600">Aktif</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-500">Jurusan IPS</span>
-          <span className="text-sm font-semibold text-emerald-600">Aktif</span>
-        </div>
-      </div>
-    ),
-    buttonLabel: 'Kelola Akademik',
-    path: '/admin/mapel',
-  },
-];
-
-const INFO_ITEMS = [
-  { icon: Settings,  label: 'Versi Sistem',    value: 'v1.0.0',     color: 'emerald' },
-  { icon: Database,  label: 'Database',         value: 'MySQL',      color: 'blue'    },
-  { icon: Code,      label: 'Backend',          value: 'Laravel',    color: 'red'     },
-  { icon: Code,      label: 'Frontend',         value: 'React',      color: 'cyan'    },
-  { icon: Shield,    label: 'Terakhir Backup',  value: '10 Jun 2026',color: 'emerald' },
-];
-
-// ─── Komponen Card ──────────────────────────────────────────────────────────
-function SettingCard({ card, onNavigate }) {
-  const Icon = card.icon;
+function Toast({ message, type = 'success', onClose }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3500);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+  const styles = {
+    success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+    error: 'bg-red-50 border-red-200 text-red-800',
+  };
+  const icons = { success: Check, error: X, warning: AlertCircle };
+  const Icon = icons[type] || Check;
   return (
-    <div className="bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all duration-200 rounded-2xl p-6 flex flex-col">
-      {/* Ikon */}
-      <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-100 mb-4">
-        <Icon size={22} strokeWidth={1.5} />
-      </div>
-
-      {/* Judul & Deskripsi */}
-      <h3 className="text-base font-bold text-slate-800 mb-1">{card.title}</h3>
-      <p className="text-sm text-slate-500 mb-4">{card.description}</p>
-
-      {/* Preview — flex-1 agar tombol selalu di bawah */}
-      <div className="flex-1">
-        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-          {card.preview}
-        </div>
-      </div>
-
-      {/* Tombol Aksi */}
-      <div className="pt-4 border-t border-slate-100 mt-4">
-        <button
-          onClick={() => onNavigate(card.path)}
-          className="w-full h-[42px] bg-emerald-50 hover:bg-emerald-500 text-emerald-700 hover:text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 hover:shadow-md hover:shadow-emerald-500/20 active:scale-[0.98]"
-        >
-          {card.buttonLabel}
-        </button>
-      </div>
+    <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-xl backdrop-blur-sm animate-in slide-in-from-right-2 fade-in duration-300 ${styles[type]}`}>
+      <Icon size={18} className="shrink-0" />
+      <span className="text-sm font-bold">{message}</span>
+      <button onClick={onClose} className="ml-2 hover:opacity-70 transition-opacity"><X size={14} /></button>
     </div>
   );
 }
 
-// ─── Komponen Info ──────────────────────────────────────────────────────────
-function InfoCard({ item }) {
-  const Icon = item.icon;
-  return (
-    <div className="bg-white rounded-2xl p-4 border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all flex flex-col items-center justify-center text-center cursor-default">
-      <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 mb-3">
-        <Icon size={18} />
-      </div>
-      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-        {item.label}
-      </div>
-      <div className="font-bold text-slate-700 text-base">{item.value}</div>
-    </div>
-  );
-}
-
-// ─── Halaman Utama ──────────────────────────────────────────────────────────
 export default function PengaturanSistemPage() {
-  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const [form, setForm] = useState({
+    name: '',
+    username: '',
+    email: '',
+    current_password: '',
+    new_password: '',
+    new_password_confirmation: '',
+  });
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const userData = await fetchMe();
+      if (userData) {
+        setForm(prev => ({
+          ...prev,
+          name: userData.name || '',
+          username: userData.username || '',
+          email: userData.email || '',
+        }));
+      }
+    } catch (err) {
+      setToast({ message: 'Gagal memuat profil', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = {
+        name: form.name,
+        username: form.username,
+        email: form.email,
+      };
+      if (form.new_password) {
+        payload.current_password = form.current_password;
+        payload.new_password = form.new_password;
+        payload.new_password_confirmation = form.new_password_confirmation;
+      }
+      const res = await updateAdminProfile(payload);
+      
+      setToast({ message: 'Profil berhasil diperbarui', type: 'success' });
+      setIsEditing(false);
+      setForm(prev => ({ ...prev, current_password: '', new_password: '', new_password_confirmation: '' }));
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+    } catch (err) {
+      setToast({ message: err?.response?.data?.message || err.message || 'Gagal menyimpan profil', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <AdminPageShell>
-      <div className="data-panel view-list">
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-5 lg:py-6 flex flex-col gap-6 animate-in fade-in duration-500">
+        
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-        {/* Header */}
-        <div className="panel-header glass mb-8 py-4 px-6 rounded-2xl">
-          <div className="flex gap-4 items-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shrink-0">
-              <Settings size={22} />
+        {/* HEADER */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 px-6 py-4 shadow-lg shadow-emerald-500/15">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+          <div className="relative flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
+                <Settings size={20} />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg font-black text-white tracking-tight">Pengaturan</h1>
+                <p className="text-emerald-100/80 text-xs mt-0.5 truncate font-medium">
+                  Kelola informasi akun dan kata sandi administrator
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-slate-800">Pengaturan Sistem</h2>
-              <p className="text-slate-500 text-sm mt-0.5 max-w-xl">
-                Kelola konfigurasi utama sistem akademik, tahun ajaran, PPDB, hak akses, dan pengaturan operasional sekolah.
-              </p>
-            </div>
+            {!isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10"
+              >
+                Edit Pengaturan
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Grid Card 2×2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {SETTING_CARDS.map((card) => (
-            <SettingCard key={card.id} card={card} onNavigate={navigate} />
-          ))}
-        </div>
+        {/* CONTENT */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center gap-4 px-6 sm:px-8 py-5 border-b border-slate-100 bg-slate-50/50">
+             <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+               <ShieldCheck size={20} />
+             </div>
+             <div>
+               <h2 className="text-base font-bold text-slate-700">Profil Administrator</h2>
+               <p className="text-sm text-slate-400 font-medium">Informasi utama akun Anda</p>
+             </div>
+          </div>
 
-        {/* Informasi Sistem */}
-        <h3 className="text-base font-bold text-slate-700 mb-4">Informasi Sistem</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {INFO_ITEMS.map((item) => (
-            <InfoCard key={item.label} item={item} />
-          ))}
+          <div className="p-6 sm:p-8 space-y-6">
+             {loading && !isEditing ? (
+               <div className="flex justify-center items-center py-10">
+                 <Loader2 size={24} className="text-emerald-500 animate-spin" />
+               </div>
+             ) : (
+               <>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Nama Akun */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <UserIcon size={12} className="text-emerald-500"/> Nama Akun
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
+                        placeholder="Admin MAS Aisyiyah Medan"
+                      />
+                    </div>
+
+                    {/* Username */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <Lock size={12} className="text-emerald-500"/> Username
+                      </label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={form.username}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
+                        placeholder="admin123"
+                      />
+                    </div>
+                 </div>
+
+                 {/* Change Password Section */}
+                 {isEditing && (
+                   <div className="pt-5 border-t border-slate-100">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Lock size={14} className="text-emerald-500" />
+                        <h3 className="text-sm font-bold text-slate-700">Ubah Kata Sandi (Opsional)</h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div className="md:col-span-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password Saat Ini</label>
+                            <input
+                              type="password"
+                              name="current_password"
+                              value={form.current_password}
+                              onChange={handleChange}
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all"
+                              placeholder="Masukkan password saat ini untuk keamanan"
+                            />
+                         </div>
+                         <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password Baru</label>
+                            <input
+                              type="password"
+                              name="new_password"
+                              value={form.new_password}
+                              onChange={handleChange}
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all"
+                              placeholder="Minimal 6 karakter"
+                            />
+                         </div>
+                         <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Konfirmasi Password Baru</label>
+                            <input
+                              type="password"
+                              name="new_password_confirmation"
+                              value={form.new_password_confirmation}
+                              onChange={handleChange}
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all"
+                              placeholder="Ulangi password baru"
+                            />
+                         </div>
+                      </div>
+                   </div>
+                 )}
+               </>
+             )}
+          </div>
+
+          {/* Footer Actions */}
+          {isEditing && (
+            <div className="px-5 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  loadData(); // Reset
+                  setForm(prev => ({ ...prev, current_password: '', new_password: '', new_password_confirmation: '' }));
+                }}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-500/20 disabled:shadow-none"
+              >
+                {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+                {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

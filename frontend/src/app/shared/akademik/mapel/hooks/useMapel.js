@@ -8,7 +8,7 @@ import {
 } from '../services/mapel.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
-const emptyForm = { nama_mapel: '', id_guru: '' };
+const emptyForm = { nama_mapel: '', id_guru: '', tingkat: '', kelompok_mapel: '' };
 
 export function useMapel() {
   const [view, setView] = useState('list');
@@ -57,6 +57,8 @@ export function useMapel() {
     setFormData({
       nama_mapel: mapel.nama_mapel,
       id_guru: mapel.id_guru,
+      tingkat: mapel.tingkat || '',
+      kelompok_mapel: mapel.kelompok_mapel || '',
     });
     setView('edit');
   };

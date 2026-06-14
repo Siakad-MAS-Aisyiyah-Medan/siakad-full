@@ -82,7 +82,7 @@ export default function SiswaAbsensiPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="text-center p-6 text-secondary">
+                  <td colSpan="4" className="text-center py-16 text-secondary">
                     Belum ada data absensi.
                   </td>
                 </tr>

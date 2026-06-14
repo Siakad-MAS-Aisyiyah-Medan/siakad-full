@@ -24,6 +24,8 @@ class StoreGuruRequest extends FormRequest
             'alamat' => 'required|string',
             'no_hp' => 'required|string|max:20',
             'role' => 'required|in:guru,wali_kelas',
+            'status' => 'required|in:aktif,nonaktif',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
 }

@@ -90,7 +90,7 @@ export default function GuruRiwayatAbsensiPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="4" className="text-center p-6 text-secondary">
+                  <td colSpan="4" className="text-center py-16 text-secondary">
                     Memuat...
                   </td>
                 </tr>
@@ -109,7 +109,7 @@ export default function GuruRiwayatAbsensiPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="text-center p-6 text-secondary">
+                  <td colSpan="4" className="text-center py-16 text-secondary">
                     Belum ada riwayat absensi.
                   </td>
                 </tr>

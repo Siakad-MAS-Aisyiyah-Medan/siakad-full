@@ -47,9 +47,11 @@ export default function PrestasiTable({
           <tbody>
             {isFetching ? (
               <tr>
-                <td colSpan="6" className="text-center p-6 text-secondary">
-                  <div style={{ display: 'inline-block', width: '2rem', height: '2rem', border: '3px solid #e2e8f0', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  <p className="mt-2">Memuat data berita & prestasi...</p>
+                <td colSpan="6" className="py-16 text-secondary">
+                  <div className="flex flex-col items-center justify-center w-full">
+                    <div style={{ display: 'inline-block', width: '2rem', height: '2rem', border: '3px solid #e2e8f0', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    <p className="mt-2 text-center">Memuat data berita & prestasi...</p>
+                  </div>
                   <style>
                     {`
                       @keyframes spin {
@@ -91,7 +93,7 @@ export default function PrestasiTable({
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center p-6 text-secondary">
+                <td colSpan="6" className="text-center py-16 text-secondary">
                   Belum ada data berita atau prestasi.
                 </td>
               </tr>

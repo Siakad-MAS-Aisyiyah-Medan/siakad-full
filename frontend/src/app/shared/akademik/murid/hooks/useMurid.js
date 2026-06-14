@@ -4,12 +4,35 @@ import { fetchKelasList } from '@app/shared/akademik/kelas/services/kelas.servic
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 import Swal from 'sweetalert2';
 
+const initialForm = {
+  username: '',
+  email: '',
+  password: '',
+  nama_siswa: '',
+  nisn: '',
+  nis: '',
+  jenis_kelamin: 'L',
+  tempat_lahir: '',
+  tanggal_lahir: '',
+  alamat: '',
+  no_hp: '',
+  tahun_masuk: new Date().getFullYear(),
+  tahun_lulus: '',
+  id_kelas: '',
+  status_aktif: true,
+};
+
 export function useMurid() {
   const [muridData, setMuridData] = useState([]);
   const [stats, setStats] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+
+  // Form State
+  const [view, setView] = useState('list');
+  const [formData, setFormData] = useState(initialForm);
+  const [editId, setEditId] = useState(null);
 
   const loadMurid = useCallback(async () => {
     setIsFetching(true);
@@ -123,13 +146,83 @@ export function useMurid() {
     }
   };
 
+  const openAdd = () => {
+    setFormData(initialForm);
+    setEditId(null);
+    setView('add');
+  };
+
+  const openEdit = (user) => {
+    const s = user.siswa || {};
+    setFormData({
+      username: user.username || '',
+      email: user.email || '',
+      password: '',
+      nama_siswa: s.nama_siswa || user.pendaftaran?.nama_lengkap || '',
+      nisn: s.nisn || '',
+      nis: s.nis || '',
+      jenis_kelamin: s.jenis_kelamin || 'L',
+      tempat_lahir: s.tempat_lahir || '',
+      tanggal_lahir: s.tanggal_lahir || '',
+      alamat: s.alamat || '',
+      no_hp: s.no_hp || '',
+      tahun_masuk: s.tahun_masuk || new Date().getFullYear(),
+      tahun_lulus: s.tahun_lulus || '',
+      id_kelas: s.id_kelas || '',
+      status_aktif: user.status_aktif !== undefined ? user.status_aktif : true,
+    });
+    setEditId(user.id_user);
+    setView('edit');
+  };
+
+  const cancelForm = () => {
+    setView('list');
+    setFormData(initialForm);
+    setEditId(null);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (view === 'add') {
+        await import('../services/murid.service').then(m => m.createMurid(formData));
+        toastSuccess('Berhasil', 'Murid berhasil ditambahkan');
+      } else {
+        await import('../services/murid.service').then(m => m.updateMurid(editId, formData));
+        toastSuccess('Berhasil', 'Data murid berhasil diperbarui');
+      }
+      loadMurid();
+      cancelForm();
+    } catch (err) {
+      toastError('Gagal', err.response?.data?.message || 'Gagal menyimpan data murid');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
+    view,
     searchQuery,
     setSearchQuery,
     filteredData,
     stats,
     loading,
     isFetching,
+    formData,
+    openAdd,
+    openEdit,
+    cancelForm,
+    handleChange,
+    submitForm,
     promoteMurid,
     removeMurid,
   };

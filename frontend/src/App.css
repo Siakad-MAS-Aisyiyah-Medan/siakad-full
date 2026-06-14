@@ -1322,6 +1322,28 @@
   gap: 1rem;
 }
 
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  .header-actions .search-box {
+    width: 100%;
+  }
+  .header-actions .search-box input {
+    width: 100%;
+  }
+  .header-actions .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .table-container {
   border-radius: 16px;
   overflow-x: auto;
@@ -4146,5 +4168,165 @@
 }
 
 
+/* ─── Dark Mode ─────────────────────────────────────────────────────────── */
+html.dark-mode {
+  --color-background: #0f172a;
+  --color-white: #1e293b;
+  --color-text-dark: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-border: #334155;
+  --color-primary-soft: rgba(16, 185, 129, 0.1);
+  --color-primary-light: rgba(16, 185, 129, 0.25);
+  --surface: #1e293b;
+  --background: #0f172a;
+  --border: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+}
 
+html.dark-mode body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
 
+html.dark-mode .dashboard-layout {
+  background: #0f172a;
+}
+
+html.dark-mode .dashboard-content {
+  background: #0f172a;
+}
+
+html.dark-mode .content-header {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: #334155;
+}
+
+html.dark-mode .content-header h1 {
+  color: #f1f5f9;
+}
+
+html.dark-mode .content-header span {
+  color: #94a3b8;
+}
+
+/* Dark mode for white cards and panels */
+html.dark-mode .bg-white,
+html.dark-mode [class*="bg-white"] {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.dark-mode .bg-slate-50,
+html.dark-mode [class*="bg-slate-50"] {
+  background-color: #0f172a !important;
+}
+
+html.dark-mode .text-slate-800,
+html.dark-mode [class*="text-slate-800"] {
+  color: #f1f5f9 !important;
+}
+
+html.dark-mode .text-slate-700,
+html.dark-mode [class*="text-slate-700"] {
+  color: #e2e8f0 !important;
+}
+
+html.dark-mode .text-slate-600,
+html.dark-mode [class*="text-slate-600"] {
+  color: #cbd5e1 !important;
+}
+
+html.dark-mode .text-slate-500,
+html.dark-mode [class*="text-slate-500"] {
+  color: #94a3b8 !important;
+}
+
+html.dark-mode .text-slate-400,
+html.dark-mode [class*="text-slate-400"] {
+  color: #64748b !important;
+}
+
+html.dark-mode .border-slate-100,
+html.dark-mode [class*="border-slate-100"] {
+  border-color: #1e293b !important;
+}
+
+html.dark-mode .border-slate-200,
+html.dark-mode [class*="border-slate-200"] {
+  border-color: #334155 !important;
+}
+
+html.dark-mode input,
+html.dark-mode select,
+html.dark-mode textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark-mode input:focus,
+html.dark-mode select:focus {
+  background-color: #1e293b !important;
+  border-color: #10b981 !important;
+}
+
+html.dark-mode .bg-slate-100,
+html.dark-mode [class*="bg-slate-100"] {
+  background-color: #1e293b !important;
+}
+
+html.dark-mode .divide-slate-100 > * + * {
+  border-color: #334155 !important;
+}
+
+html.dark-mode .glass {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: #334155;
+}
+
+html.dark-mode .min-h-screen,
+html.dark-mode [class*="min-h-screen"] {
+  background-color: #0f172a !important;
+}
+
+html.dark-mode .sticky {
+  background-color: #1e293b !important;
+}
+
+html.dark-mode .shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode table th {
+  color: #64748b !important;
+}
+
+html.dark-mode table tr:hover td {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+html.dark-mode .data-panel {
+  background: transparent;
+}
+
+/* Preserve dark mode for dark elements */
+html.dark-mode .bg-slate-900,
+html.dark-mode [class*="bg-slate-900"] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.dark-mode .bg-emerald-500 {
+  background-color: #10b981 !important;
+}
+
+html.dark-mode .text-white {
+  color: #ffffff !important;
+}
+
+/* Dark mode header top bar */
+html.dark-mode .border-b.border-slate-200.px-6.py-5 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}

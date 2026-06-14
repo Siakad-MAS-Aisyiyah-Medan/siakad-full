@@ -17,7 +17,6 @@ import AdminHakAkses from '@app/pages/admin/hak-akses';
 import AdminLaporan from '@app/pages/admin/laporan';
 import AdminPengaturan from '@app/pages/admin/pengaturan';
 import AdminTahunAjaran from '@app/pages/admin/pengaturan/tahun-ajaran';
-import AdminAbsensiGuru from '@app/pages/admin/absensi';
 import AdminAuditLogs from '@app/pages/admin/audit-logs';
 
 import DashboardKepalaSekolah from '@app/pages/kepala-sekolah/dashboard';
@@ -75,7 +74,6 @@ export const roleRoutes = (
     <Route path="/admin/pengaturan" element={wrapPerm('/admin/pengaturan', <AdminPengaturan />)} />
     <Route path="/admin/pengaturan/tahun-ajaran" element={wrapPerm('/admin/pengaturan', <AdminTahunAjaran />)} />
     <Route path="/admin/laporan" element={wrapPerm('/admin/laporan', <AdminLaporan />)} />
-    <Route path="/admin/absensi-guru" element={wrapPerm('/admin/absensi-guru', <AdminAbsensiGuru />)} />
     <Route path="/admin/audit-logs" element={wrapPerm('/admin/audit-logs', <AdminAuditLogs />)} />
 
     {/* Kepala sekolah */}
@@ -83,14 +81,12 @@ export const roleRoutes = (
     <Route path="/kepala-sekolah/data" element={wrapPerm('/kepsek/data', <KepsekLaporanHub initialJenis="siswa" />)} />
     <Route path="/kepala-sekolah/ppdb" element={wrapPerm('/kepsek/ppdb', <KepsekLaporanHub initialJenis="ppdb" />)} />
     <Route path="/kepala-sekolah/laporan" element={wrapPerm('/kepsek/laporan', <KepsekLaporanHub />)} />
-    <Route path="/kepala-sekolah/absensi-guru" element={wrapPerm('/kepsek/absensi-guru', <KepsekLaporanAbsensi initialTab="guru" />)} />
     <Route path="/kepala-sekolah/laporan-absensi" element={wrapPerm('/kepsek/laporan-absensi', <KepsekLaporanAbsensi />)} />
     <Route path="/kepala-sekolah/laporan-nilai" element={wrapPerm('/kepsek/laporan-nilai', <KepsekLaporanNilai />)} />
     <Route path="/kepsek/dashboard" element={<Navigate to="/kepala-sekolah/dashboard" replace />} />
     <Route path="/kepsek/data" element={<Navigate to="/kepala-sekolah/data" replace />} />
     <Route path="/kepsek/ppdb" element={<Navigate to="/kepala-sekolah/ppdb" replace />} />
     <Route path="/kepsek/laporan" element={<Navigate to="/kepala-sekolah/laporan" replace />} />
-    <Route path="/kepsek/absensi-guru" element={<Navigate to="/kepala-sekolah/absensi-guru" replace />} />
     <Route path="/kepsek/laporan-absensi" element={<Navigate to="/kepala-sekolah/laporan-absensi" replace />} />
     <Route path="/kepsek/laporan-nilai" element={<Navigate to="/kepala-sekolah/laporan-nilai" replace />} />
 

@@ -102,6 +102,11 @@ export async function fetchAdminPendaftar(params = {}) {
   return items;
 }
 
+export async function fetchAdminPpdbStats() {
+  const res = await apiClient.get('/admin/ppdb/stats');
+  return unwrapData(res);
+}
+
 export async function fetchAdminPendaftarDetail(id) {
   const res = await apiClient.get(`/admin/ppdb/${id}`);
   return unwrapData(res);

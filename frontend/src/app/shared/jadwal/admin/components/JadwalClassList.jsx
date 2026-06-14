@@ -97,21 +97,21 @@ export default function JadwalClassList({
 
               {/* Footer Action */}
               <div 
-                className={`mt-auto bg-[#F8FAFC] border-t border-[#F1F5F9] flex justify-between items-center transition-colors w-full ${
-                  isReadOnly ? 'group-hover:bg-blue-50' : 'group-hover:bg-[#ECFDF5]'
+                className={`mt-auto bg-custom-F8FAFC border-t border-custom-F1F5F9 flex justify-between items-center transition-colors w-full ${
+                  isReadOnly ? 'group-hover:bg-blue-50' : 'group-hover-bg-ECFDF5'
                 }`}
                 style={{ padding: '16px 24px', boxSizing: 'border-box' }}
               >
                 <span className={`font-bold text-[15px] tracking-wide transition-colors ${
-                  isReadOnly ? 'text-blue-600 group-hover:text-blue-700' : 'text-[#059669] group-hover:text-[#047857]'
+                  isReadOnly ? 'text-blue-600 group-hover:text-blue-700' : 'text-emerald-600 group-hover:text-emerald-700'
                 }`}>
                   {isReadOnly ? 'Lihat Jadwal' : (isConfigured ? 'Edit Jadwal' : 'Susun Jadwal')}
                 </span>
-                <div className={`shrink-0 w-[32px] h-[32px] rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-sm flex items-center justify-center transition-all ${
-                  isReadOnly ? 'group-hover:border-blue-200 group-hover:bg-blue-100' : 'group-hover:border-[#A7F3D0] group-hover:bg-[#F0FDF4]'
+                <div className={`shrink-0 w-custom-32 h-custom-32 rounded-full bg-custom-FFFFFF border border-custom-E2E8F0 shadow-sm flex items-center justify-center transition-all ${
+                  isReadOnly ? 'group-hover:border-blue-200 group-hover:bg-blue-100' : 'group-hover-border-A7F3D0 group-hover-bg-F0FDF4'
                 }`}>
                   <ChevronRight size={18} className={`transform group-hover:translate-x-0.5 transition-transform ${
-                    isReadOnly ? 'text-blue-600' : 'text-[#059669]'
+                    isReadOnly ? 'text-blue-600' : 'text-emerald-600'
                   }`} />
                 </div>
               </div>

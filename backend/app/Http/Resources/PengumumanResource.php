@@ -12,6 +12,8 @@ class PengumumanResource extends JsonResource
         return [
             'id' => $this->id,
             'judul' => $this->judul,
+            'kategori' => $this->kategori,
+            'thumbnail' => $this->thumbnail,
             'isi' => $this->isi,
             'tanggal_publikasi' => $this->tanggal_publikasi,
             'akses' => $this->akses,

@@ -16,6 +16,8 @@ class ProfilSekolah extends Model
         'alamat',
         'kata_sambutan',
         'nama_kepsek',
+        'foto_kepsek',
+        'no_hp',
         'visi',
         'misi'
     ];

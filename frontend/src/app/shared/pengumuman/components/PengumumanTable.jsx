@@ -24,7 +24,7 @@ export default function PengumumanTable({
           <h2 className="text-2xl font-bold text-slate-800">Pengumuman Sekolah</h2>
           <p className="text-sm font-medium text-slate-500 mt-1">Kelola informasi penting untuk ekosistem sekolah.</p>
         </div>
-        <button type="button" onClick={onAdd} className="btn-primary py-2.5 px-6 rounded-xl font-bold flex items-center gap-2 shadow-sm shadow-primary/30 hover:shadow-primary/50 transition-all">
+        <button type="button" onClick={onAdd} className="btn-primary w-full md:w-auto justify-center py-2.5 px-6 rounded-xl font-bold flex items-center gap-2 shadow-sm shadow-primary/30 hover:shadow-primary/50 transition-all">
           <Plus size={18} strokeWidth={2.5} /> Tambah Pengumuman
         </button>
       </div>
@@ -63,30 +63,27 @@ export default function PengumumanTable({
       {/* FILTER & TABEL */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         {/* Toolbar */}
-        <div className="border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white min-h-[76px]" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
+        <div className="border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white min-h-[76px] px-4 md:px-8 py-4 md:py-0">
           
           {/* Tabs */}
-          <div className="flex items-center gap-8 h-full md:h-[76px]">
+          <div className="flex items-center gap-2 h-full py-4 overflow-x-auto w-full md:w-auto hide-scrollbar">
             {['semua', 'umum', 'internal'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilterAkses(tab)}
-                className={`h-[50px] md:h-full flex items-center text-[15px] font-bold capitalize transition-all relative ${
+                className={`flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold capitalize transition-all ${
                   filterAkses === tab
-                    ? 'text-emerald-600'
-                    : 'text-slate-400 hover:text-slate-600'
+                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 border border-slate-200'
                 }`}
               >
                 {tab}
-                {filterAkses === tab && (
-                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-emerald-500 rounded-t-full"></span>
-                )}
               </button>
             ))}
           </div>
 
           {/* Search */}
-          <div className="flex items-center bg-white border border-slate-200 hover:border-emerald-300 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.03)] rounded-xl px-4 h-12 focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500 transition-all w-full md:w-[340px] my-3 md:my-0 mr-0 md:mr-2 group">
+          <div className="flex items-center bg-white border border-slate-200 hover:border-emerald-300 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.03)] rounded-xl px-4 h-12 focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500 transition-all w-full md:w-[340px] mt-2 md:mt-0 mr-0 group shrink-0">
             <Search className="text-slate-400 group-focus-within:text-emerald-500 mr-3 shrink-0 transition-colors" size={18} strokeWidth={2.5} />
             <input
               type="text"
@@ -115,9 +112,9 @@ export default function PengumumanTable({
               {isFetching ? (
                 <tr>
                   <td colSpan="5" className="p-0">
-                    <div className="py-20 flex flex-col items-center justify-center">
+                    <div className="py-20 flex flex-col items-center justify-center w-full">
                       <div className="w-10 h-10 border-4 border-slate-100 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                      <p className="text-slate-500 font-medium">Memuat data pengumuman...</p>
+                      <p className="text-slate-500 font-medium text-center">Memuat data pengumuman...</p>
                     </div>
                   </td>
                 </tr>
@@ -126,11 +123,23 @@ export default function PengumumanTable({
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
                       <p className="font-bold text-slate-800 text-[15px] flex items-center gap-2">
-                        <Megaphone size={16} className="text-slate-400" />
-                        {item.judul}
+                        {item.thumbnail ? (
+                          <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+                            <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <Megaphone size={16} className="text-slate-400 shrink-0" />
+                        )}
+                        <span className="truncate max-w-xs md:max-w-sm">{item.judul}</span>
                       </p>
-                      <p className="text-xs font-medium text-slate-500 mt-1.5 flex items-center gap-1.5 ml-6">
+                      <p className="text-xs font-medium text-slate-500 mt-1.5 flex items-center gap-2 ml-10">
                         Oleh: <span className="text-slate-700 font-semibold">{item.penulis?.name || 'Admin System'}</span>
+                        {item.kategori && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                            <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold tracking-wide uppercase" style={{ fontSize: '10px' }}>{item.kategori}</span>
+                          </>
+                        )}
                       </p>
                     </td>
                     <td className="py-5 text-sm font-semibold text-slate-600" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
@@ -146,7 +155,7 @@ export default function PengumumanTable({
                         {item.akses}
                       </span>
                     </td>
-                    <td className="py-5 text-sm font-medium text-slate-500 max-w-xs truncate" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
+                    <td className="py-5 text-sm font-medium text-slate-500 max-w-[200px] truncate" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
                       {item.isi}
                     </td>
                     <td className="py-5 text-right" style={{ paddingLeft: '32px', paddingRight: '32px' }}>

@@ -29,7 +29,7 @@ export default function FormInput({
   // Base classes for the input field
   // NOTE: !pl-12 and !pr-12 are used with !important to prevent Tailwind forms plugin 
   // from overriding the padding with [type="text"] specificity.
-  const inputClasses = `relative z-0 w-full h-12 bg-[#F8FAFC] border ${borderClasses} rounded-xl focus:ring-4 focus:bg-white outline-none transition-all text-slate-800 text-[15px] placeholder-[#94A3B8] ${Icon ? '!pl-12' : '!pl-4'} ${isPassword || isSelect ? '!pr-12' : '!pr-4'} ${isSelect ? 'appearance-none' : ''} ${className}`;
+  const inputClasses = `relative z-0 w-full h-12 bg-custom-F8FAFC border ${borderClasses} rounded-xl focus:ring-4 focus:bg-white outline-none transition-all text-slate-800 text-[15px] placeholder-custom-94A3B8 ${Icon ? 'imp-pl-12' : 'imp-pl-4'} ${isPassword || isSelect ? 'imp-pr-12' : 'imp-pr-4'} ${isSelect ? 'appearance-none' : ''} ${className}`;
 
   return (
     <div>

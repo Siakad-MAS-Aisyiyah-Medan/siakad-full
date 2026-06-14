@@ -8,12 +8,16 @@ export async function fetchGuruList(params = {}) {
 }
 
 export async function createGuru(payload) {
-  const response = await apiClient.post('/guru', payload);
+  let isFormData = payload instanceof FormData;
+  const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+  const response = await apiClient.post('/guru', payload, config);
   return response.data;
 }
 
 export async function updateGuru(id, payload) {
-  const response = await apiClient.put(`/guru/${id}`, payload);
+  let isFormData = payload instanceof FormData;
+  const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+  const response = await apiClient.post(`/guru/${id}?_method=PUT`, payload, config);
   return response.data;
 }
 

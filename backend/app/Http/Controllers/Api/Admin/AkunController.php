@@ -120,4 +120,38 @@ class AkunController extends Controller
             'message' => 'Akun berhasil dihapus',
         ]);
     }
+
+    public function updateProfile(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id_user . ',id_user',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
+            'current_password' => 'nullable|string',
+            'new_password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        if ($request->filled('new_password')) {
+            if (!$request->filled('current_password') || !\Illuminate\Support\Facades\Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Password saat ini salah.'
+                ], 422);
+            }
+            $user->password = \Illuminate\Support\Facades\Hash::make($request->new_password);
+        }
+
+        $user->name = $validated['name'];
+        $user->username = $validated['username'];
+        $user->email = $validated['email'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil berhasil diperbarui.',
+            'data' => $user
+        ]);
+    }
 }

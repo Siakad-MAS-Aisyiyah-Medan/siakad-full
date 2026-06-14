@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('permission:manage_murid')->group(function () {
         Route::get('/murid/stats', [MuridController::class, 'stats']);
         Route::get('/murid', [MuridController::class, 'index']);
+        Route::post('/murid', [MuridController::class, 'store']);
         Route::put('/murid/{id}', [MuridController::class, 'update']);
         Route::post('/murid/{id}/enroll', [MuridController::class, 'enroll']);
         Route::delete('/murid/{id}', [MuridController::class, 'destroy']);
@@ -93,13 +94,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware('permission:manage_all')->group(function () {
+        Route::put('/akun/profile', [\App\Http\Controllers\Api\Admin\AkunController::class, 'updateProfile']);
         Route::get('/akun', [\App\Http\Controllers\Api\Admin\AkunController::class, 'index']);
         Route::post('/akun', [\App\Http\Controllers\Api\Admin\AkunController::class, 'store']);
         Route::delete('/akun/{id}', [\App\Http\Controllers\Api\Admin\AkunController::class, 'destroy']);
+
+        Route::apiResource('/tahun-ajaran', \App\Http\Controllers\Api\Admin\TahunAjaranController::class);
+        Route::put('/tahun-ajaran/{id}/activate', [\App\Http\Controllers\Api\Admin\TahunAjaranController::class, 'activate']);
+        
         Route::get('/audit-logs', [AuditLogController::class, 'index']);
         
         Route::get('/profil-sekolah', [ProfilSekolahController::class, 'show']);
         Route::put('/profil-sekolah', [ProfilSekolahController::class, 'update']);
+
+        // Settings API
+        Route::get('/settings', [\App\Http\Controllers\Api\Admin\SettingsController::class, 'index']);
+        Route::put('/settings/{key}', [\App\Http\Controllers\Api\Admin\SettingsController::class, 'update']);
+        Route::post('/settings/bulk', [\App\Http\Controllers\Api\Admin\SettingsController::class, 'bulkUpdate']);
     });
 
     Route::middleware('permission:manage_ekskul')->group(function () {

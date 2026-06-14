@@ -32,6 +32,33 @@ class AdminPPDBController extends Controller
         return ApiResponse::paginated($paginator, 'Daftar pendaftar PPDB');
     }
 
+    public function stats()
+    {
+        // Calculate stats
+        $all = \App\Models\Pendaftaran::query()->get(['status_pendaftaran', 'ppdb_status']);
+        
+        $menunggu = 0;
+        $diterima = 0;
+        $ditolak = 0;
+
+        foreach ($all as $p) {
+            $status = $p->status_pendaftaran ?? $p->ppdb_status;
+            if (in_array($status, ['diajukan', 'terverifikasi', 'revisi', 'draft', 'submitted', 'verified'])) {
+                $menunggu++;
+            } elseif ($status === 'diterima' || $status === 'accepted') {
+                $diterima++;
+            } elseif ($status === 'ditolak' || $status === 'rejected') {
+                $ditolak++;
+            }
+        }
+
+        return ApiResponse::success([
+            'menunggu' => $menunggu,
+            'diterima' => $diterima,
+            'ditolak' => $ditolak,
+        ], 'Statistik PPDB');
+    }
+
     public function show($id)
     {
         $pendaftaran = $this->ppdb->adminFind((int) $id);

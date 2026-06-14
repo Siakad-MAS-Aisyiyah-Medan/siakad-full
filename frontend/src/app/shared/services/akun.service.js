@@ -15,3 +15,8 @@ export async function deleteAdminAkun(id) {
   const response = await apiClient.delete(`/akun/${id}`);
   return unwrapData(response);
 }
+
+export async function updateAdminProfile(data) {
+  const response = await apiClient.put('/akun/profile', data);
+  return unwrapData(response);
+}

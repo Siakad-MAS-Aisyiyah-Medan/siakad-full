@@ -78,7 +78,7 @@ export default function AuditLogsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center p-6 text-secondary">
+                <td colSpan="6" className="text-center py-16 text-secondary">
                   Belum ada log audit.
                 </td>
               </tr>

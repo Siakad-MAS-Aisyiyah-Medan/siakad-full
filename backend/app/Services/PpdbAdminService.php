@@ -22,6 +22,32 @@ class PpdbAdminService
         return $this->ppdb->adminList($search, $status, $perPage);
     }
 
+    public function getStats(): array
+    {
+        $all = Pendaftaran::query()->get(['status_pendaftaran', 'ppdb_status']);
+        
+        $menunggu = 0;
+        $diterima = 0;
+        $ditolak = 0;
+
+        foreach ($all as $p) {
+            $status = $p->status_pendaftaran ?? $p->ppdb_status;
+            if (in_array($status, ['diajukan', 'terverifikasi', 'revisi', 'draft'])) {
+                $menunggu++;
+            } elseif ($status === 'diterima') {
+                $diterima++;
+            } elseif ($status === 'ditolak') {
+                $ditolak++;
+            }
+        }
+
+        return [
+            'menunggu' => $menunggu,
+            'diterima' => $diterima,
+            'ditolak' => $ditolak,
+        ];
+    }
+
     public function find(int $id): Pendaftaran
     {
         return $this->ppdb->adminFind($id);

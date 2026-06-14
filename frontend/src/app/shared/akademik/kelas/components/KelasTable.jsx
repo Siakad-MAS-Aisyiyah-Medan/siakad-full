@@ -1,90 +1,124 @@
-import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, MapPin, Users, Building, AlertCircle } from 'lucide-react';
 
 export default function KelasTable({
   filteredData,
+  searchQuery,
+  onSearchChange,
   onAdd,
   onEdit,
   onDelete,
   isFetching = false,
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse kelas-table">
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
+      <div className="flex-1 overflow-x-auto">
+        <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[25%]">Nama Kelas</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[15%]">Tingkat</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[15%]">Jurusan</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Wali Kelas</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[15%]">Jumlah Siswa</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right w-[10%]">Aksi</th>
+            <tr className="bg-slate-50/80 border-b border-slate-100">
+              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest" style={{ paddingLeft: '32px', paddingRight: '16px' }}>Detail Kelas</th>
+              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-4">Wali Kelas</th>
+              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-4">Kapasitas & Lokasi</th>
+              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest text-right" style={{ paddingLeft: '16px', paddingRight: '32px' }}>Aksi</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {isFetching ? (
               <tr>
-                <td colSpan="5" className="text-center p-6 text-secondary">
-                  <div style={{ display: 'inline-block', width: '2rem', height: '2rem', border: '3px solid #e2e8f0', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  <p className="mt-2">Memuat data kelas...</p>
-                  <style>
-                    {`
-                      @keyframes spin {
-                        to { transform: rotate(360deg); }
-                      }
-                    `}
-                  </style>
+                <td colSpan="4" className="py-20">
+                  <div className="flex flex-col items-center justify-center w-full">
+                    <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-3"></div>
+                    <p className="text-sm font-semibold text-slate-500 text-center">Memuat data kelas...</p>
+                  </div>
                 </td>
               </tr>
             ) : filteredData.length > 0 ? (
-              filteredData.map((kelas) => (
-                <tr key={kelas.id_kelas} className="hover:bg-slate-50/50 transition-colors group border-b border-slate-100 last:border-none">
-                  <td className="px-6 py-4">
-                    <span className="font-bold text-slate-800">{kelas.nama_kelas}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">
-                      Kelas {kelas.tingkat || '-'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
-                      {kelas.jurusan || '-'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold">
-                    {kelas.wali_kelas?.guru?.nama_guru ? (
-                      <span className="text-slate-700">{kelas.wali_kelas.guru.nama_guru}</span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">
-                        Belum Ditentukan
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-700">
-                    {kelas.jumlah_siswa} Siswa
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button type="button" onClick={() => onEdit(kelas)} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data">
-                        <Edit2 size={16} />
-                      </button>
-                      <button type="button" onClick={() => onDelete(kelas.id_kelas)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus Data">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+              filteredData.map((kelas) => {
+                const overcapacity = kelas.jumlah_siswa > (kelas.kapasitas_maksimal || 36);
+                return (
+                  <tr key={kelas.id_kelas} className="hover:bg-slate-50/80 transition-colors group">
+                    <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '16px' }}>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 font-black text-lg">
+                          {kelas.tingkat || 'X'}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-800 text-[15px]">{kelas.nama_kelas}</p>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                              Kelas {kelas.tingkat || '-'}
+                            </span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
+                              {kelas.jurusan || '-'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-5 px-4">
+                      {kelas.wali_kelas?.guru?.nama_guru ? (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 overflow-hidden font-bold text-xs border border-slate-300">
+                            {kelas.wali_kelas.guru.foto ? (
+                              <img src={kelas.wali_kelas.guru.foto} alt="Wali" className="w-full h-full object-cover" />
+                            ) : (
+                              kelas.wali_kelas.guru.nama_guru.charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-700">{kelas.wali_kelas.guru.nama_guru}</p>
+                            <p className="text-[11px] font-semibold text-slate-500 mt-0.5">Wali Kelas Definitif</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                          <AlertCircle size={12} strokeWidth={3} /> Belum Ditentukan
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="py-5 px-4">
+                      <div className="space-y-2">
+                        <p className={`text-xs font-semibold flex items-center gap-2 ${overcapacity ? 'text-rose-600' : 'text-slate-600'}`}>
+                          <Users size={14} className={overcapacity ? 'text-rose-500' : 'text-slate-400'} /> 
+                          {kelas.jumlah_siswa} / {kelas.kapasitas_maksimal || 36} Siswa 
+                          {overcapacity && <span className="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-sm font-bold ml-1">Penuh</span>}
+                        </p>
+                        <p className="text-xs font-semibold text-slate-600 flex items-center gap-2">
+                          <MapPin size={14} className="text-slate-400" /> {kelas.ruangan || <span className="text-slate-400 italic">Ruangan belum diatur</span>}
+                        </p>
+                      </div>
+                    </td>
+
+                    <td className="py-5 text-right" style={{ paddingLeft: '16px', paddingRight: '32px' }}>
+                      <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => onEdit(kelas)}
+                          className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition-colors"
+                          title="Edit Kelas"
+                        >
+                          <Edit2 size={14} strokeWidth={2.5} />
+                        </button>
+                        <button
+                          onClick={() => onDelete(kelas.id_kelas)}
+                          className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
+                          title="Hapus Kelas"
+                        >
+                          <Trash2 size={14} strokeWidth={2.5} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan="6" className="text-center py-12 px-6">
-                  <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search size={24} className="text-slate-400" />
+                <td colSpan="4" className="text-center py-20">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Building size={24} className="text-slate-300" />
                   </div>
-                  <h3 className="text-sm font-bold text-slate-700 mb-1">Data Kelas Tidak Ditemukan</h3>
-                  <p className="text-xs text-slate-500">Coba sesuaikan filter pencarian atau tambahkan kelas baru.</p>
+                  <p className="text-sm font-bold text-slate-600">Tidak ada data kelas</p>
+                  <p className="text-xs font-medium text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
                 </td>
               </tr>
             )}

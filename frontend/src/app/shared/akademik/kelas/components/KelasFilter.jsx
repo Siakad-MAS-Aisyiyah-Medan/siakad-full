@@ -9,9 +9,9 @@ export default function KelasFilter({
   onJurusanChange 
 }) {
   return (
-    <div className="flex flex-col md:flex-row items-center w-full lg:w-auto" style={{ gap: '12px' }}>
+    <div className="flex flex-col sm:flex-row flex-wrap items-center w-full lg:w-auto" style={{ gap: '12px' }}>
       {/* Search Box */}
-      <div className="flex items-center bg-white border border-slate-200 hover:border-emerald-300 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.03)] rounded-xl px-4 h-[46px] focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500 transition-all w-full md:w-[340px] group">
+      <div className="flex items-center bg-white border border-slate-200 hover:border-emerald-300 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.03)] rounded-xl px-4 h-[46px] focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500 transition-all w-full sm:flex-1 lg:w-[340px] group">
         <Search className="text-slate-400 group-focus-within:text-emerald-500 mr-3 shrink-0 transition-colors" size={18} strokeWidth={2.5} />
         <input
           type="text"
@@ -23,7 +23,7 @@ export default function KelasFilter({
       </div>
 
       {/* Select Tingkat */}
-      <div className="relative w-full md:w-32 shrink-0">
+      <div className="relative w-full sm:w-auto md:w-32 shrink-0">
         <select
           value={filterTingkat}
           onChange={(e) => onTingkatChange(e.target.value)}
@@ -38,7 +38,7 @@ export default function KelasFilter({
       </div>
 
       {/* Select Jurusan */}
-      <div className="relative w-full md:w-32 shrink-0">
+      <div className="relative w-full sm:w-auto md:w-32 shrink-0">
         <select
           value={filterJurusan}
           onChange={(e) => onJurusanChange(e.target.value)}

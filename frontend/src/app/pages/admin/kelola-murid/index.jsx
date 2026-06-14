@@ -1,24 +1,32 @@
 import AdminPageShell from '@app/shared/components/AdminPageShell';
 import MuridFilter from '@app/shared/akademik/murid/components/MuridFilter';
 import MuridTable from '@app/shared/akademik/murid/components/MuridTable';
+import MuridForm from '@app/shared/akademik/murid/components/MuridForm';
 import { useMurid } from '@app/shared/akademik/murid/hooks/useMurid';
 import { Users, UserCheck, UserPlus, GraduationCap, Plus } from 'lucide-react';
-import Swal from 'sweetalert2';
 
 export default function MuridPage() {
-  const { searchQuery, setSearchQuery, filteredData, stats, isFetching, promoteMurid, removeMurid } = useMurid();
-
-  const handleAddClick = () => {
-    Swal.fire({
-      icon: 'info',
-      title: 'Fitur Dalam Pengembangan',
-      text: 'Fitur penambahan murid manual dari Admin sedang dalam antrean pengembangan backend.',
-      confirmButtonColor: '#10b981'
-    });
-  };
+  const { 
+    view, 
+    searchQuery, 
+    setSearchQuery, 
+    filteredData, 
+    stats, 
+    isFetching, 
+    formData,
+    loading,
+    openAdd,
+    openEdit,
+    cancelForm,
+    handleChange,
+    submitForm,
+    promoteMurid, 
+    removeMurid 
+  } = useMurid();
 
   return (
     <AdminPageShell>
+      {view === 'list' && (
       <div className="mb-8 space-y-6">
         {/* Header & Stats Container */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col gap-6">
@@ -32,7 +40,7 @@ export default function MuridPage() {
             <div className="flex items-center gap-3 w-full lg:w-auto">
               <MuridFilter searchQuery={searchQuery} onSearchChange={setSearchQuery} />
               <button 
-                onClick={handleAddClick}
+                onClick={openAdd}
                 className="btn-primary h-12 px-5 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all shrink-0"
               >
                 <Plus size={18} strokeWidth={2.5} />
@@ -89,8 +97,20 @@ export default function MuridPage() {
           </div>
         </div>
 
-        <MuridTable data={filteredData} onPromote={promoteMurid} onDelete={removeMurid} isFetching={isFetching} />
+        <MuridTable data={filteredData} onPromote={promoteMurid} onDelete={removeMurid} onEdit={openEdit} isFetching={isFetching} />
       </div>
+      )}
+      
+      {(view === 'add' || view === 'edit') && (
+        <MuridForm
+          view={view}
+          formData={formData}
+          loading={loading}
+          onChange={handleChange}
+          onSubmit={submitForm}
+          onCancel={cancelForm}
+        />
+      )}
     </AdminPageShell>
   );
 }

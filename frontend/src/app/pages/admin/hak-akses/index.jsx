@@ -127,8 +127,8 @@ export default function HakAksesPage() {
       <div className="data-panel view-list">
         <div className="panel-header glass">
           <div className="header-text">
-            <h2>Akun & Hak Akses</h2>
-            <p>Kelola role pengguna dan hak akses menu di sistem SIAKAD.</p>
+            <h2>Manajemen Pengguna</h2>
+            <p>Kelola peran pengguna dan akun di sistem SIAKAD.</p>
           </div>
           <div className="header-actions">
             <button type="button" onClick={handleAdd} className="btn-primary flex items-center gap-2">
@@ -144,7 +144,7 @@ export default function HakAksesPage() {
             </div>
             <div className="stat-content">
               <div className="stat-value text-2xl font-bold">{isAkunLoading ? '...' : stats.total_akun}</div>
-              <div className="stat-label text-sm text-slate-500">Total Akun Terdaftar</div>
+              <div className="stat-label text-sm text-slate-500">Total Akun</div>
             </div>
           </div>
           <div className="stat-box glass border-green flex gap-4 items-center p-5 safe-p-5">
@@ -153,7 +153,7 @@ export default function HakAksesPage() {
             </div>
             <div className="stat-content">
               <div className="stat-value text-2xl font-bold">{isAkunLoading ? '...' : stats.role_aktif}</div>
-              <div className="stat-label text-sm text-slate-500">Jenis Role Digunakan</div>
+              <div className="stat-label text-sm text-slate-500">Role Aktif</div>
             </div>
           </div>
         </div>
@@ -218,31 +218,36 @@ export default function HakAksesPage() {
           <table className="data-table w-full text-left border-collapse kelas-table">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama / Username</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">NIP/NISN</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 rounded-tl-xl w-[20%]">
+                      NIP/NISN
+                    </th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 w-[25%]">
+                      Email
+                    </th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 w-[20%]">
+                      Role
+                    </th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 w-[20%]">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 text-right rounded-tr-xl w-[15%]">
+                      Aksi
+                    </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
               {isAkunLoading ? (
                 <tr>
-                  <td colSpan="6" className="text-center p-8 text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
+                  <td colSpan="5" className="p-8 text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2 w-full">
                       <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-sm">Memuat data akun...</span>
+                      <span className="text-sm text-center">Memuat data akun...</span>
                     </div>
                   </td>
                 </tr>
               ) : akunData.length > 0 ? (
                 akunData.map((akun) => (
                   <tr key={akun.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-800">{akun.name}</div>
-                      <div className="text-xs text-slate-500">@{akun.username}</div>
-                    </td>
                     <td className="px-6 py-4 font-medium text-slate-600">{akun.nip_nisn || '-'}</td>
                     <td className="px-6 py-4 text-slate-600">{akun.email}</td>
                     <td className="px-6 py-4">
@@ -269,7 +274,7 @@ export default function HakAksesPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center p-8 text-slate-500 text-sm">Tidak ada data akun yang ditemukan</td>
+                  <td colSpan="5" className="text-center py-16 text-slate-500 text-sm">Tidak ada data akun yang ditemukan</td>
                 </tr>
               )}
             </tbody>
@@ -302,7 +307,7 @@ export default function HakAksesPage() {
       </div>
 
       {isModalOpen && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-[#0f172a]/40 backdrop-blur-md transition-all">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-custom-0f172a-40 backdrop-blur-md transition-all">
           <div className="bg-white rounded-[20px] shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 border border-slate-100 flex flex-col max-h-screen">
             {/* Header Section */}
             <div className="flex justify-between items-start p-8 pb-6 border-b border-slate-100 bg-white">
@@ -419,11 +424,11 @@ export default function HakAksesPage() {
             </div>
 
             {/* Footer Actions */}
-            <div className="flex justify-end items-center gap-[12px] px-[40px] py-[20px] bg-[#F8FAFC] border-t border-[#E5E7EB]">
+            <div className="flex justify-end items-center gap-[12px] px-[40px] py-[20px] bg-custom-F8FAFC border-t border-custom-E5E7EB">
               <button 
                 type="button" 
                 onClick={handleCloseModal} 
-                className="flex items-center justify-center h-[44px] min-w-[96px] px-[18px] rounded-xl bg-[#FFFFFF] border border-[#CBD5E1] text-[#334155] font-semibold hover:bg-[#F1F5F9] hover:border-[#94A3B8] transition-all text-[14px]"
+                className="flex items-center justify-center h-[44px] min-w-[96px] px-[18px] rounded-xl bg-custom-FFFFFF border border-custom-CBD5E1 text-custom-334155 font-semibold hover-bg-F1F5F9 hover-border-94A3B8 transition-all text-[14px]"
               >
                 Batal
               </button>
@@ -431,7 +436,7 @@ export default function HakAksesPage() {
                 type="submit" 
                 form="addAccountForm"
                 disabled={isSubmitting} 
-                className="flex items-center justify-center gap-[8px] h-[44px] min-w-[150px] px-[20px] rounded-xl bg-[#059669] text-white font-bold whitespace-nowrap hover:bg-[#047857] transition-all text-[14px]"
+                className="flex items-center justify-center gap-[8px] h-[44px] min-w-[150px] px-[20px] rounded-xl bg-custom-059669 text-white font-bold whitespace-nowrap hover-bg-047857 transition-all text-[14px]"
               >
                 {isSubmitting ? (
                   <>

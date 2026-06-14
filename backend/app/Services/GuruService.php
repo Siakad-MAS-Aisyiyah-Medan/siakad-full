@@ -47,6 +47,11 @@ class GuruService
             $user->role = $data['role'];
             $user->save();
 
+            $fotoPath = null;
+            if (isset($data['foto']) && $data['foto'] instanceof \Illuminate\Http\UploadedFile) {
+                $fotoPath = '/storage/' . $data['foto']->store('guru', 'public');
+            }
+
             Guru::create([
                 'id_user' => $user->id_user,
                 'nip_nuptk' => $data['nip_nuptk'],
@@ -55,6 +60,8 @@ class GuruService
                 'agama' => $data['agama'],
                 'alamat' => $data['alamat'],
                 'no_hp' => $data['no_hp'],
+                'status' => $data['status'],
+                'foto' => $fotoPath,
             ]);
 
             $created = User::with('guru')->findOrFail($user->id_user);
@@ -90,6 +97,17 @@ class GuruService
                 $user->update(['password' => $data['password']]);
             }
 
+            $guru = Guru::where('id_user', $id)->first();
+            $fotoPath = $guru ? $guru->foto : null;
+
+            if (isset($data['foto']) && $data['foto'] instanceof \Illuminate\Http\UploadedFile) {
+                if ($fotoPath) {
+                    $oldPath = str_replace('/storage/', '', $fotoPath);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+                $fotoPath = '/storage/' . $data['foto']->store('guru', 'public');
+            }
+
             $profilePayload = [
                 'nip_nuptk' => $data['nip_nuptk'],
                 'nama_guru' => $data['nama_guru'],
@@ -97,9 +115,10 @@ class GuruService
                 'agama' => $data['agama'],
                 'alamat' => $data['alamat'],
                 'no_hp' => $data['no_hp'],
+                'status' => $data['status'],
+                'foto' => $fotoPath,
             ];
 
-            $guru = Guru::where('id_user', $id)->first();
             if ($guru) {
                 $guru->update($profilePayload);
             } else {

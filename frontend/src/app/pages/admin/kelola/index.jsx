@@ -22,44 +22,10 @@ export default function GuruPage() {
     isFetching,
   } = useGuru();
 
-  const [activeTab, setActiveTab] = useState('data');
-
   return (
     <AdminPageShell>
-      <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid #e2e8f0', marginBottom: '2rem' }}>
-        <button
-          onClick={() => setActiveTab('data')}
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'data' ? '3px solid var(--color-primary)' : '3px solid transparent',
-            color: activeTab === 'data' ? 'var(--color-primary)' : '#64748b',
-            fontWeight: activeTab === 'data' ? 'bold' : 'normal',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}
-        >
-          Data Guru & Pegawai
-        </button>
-        <button
-          onClick={() => setActiveTab('absensi')}
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'absensi' ? '3px solid var(--color-primary)' : '3px solid transparent',
-            color: activeTab === 'absensi' ? 'var(--color-primary)' : '#64748b',
-            fontWeight: activeTab === 'absensi' ? 'bold' : 'normal',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}
-        >
-          Absensi Guru
-        </button>
-      </div>
 
-      {activeTab === 'data' && view === 'list' && (
+      {view === 'list' && (
         <GuruTable
           filteredData={filteredData}
           searchQuery={searchQuery}
@@ -70,7 +36,7 @@ export default function GuruPage() {
           isFetching={isFetching}
         />
       )}
-      {activeTab === 'data' && (view === 'add' || view === 'edit') && (
+      {(view === 'add' || view === 'edit') && (
         <GuruForm
           view={view}
           formData={formData}
@@ -81,7 +47,6 @@ export default function GuruPage() {
         />
       )}
 
-      {activeTab === 'absensi' && <AbsensiGuruView />}
     </AdminPageShell>
   );
 }

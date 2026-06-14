@@ -3,7 +3,7 @@ import { fetchKelasList, fetchKelasStats, createKelas, updateKelas, deleteKelas 
 import { fetchGuruList } from '@app/shared/akademik/guru/services/guru.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
-const emptyForm = { nama_kelas: '', tingkat: '', jurusan: '', id_wali_kelas: '' };
+const emptyForm = { nama_kelas: '', tingkat: '', jurusan: '', id_wali_kelas: '', kapasitas_maksimal: 36, ruangan: '' };
 
 export function useKelas() {
   const [view, setView] = useState('list');
@@ -62,6 +62,8 @@ export function useKelas() {
       tingkat: kelas.tingkat || '',
       jurusan: kelas.jurusan || '',
       id_wali_kelas: kelas.id_wali_kelas || '',
+      kapasitas_maksimal: kelas.kapasitas_maksimal || 36,
+      ruangan: kelas.ruangan || '',
     });
     setView('edit');
   };
@@ -82,6 +84,8 @@ export function useKelas() {
       nama_kelas: formData.nama_kelas,
       tingkat: formData.tingkat,
       jurusan: formData.jurusan,
+      kapasitas_maksimal: Number(formData.kapasitas_maksimal) || 36,
+      ruangan: formData.ruangan || null,
       id_wali_kelas: formData.id_wali_kelas ? Number(formData.id_wali_kelas) : null,
     };
     try {

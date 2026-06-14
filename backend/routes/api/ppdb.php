@@ -49,6 +49,7 @@ Route::middleware([
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_ppdb'])->prefix('admin/ppdb')->group(function () {
+    Route::get('/stats', [AdminPPDBController::class, 'stats']);
     Route::get('/', [AdminPPDBController::class, 'index']);
     Route::get('/{id}', [AdminPPDBController::class, 'show']);
     Route::post('/{id}/verifikasi', [AdminPPDBController::class, 'verifikasi']);

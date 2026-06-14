@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Swal from 'sweetalert2';
 import {
   fetchAdminPendaftar,
+  fetchAdminPpdbStats,
   adminVerifikasi,
   adminRevisi,
   adminTerima,
@@ -13,6 +14,7 @@ import { toastError, toastSuccess } from '@app/shared/hooks/useConfirm';
 
 export function useAdminPpdb() {
   const [items, setItems] = useState([]);
+  const [stats, setStats] = useState({ menunggu: 0, diterima: 0, ditolak: 0 });
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -21,11 +23,15 @@ export function useAdminPpdb() {
   const load = useCallback(async () => {
     setIsFetching(true);
     try {
-      const data = await fetchAdminPendaftar({
-        status: statusFilter || undefined,
-        search: searchQuery || undefined,
-      });
+      const [data, statsData] = await Promise.all([
+        fetchAdminPendaftar({
+          status: statusFilter || undefined,
+          search: searchQuery || undefined,
+        }),
+        fetchAdminPpdbStats(),
+      ]);
       setItems(data);
+      setStats(statsData);
     } catch (e) {
       console.error(e);
     } finally {
@@ -37,14 +43,7 @@ export function useAdminPpdb() {
     load();
   }, [load]);
 
-  const stats = useMemo(() => {
-    const counts = { diajukan: 0, terverifikasi: 0, diterima: 0, ditolak: 0, revisi: 0 };
-    items.forEach((p) => {
-      const s = p.status || p.ppdb_status;
-      if (counts[s] !== undefined) counts[s]++;
-    });
-    return counts;
-  }, [items]);
+  // Stats now comes from the backend
 
   const promptCatatan = async (title) => {
     const result = await Swal.fire({

@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Traits\AuditsAdminActions;
 use App\Models\User;
+use App\Models\Siswa;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 
@@ -42,6 +45,38 @@ class MuridService
         ];
     }
 
+    public function createMurid(array $data): User
+    {
+        return DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name' => $data['nama_siswa'],
+                'username' => $data['username'],
+                'email' => $data['email'] ?? null,
+                'password' => Hash::make($data['password']),
+                'role' => 'siswa',
+                'status_aktif' => $data['status_aktif'] ?? true,
+            ]);
+
+            $user->siswa()->create([
+                'nama_siswa' => $data['nama_siswa'],
+                'nisn' => $data['nisn'] ?? null,
+                'nis' => $data['nis'] ?? null,
+                'jenis_kelamin' => $data['jenis_kelamin'],
+                'tempat_lahir' => $data['tempat_lahir'] ?? null,
+                'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
+                'alamat' => $data['alamat'] ?? null,
+                'no_hp' => $data['no_hp'] ?? null,
+                'tahun_masuk' => $data['tahun_masuk'],
+                'tahun_lulus' => $data['tahun_lulus'] ?? null,
+                'id_kelas' => $data['id_kelas'] ?? null,
+            ]);
+
+            $fresh = $user->fresh(['siswa']);
+            $this->auditAdmin('murid.create', $fresh, ['username' => $fresh->username]);
+            return $fresh;
+        });
+    }
+
     public function updateMurid(int $id, array $data): User
     {
         $user = User::findOrFail($id);
@@ -58,9 +93,25 @@ class MuridService
             throw new InvalidArgumentException('Perubahan role tidak diizinkan melalui update.');
         }
 
-        $user->update([
-            'status_aktif' => $data['status_aktif'] ?? $user->status_aktif,
-        ]);
+        DB::transaction(function () use ($user, $data) {
+            $user->update([
+                'status_aktif' => $data['status_aktif'] ?? $user->status_aktif,
+            ]);
+
+            if ($user->siswa) {
+                $siswaData = [];
+                $fields = ['nama_siswa', 'nisn', 'nis', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp', 'tahun_masuk', 'tahun_lulus', 'id_kelas'];
+                foreach ($fields as $field) {
+                    if (array_key_exists($field, $data)) {
+                        $siswaData[$field] = $data[$field];
+                    }
+                }
+                
+                if (!empty($siswaData)) {
+                    $user->siswa->update($siswaData);
+                }
+            }
+        });
 
         $fresh = $user->fresh(['siswa', 'pendaftaran']);
         $this->auditAdmin('murid.update', $fresh, ['username' => $fresh->username]);

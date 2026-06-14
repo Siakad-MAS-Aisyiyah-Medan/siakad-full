@@ -14,10 +14,12 @@ class UpdatePengumumanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'judul' => 'sometimes|string|max:255',
-            'isi' => 'sometimes|string',
+            'judul' => 'sometimes|required|string|max:255',
+            'isi' => 'sometimes|required|string',
             'tanggal_publikasi' => 'nullable|date',
-            'akses' => 'sometimes|in:umum,internal',
+            'akses' => 'sometimes|required|in:umum,internal',
+            'kategori' => 'nullable|string|max:100',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

@@ -37,6 +37,8 @@ class UpdateGuruRequest extends FormRequest
             'no_hp' => 'required|string|max:20',
             'role' => 'required|in:guru,wali_kelas',
             'status_aktif' => 'sometimes|boolean',
+            'status' => 'required|in:aktif,nonaktif',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
 }

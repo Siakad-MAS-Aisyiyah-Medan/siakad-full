@@ -12,6 +12,11 @@ export async function fetchMuridStats() {
   return response.data?.data;
 }
 
+export async function createMurid(payload) {
+  const response = await apiClient.post('/murid', payload);
+  return response.data;
+}
+
 export async function updateMurid(id, payload) {
   const response = await apiClient.put(`/murid/${id}`, payload);
   return response.data;

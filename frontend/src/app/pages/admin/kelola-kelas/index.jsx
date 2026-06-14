@@ -81,7 +81,7 @@ export default function KelasPage() {
               <h2 className="text-xl font-black text-slate-800 tracking-tight">Data Kelas</h2>
               <p className="text-sm font-medium text-slate-500 mt-1">Kelola pembagian kelas dan penetapan wali kelas.</p>
             </div>
-            <div className="flex flex-col md:flex-row items-center w-full lg:w-auto" style={{ gap: '12px' }}>
+            <div className="flex flex-col lg:flex-row flex-wrap items-center w-full xl:w-auto" style={{ gap: '12px' }}>
               <KelasFilter 
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}

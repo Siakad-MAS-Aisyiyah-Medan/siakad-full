@@ -31,6 +31,12 @@ class PpdbController extends Controller
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data PPDB');
     }
 
+    public function stats()
+    {
+        $stats = $this->ppdbService->getStats();
+        return ApiResponse::success($stats, 'Berhasil mengambil statistik PPDB');
+    }
+
     public function show($id)
     {
         $pendaftaran = $this->ppdbService->find((int) $id);

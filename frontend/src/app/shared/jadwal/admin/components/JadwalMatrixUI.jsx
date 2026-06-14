@@ -110,7 +110,7 @@ export default function JadwalMatrixUI({
                       </td>
 
                       {isIstirahat ? (
-                        <td colSpan={6} className="px-4 py-6 text-center border-l border-slate-100 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#f8fafc_10px,#f8fafc_20px)] relative overflow-hidden">
+                        <td colSpan={6} className="px-4 py-6 text-center border-l border-slate-100 bg-striped-slate relative overflow-hidden">
                           <div className="absolute inset-0 bg-slate-50/50 backdrop-blur-[1px]"></div>
                           <span className="relative z-10 px-6 py-2 bg-white rounded-full text-slate-400 font-bold tracking-[0.2em] uppercase text-xs border border-slate-200 shadow-sm flex items-center justify-center max-w-max mx-auto gap-2">
                             <Clock size={14} className="text-amber-400" />

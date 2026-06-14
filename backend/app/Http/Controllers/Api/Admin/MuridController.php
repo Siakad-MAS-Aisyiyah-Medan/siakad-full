@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EnrollMuridRequest;
 use App\Http\Requests\Admin\IndexMuridRequest;
+use App\Http\Requests\Admin\StoreMuridRequest;
 use App\Http\Requests\Admin\UpdateMuridRequest;
 use App\Services\MuridService;
 use InvalidArgumentException;
@@ -30,6 +31,16 @@ class MuridController extends Controller
     {
         $stats = $this->muridService->getStats();
         return ApiResponse::success($stats, 'Berhasil mengambil statistik murid');
+    }
+
+    public function store(StoreMuridRequest $request)
+    {
+        try {
+            $user = $this->muridService->createMurid($request->validated());
+            return ApiResponse::success($user, 'Murid berhasil ditambahkan', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Gagal menambahkan murid: ' . $e->getMessage(), 500);
+        }
     }
 
     public function update(UpdateMuridRequest $request, $id)

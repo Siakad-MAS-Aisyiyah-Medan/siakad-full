@@ -73,7 +73,7 @@ export default function GuruTable({
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center p-6 text-secondary">
+                <td colSpan="5" className="text-center py-16 text-secondary">
                   <UserX size={48} className="mx-auto mb-2 opacity-50" />
                   Data tenaga pendidik tidak ditemukan.
                 </td>

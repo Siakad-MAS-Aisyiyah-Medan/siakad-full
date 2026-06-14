@@ -18,6 +18,8 @@ class StorePengumumanRequest extends FormRequest
             'isi' => 'required|string',
             'tanggal_publikasi' => 'nullable|date',
             'akses' => 'required|in:umum,internal',
+            'kategori' => 'nullable|string|max:100',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

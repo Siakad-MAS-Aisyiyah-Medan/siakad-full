@@ -19,6 +19,8 @@ const emptyForm = {
   alamat: '',
   no_hp: '',
   role: 'guru',
+  status: 'aktif',
+  foto: null,
 };
 
 export function useGuru() {
@@ -76,6 +78,8 @@ export function useGuru() {
       alamat: profile.alamat || '',
       no_hp: profile.no_hp || '',
       role: guru.role,
+      status: profile.status || 'aktif',
+      foto: profile.foto || null,
     });
     setView('edit');
   };
@@ -86,7 +90,11 @@ export function useGuru() {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'foto') {
+      setFormData({ ...formData, foto: e.target.files[0] });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   const submitForm = async (e) => {
@@ -98,11 +106,25 @@ export function useGuru() {
           Swal.fire('Opps', 'Password wajib diisi untuk pengguna baru!', 'warning');
           return;
         }
-        await createGuru(formData);
+        
+        const payload = new FormData();
+        Object.keys(formData).forEach(key => {
+          if (formData[key] !== null && formData[key] !== '') {
+            payload.append(key, formData[key]);
+          }
+        });
+
+        await createGuru(payload);
         toastSuccess('Berhasil', 'Data tenaga pendidik ditambahkan');
       } else {
-        const payload = { ...formData };
-        if (payload.password === '') delete payload.password;
+        const payload = new FormData();
+        Object.keys(formData).forEach(key => {
+          if (key === 'password' && !formData.password) return; // skip empty password on edit
+          if (formData[key] !== null && formData[key] !== '') {
+            payload.append(key, formData[key]);
+          }
+        });
+
         await updateGuru(currentId, payload);
         toastSuccess('Berhasil', 'Data tenaga pendidik diperbarui');
       }
