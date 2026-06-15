@@ -94,9 +94,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware('permission:manage_all')->group(function () {
-        Route::put('/akun/profile', [\App\Http\Controllers\AkunController::class, 'updateProfile']);
         Route::get('/akun', [\App\Http\Controllers\AkunController::class, 'index']);
         Route::post('/akun', [\App\Http\Controllers\AkunController::class, 'store']);
+        Route::put('/akun/{id}', [\App\Http\Controllers\AkunController::class, 'update']);
         Route::delete('/akun/{id}', [\App\Http\Controllers\AkunController::class, 'destroy']);
 
         Route::apiResource('/tahun-ajaran', \App\Http\Controllers\TahunAjaranController::class);

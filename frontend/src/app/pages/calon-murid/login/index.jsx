@@ -61,11 +61,11 @@ export default function LoginCalonMurid() {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!loginId.trim()) {
-      setError('NISN / email wajib diisi.');
+      Swal.fire({ icon: 'error', title: 'Gagal Login', text: 'NISN / email wajib diisi.' });
       return;
     }
     if (!password) {
-      setError('Password wajib diisi.');
+      Swal.fire({ icon: 'error', title: 'Gagal Login', text: 'Password wajib diisi.' });
       return;
     }
 
@@ -76,7 +76,7 @@ export default function LoginCalonMurid() {
       const { user, profile, token, permissions, menus, redirect_path } = result;
 
       if (user.role !== 'calon_siswa') {
-        setError('Akun ini bukan calon siswa. Gunakan halaman login.');
+        Swal.fire({ icon: 'error', title: 'Gagal Login', text: 'Akun ini bukan calon siswa. Gunakan halaman login.' });
         return;
       }
 
@@ -87,7 +87,7 @@ export default function LoginCalonMurid() {
 
       await Swal.fire({
         icon: 'success',
-        title: 'Login Berhasil',
+        title: 'Berhasil Login',
         text: `Selamat datang, ${displayName}!`,
         timer: 1400,
         showConfirmButton: false,
@@ -99,7 +99,7 @@ export default function LoginCalonMurid() {
         err.response?.data?.message ||
         err.message ||
         'Login gagal. Periksa kembali data Anda.';
-      setError(message);
+      Swal.fire({ icon: 'error', title: 'Gagal Login', text: message });
     } finally {
       setLoading(false);
     }
@@ -214,7 +214,7 @@ export default function LoginCalonMurid() {
                   Memproses...
                 </>
               ) : (
-                'Masuk'
+                'Login Sistem'
               )}
             </button>
           </form>

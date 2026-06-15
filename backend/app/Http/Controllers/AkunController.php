@@ -121,6 +121,39 @@ class AkunController extends Controller
         ]);
     }
 
+    public function update(\Illuminate\Http\Request $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
+            'role' => 'required|string|in:' . implode(',', User::ROLES),
+            'status' => 'nullable|string|in:aktif,nonaktif',
+        ]);
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->role = $validated['role'];
+        if ($request->filled('status')) {
+            $user->status_akun = $validated['status'];
+            $user->status_aktif = $validated['status'] === 'aktif';
+        }
+
+        if ($request->filled('password')) {
+            $request->validate(['password' => 'string|min:6']);
+            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Akun berhasil diperbarui',
+            'data' => $user
+        ]);
+    }
+
     public function updateProfile(\Illuminate\Http\Request $request): JsonResponse
     {
         $user = auth()->user();

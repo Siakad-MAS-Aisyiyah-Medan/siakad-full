@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [roleType, setRoleType] = useState('Murid & Calon Murid');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -42,7 +43,7 @@ export default function LoginPage() {
 
       Swal.fire({
         icon: 'success',
-        title: 'Login Berhasil!',
+        title: 'Berhasil Login',
         text: `Selamat datang kembali, ${displayName}!`,
         timer: 1500,
         showConfirmButton: false,
@@ -52,12 +53,24 @@ export default function LoginPage() {
     } catch (err) {
       Swal.fire({
         icon: 'error',
-        title: 'Login Gagal',
-        text: err.response?.data?.message || 'NISN, Email, atau Password salah!',
+        title: 'Gagal Login',
+        text: err.response?.data?.message || 'Username, NIP, NISN, Email, atau Password salah!',
       });
     } finally {
       setLoading(false);
     }
+  };
+
+  const getLoginLabel = () => {
+    if (roleType === 'Administrator') return 'Username';
+    if (roleType === 'Pegawai') return 'NIP / Email';
+    return 'NISN / Email';
+  };
+
+  const getLoginPlaceholder = () => {
+    if (roleType === 'Administrator') return 'Masukkan Username';
+    if (roleType === 'Pegawai') return 'Masukkan NIP atau email';
+    return 'Masukkan NISN atau email';
   };
 
   return (
@@ -90,23 +103,47 @@ export default function LoginPage() {
           <header>
             <AppLogo size="lg" className="login-form-logo" />
             <h2>Selamat Datang</h2>
-            <p>Silakan masuk ke akun Anda</p>
+            <p>Silakan pilih akses dan masuk ke akun Anda</p>
           </header>
+
+          <div style={{ display: 'flex', marginBottom: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
+            {['Administrator', 'Pegawai', 'Murid & Calon Murid'].map((role) => (
+              <button
+                key={role}
+                type="button"
+                onClick={() => setRoleType(role)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem 0.5rem',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: roleType === role ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: roleType === role ? 'var(--primary)' : '#6b7280',
+                  fontWeight: roleType === role ? '600' : '400',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  fontSize: '0.9rem'
+                }}
+              >
+                {role}
+              </button>
+            ))}
+          </div>
 
           <form onSubmit={handleLogin}>
             <div className="input-group">
-              <label htmlFor="username">NISN / Email</label>
+              <label htmlFor="username">{getLoginLabel()}</label>
               <input
                 type="text"
                 id="username"
-                placeholder="Masukkan NISN atau email"
+                placeholder={getLoginPlaceholder()}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
             <div className="input-group">
-              <label htmlFor="password">Kata Sandi</label>
+              <label htmlFor="password">Password</label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -138,7 +175,7 @@ export default function LoginPage() {
               </div>
             </div>
             <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
-              {loading ? 'Memproses...' : 'Login'}
+              {loading ? 'Memproses...' : 'Login Sistem'}
             </button>
           </form>
 

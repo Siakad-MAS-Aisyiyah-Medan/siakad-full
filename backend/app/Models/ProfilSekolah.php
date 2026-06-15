@@ -10,6 +10,8 @@ class ProfilSekolah extends Model
 
     protected $fillable = [
         'nama_sekolah',
+        'npsn',
+        'akreditasi',
         'hero_subtitle',
         'hero_image',
         'tentang_kami',

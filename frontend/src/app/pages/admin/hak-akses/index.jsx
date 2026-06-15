@@ -4,7 +4,7 @@ import { Plus, X, UserPlus, User, AtSign, Mail, Shield, Lock, Eye, EyeOff, Info,
 import Swal from 'sweetalert2';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
 import FormInput from '@app/shared/components/FormInput';
-import { fetchAdminAkunList, createAdminAkun, deleteAdminAkun } from '@app/shared/services/akun.service';
+import { fetchAdminAkunList, createAdminAkun, deleteAdminAkun, updateAdminAkun } from '@app/shared/services/akun.service';
 
 export default function HakAksesPage() {
   const [akunData, setAkunData] = useState([]);
@@ -20,12 +20,15 @@ export default function HakAksesPage() {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'admin'
+    role: 'admin',
+    status: 'aktif'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -81,41 +84,66 @@ export default function HakAksesPage() {
   };
 
   const handleAdd = () => {
+    setIsEditMode(false);
+    setEditId(null);
+    setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'admin', status: 'aktif' });
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (akun) => {
+    setIsEditMode(true);
+    setEditId(akun.id);
+    setFormData({ 
+      name: akun.name, 
+      email: akun.email, 
+      password: '', 
+      confirmPassword: '', 
+      role: akun.role,
+      status: akun.status === 'aktif' ? 'aktif' : 'nonaktif'
+    });
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'admin' });
+    setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'admin', status: 'aktif' });
     setShowPassword(false);
     setShowConfirmPassword(false);
+    setIsEditMode(false);
+    setEditId(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password && formData.password !== formData.confirmPassword) {
       Swal.fire('Error', 'Konfirmasi password tidak cocok', 'error');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Send without confirmPassword
       const submitData = { ...formData };
       delete submitData.confirmPassword;
 
-      // Auto-generate username from email since backend requires it
-      const baseUsername = formData.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      submitData.username = `${baseUsername}${randomSuffix}`;
+      if (!isEditMode) {
+        const baseUsername = formData.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+        submitData.username = `${baseUsername}${randomSuffix}`;
+        
+        await createAdminAkun(submitData);
+      } else {
+        if (!submitData.password) {
+          delete submitData.password;
+        }
+        await updateAdminAkun(editId, submitData);
+      }
 
-      await createAdminAkun(submitData);
       Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
       handleCloseModal();
       loadAkun();
     } catch (error) {
       console.error(error);
-      Swal.fire('Gagal', 'Terjadi kesalahan saat menambahkan akun. Periksa data Anda.', 'error');
+      Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan akun. Periksa data Anda.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -262,7 +290,7 @@ export default function HakAksesPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => Swal.fire('Info', 'Fitur edit akun sedang dalam pengembangan', 'info')} title="Edit">
+                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => handleEdit(akun)} title="Edit">
                           <Edit2 size={16} />
                         </button>
                         <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={() => handleDelete(akun.id, akun.name)} title="Hapus">
@@ -316,7 +344,7 @@ export default function HakAksesPage() {
                   <UserPlus size={24} />
                 </div>
                 <div>
-                  <h3 className="text-[22px] font-bold text-slate-900 font-inter">Tambah Akun Baru</h3>
+                  <h3 className="text-[22px] font-bold text-slate-900 font-inter">{isEditMode ? 'Edit Akun Pengguna' : 'Tambah Akun Baru'}</h3>
                   <p className="text-[14px] text-slate-500 mt-0.5">Lengkapi informasi akun untuk memberikan akses ke sistem.</p>
                 </div>
               </div>
@@ -368,19 +396,32 @@ export default function HakAksesPage() {
                       { value: 'calon_siswa', label: 'Calon Siswa' }
                     ]}
                   />
+                  {isEditMode && (
+                    <FormInput 
+                      label="Status Akun"
+                      type="select"
+                      icon={Shield}
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      options={[
+                        { value: 'aktif', label: 'Aktif' },
+                        { value: 'nonaktif', label: 'Nonaktif' }
+                      ]}
+                    />
+                  )}
                 </div>
 
                 {/* Row 3: Passwords */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <FormInput 
-                      label="Password"
+                      label={isEditMode ? "Password Baru (Opsional)" : "Password"}
                       type="password"
                       icon={Lock}
                       placeholder="Minimal 6 karakter"
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      required
+                      required={!isEditMode}
                       minLength="6"
                     />
                     {/* Password Strength pseudo-indicator */}
@@ -446,7 +487,7 @@ export default function HakAksesPage() {
                 ) : (
                   <>
                     <Check size={18} />
-                    Simpan Akun
+                    {isEditMode ? 'Simpan Perubahan' : 'Tambahkan'}
                   </>
                 )}
               </button>

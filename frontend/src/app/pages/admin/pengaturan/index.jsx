@@ -81,7 +81,7 @@ export default function PengaturanSistemPage() {
       }
       const res = await updateAdminProfile(payload);
       
-      setToast({ message: 'Profil berhasil diperbarui', type: 'success' });
+      setToast({ message: 'Data berhasil disimpan', type: 'success' });
       setIsEditing(false);
       setForm(prev => ({ ...prev, current_password: '', new_password: '', new_password_confirmation: '' }));
       
@@ -122,7 +122,7 @@ export default function PengaturanSistemPage() {
                 onClick={() => setIsEditing(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10"
               >
-                Edit Pengaturan
+                Edit
               </button>
             )}
           </div>
@@ -177,6 +177,22 @@ export default function PengaturanSistemPage() {
                         disabled={!isEditing}
                         className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
                         placeholder="admin123"
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <Mail size={12} className="text-emerald-500"/> Email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
+                        placeholder="admin@email.com"
                       />
                     </div>
                  </div>
@@ -249,7 +265,7 @@ export default function PengaturanSistemPage() {
                 className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-500/20 disabled:shadow-none"
               >
                 {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-                {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
+                {saving ? 'Menyimpan...' : 'Simpan'}
               </button>
             </div>
           )}

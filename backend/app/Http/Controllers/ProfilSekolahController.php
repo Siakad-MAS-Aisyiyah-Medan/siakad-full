@@ -41,6 +41,8 @@ class ProfilSekolahController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama_sekolah' => 'nullable|string|max:255',
+            'npsn' => 'nullable|string|max:20',
+            'akreditasi' => 'nullable|string|max:10',
             'hero_subtitle' => 'nullable|string|max:255',
             'tentang_kami' => 'nullable|string',
             'alamat' => 'nullable|string',

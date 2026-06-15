@@ -5,6 +5,8 @@ import { getProfilSekolah, updateProfilSekolah } from '@app/shared/services/prof
 export default function InfoProfilPage({ readOnly = false }) {
   const [formData, setFormData] = useState({
     nama_sekolah: '',
+    npsn: '',
+    akreditasi: '',
     hero_subtitle: '',
     tentang_kami: '',
     alamat: '',
@@ -125,6 +127,17 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>NPSN</p>
+              <p style={{ fontSize: '1.1rem' }}>{formData.npsn || '-'}</p>
+            </div>
+            <div>
+              <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Akreditasi</p>
+              <p style={{ fontSize: '1.1rem' }}>{formData.akreditasi || '-'}</p>
+            </div>
+          </div>
+
           <div>
             <p style={{ fontWeight: 'bold', color: '#64748b', marginBottom: '0.25rem' }}>Tentang Kami</p>
             <p style={{ fontSize: '1rem', whiteSpace: 'pre-line' }}>{formData.tentang_kami || '-'}</p>
@@ -194,6 +207,35 @@ export default function InfoProfilPage({ readOnly = false }) {
               style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
               placeholder="Contoh: Sekolah Berbasis Islam Modern"
             />
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>NPSN</label>
+            <input
+              type="text"
+              name="npsn"
+              value={formData.npsn || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+              placeholder="Contoh: 12345678"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.5rem' }}>Akreditasi</label>
+            <select
+              name="akreditasi"
+              value={formData.akreditasi || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#fff' }}
+            >
+              <option value="">Pilih Akreditasi</option>
+              <option value="A">A (Unggul)</option>
+              <option value="B">B (Baik Sekali)</option>
+              <option value="C">C (Baik)</option>
+              <option value="TT">Tidak Terakreditasi</option>
+            </select>
           </div>
         </div>
 
