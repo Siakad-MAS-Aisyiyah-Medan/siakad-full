@@ -4,17 +4,17 @@ import InfoProfilPage from './info';
 import PrestasiPage from './prestasi';
 import EkskulPage from './ekskul';
 
-export default function ProfilSekolahPage() {
+export default function ProfilSekolahPage({ readOnly = false }) {
   const [activeTab, setActiveTab] = useState('info');
 
   const renderContent = () => {
     switch (activeTab) {
       case 'info':
-        return <InfoProfilPage />;
+        return <InfoProfilPage readOnly={readOnly} />;
       case 'prestasi':
-        return <PrestasiPage />;
+        return <PrestasiPage readOnly={readOnly} />;
       case 'ekskul':
-        return <EkskulPage />;
+        return <EkskulPage readOnly={readOnly} />;
       default:
         return null;
     }

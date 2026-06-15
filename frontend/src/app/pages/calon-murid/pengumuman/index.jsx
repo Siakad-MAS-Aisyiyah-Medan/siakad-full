@@ -1,146 +1,89 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar, Loader2, Megaphone, Tag, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Calendar, ChevronRight, Loader2 } from 'lucide-react';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
-import PortalPageShell from '@app/shared/ppdb/components/portal/PortalPageShell';
-import Button from '@app/shared/ppdb/components/portal/Button';
-import EmptyState from '@app/shared/ppdb/components/portal/EmptyState';
-import { fetchPpdbInfo } from "@app/shared/services/ppdb.service";
+import { fetchPpdbInfo } from '@app/shared/services/ppdb.service';
+import './pengumuman-ppdb.css';
 
-const DEFAULT_ANNOUNCEMENTS = [
-  {
-    id: 1,
-    title: 'Penerimaan Peserta Didik Baru 2026/2027',
-    category: 'PPDB',
-    date: '2026',
-    body: 'MAS Aisyiyah Medan membuka pendaftaran peserta didik baru Tahun Pelajaran 2026/2027. Buat akun calon murid, lengkapi formulir dan berkas, lalu pantau status pendaftaran secara online.',
-    featured: true,
-  },
-  {
-    id: 2,
-    title: 'Alur Pendaftaran Online',
-    category: 'Informasi',
-    date: '2026',
-    body: 'Buat akun → login → lengkapi formulir → upload berkas → submit → pantau status di portal.',
-    featured: false,
-  },
-];
-
-const CATEGORY_COLORS = {
-  PPDB: 'cm-badge--green',
-  Informasi: 'cm-badge--blue',
-  Pengumuman: 'cm-badge--amber',
-  Akademik: 'cm-badge--purple',
-};
-
-function mapAnnouncements(info) {
-  if (!info) return DEFAULT_ANNOUNCEMENTS;
-  const list = info.pengumuman_list || info.announcements;
-  if (Array.isArray(list) && list.length) {
-    return list.map((item, i) => ({
-      id: item.id || i,
-      title: item.judul || item.title || 'Pengumuman',
-      category: item.kategori || item.category || 'PPDB',
-      date: item.tanggal || item.published_at || item.date || '—',
-      body: item.isi || item.body || item.deskripsi || '',
-      featured: i === 0,
-    }));
-  }
-  if (info.deskripsi || info.description) {
-    return [
-      {
-        id: 'main',
-        title: info.judul || info.title || 'Informasi PPDB',
-        category: 'PPDB',
-        date: info.tahun_ajaran || info.academic_year || '2026/2027',
-        body: info.deskripsi || info.description,
-        featured: true,
-      },
-      ...DEFAULT_ANNOUNCEMENTS.slice(1),
-    ];
-  }
-  return DEFAULT_ANNOUNCEMENTS;
-}
-
-export default function PengumumanCalonMurid() {
-  const navigate = useNavigate();
-  const [items, setItems] = useState([]);
+export default function PengumumanPpdb() {
+  const [pengumumanData, setPengumumanData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPpdbInfo()
-      .then((info) => setItems(mapAnnouncements(info)))
-      .catch(() => setItems(DEFAULT_ANNOUNCEMENTS))
-      .finally(() => setLoading(false));
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      const data = await fetchPpdbInfo();
+      // data.pengumuman might be available, depending on the API. 
+      // If it's a list, we use it. 
+      if (data && Array.isArray(data.pengumuman)) {
+        setPengumumanData(data.pengumuman);
+      } else if (data && data.data && Array.isArray(data.data)) {
+        setPengumumanData(data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <CalonMuridLayout>
-      <PortalPageShell>
-        {/* Page Header */}
-        <div className="cm-page-header cm-page-header--pengumuman">
-          <div className="cm-page-header__icon">
-            <Megaphone size={28} strokeWidth={1.5} />
-          </div>
-          <div className="cm-page-header__content">
-            <h1 className="cm-page-header__title">Pengumuman</h1>
-            <p className="cm-page-header__subtitle">
-              Informasi resmi terbaru dari panitia PPDB.
-            </p>
-          </div>
+      <div className="pengumuman-header animate-stagger-1">
+        <div className="pengumuman-header__icon">
+          <Bell size={28} />
         </div>
+        <div>
+          <h1 className="text-2xl font-bold text-emerald-900">Pengumuman Terkini</h1>
+          <p className="text-emerald-700/80">
+            Pusat informasi dan pemberitahuan resmi terkait pendaftaran peserta didik baru.
+          </p>
+        </div>
+      </div>
 
+      <div className="pengumuman-content animate-stagger-2">
         {loading ? (
-          <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-slate-500">
-            <Loader2 className="h-10 w-10 animate-spin text-emerald-600" />
+          <div className="flex flex-col items-center justify-center p-12 text-slate-400 bg-white/50 backdrop-blur rounded-3xl">
+            <Loader2 size={40} className="animate-spin mb-4" />
             <p>Memuat pengumuman...</p>
           </div>
-        ) : items.length === 0 ? (
-          <EmptyState
-            title="Belum ada pengumuman"
-            description="Pengumuman resmi PPDB akan ditampilkan di halaman ini."
-            actionLabel="Lihat Informasi PPDB"
-            onAction={() => navigate('/ppdb/informasi')}
-            icon={Megaphone}
-          />
-        ) : (
-          <div className="space-y-4">
-            {items.map((item) => {
-              const categoryColor = CATEGORY_COLORS[item.category] || 'cm-badge--green';
-              return (
-                <article key={item.id} className={`cm-announce-card${item.featured ? ' cm-announce-card--featured' : ''}`}>
-                  <div className="cm-announce-card__header">
-                    <div className="cm-announce-card__meta">
-                      <span className={`cm-badge ${categoryColor}`}>
-                        <Tag size={11} />
-                        {item.category}
-                      </span>
-                      <span className="cm-announce-card__date">
-                        <Calendar size={13} />
-                        {item.date}
-                      </span>
-                    </div>
-                    {item.featured && (
-                      <span className="cm-announce-card__featured-label">Terbaru</span>
-                    )}
-                  </div>
-                  <div className="cm-announce-card__icon-wrap" aria-hidden>
-                    <Megaphone size={18} />
-                  </div>
-                  <h2 className="cm-announce-card__title">{item.title}</h2>
-                  <p className="cm-announce-card__body">{item.body}</p>
-                </article>
-              );
-            })}
-            <div className="pt-2 flex flex-col sm:flex-row gap-3">
-              <Button variant="secondary" onClick={() => navigate('/ppdb/informasi')}>
-                Buka Halaman Informasi Lengkap
-                <ArrowRight size={16} />
-              </Button>
+        ) : pengumumanData.length === 0 ? (
+          <div className="empty-pengumuman">
+            <div className="empty-pengumuman__icon">
+              <Bell size={48} />
             </div>
+            <h3>Belum Ada Pengumuman</h3>
+            <p>Saat ini belum ada pengumuman terbaru untuk Anda. Silakan cek kembali nanti secara berkala.</p>
+          </div>
+        ) : (
+          <div className="pengumuman-grid">
+            {pengumumanData.map((item, index) => (
+              <div key={item.id || index} className="pengumuman-card">
+                <div className="pengumuman-card__head">
+                  <span className="pengumuman-card__badge">Pemberitahuan</span>
+                  {item.created_at && (
+                    <span className="pengumuman-card__date">
+                      <Calendar size={14} />
+                      {new Date(item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </span>
+                  )}
+                </div>
+                <h3 className="pengumuman-card__title">{item.judul || 'Pengumuman Penting'}</h3>
+                <p className="pengumuman-card__excerpt">
+                  {item.konten || item.deskripsi || item.isi || 'Tidak ada konten deskripsi untuk pengumuman ini.'}
+                </p>
+                <div className="pengumuman-card__footer">
+                  <button className="pengumuman-btn">
+                    Baca Selengkapnya <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-      </PortalPageShell>
+      </div>
     </CalonMuridLayout>
   );
 }

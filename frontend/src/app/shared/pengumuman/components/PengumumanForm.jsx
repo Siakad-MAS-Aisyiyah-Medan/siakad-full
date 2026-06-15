@@ -1,7 +1,7 @@
 import { Save, X, Image as ImageIcon, Tag, Lock, Users } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function PengumumanForm({ view, formData, loading, onChange, onSubmit, onCancel }) {
+export default function PengumumanForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
       <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
           <h2 className="text-xl font-extrabold text-slate-800">
-            {view === 'add' ? 'Buat Pengumuman Baru' : 'Edit Pengumuman'}
+            {readOnly ? 'Detail Pengumuman' : (view === 'add' ? 'Buat Pengumuman Baru' : 'Edit Pengumuman')}
           </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">
             Isi detail pengumuman yang akan dipublikasikan.
@@ -58,9 +58,10 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                 value={formData.judul}
                 onChange={onChange}
                 placeholder="Contoh: Jadwal Ujian Tengah Semester Genap..."
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-medium rounded-xl px-4 h-12 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-400"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-medium rounded-xl px-4 h-12 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-400 disabled:bg-slate-100"
                 required
-                autoFocus
+                autoFocus={!readOnly}
+                disabled={readOnly}
               />
             </div>
 
@@ -74,8 +75,9 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                 onChange={onChange}
                 placeholder="Tuliskan isi pengumuman secara detail di sini..."
                 rows={8}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-medium rounded-xl p-4 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-400 resize-none"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-medium rounded-xl p-4 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-400 resize-none disabled:bg-slate-100"
                 required
+                disabled={readOnly}
               />
             </div>
           </div>
@@ -94,6 +96,7 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                   accept="image/png, image/jpeg, image/jpg, image/gif"
                   onChange={onChange}
                   className="hidden"
+                  disabled={readOnly}
                 />
                 {previewUrl ? (
                   <div className="absolute inset-0 w-full h-full">
@@ -129,7 +132,8 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                   name="kategori"
                   value={formData.kategori || ''}
                   onChange={onChange}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
+                  disabled={readOnly}
                 >
                   <option value="" disabled>Pilih Kategori...</option>
                   {KATEGORI_OPTIONS.map((opt) => (
@@ -149,7 +153,8 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                 name="tanggal_publikasi"
                 value={formData.tanggal_publikasi}
                 onChange={onChange}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-xl px-4 h-12 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-xl px-4 h-12 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all disabled:bg-slate-100"
+                disabled={readOnly}
               />
             </div>
           </div>
@@ -192,6 +197,7 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                 checked={formData.akses === 'umum'}
                 onChange={onChange}
                 className="hidden"
+                disabled={readOnly}
               />
             </label>
 
@@ -226,6 +232,7 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                 checked={formData.akses === 'internal'}
                 onChange={onChange}
                 className="hidden"
+                disabled={readOnly}
               />
             </label>
           </div>
@@ -238,20 +245,22 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
             onClick={onCancel}
             className="h-11 px-6 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
           >
-            Batal
+            {readOnly ? 'Tutup' : 'Batal'}
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-11 px-8 rounded-xl font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save size={18} strokeWidth={2.5} />
-            )}
-            {loading ? 'Menyimpan...' : 'Simpan & Publikasikan'}
-          </button>
+          {!readOnly && (
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-11 px-8 rounded-xl font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Save size={18} strokeWidth={2.5} />
+              )}
+              {loading ? 'Menyimpan...' : 'Simpan & Publikasikan'}
+            </button>
+          )}
         </div>
       </form>
     </div>

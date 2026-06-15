@@ -2,7 +2,7 @@ import EkskulTable from '@app/shared/ekstrakurikuler/components/EkskulTable';
 import EkskulForm from '@app/shared/ekstrakurikuler/components/EkskulForm';
 import { useEkskul } from '@app/shared/ekstrakurikuler/hooks/useEkskul';
 
-export default function EkskulPage() {
+export default function EkskulPage({ readOnly = false }) {
   const {
     view,
     searchQuery,
@@ -27,10 +27,11 @@ export default function EkskulPage() {
           filteredData={filteredData}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={removeItem}
+          onAdd={readOnly ? undefined : openAdd}
+          onEdit={readOnly ? undefined : openEdit}
+          onDelete={readOnly ? undefined : removeItem}
           isFetching={isFetching}
+          readOnly={readOnly}
         />
       )}
       {(view === 'add' || view === 'edit') && (
@@ -42,6 +43,7 @@ export default function EkskulPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
     </>

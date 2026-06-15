@@ -5,7 +5,7 @@ import MuridForm from '@app/shared/akademik/murid/components/MuridForm';
 import { useMurid } from '@app/shared/akademik/murid/hooks/useMurid';
 import { Users, UserCheck, UserPlus, GraduationCap, Plus } from 'lucide-react';
 
-export default function MuridPage() {
+export default function MuridPage({ readOnly = false }) {
   const { 
     view, 
     searchQuery, 
@@ -39,13 +39,15 @@ export default function MuridPage() {
             </div>
             <div className="flex items-center gap-3 w-full lg:w-auto">
               <MuridFilter searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-              <button 
-                onClick={openAdd}
-                className="btn-primary h-12 px-5 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all shrink-0"
-              >
-                <Plus size={18} strokeWidth={2.5} />
-                <span className="hidden md:inline">Tambah Murid</span>
-              </button>
+              {!readOnly && (
+                <button 
+                  onClick={openAdd}
+                  className="btn-primary h-12 px-5 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all shrink-0"
+                >
+                  <Plus size={18} strokeWidth={2.5} />
+                  <span className="hidden md:inline">Tambah Murid</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -97,7 +99,14 @@ export default function MuridPage() {
           </div>
         </div>
 
-        <MuridTable data={filteredData} onPromote={promoteMurid} onDelete={removeMurid} onEdit={openEdit} isFetching={isFetching} />
+        <MuridTable 
+          data={filteredData} 
+          onPromote={readOnly ? undefined : promoteMurid} 
+          onDelete={readOnly ? undefined : removeMurid} 
+          onEdit={readOnly ? undefined : openEdit} 
+          isFetching={isFetching} 
+          readOnly={readOnly} 
+        />
       </div>
       )}
       
@@ -109,6 +118,7 @@ export default function MuridPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
     </AdminPageShell>

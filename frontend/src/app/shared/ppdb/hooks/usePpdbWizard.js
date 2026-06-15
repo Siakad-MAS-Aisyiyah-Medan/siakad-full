@@ -8,7 +8,6 @@ import {
   EDITABLE_STATUSES,
   FINAL_STATUSES,
   PPDB_STEPS,
-  stepIndexFromCurrentStep,
 } from '../config/ppdbWizardConfig';
 import {
   fetchMyRegistration,
@@ -33,7 +32,6 @@ const SAVE_FN = {
   'pendidikan-asal': saveStepPendidikanAsal,
   'orang-tua-wali': saveStepOrangTuaWali,
   kepribadian: saveStepKepribadian,
-  dokumen: saveStepDokumen,
 };
 
 const EMPTY_FORMS = {
@@ -42,7 +40,6 @@ const EMPTY_FORMS = {
   pendidikanAsal: {},
   orangTuaWali: {},
   kepribadian: {},
-  dokumen: {},
   meta: {},
 };
 
@@ -72,27 +69,74 @@ export function extractApiError(err) {
 function mapRegistrationToForms(p) {
   if (!p) return { ...EMPTY_FORMS };
   return {
-    keteranganPribadi: p.keterangan_pribadi || {},
-    kesehatan: p.kesehatan || {},
-    pendidikanAsal: p.pendidikan_asal || {},
-    orangTuaWali: p.orang_tua_wali || {},
-    kepribadian: p.kepribadian || {},
-    dokumen: p.dokumen || {},
+    keteranganPribadi: {
+      nama_lengkap: p.nama_lengkap ?? '',
+      tempat_lahir: p.tempat_lahir ?? '',
+      tgl_lahir: p.tgl_lahir ?? '',
+      jenis_kelamin: p.jenis_kelamin ?? '',
+      agama: p.agama ?? '',
+      kewarganegaraan: p.kewarganegaraan ?? '',
+      anak_ke: p.anak_ke ?? '',
+      jml_saudara_kandung: p.jml_saudara_kandung ?? '',
+      jml_saudara_tiri: p.jml_saudara_tiri ?? '',
+      alamat: p.alamat ?? '',
+      no_telp: p.no_telp ?? '',
+      status_yatim: p.status_yatim ?? '',
+    },
+    kesehatan: {
+      berat_badan: p.berat_badan ?? '',
+      tinggi_badan: p.tinggi_badan ?? '',
+      gol_darah: p.gol_darah ?? '',
+      penyakit_diderita: p.penyakit_diderita ?? '',
+      cacat_badan: p.cacat_badan ?? '',
+    },
+    pendidikanAsal: {
+      sekolah_asal: p.sekolah_asal ?? '',
+      tahun_lulus: p.tahun_lulus ?? '',
+      no_sttb: p.no_sttb ?? '',
+      pindahan_dari: p.pindahan_dari ?? '',
+      no_surat_pindah: p.no_surat_pindah ?? '',
+    },
+    orangTuaWali: {
+      nama_ayah: p.nama_ayah ?? '',
+      nama_ibu: p.nama_ibu ?? '',
+      pendidikan_ayah: p.pendidikan_ayah ?? '',
+      pendidikan_ibu: p.pendidikan_ibu ?? '',
+      pekerjaan_ayah: p.pekerjaan_ayah ?? '',
+      pekerjaan_ibu: p.pekerjaan_ibu ?? '',
+      agama_ortu: p.agama_ortu ?? '',
+      alamat_ortu: p.alamat_ortu ?? '',
+      no_hp_ortu: p.no_hp_ortu ?? '',
+      nama_wali: p.nama_wali ?? '',
+      pendidikan_wali: p.pendidikan_wali ?? '',
+      pekerjaan_wali: p.pekerjaan_wali ?? '',
+      agama_wali: p.agama_wali ?? '',
+      alamat_wali: p.alamat_wali ?? '',
+    },
+    kepribadian: {
+      hobi: p.hobi ?? '',
+      cita_cita: p.cita_cita ?? '',
+    },
     meta: {
-      status: p.status_pendaftaran,
+      status: p.ppdb_status ?? p.status_pendaftaran ?? 'draft',
       currentStep: p.current_step,
       currentStepIndex: p.current_step_index,
-      nomor: p.nomor_pendaftaran,
-      tahun: p.tahun_pelajaran,
+      nomor: p.no_registrasi ?? p.nomor_pendaftaran,
+      tahun: p.tahun_pelajaran ?? '2026/2027',
     },
   };
 }
 
-function mergeCompletedSteps(prev, stepIndex) {
-  if (stepIndex < 0 || stepIndex >= PPDB_STEPS.length - 1) return prev;
-  const set = new Set(prev);
-  set.add(stepIndex);
-  return [...set].sort((a, b) => a - b);
+function recalculateCompletedSteps(formsData) {
+  const completed = [];
+  PPDB_STEPS.forEach((step, index) => {
+    if (step.key === 'review') return;
+    const { valid } = validateStep(step.key, formsData);
+    if (valid) {
+      completed.push(index);
+    }
+  });
+  return completed;
 }
 
 export function usePpdbWizard() {
@@ -118,39 +162,46 @@ export function usePpdbWizard() {
   activeStepRef.current = activeStep;
 
   const applyRegistration = useCallback((p) => {
-    setForms(mapRegistrationToForms(p));
+    const formsData = mapRegistrationToForms(p);
+    setForms(formsData);
     const status = p?.status_pendaftaran || 'draft';
     const locked = FINAL_STATUSES.includes(status);
     setIsLocked(locked);
 
-    const stepIdx =
-      typeof p?.current_step_index === 'number'
-        ? p.current_step_index - 1
-        : stepIndexFromCurrentStep(p?.current_step_key || p?.current_step);
-
-    const safeStep = Math.min(Math.max(0, stepIdx), PPDB_STEPS.length - 1);
-    setActiveStep(safeStep);
-    setServerStepIndex(safeStep);
-    setCompletedSteps(buildInitialCompletedSteps(p?.current_step_index ?? safeStep + 1));
+    const safeStep = 0; // Default ke step 0, hitung maxReachable nanti
+    
+    const computedCompleted = recalculateCompletedSteps(formsData);
+    setCompletedSteps(computedCompleted);
+    
+    // Set active step to the first uncompleted step or 0
+    let firstIncomplete = 0;
+    while (computedCompleted.includes(firstIncomplete) && firstIncomplete < PPDB_STEPS.length - 1) {
+      firstIncomplete++;
+    }
+    
+    setActiveStep(firstIncomplete);
+    setServerStepIndex(firstIncomplete);
     setFieldErrors({});
     setReady(true);
   }, []);
 
   const syncFromServer = useCallback((p, { keepActiveStep = false } = {}) => {
-    setForms(mapRegistrationToForms(p));
+    const formsData = mapRegistrationToForms(p);
+    setForms(formsData);
     const status = p?.status_pendaftaran || 'draft';
     setIsLocked(FINAL_STATUSES.includes(status));
 
-    const serverIdx =
-      typeof p?.current_step_index === 'number'
-        ? Math.min(PPDB_STEPS.length - 1, Math.max(0, p.current_step_index - 1))
-        : stepIndexFromCurrentStep(p?.current_step_key || p?.current_step);
-
-    setServerStepIndex(serverIdx);
-    setCompletedSteps(buildInitialCompletedSteps(p?.current_step_index ?? serverIdx + 1));
+    const computedCompleted = recalculateCompletedSteps(formsData);
+    setCompletedSteps(computedCompleted);
+    
+    let firstIncomplete = 0;
+    while (computedCompleted.includes(firstIncomplete) && firstIncomplete < PPDB_STEPS.length - 1) {
+      firstIncomplete++;
+    }
+    setServerStepIndex(firstIncomplete);
 
     if (!keepActiveStep) {
-      setActiveStep(serverIdx);
+      setActiveStep(firstIncomplete);
     }
   }, []);
 
@@ -166,11 +217,8 @@ export function usePpdbWizard() {
         const updated = await saveFn(payload);
         const stepIndex = PPDB_STEPS.findIndex((s) => s.key === stepKey);
 
+        // completedSteps is updated inside syncFromServer because we passed the updated payload
         syncFromServer(updated, { keepActiveStep: !advance });
-
-        if (stepIndex >= 0) {
-          setCompletedSteps((prev) => mergeCompletedSteps(prev, stepIndex));
-        }
 
         if (advance && stepIndex >= 0 && stepIndex < PPDB_STEPS.length - 1) {
           setActiveStep(stepIndex + 1);
@@ -270,23 +318,7 @@ export function usePpdbWizard() {
     [isLocked, persistStep],
   );
 
-  useEffect(() => {
-    if (!ready || isLocked || saving) return undefined;
-
-    const step = PPDB_STEPS[activeStep];
-    if (!step || step.key === 'review') return undefined;
-
-    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-
-    autoSaveTimer.current = setTimeout(() => {
-      if (skipAutoSave.current) return;
-      saveDraft(true);
-    }, AUTO_SAVE_MS);
-
-    return () => {
-      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-    };
-  }, [forms, activeStep, ready, isLocked, saving, saveDraft]);
+  // Auto-save dinonaktifkan atas permintaan. Data hanya disimpan saat menekan Simpan & Lanjut atau Simpan Draft.
 
   const saveAndNext = async () => {
     const step = PPDB_STEPS[activeStep];

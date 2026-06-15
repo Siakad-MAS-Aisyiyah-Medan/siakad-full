@@ -11,6 +11,7 @@ export default function PengumumanTable({
   onEdit,
   onDelete,
   isFetching = false,
+  readOnly = false,
 }) {
   const totalPengumuman = items.length;
   const pengumumanUmum = items.filter((p) => p.akses === 'umum').length;
@@ -24,9 +25,11 @@ export default function PengumumanTable({
           <h2 className="text-2xl font-bold text-slate-800">Pengumuman Sekolah</h2>
           <p className="text-sm font-medium text-slate-500 mt-1">Kelola informasi penting untuk ekosistem sekolah.</p>
         </div>
-        <button type="button" onClick={onAdd} className="btn-primary w-full md:w-auto justify-center py-2.5 px-6 rounded-xl font-bold flex items-center gap-2 shadow-sm shadow-primary/30 hover:shadow-primary/50 transition-all">
-          <Plus size={18} strokeWidth={2.5} /> Tambah Pengumuman
-        </button>
+        {!readOnly && (
+          <button type="button" onClick={onAdd} className="btn-primary w-full md:w-auto justify-center py-2.5 px-6 rounded-xl font-bold flex items-center gap-2 shadow-sm shadow-primary/30 hover:shadow-primary/50 transition-all">
+            <Plus size={18} strokeWidth={2.5} /> Tambah Pengumuman
+          </button>
+        )}
       </div>
 
       {/* STATISTIK */}
@@ -160,12 +163,14 @@ export default function PengumumanTable({
                     </td>
                     <td className="py-5 text-right" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => onEdit(item)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title="Edit">
-                          <Edit2 size={18} />
+                        <button onClick={() => onEdit && onEdit(item)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title={readOnly ? "Detail" : "Edit"}>
+                          {readOnly ? <Search size={18} /> : <Edit2 size={18} />}
                         </button>
-                        <button onClick={() => onDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Hapus">
-                          <Trash2 size={18} />
-                        </button>
+                        {!readOnly && (
+                          <button onClick={() => onDelete && onDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Hapus">
+                            <Trash2 size={18} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -183,9 +188,11 @@ export default function PengumumanTable({
                       <p className="text-slate-500 mb-8 max-w-sm mx-auto text-sm leading-relaxed">
                           Mulai bagikan informasi, agenda, atau pemberitahuan penting pertama ke seluruh ekosistem sekolah.
                       </p>
-                      <button type="button" onClick={onAdd} className="btn-primary py-2.5 px-6 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all" style={{ marginBottom: '10px' }}>
-                        <Plus size={18} strokeWidth={2.5} /> Buat Pengumuman
-                      </button>
+                      {!readOnly && (
+                        <button type="button" onClick={onAdd} className="btn-primary py-2.5 px-6 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all" style={{ marginBottom: '10px' }}>
+                          <Plus size={18} strokeWidth={2.5} /> Buat Pengumuman
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

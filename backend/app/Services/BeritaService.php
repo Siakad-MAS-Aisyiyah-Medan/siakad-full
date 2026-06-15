@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use App\Http\Resources\BeritaResource;
 use App\Models\Berita;
 use App\Support\SearchInput;

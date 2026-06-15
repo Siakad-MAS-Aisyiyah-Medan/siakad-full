@@ -5,7 +5,7 @@ import { useGuru } from '@app/shared/akademik/guru/hooks/useGuru';
 import { useState } from 'react';
 import AbsensiGuruView from './AbsensiGuruView';
 
-export default function GuruPage() {
+export default function GuruPage({ readOnly = false }) {
   const {
     view,
     searchQuery,
@@ -30,10 +30,11 @@ export default function GuruPage() {
           filteredData={filteredData}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={removeGuru}
+          onAdd={readOnly ? undefined : openAdd}
+          onEdit={readOnly ? undefined : openEdit}
+          onDelete={readOnly ? undefined : removeGuru}
           isFetching={isFetching}
+          readOnly={readOnly}
         />
       )}
       {(view === 'add' || view === 'edit') && (
@@ -44,6 +45,7 @@ export default function GuruPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
 

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use App\Models\User;
 use App\Models\Siswa;
 use Illuminate\Support\Facades\DB;

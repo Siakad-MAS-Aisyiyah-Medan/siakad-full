@@ -4,7 +4,6 @@ export const PPDB_STEPS = [
   { key: 'pendidikan-asal', label: 'Pendidikan Asal', shortLabel: 'Pendidikan' },
   { key: 'orang-tua-wali', label: 'Orang Tua / Wali', shortLabel: 'Orang Tua' },
   { key: 'kepribadian', label: 'Kepribadian', shortLabel: 'Kepribadian' },
-  { key: 'dokumen', label: 'Dokumen', shortLabel: 'Dokumen' },
   { key: 'review', label: 'Review & Submit', shortLabel: 'Review' },
 ];
 
@@ -14,7 +13,6 @@ export const STEP_DESCRIPTIONS = {
   'pendidikan-asal': 'Masukkan data sekolah asal dan nomor STTB.',
   'orang-tua-wali': 'Lengkapi data orang tua atau wali calon siswa.',
   kepribadian: 'Ceritakan hobi dan cita-cita calon siswa.',
-  dokumen: 'Lengkapi referensi dokumen pendukung (path/URL sementara).',
   review: 'Periksa kembali seluruh data sebelum mengajukan pendaftaran.',
 };
 
@@ -59,13 +57,16 @@ export const FINAL_STATUSES = ['submitted', 'verified', 'accepted', 'rejected'];
 
 export const STATUS_YATIM_OPTIONS = ['Yatim', 'Piatu', 'Yatim Piatu', 'Tidak'];
 
+export const AGAMA_OPTIONS = ['Islam', 'Kristen Protestan', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'];
+
+export const GOL_DARAH_OPTIONS = ['A', 'B', 'AB', 'O', 'Tidak Tahu', '-'];
+
 export const STEP_SECTION = {
   'keterangan-pribadi': 'keteranganPribadi',
   kesehatan: 'kesehatan',
   'pendidikan-asal': 'pendidikanAsal',
   'orang-tua-wali': 'orangTuaWali',
   kepribadian: 'kepribadian',
-  dokumen: 'dokumen',
 };
 
 export const STEP_REQUIRED = {
@@ -86,7 +87,6 @@ export const STEP_REQUIRED = {
   'pendidikan-asal': ['sekolah_asal', 'no_sttb'],
   'orang-tua-wali': ['nama_ayah', 'nama_ibu', 'no_hp_ortu'],
   kepribadian: ['hobi', 'cita_cita'],
-  dokumen: [],
 };
 
 export const EDITABLE_STATUSES = ['draft', 'revision', 'revisi'];
@@ -137,14 +137,5 @@ export const REVIEW_SECTIONS = [
   { title: 'Kepribadian', section: 'kepribadian', fields: [
     ['hobi', 'Hobi'],
     ['cita_cita', 'Cita-cita'],
-  ]},
-  { title: 'Dokumen', section: 'dokumen', fields: [
-    ['foto_copy_ijazah', 'Foto Copy Ijazah'],
-    ['stk_asli', 'STK Asli'],
-    ['pas_foto', 'Pas Foto'],
-    ['nisn_dokumen', 'NISN (Dokumen)'],
-    ['fc_kartu_keluarga', 'FC Kartu Keluarga'],
-    ['fc_ktp_orang_tua', 'FC KTP Orang Tua'],
-    ['catatan_tambahan', 'Catatan Tambahan'],
   ]},
 ];

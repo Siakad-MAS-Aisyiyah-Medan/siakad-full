@@ -21,7 +21,7 @@ export default function FormInput({
         id={id}
         type={type}
         value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(id, e.target.value)}
         disabled={disabled}
         placeholder={placeholder || ''}
         aria-invalid={error ? 'true' : undefined}

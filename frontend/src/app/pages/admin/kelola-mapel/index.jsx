@@ -3,7 +3,7 @@ import MapelTable from '@app/shared/akademik/mapel/components/MapelTable';
 import MapelForm from '@app/shared/akademik/mapel/components/MapelForm';
 import { useMapel } from '@app/shared/akademik/mapel/hooks/useMapel';
 
-export default function MapelPage() {
+export default function MapelPage({ readOnly = false }) {
   const {
     view,
     searchQuery,
@@ -28,10 +28,11 @@ export default function MapelPage() {
           filteredData={filteredData}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={removeMapel}
+          onAdd={readOnly ? undefined : openAdd}
+          onEdit={readOnly ? undefined : openEdit}
+          onDelete={readOnly ? undefined : removeMapel}
           isFetching={isFetching}
+          readOnly={readOnly}
         />
       )}
       {(view === 'add' || view === 'edit') && (
@@ -43,6 +44,7 @@ export default function MapelPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
     </AdminPageShell>

@@ -151,7 +151,7 @@ class NilaiService
 
     public function legerForWali(int $waliUserId, array $filters): array
     {
-        $kelas = $this->resolveWaliKelas($waliUserId);
+        $kelas = $this->resolveWaliKelas($waliUserId, $filters['id_kelas'] ?? null);
 
         $query = Nilai::with(['siswa.siswa', 'mapel', 'guruInput.guru'])
             ->whereIn('id_user_siswa', function ($q) use ($kelas) {
@@ -179,7 +179,7 @@ class NilaiService
 
     public function validateByWali(int $waliUserId, array $payload): array
     {
-        $kelas = $this->resolveWaliKelas($waliUserId);
+        $kelas = $this->resolveWaliKelas($waliUserId, $payload['id_kelas'] ?? null);
         $semester = $payload['semester'];
         $tahunAjaran = $payload['tahun_ajaran'];
 
@@ -238,6 +238,11 @@ class NilaiService
     private function assertGuruCanInput(int $guruId, int $mapelId): void
     {
         $user = User::findOrFail($guruId);
+        
+        if ($user->role === 'admin') {
+            return;
+        }
+
         if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
             throw new InvalidArgumentException('Hanya guru yang dapat menginput nilai siswa.');
         }
@@ -248,14 +253,22 @@ class NilaiService
         }
     }
 
-    private function resolveWaliKelas(int $waliUserId): Kelas
+    private function resolveWaliKelas(int $userId, ?int $targetIdKelas = null): Kelas
     {
-        $user = User::findOrFail($waliUserId);
+        $user = User::findOrFail($userId);
+        
+        if ($user->role === 'admin') {
+            if (!$targetIdKelas) {
+                throw new InvalidArgumentException('Pilih kelas terlebih dahulu.');
+            }
+            return Kelas::findOrFail($targetIdKelas);
+        }
+
         if ($user->role !== 'wali_kelas') {
             throw new InvalidArgumentException('Akses hanya untuk wali kelas.');
         }
 
-        $kelas = Kelas::where('id_wali_kelas', $waliUserId)->first();
+        $kelas = Kelas::where('id_wali_kelas', $userId)->first();
         if (!$kelas) {
             throw new InvalidArgumentException('Anda belum ditugaskan sebagai wali kelas.');
         }

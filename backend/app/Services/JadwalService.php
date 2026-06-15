@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use App\Http\Resources\JadwalResource;
 use App\Models\JadwalPelajaran;
 use App\Models\Siswa;

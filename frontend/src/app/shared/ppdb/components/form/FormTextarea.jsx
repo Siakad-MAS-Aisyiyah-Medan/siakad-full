@@ -21,7 +21,7 @@ export default function FormTextarea({
         id={id}
         rows={rows}
         value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(id, e.target.value)}
         disabled={disabled}
         placeholder={placeholder || ''}
         aria-invalid={error ? 'true' : undefined}

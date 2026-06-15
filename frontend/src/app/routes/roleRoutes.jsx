@@ -26,9 +26,9 @@ import KepsekLaporanNilai from '@app/pages/kepala-sekolah/laporan-nilai';
 
 import DashboardGuru from '@app/pages/guru/dashboard';
 import GuruJadwal from '@app/pages/guru/jadwal';
-import GuruAbsensi from '@app/pages/guru/absensi';
+import GuruAbsensi from '@app/pages/guru/absensi/GuruAbsensi';
 import GuruRiwayatAbsensi from '@app/pages/guru/riwayat-absensi';
-import GuruNilai from '@app/pages/guru/nilai';
+import GuruNilai from '@app/pages/guru/nilai/GuruNilai';
 
 import DashboardWaliKelas from '@app/pages/guru/dashboard';
 import WaliAbsensi from '@app/pages/guru/absensi';
@@ -78,15 +78,23 @@ export const roleRoutes = (
 
     {/* Kepala sekolah */}
     <Route path="/kepala-sekolah/dashboard" element={wrapPerm('/kepsek/dashboard', <DashboardKepalaSekolah />)} />
-    <Route path="/kepala-sekolah/data" element={wrapPerm('/kepsek/data', <KepsekLaporanHub initialJenis="siswa" />)} />
-    <Route path="/kepala-sekolah/ppdb" element={wrapPerm('/kepsek/ppdb', <KepsekLaporanHub initialJenis="ppdb" />)} />
-    <Route path="/kepala-sekolah/laporan" element={wrapPerm('/kepsek/laporan', <KepsekLaporanHub />)} />
+    <Route path="/kepala-sekolah/data-diri" element={wrapPerm('/kepsek/dashboard', placeholder('Data Diri', 'Halaman profil dan data diri Anda.'))} />
+    <Route path="/kepala-sekolah/profil-sekolah" element={wrapPerm('/kepsek/profil-sekolah', <AdminProfilSekolah readOnly />)} />
+    <Route path="/kepala-sekolah/pengumuman" element={wrapPerm('/kepsek/pengumuman', <AdminPengumuman readOnly />)} />
+    <Route path="/kepala-sekolah/data-ppdb" element={wrapPerm('/kepsek/data-ppdb', <KepsekLaporanHub initialJenis="ppdb" />)} />
+    <Route path="/kepala-sekolah/data-murid" element={wrapPerm('/kepsek/data-murid', <AdminMurid readOnly />)} />
+    <Route path="/kepala-sekolah/data-guru" element={wrapPerm('/kepsek/data-guru', <AdminGuru readOnly />)} />
+    <Route path="/kepala-sekolah/data-kelas" element={wrapPerm('/kepsek/data-kelas', <AdminKelas readOnly />)} />
     <Route path="/kepala-sekolah/laporan-absensi" element={wrapPerm('/kepsek/laporan-absensi', <KepsekLaporanAbsensi />)} />
     <Route path="/kepala-sekolah/laporan-nilai" element={wrapPerm('/kepsek/laporan-nilai', <KepsekLaporanNilai />)} />
     <Route path="/kepsek/dashboard" element={<Navigate to="/kepala-sekolah/dashboard" replace />} />
-    <Route path="/kepsek/data" element={<Navigate to="/kepala-sekolah/data" replace />} />
-    <Route path="/kepsek/ppdb" element={<Navigate to="/kepala-sekolah/ppdb" replace />} />
-    <Route path="/kepsek/laporan" element={<Navigate to="/kepala-sekolah/laporan" replace />} />
+    <Route path="/kepsek/data-diri" element={<Navigate to="/kepala-sekolah/data-diri" replace />} />
+    <Route path="/kepsek/profil-sekolah" element={<Navigate to="/kepala-sekolah/profil-sekolah" replace />} />
+    <Route path="/kepsek/pengumuman" element={<Navigate to="/kepala-sekolah/pengumuman" replace />} />
+    <Route path="/kepsek/data-ppdb" element={<Navigate to="/kepala-sekolah/data-ppdb" replace />} />
+    <Route path="/kepsek/data-murid" element={<Navigate to="/kepala-sekolah/data-murid" replace />} />
+    <Route path="/kepsek/data-guru" element={<Navigate to="/kepala-sekolah/data-guru" replace />} />
+    <Route path="/kepsek/data-kelas" element={<Navigate to="/kepala-sekolah/data-kelas" replace />} />
     <Route path="/kepsek/laporan-absensi" element={<Navigate to="/kepala-sekolah/laporan-absensi" replace />} />
     <Route path="/kepsek/laporan-nilai" element={<Navigate to="/kepala-sekolah/laporan-nilai" replace />} />
 

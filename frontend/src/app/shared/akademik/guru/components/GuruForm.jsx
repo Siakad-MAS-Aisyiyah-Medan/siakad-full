@@ -1,7 +1,7 @@
 import { Save, X, Image as ImageIcon, ShieldAlert, GraduationCap, MapPin, Phone, Mail, User as UserIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function GuruForm({ view, formData, loading, onChange, onSubmit, onCancel }) {
+export default function GuruForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
       <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
           <h2 className="text-xl font-extrabold text-slate-800">
-            {view === 'add' ? 'Tambah Data Guru Baru' : 'Edit Data Guru'}
+            {readOnly ? 'Detail Data Guru' : (view === 'add' ? 'Tambah Data Guru Baru' : 'Edit Data Guru')}
           </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">
             Lengkapi profil, akun login, dan foto guru/tenaga pendidik.
@@ -51,6 +51,7 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   name="foto"
                   accept="image/png, image/jpeg, image/jpg"
                   onChange={onChange}
+                  disabled={readOnly}
                   className="hidden"
                 />
                 {previewUrl ? (
@@ -89,8 +90,9 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                     value={formData.username}
                     onChange={onChange}
                     placeholder="misal: guru_budiman"
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                     required
+                    disabled={readOnly}
                   />
                 </div>
                 <div>
@@ -105,8 +107,9 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                       value={formData.email}
                       onChange={onChange}
                       placeholder="budiman@sekolah.id"
-                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl pl-9 pr-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl pl-9 pr-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                       required
+                      disabled={readOnly}
                     />
                   </div>
                 </div>
@@ -118,7 +121,8 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                     value={formData.password}
                     onChange={onChange}
                     placeholder="Minimal 8 karakter"
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -142,8 +146,9 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                     value={formData.nama_guru}
                     onChange={onChange}
                     placeholder="Contoh: Drs. Budiman Wijaya, M.Pd."
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                     required
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -156,8 +161,9 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   value={formData.nip_nuptk}
                   onChange={onChange}
                   placeholder="Nomor identitas pegawai"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                   required
+                  disabled={readOnly}
                 />
               </div>
 
@@ -173,8 +179,9 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                     value={formData.no_hp}
                     onChange={onChange}
                     placeholder="Contoh: 081234567890"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                     required
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -185,7 +192,8 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   name="jenis_kelamin"
                   value={formData.jenis_kelamin}
                   onChange={onChange}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
+                  disabled={readOnly}
                 >
                   <option value="L">Laki-Laki</option>
                   <option value="P">Perempuan</option>
@@ -198,7 +206,8 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   name="agama"
                   value={formData.agama}
                   onChange={onChange}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
+                  disabled={readOnly}
                 >
                   <option value="Islam">Islam</option>
                   <option value="Kristen">Kristen Protestan</option>
@@ -221,8 +230,9 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                     onChange={onChange}
                     rows="3"
                     placeholder="Alamat lengkap tempat tinggal"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none disabled:bg-slate-100"
                     required
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -236,7 +246,8 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   name="role"
                   value={formData.role}
                   onChange={onChange}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
+                  disabled={readOnly}
                 >
                   <option value="guru">Guru Biasa / Mata Pelajaran</option>
                   <option value="wali_kelas">Guru & Wali Kelas</option>
@@ -249,9 +260,10 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   name="status"
                   value={formData.status}
                   onChange={onChange}
-                  className={`w-full bg-slate-50 border border-slate-200 text-[14px] font-bold rounded-xl px-4 h-11 focus:outline-none focus:ring-4 transition-all appearance-none cursor-pointer ${
+                  className={`w-full bg-slate-50 border border-slate-200 text-[14px] font-bold rounded-xl px-4 h-11 focus:outline-none focus:ring-4 transition-all appearance-none cursor-pointer disabled:bg-slate-100 ${
                     formData.status === 'aktif' ? 'text-emerald-600 focus:border-emerald-500 focus:ring-emerald-500/10' : 'text-rose-600 focus:border-rose-500 focus:ring-rose-500/10'
                   }`}
+                  disabled={readOnly}
                 >
                   <option value="aktif">🟢 Aktif Mengajar</option>
                   <option value="nonaktif">🔴 Nonaktif / Cuti / Resign</option>
@@ -269,20 +281,22 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
             onClick={onCancel}
             className="h-11 px-6 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
           >
-            Batal
+            {readOnly ? 'Tutup' : 'Batal'}
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-11 px-8 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save size={18} strokeWidth={2.5} />
-            )}
-            {loading ? 'Menyimpan...' : 'Simpan Data Guru'}
-          </button>
+          {!readOnly && (
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-11 px-8 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Save size={18} strokeWidth={2.5} />
+              )}
+              {loading ? 'Menyimpan...' : 'Simpan Data Guru'}
+            </button>
+          )}
         </div>
       </form>
     </div>

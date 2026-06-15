@@ -5,7 +5,7 @@ import KelasFilter from '@app/shared/akademik/kelas/components/KelasFilter';
 import { useKelas } from '@app/shared/akademik/kelas/hooks/useKelas';
 import { Users, Library, GraduationCap, AlertCircle, Plus } from 'lucide-react';
 
-export default function KelasPage() {
+export default function KelasPage({ readOnly = false }) {
   const {
     view,
     searchQuery,
@@ -90,25 +90,28 @@ export default function KelasPage() {
                 filterJurusan={filterJurusan}
                 onJurusanChange={setFilterJurusan}
               />
-              <button 
-                type="button" 
-                onClick={openAdd} 
-                className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white h-[46px] px-6 rounded-xl font-bold flex items-center justify-center shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all shrink-0"
-                style={{ gap: '8px' }}
-              >
-                <Plus size={18} strokeWidth={2.5} />
-                <span>Tambah Kelas</span>
-              </button>
+              {!readOnly && (
+                <button 
+                  type="button" 
+                  onClick={openAdd} 
+                  className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white h-[46px] px-6 rounded-xl font-bold flex items-center justify-center shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all shrink-0"
+                  style={{ gap: '8px' }}
+                >
+                  <Plus size={18} strokeWidth={2.5} />
+                  <span>Tambah Kelas</span>
+                </button>
+              )}
             </div>
           </div>
 
           {/* TABLE */}
           <KelasTable
             filteredData={filteredData}
-            onAdd={openAdd}
-            onEdit={openEdit}
-            onDelete={removeKelas}
+            onAdd={readOnly ? undefined : openAdd}
+            onEdit={readOnly ? undefined : openEdit}
+            onDelete={readOnly ? undefined : removeKelas}
             isFetching={isFetching}
+            readOnly={readOnly}
           />
         </div>
       )}
@@ -121,6 +124,7 @@ export default function KelasPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
     </AdminPageShell>

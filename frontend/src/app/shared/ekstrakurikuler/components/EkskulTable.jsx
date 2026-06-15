@@ -8,6 +8,7 @@ export default function EkskulTable({
   onEdit,
   onDelete,
   isFetching = false,
+  readOnly = false,
 }) {
   return (
     <div className="data-panel view-list">
@@ -26,9 +27,11 @@ export default function EkskulTable({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <button type="button" onClick={onAdd} className="btn-primary">
-            <Plus size={18} /> Tambah Ekskul
-          </button>
+          {!readOnly && (
+            <button type="button" onClick={onAdd} className="btn-primary">
+              <Plus size={18} /> Tambah Ekskul
+            </button>
+          )}
         </div>
       </div>
 
@@ -74,17 +77,19 @@ export default function EkskulTable({
                   </td>
                   <td>{item.lokasi || '-'}</td>
                   <td className="actions-cell">
-                    <button type="button" onClick={() => onEdit(item)} className="btn-icon edit" title="Edit">
-                      <Edit2 size={16} />
+                    <button type="button" onClick={() => onEdit && onEdit(item)} className="btn-icon edit" title={readOnly ? "Detail" : "Edit"}>
+                      {readOnly ? <Search size={16} /> : <Edit2 size={16} />}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id_ekskul)}
-                      className="btn-icon delete"
-                      title="Hapus"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {!readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => onDelete && onDelete(item.id_ekskul)}
+                        className="btn-icon delete"
+                        title="Hapus"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

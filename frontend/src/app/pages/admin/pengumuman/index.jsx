@@ -3,7 +3,7 @@ import PengumumanTable from '@app/shared/pengumuman/components/PengumumanTable';
 import PengumumanForm from '@app/shared/pengumuman/components/PengumumanForm';
 import { usePengumuman } from '@app/shared/pengumuman/hooks/usePengumuman';
 
-export default function PengumumanPage() {
+export default function PengumumanPage({ readOnly = false }) {
   const {
     view,
     items,
@@ -33,10 +33,11 @@ export default function PengumumanPage() {
           onSearchChange={setSearchQuery}
           filterAkses={filterAkses}
           setFilterAkses={setFilterAkses}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={removeItem}
+          onAdd={readOnly ? undefined : openAdd}
+          onEdit={readOnly ? undefined : openEdit}
+          onDelete={readOnly ? undefined : removeItem}
           isFetching={isFetching}
+          readOnly={readOnly}
         />
       )}
       {(view === 'add' || view === 'edit') && (
@@ -47,6 +48,7 @@ export default function PengumumanPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
     </AdminPageShell>

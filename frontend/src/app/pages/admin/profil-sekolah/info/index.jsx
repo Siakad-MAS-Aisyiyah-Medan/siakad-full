@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { getProfilSekolah, updateProfilSekolah } from '@app/shared/services/profilSekolah.service';
 
-export default function InfoProfilPage() {
+export default function InfoProfilPage({ readOnly = false }) {
   const [formData, setFormData] = useState({
     nama_sekolah: '',
     hero_subtitle: '',
@@ -84,20 +84,22 @@ export default function InfoProfilPage() {
       <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Informasi Profil Sekolah</h2>
-          <button
-            onClick={() => setIsEditing(true)}
-            style={{
-              padding: '0.5rem 1.5rem',
-              backgroundColor: 'var(--color-primary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            Edit Profil
-          </button>
+          {!readOnly && (
+            <button
+              onClick={() => setIsEditing(true)}
+              style={{
+                padding: '0.5rem 1.5rem',
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              Edit Profil
+            </button>
+          )}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

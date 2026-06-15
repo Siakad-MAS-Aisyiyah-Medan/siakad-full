@@ -22,7 +22,7 @@ export default function FormSelect({
         <select
           id={id}
           value={value ?? ''}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(id, e.target.value)}
           disabled={disabled}
           aria-invalid={error ? 'true' : undefined}
           className={`${selectClass}${error ? ' border-red-500 ring-[4px] ring-red-500/15' : ''}`}

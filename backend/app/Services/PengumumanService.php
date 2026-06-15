@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use App\Http\Resources\PengumumanResource;
 use App\Models\Pengumuman;
 use App\Support\SearchInput;

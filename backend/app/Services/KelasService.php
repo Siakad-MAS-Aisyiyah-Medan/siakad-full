@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use App\Http\Resources\KelasResource;
 use App\Models\Kelas;
 use App\Support\SearchInput;

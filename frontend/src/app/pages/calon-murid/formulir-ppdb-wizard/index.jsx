@@ -6,7 +6,6 @@ import {
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
 import FormActions from '@app/shared/ppdb/components/form/FormActions';
 import {
-  StepDokumen,
   StepKepribadian,
   StepKeteranganPribadi,
   StepKesehatan,
@@ -24,7 +23,6 @@ const STEP_ICONS = {
   'pendidikan-asal': School,
   'orang-tua-wali': Users,
   kepribadian: Star,
-  dokumen: FileText,
   review: ClipboardCheck,
 };
 
@@ -35,7 +33,6 @@ const STEP_ACCENTS = {
   'pendidikan-asal': 'wizard-accent--amber',
   'orang-tua-wali': 'wizard-accent--purple',
   kepribadian: 'wizard-accent--pink',
-  dokumen: 'wizard-accent--slate',
   review: 'wizard-accent--green',
 };
 
@@ -92,7 +89,6 @@ export default function FormulirPpdbWizard() {
       case 'pendidikan-asal':    return <StepPendidikan data={w.forms.pendidikanAsal} {...common} />;
       case 'orang-tua-wali':     return <StepOrtu data={w.forms.orangTuaWali} {...common} />;
       case 'kepribadian':        return <StepKepribadian data={w.forms.kepribadian} {...common} />;
-      case 'dokumen':            return <StepDokumen data={w.forms.dokumen} {...common} />;
       case 'review':             return <StepReview forms={w.forms} />;
       default:                   return null;
     }
@@ -130,7 +126,7 @@ export default function FormulirPpdbWizard() {
 
   return (
     <CalonMuridLayout>
-      <div className="wizard-root">
+      <div className="wizard-root animate-stagger-1">
         {/* ── Wizard Page Header ── */}
         <div className="wizard-page-header">
           <div className="wizard-page-header__left">
@@ -164,7 +160,7 @@ export default function FormulirPpdbWizard() {
         </div>
 
         {/* ── Step Progress Bar ── */}
-        <div className="wizard-progress-wrap">
+        <div className="wizard-progress-wrap animate-stagger-2">
           {/* Mini progress pill */}
           <div className="wizard-progress-topbar">
             <span className="wizard-progress-label">
@@ -219,7 +215,7 @@ export default function FormulirPpdbWizard() {
         </div>
 
         {/* ── Form Card ── */}
-        <div className="wizard-form-card">
+        <div className="wizard-form-card animate-stagger-3">
           {/* Step header */}
           <div className={`wizard-step-header ${accentClass}`}>
             <div className="wizard-step-header__icon">

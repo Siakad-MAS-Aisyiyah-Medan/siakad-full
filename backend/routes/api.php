@@ -11,14 +11,14 @@ require __DIR__.'/api/calon-siswa.php';
 
 // Route Publik (Tidak butuh login)
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Public\PengumumanController as PublicPengumumanController;
-use App\Http\Controllers\Api\Public\BeritaController as PublicBeritaController;
-use App\Http\Controllers\Api\Public\EkskulController as PublicEkskulController;
+use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\BeritaController;
+use App\Http\Controllers\EkskulController;
 
 Route::prefix('public')->group(function () {
-    Route::get('/pengumuman', [PublicPengumumanController::class, 'index']);
-    Route::get('/pengumuman/{id}', [PublicPengumumanController::class, 'show']);
-    Route::get('/berita', [PublicBeritaController::class, 'index']);
-    Route::get('/berita/{id}', [PublicBeritaController::class, 'show']);
-    Route::get('/ekskul', [PublicEkskulController::class, 'index']);
+    Route::get('/pengumuman', [PengumumanController::class, 'publicIndex']);
+    Route::get('/pengumuman/{id}', [PengumumanController::class, 'publicShow']);
+    Route::get('/berita', [BeritaController::class, 'publicIndex']);
+    Route::get('/berita/{id}', [BeritaController::class, 'publicShow']);
+    Route::get('/ekskul', [EkskulController::class, 'publicIndex']);
 });

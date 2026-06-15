@@ -2,7 +2,7 @@ import PrestasiTable from '@app/shared/berita-prestasi/components/PrestasiTable'
 import PrestasiForm from '@app/shared/berita-prestasi/components/PrestasiForm';
 import { usePrestasi } from '@app/shared/berita-prestasi/hooks/usePrestasi';
 
-export default function PrestasiPage() {
+export default function PrestasiPage({ readOnly = false }) {
   const {
     view,
     searchQuery,
@@ -26,10 +26,11 @@ export default function PrestasiPage() {
           filteredData={filteredData}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={removeItem}
+          onAdd={readOnly ? undefined : openAdd}
+          onEdit={readOnly ? undefined : openEdit}
+          onDelete={readOnly ? undefined : removeItem}
           isFetching={isFetching}
+          readOnly={readOnly}
         />
       )}
       {(view === 'add' || view === 'edit') && (
@@ -40,6 +41,7 @@ export default function PrestasiPage() {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
+          readOnly={readOnly}
         />
       )}
     </>

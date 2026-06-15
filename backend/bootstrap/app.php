@@ -4,7 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+$builder = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
-                return \App\Helpers\ApiResponse::error(
+                return \App\Utils\ApiResponse::error(
                     'Validasi gagal',
                     422,
                     $e->errors()
@@ -42,7 +42,11 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             if ($e instanceof \Illuminate\Auth\AuthenticationException) {
-                return \App\Helpers\ApiResponse::error('Unauthenticated', 401);
+                return \App\Utils\ApiResponse::error('Unauthenticated', 401);
+            }
+
+            if ($e instanceof \Symfony\Component\Routing\Exception\RouteNotFoundException && str_contains($e->getMessage(), '[login]')) {
+                return \App\Utils\ApiResponse::error('Unauthenticated', 401);
             }
 
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
@@ -54,7 +58,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     default => 'Permintaan tidak dapat diproses.',
                 };
 
-                return \App\Helpers\ApiResponse::error($message, $status);
+                return \App\Utils\ApiResponse::error($message, $status);
             }
 
             report($e);
@@ -63,6 +67,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? $e->getMessage()
                 : 'Terjadi kesalahan pada server.';
 
-            return \App\Helpers\ApiResponse::error($message, 500);
+            return \App\Utils\ApiResponse::error($message, 500);
         });
-    })->create();
+    });
+
+$app = $builder->create();
+
+// PENGATURAN EKSTREM: Memindahkan storage ke folder Temp bawaan Windows
+$app->useStoragePath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'siakad_storage');
+
+return $app;

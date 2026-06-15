@@ -11,7 +11,7 @@ const PPDB_LABELS = {
   menjadi_murid: 'Menjadi Murid',
 };
 
-export default function MuridTable({ data, onPromote, onDelete, onEdit, isFetching = false }) {
+export default function MuridTable({ data, onPromote, onDelete, onEdit, isFetching = false, readOnly = false }) {
   return (
     <div className="table-container glass mt-6">
       <table className="data-table">
@@ -88,34 +88,42 @@ export default function MuridTable({ data, onPromote, onDelete, onEdit, isFetchi
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid">
-                        <Eye size={16} />
-                      </button>
-                      <button 
-                        type="button"
-                        onClick={() => onEdit(murid)}
-                        className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      {canPromote && (
-                        <button
-                          type="button"
-                          onClick={() => onPromote(murid)}
-                          className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
-                          title="Jadikan Siswa Aktif"
-                        >
-                          <ShieldCheck size={16} />
+                      {readOnly ? (
+                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid" onClick={() => onEdit && onEdit(murid)}>
+                          <Eye size={16} />
                         </button>
+                      ) : (
+                        <>
+                          <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid">
+                            <Eye size={16} />
+                          </button>
+                          <button 
+                            type="button"
+                            onClick={() => onEdit && onEdit(murid)}
+                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          {canPromote && (
+                            <button
+                              type="button"
+                              onClick={() => onPromote && onPromote(murid)}
+                              className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                              title="Jadikan Siswa Aktif"
+                            >
+                              <ShieldCheck size={16} />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => onDelete && onDelete(murid.id_user)}
+                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Hapus Permanen"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => onDelete(murid.id_user)}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Hapus Permanen"
-                      >
-                        <Trash2 size={16} />
-                      </button>
                     </div>
                   </td>
                 </tr>

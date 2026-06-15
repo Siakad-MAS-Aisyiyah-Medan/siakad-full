@@ -8,6 +8,7 @@ export default function MapelTable({
   onEdit,
   onDelete,
   isFetching = false,
+  readOnly = false,
 }) {
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
@@ -33,14 +34,16 @@ export default function MapelTable({
               className="w-full md:w-64 bg-white border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-full pl-10 pr-4 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:font-medium placeholder:text-slate-400"
             />
           </div>
-          <button
-            type="button"
-            onClick={onAdd}
-            className="btn-primary h-10 px-5 rounded-full font-bold flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
-          >
-            <Plus size={18} strokeWidth={2.5} />
-            <span className="hidden md:inline">Tambah Mapel</span>
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={onAdd}
+              className="btn-primary h-10 px-5 rounded-full font-bold flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+            >
+              <Plus size={18} strokeWidth={2.5} />
+              <span className="hidden md:inline">Tambah Mapel</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -111,19 +114,21 @@ export default function MapelTable({
                   <td className="py-5 text-right" style={{ paddingLeft: '16px', paddingRight: '32px' }}>
                     <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => onEdit(mapel)}
+                        onClick={() => onEdit && onEdit(mapel)}
                         className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition-colors"
-                        title="Edit Mapel"
+                        title={readOnly ? "Detail Mapel" : "Edit Mapel"}
                       >
-                        <Edit2 size={14} strokeWidth={2.5} />
+                        {readOnly ? <Search size={14} strokeWidth={2.5} /> : <Edit2 size={14} strokeWidth={2.5} />}
                       </button>
-                      <button
-                        onClick={() => onDelete(mapel.id_mapel)}
-                        className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
-                        title="Hapus Mapel"
-                      >
-                        <Trash2 size={14} strokeWidth={2.5} />
-                      </button>
+                      {!readOnly && (
+                        <button
+                          onClick={() => onDelete && onDelete(mapel.id_mapel)}
+                          className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
+                          title="Hapus Mapel"
+                        >
+                          <Trash2 size={14} strokeWidth={2.5} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

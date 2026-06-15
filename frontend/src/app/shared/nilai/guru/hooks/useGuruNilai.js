@@ -22,16 +22,21 @@ export function useGuruNilai() {
   const [saving, setSaving] = useState(false);
 
   const userId = getStoredUser()?.id_user;
+  const userRole = getStoredUser()?.role;
 
   const loadOptions = useCallback(async () => {
     try {
       const [kelas, mapel] = await Promise.all([fetchKelasList(), fetchMapelList()]);
       setKelasList(kelas);
-      setMapelList(mapel.filter((m) => Number(m.id_guru) === Number(userId)));
+      setMapelList(
+        userRole === 'admin'
+          ? mapel
+          : mapel.filter((m) => Number(m.id_guru) === Number(userId))
+      );
     } catch (e) {
       console.error(e);
     }
-  }, [userId]);
+  }, [userId, userRole]);
 
   useEffect(() => {
     loadOptions();

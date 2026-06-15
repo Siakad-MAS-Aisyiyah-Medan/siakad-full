@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Pendaftaran;
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 

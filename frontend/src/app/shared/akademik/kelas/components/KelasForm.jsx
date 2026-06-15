@@ -1,13 +1,13 @@
 import { Save, X, Users, MapPin, GraduationCap, Building } from 'lucide-react';
 import { guruLabel } from '@app/shared/utils/guruLabel';
 
-export default function KelasForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel }) {
+export default function KelasForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
       <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
           <h2 className="text-xl font-extrabold text-slate-800">
-            {view === 'add' ? 'Tambah Kelas Baru' : 'Edit Data Kelas'}
+            {readOnly ? 'Detail Data Kelas' : (view === 'add' ? 'Tambah Kelas Baru' : 'Edit Data Kelas')}
           </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">
             Lengkapi detail informasi untuk kelas ini.
@@ -38,9 +38,10 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
                   value={formData.nama_kelas}
                   onChange={onChange}
                   placeholder="Contoh: X IPA 1"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                   required
-                  autoFocus
+                  autoFocus={!readOnly}
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -51,8 +52,9 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
                 name="tingkat"
                 value={formData.tingkat}
                 onChange={onChange}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
                 required
+                disabled={readOnly}
               >
                 <option value="" disabled>Pilih Tingkat...</option>
                 <option value="X">Kelas X</option>
@@ -67,8 +69,9 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
                 name="jurusan"
                 value={formData.jurusan}
                 onChange={onChange}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
                 required
+                disabled={readOnly}
               >
                 <option value="" disabled>Pilih Jurusan...</option>
                 <option value="IPA">IPA (MIPA)</option>
@@ -92,8 +95,9 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
                   min="1"
                   max="100"
                   placeholder="36"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                   required
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -110,7 +114,8 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
                   value={formData.ruangan}
                   onChange={onChange}
                   placeholder="Contoh: Gedung A Lt. 2 Ruang 101"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -125,7 +130,8 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
                   name="id_wali_kelas"
                   value={formData.id_wali_kelas}
                   onChange={onChange}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
+                  disabled={readOnly}
                 >
                   <option value="">-- Pilih Wali Kelas --</option>
                   {guruData.map((guru) => (
@@ -147,20 +153,22 @@ export default function KelasForm({ view, formData, guruData, loading, onChange,
             onClick={onCancel}
             className="h-11 px-6 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
           >
-            Batal
+            {readOnly ? 'Tutup' : 'Batal'}
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-11 px-8 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save size={18} strokeWidth={2.5} />
-            )}
-            {loading ? 'Menyimpan...' : 'Simpan Data Kelas'}
-          </button>
+          {!readOnly && (
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-11 px-8 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Save size={18} strokeWidth={2.5} />
+              )}
+              {loading ? 'Menyimpan...' : 'Simpan Data Kelas'}
+            </button>
+          )}
         </div>
       </form>
     </div>

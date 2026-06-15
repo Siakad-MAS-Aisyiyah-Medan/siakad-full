@@ -2,7 +2,7 @@ import { Save, X, ShieldAlert, GraduationCap, MapPin, Phone, Mail, Calendar, Has
 import { useState, useEffect } from 'react';
 import { fetchKelasList } from '@app/shared/akademik/kelas/services/kelas.service';
 
-export default function MuridForm({ view, formData, loading, onChange, onSubmit, onCancel }) {
+export default function MuridForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const [kelasList, setKelasList] = useState([]);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
       <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
           <h2 className="text-xl font-extrabold text-slate-800">
-            {view === 'add' ? 'Tambah Data Murid Baru' : 'Edit Data Murid'}
+            {readOnly ? 'Detail Data Murid' : (view === 'add' ? 'Tambah Data Murid Baru' : 'Edit Data Murid')}
           </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">
             Lengkapi profil, identitas, dan akun login murid.
@@ -57,8 +57,9 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     value={formData.username || ''}
                     onChange={onChange}
                     placeholder="NISN atau format lain"
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                     required
+                    disabled={readOnly}
                   />
                 </div>
                 <div>
@@ -73,7 +74,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                       value={formData.email || ''}
                       onChange={onChange}
                       placeholder="Email murid (opsional)"
-                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl pl-9 pr-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl pl-9 pr-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                      disabled={readOnly}
                     />
                   </div>
                 </div>
@@ -85,8 +87,9 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     value={formData.password || ''}
                     onChange={onChange}
                     placeholder="Minimal 6 karakter"
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                     required={view === 'add'}
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -103,7 +106,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     name="id_kelas"
                     value={formData.id_kelas || ''}
                     onChange={onChange}
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer"
+                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer disabled:bg-slate-100"
+                    disabled={readOnly}
                   >
                     <option value="">-- Pilih Kelas (Opsional) --</option>
                     {kelasList.map(k => (
@@ -119,8 +123,9 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                       name="tahun_masuk"
                       value={formData.tahun_masuk || new Date().getFullYear()}
                       onChange={onChange}
-                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                       required
+                      disabled={readOnly}
                     />
                   </div>
                   <div>
@@ -130,7 +135,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                       name="tahun_lulus"
                       value={formData.tahun_lulus || ''}
                       onChange={onChange}
-                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3.5 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                      disabled={readOnly}
                     />
                   </div>
                 </div>
@@ -155,8 +161,9 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     value={formData.nama_siswa || ''}
                     onChange={onChange}
                     placeholder="Nama Lengkap"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[15px] font-semibold rounded-xl pl-11 pr-4 h-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
                     required
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -173,7 +180,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     value={formData.nisn || ''}
                     onChange={onChange}
                     placeholder="Nomor Induk Siswa Nasional"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -186,7 +194,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                   value={formData.nis || ''}
                   onChange={onChange}
                   placeholder="Nomor Induk Sekolah"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                  disabled={readOnly}
                 />
               </div>
 
@@ -196,7 +205,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                   name="jenis_kelamin"
                   value={formData.jenis_kelamin || 'L'}
                   onChange={onChange}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
+                  disabled={readOnly}
                 >
                   <option value="L">Laki-Laki</option>
                   <option value="P">Perempuan</option>
@@ -215,7 +225,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     value={formData.no_hp || ''}
                     onChange={onChange}
                     placeholder="Contoh: 081234567890"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -228,7 +239,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                   value={formData.tempat_lahir || ''}
                   onChange={onChange}
                   placeholder="Tempat kelahiran"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                  disabled={readOnly}
                 />
               </div>
 
@@ -243,7 +255,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     name="tanggal_lahir"
                     value={formData.tanggal_lahir || ''}
                     onChange={onChange}
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all disabled:bg-slate-100"
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -260,7 +273,8 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                     onChange={onChange}
                     rows="3"
                     placeholder="Alamat lengkap tempat tinggal"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none disabled:bg-slate-100"
+                    disabled={readOnly}
                   />
                 </div>
               </div>
@@ -274,9 +288,10 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                   name="status_aktif"
                   value={formData.status_aktif !== undefined ? (formData.status_aktif ? '1' : '0') : '1'}
                   onChange={(e) => onChange({ target: { name: 'status_aktif', value: e.target.value === '1' } })}
-                  className={`w-full bg-slate-50 border border-slate-200 text-[14px] font-bold rounded-xl px-4 h-11 focus:outline-none focus:ring-4 transition-all appearance-none cursor-pointer ${
+                  className={`w-full bg-slate-50 border border-slate-200 text-[14px] font-bold rounded-xl px-4 h-11 focus:outline-none focus:ring-4 transition-all appearance-none cursor-pointer disabled:bg-slate-100 ${
                     (formData.status_aktif !== undefined ? formData.status_aktif : true) ? 'text-emerald-600 focus:border-emerald-500 focus:ring-emerald-500/10' : 'text-rose-600 focus:border-rose-500 focus:ring-rose-500/10'
                   }`}
+                  disabled={readOnly}
                 >
                   <option value="1">🟢 Aktif</option>
                   <option value="0">🔴 Nonaktif</option>
@@ -294,20 +309,22 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
             onClick={onCancel}
             className="h-11 px-6 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
           >
-            Batal
+            {readOnly ? 'Tutup' : 'Batal'}
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-11 px-8 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-600/30 hover:shadow-emerald-600/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save size={18} strokeWidth={2.5} />
-            )}
-            {loading ? 'Menyimpan...' : 'Simpan Data Murid'}
-          </button>
+          {!readOnly && (
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-11 px-8 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-600/30 hover:shadow-emerald-600/50 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Save size={18} strokeWidth={2.5} />
+              )}
+              {loading ? 'Menyimpan...' : 'Simpan Data Murid'}
+            </button>
+          )}
         </div>
       </form>
     </div>

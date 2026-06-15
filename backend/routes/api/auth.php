@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->middleware('throttle:10,1')->group(function () {

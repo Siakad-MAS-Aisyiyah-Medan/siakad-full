@@ -8,6 +8,7 @@ export default function KelasTable({
   onEdit,
   onDelete,
   isFetching = false,
+  readOnly = false,
 }) {
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
@@ -93,19 +94,21 @@ export default function KelasTable({
                     <td className="py-5 text-right" style={{ paddingLeft: '16px', paddingRight: '32px' }}>
                       <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => onEdit(kelas)}
+                          onClick={() => onEdit && onEdit(kelas)}
                           className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition-colors"
-                          title="Edit Kelas"
+                          title={readOnly ? "Detail Kelas" : "Edit Kelas"}
                         >
-                          <Edit2 size={14} strokeWidth={2.5} />
+                          {readOnly ? <Search size={14} strokeWidth={2.5} /> : <Edit2 size={14} strokeWidth={2.5} />}
                         </button>
-                        <button
-                          onClick={() => onDelete(kelas.id_kelas)}
-                          className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
-                          title="Hapus Kelas"
-                        >
-                          <Trash2 size={14} strokeWidth={2.5} />
-                        </button>
+                        {!readOnly && (
+                          <button
+                            onClick={() => onDelete && onDelete(kelas.id_kelas)}
+                            className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
+                            title="Hapus Kelas"
+                          >
+                            <Trash2 size={14} strokeWidth={2.5} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

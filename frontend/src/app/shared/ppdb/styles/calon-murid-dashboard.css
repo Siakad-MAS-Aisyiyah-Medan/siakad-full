@@ -157,10 +157,17 @@
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   padding: 1.5rem 1.75rem;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   border-radius: 20px;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cm-welcome:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(15, 122, 92, 0.1);
 }
 
 .cm-welcome__eyebrow {
@@ -258,11 +265,18 @@
 
 /* Cards */
 .cm-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   border-radius: 20px;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   padding: 1.35rem 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(15, 122, 92, 0.1);
 }
 
 .cm-card h2 {
@@ -452,7 +466,14 @@
   background: #fff;
   border-color: var(--color-primary);
   color: var(--color-primary);
-  box-shadow: 0 0 0 4px var(--color-primary-soft);
+  box-shadow: 0 0 0 6px rgba(15, 122, 92, 0.15);
+  animation: cm-pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes cm-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(15, 122, 92, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(15, 122, 92, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(15, 122, 92, 0); }
 }
 
 .cm-stepper-horizontal__label {
@@ -496,8 +517,8 @@
 
 .cm-quick-card:hover {
   border-color: var(--color-primary-light);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(15, 122, 92, 0.15);
+  transform: translateY(-4px) scale(1.02);
 }
 
 .cm-quick-card--primary {
@@ -683,4 +704,57 @@
   .cm-stepper-horizontal__label {
     font-size: 0.62rem;
   }
+}
+
+/* Tutorial Overlay Styles */
+.tutorial-card {
+  border-radius: 24px !important;
+  padding: 2rem !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  animation: lc-slide-up 0.5s ease forwards !important;
+}
+
+.tutorial-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-mascot {
+  font-size: 4rem;
+  margin: 1rem 0;
+  animation: float-mascot 3s ease-in-out infinite;
+}
+
+@keyframes float-mascot {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.tutorial-text {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.tutorial-btn {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent, #10b981) 100%) !important;
+  color: white !important;
+  border-radius: 999px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  border: none !important;
+  box-shadow: 0 10px 20px rgba(15, 122, 92, 0.2) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.tutorial-btn:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 15px 25px rgba(15, 122, 92, 0.3) !important;
 }

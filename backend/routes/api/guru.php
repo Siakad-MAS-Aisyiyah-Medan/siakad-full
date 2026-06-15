@@ -1,24 +1,24 @@
 <?php
 
-use App\Http\Controllers\Api\Guru\AbsensiController;
-use App\Http\Controllers\Api\Guru\JadwalController;
-use App\Http\Controllers\Api\Guru\NilaiController;
-use App\Http\Controllers\Api\LaporanController;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'permission:view_jadwal_mengajar'])->group(function () {
-    Route::get('/guru/jadwal', [JadwalController::class, 'index']);
+    Route::get('/guru/jadwal', [JadwalController::class, 'adminIndex']);
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa'])->group(function () {
-    Route::get('/guru/absensi/siswa/form', [AbsensiController::class, 'formData']);
-    Route::post('/guru/absensi/siswa/bulk', [AbsensiController::class, 'bulkStore']);
-    Route::get('/guru/absensi/siswa/rekap', [AbsensiController::class, 'rekapSiswa']);
+    Route::get('/guru/absensi/siswa/form', [AbsensiController::class, 'guruFormData']);
+    Route::post('/guru/absensi/siswa/bulk', [AbsensiController::class, 'guruBulkStore']);
+    Route::get('/guru/absensi/siswa/rekap', [AbsensiController::class, 'guruRekapSiswa']);
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_nilai_siswa'])->group(function () {
-    Route::get('/guru/nilai/form', [NilaiController::class, 'formData']);
-    Route::post('/guru/nilai/bulk', [NilaiController::class, 'bulkStore']);
+    Route::get('/guru/nilai/form', [NilaiController::class, 'guruFormData']);
+    Route::post('/guru/nilai/bulk', [NilaiController::class, 'guruBulkStore']);
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa,manage_nilai_siswa'])->group(function () {
@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa,manage_nilai
 });
 
 Route::middleware(['auth:sanctum', 'permission:view_dashboard_guru'])->group(function () {
-    Route::post('/guru/absensi/self/check-in', [AbsensiController::class, 'checkIn']);
-    Route::post('/guru/absensi/self/check-out', [AbsensiController::class, 'checkOut']);
-    Route::get('/guru/absensi/self/riwayat', [AbsensiController::class, 'riwayatGuru']);
+    Route::post('/guru/absensi/self/check-in', [AbsensiController::class, 'guruCheckIn']);
+    Route::post('/guru/absensi/self/check-out', [AbsensiController::class, 'guruCheckOut']);
+    Route::get('/guru/absensi/self/riwayat', [AbsensiController::class, 'guruRiwayatGuru']);
 });

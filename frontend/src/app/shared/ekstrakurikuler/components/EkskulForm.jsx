@@ -1,11 +1,11 @@
 import { Save, X } from 'lucide-react';
 import { guruLabel } from '@app/shared/utils/guruLabel';
 
-export default function EkskulForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel }) {
+export default function EkskulForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   return (
     <div className="form-panel glass">
       <div className="panel-header border-b">
-        <h2>{view === 'add' ? 'Tambah Ekstrakurikuler' : 'Edit Ekstrakurikuler'}</h2>
+        <h2>{readOnly ? 'Detail Ekstrakurikuler' : (view === 'add' ? 'Tambah Ekstrakurikuler' : 'Edit Ekstrakurikuler')}</h2>
       </div>
 
       <form onSubmit={onSubmit} className="custom-form p-6 mt-4">
@@ -19,18 +19,19 @@ export default function EkskulForm({ view, formData, guruData, loading, onChange
             value={formData.nama_ekskul}
             onChange={onChange}
             required
-            autoFocus
+            autoFocus={!readOnly}
+            disabled={readOnly}
           />
         </div>
 
         <div className="input-group full mt-4">
           <label>Deskripsi</label>
-          <textarea name="deskripsi" value={formData.deskripsi} onChange={onChange} rows={4} />
+          <textarea name="deskripsi" value={formData.deskripsi} onChange={onChange} rows={4} disabled={readOnly} />
         </div>
 
         <div className="input-group full mt-4">
           <label>Pembina</label>
-          <select name="id_pembina" value={formData.id_pembina} onChange={onChange}>
+          <select name="id_pembina" value={formData.id_pembina} onChange={onChange} disabled={readOnly}>
             <option value="">-- Pilih Pembina --</option>
             {guruData.map((g) => (
               <option key={g.id_user} value={g.id_user}>
@@ -42,26 +43,28 @@ export default function EkskulForm({ view, formData, guruData, loading, onChange
 
         <div className="input-group full mt-4">
           <label>Hari</label>
-          <input type="text" name="hari" value={formData.hari} onChange={onChange} placeholder="Senin" />
+          <input type="text" name="hari" value={formData.hari} onChange={onChange} placeholder="Senin" disabled={readOnly} />
         </div>
 
         <div className="input-group full mt-4">
           <label>Jam</label>
-          <input type="text" name="jam" value={formData.jam} onChange={onChange} placeholder="15:00 - 17:00" />
+          <input type="text" name="jam" value={formData.jam} onChange={onChange} placeholder="15:00 - 17:00" disabled={readOnly} />
         </div>
 
         <div className="input-group full mt-4">
           <label>Lokasi</label>
-          <input type="text" name="lokasi" value={formData.lokasi} onChange={onChange} placeholder="Lapangan" />
+          <input type="text" name="lokasi" value={formData.lokasi} onChange={onChange} placeholder="Lapangan" disabled={readOnly} />
         </div>
 
         <div className="form-footer mt-8">
           <button type="button" onClick={onCancel} className="btn-outline">
-            <X size={18} /> Batal
+            <X size={18} /> {readOnly ? 'Tutup' : 'Batal'}
           </button>
-          <button type="submit" className="btn-primary" disabled={loading}>
-            <Save size={18} /> {loading ? 'Menyimpan...' : 'Simpan'}
-          </button>
+          {!readOnly && (
+            <button type="submit" className="btn-primary" disabled={loading}>
+              <Save size={18} /> {loading ? 'Menyimpan...' : 'Simpan'}
+            </button>
+          )}
         </div>
       </form>
     </div>

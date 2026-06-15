@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Traits\AuditsAdminActions;
+use App\Utils\AuditsAdminActions;
 use App\Models\Ekskul;
 use App\Models\Guru;
 use App\Models\JadwalPelajaran;

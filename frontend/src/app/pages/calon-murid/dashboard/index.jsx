@@ -15,6 +15,7 @@ import { mapPpdbInfoToPanel } from '@app/shared/ppdb/utils/formatPpdbInfo';
 import { fetchMyRegistration, fetchPpdbInfo } from "@app/shared/services/ppdb.service";
 import { startOrResumePpdb } from '@app/shared/ppdb/utils/startOrResumePpdb';
 import { getStoredUser } from '@app/shared/services/auth.service';
+import OnboardingTutorial from '@app/shared/ppdb/components/dashboard/OnboardingTutorial';
 
 export default function DashboardCalonMurid() {
   const navigate = useNavigate();
@@ -62,42 +63,57 @@ export default function DashboardCalonMurid() {
   return (
     <CalonMuridLayout>
       {loading ? (
-        <div className="calon-murid-loading">
+        <div className="calon-murid-loading animate-stagger-1">
           <span className="calon-murid-spinner calon-murid-spinner--lg" />
           <p>Memuat dashboard...</p>
         </div>
       ) : (
         <>
+          <OnboardingTutorial name={name} />
           <DashboardWelcomeHeader name={name} />
 
-          <div className="calon-murid-dashboard-grid">
+          <div className="calon-murid-dashboard-grid animate-stagger-1">
             <div className="calon-murid-dashboard-main">
-              <RegistrationStatusCard
-                pendaftaran={p}
-                progressPercent={percent}
-                dashboardState={dashboardState}
-              />
+              <div className="animate-stagger-2 hover-lift">
+                <RegistrationStatusCard
+                  pendaftaran={p}
+                  progressPercent={percent}
+                  dashboardState={dashboardState}
+                />
+              </div>
 
-              <DashboardPrimaryAction
-                dashboardState={dashboardState}
-                onStart={handleStart}
-                onNavigate={navigate}
-                starting={starting}
-              />
+              <div className="animate-stagger-3">
+                <DashboardPrimaryAction
+                  dashboardState={dashboardState}
+                  onStart={handleStart}
+                  onNavigate={navigate}
+                  starting={starting}
+                />
+              </div>
 
               {dashboardState.showProgress ? (
-                <PpdbProgressStepper steps={steps} activeIndex={activeIndex} percent={percent} />
+                <div className="animate-stagger-4">
+                  <PpdbProgressStepper steps={steps} activeIndex={activeIndex} percent={percent} />
+                </div>
               ) : null}
 
-              <PpdbTimeline activeIndex={timelineActiveIndex} />
+              <div className="animate-stagger-4">
+                <PpdbTimeline activeIndex={timelineActiveIndex} />
+              </div>
 
-              <QuickActionsGrid dashboardState={dashboardState} />
+              <div className="animate-stagger-4 hover-lift">
+                <QuickActionsGrid dashboardState={dashboardState} />
+              </div>
             </div>
 
-            <aside className="calon-murid-dashboard-aside">
+            <aside className="calon-murid-dashboard-aside animate-stagger-3">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <DashboardAnnouncementsPreview ppdbInfo={ppdbInfo} />
-                <ImportantInfoPanel info={infoPanelData} />
+                <div className="hover-lift">
+                  <DashboardAnnouncementsPreview ppdbInfo={ppdbInfo} />
+                </div>
+                <div className="hover-lift">
+                  <ImportantInfoPanel info={infoPanelData} />
+                </div>
               </div>
             </aside>
           </div>
