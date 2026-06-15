@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:1001', 'http://localhost:1002', 'https://siakad-alpha.vercel.app', env('FRONTEND_URL')],
+    'allowed_origins' => ['http://localhost:1001', 'http://localhost:1002', 'https://siakad-alpha.vercel.app', 'https://siakad-ruddy.vercel.app', env('FRONTEND_URL')],
 
     'allowed_origins_patterns' => [],
 
