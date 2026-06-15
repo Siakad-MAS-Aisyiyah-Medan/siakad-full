@@ -10,6 +10,9 @@ $_ENV['APP_ROUTES_CACHE'] = '/tmp/routes.php';
 $_ENV['APP_SERVICES_CACHE'] = '/tmp/services.php';
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp';
 
+// Fix path routing in Vercel. Vercel sets SCRIPT_NAME to /api/index.php, which makes Symfony strip /api from the URL path!
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = require_once __DIR__ . '/../bootstrap/app.php';
