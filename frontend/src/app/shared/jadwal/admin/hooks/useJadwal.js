@@ -130,7 +130,7 @@ export function useJadwal() {
       };
 
       await saveJadwalMatrix(currentKelas.id_kelas, payload);
-      toastSuccess('Berhasil', 'Jadwal berhasil disimpan.');
+      toastSuccess('Berhasil', 'Data berhasil disimpan');
       
       // Reload class list to update jadwal_count badge
       loadBaseData();

@@ -138,7 +138,7 @@ export default function LoginPage() {
               </div>
             </div>
             <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
-              {loading ? 'Memproses...' : 'Masuk ke Sistem'}
+              {loading ? 'Memproses...' : 'Login'}
             </button>
           </form>
 

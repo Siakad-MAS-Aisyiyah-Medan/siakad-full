@@ -91,10 +91,10 @@ export function useKelas() {
     try {
       if (view === 'add') {
         await createKelas(payload);
-        toastSuccess('Berhasil', 'Data kelas ditambahkan');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         await updateKelas(currentId, payload);
-        toastSuccess('Berhasil', 'Data kelas diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       await loadData();
       setView('list');
@@ -115,7 +115,7 @@ export function useKelas() {
     if (!ok) return;
     try {
       await deleteKelas(id_kelas);
-      toastSuccess('Terhapus!', 'Data kelas telah dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadData();
     } catch {
       toastError('Gagal', 'Gagal menghapus data kelas.');

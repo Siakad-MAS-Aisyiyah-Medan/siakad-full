@@ -95,10 +95,10 @@ export function useEkskul() {
     try {
       if (view === 'add') {
         await createEkskul(payload);
-        toastSuccess('Berhasil', 'Ekstrakurikuler berhasil ditambahkan');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         await updateEkskul(currentId, payload);
-        toastSuccess('Berhasil', 'Ekstrakurikuler berhasil diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       await loadData();
       setView('list');
@@ -119,7 +119,7 @@ export function useEkskul() {
     if (!ok) return;
     try {
       await deleteEkskul(id);
-      toastSuccess('Terhapus!', 'Ekstrakurikuler telah dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadData();
     } catch {
       toastError('Gagal', 'Gagal menghapus data.');

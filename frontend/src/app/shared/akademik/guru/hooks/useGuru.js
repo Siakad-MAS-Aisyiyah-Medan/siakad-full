@@ -115,7 +115,7 @@ export function useGuru() {
         });
 
         await createGuru(payload);
-        toastSuccess('Berhasil', 'Data tenaga pendidik ditambahkan');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         const payload = new FormData();
         Object.keys(formData).forEach(key => {
@@ -126,7 +126,7 @@ export function useGuru() {
         });
 
         await updateGuru(currentId, payload);
-        toastSuccess('Berhasil', 'Data tenaga pendidik diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       await loadGuru();
       setView('list');
@@ -147,7 +147,7 @@ export function useGuru() {
     if (!ok) return;
     try {
       await deleteGuru(id_user);
-      toastSuccess('Terhapus!', 'Satu akun tenaga pendidik telah dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadGuru();
     } catch {
       toastError('Gagal', 'Gagal menghapus data guru.');

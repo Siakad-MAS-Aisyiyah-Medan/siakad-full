@@ -78,10 +78,10 @@ export function useMapel() {
     try {
       if (view === 'add') {
         await createMapel(formData);
-        toastSuccess('Berhasil', 'Mata pelajaran berhasil ditambahkan');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         await updateMapel(currentId, formData);
-        toastSuccess('Berhasil', 'Mata pelajaran berhasil diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       await loadData();
       setView('list');
@@ -102,7 +102,7 @@ export function useMapel() {
     if (!ok) return;
     try {
       await deleteMapel(id_mapel);
-      toastSuccess('Terhapus!', 'Satu mata pelajaran berhasil dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadData();
     } catch {
       toastError('Gagal', 'Gagal menghapus mata pelajaran.');

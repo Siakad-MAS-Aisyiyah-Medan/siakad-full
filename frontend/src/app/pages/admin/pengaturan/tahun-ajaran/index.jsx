@@ -375,10 +375,10 @@ export default function TahunAjaranPage() {
     try {
       if (modal === 'add') {
         await createTahunAjaran(form);
-        showToast('Tahun ajaran baru berhasil ditambahkan');
+        showToast('Data berhasil disimpan');
       } else {
         await updateTahunAjaran(editId, form);
-        showToast('Tahun ajaran berhasil diperbarui');
+        showToast('Data berhasil disimpan');
       }
 
       await loadData();
@@ -395,7 +395,7 @@ export default function TahunAjaranPage() {
     try {
       await deleteTahunAjaran(deleteTarget.id);
       await loadData();
-      showToast('Tahun ajaran berhasil dihapus');
+      showToast('Data berhasil dihapus');
     } catch (err) {
       showToast(err.message || 'Gagal menghapus data', 'error');
     } finally {

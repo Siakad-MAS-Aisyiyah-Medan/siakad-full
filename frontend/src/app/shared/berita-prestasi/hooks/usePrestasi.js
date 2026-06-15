@@ -88,10 +88,10 @@ export function usePrestasi() {
     try {
       if (view === 'add') {
         await createBerita(payload);
-        toastSuccess('Berhasil', 'Artikel berhasil ditambahkan');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         await updateBerita(currentId, payload);
-        toastSuccess('Berhasil', 'Artikel berhasil diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       await loadData();
       setView('list');
@@ -112,7 +112,7 @@ export function usePrestasi() {
     if (!ok) return;
     try {
       await deleteBerita(id);
-      toastSuccess('Terhapus!', 'Artikel telah dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadData();
     } catch {
       toastError('Gagal', 'Gagal menghapus artikel.');

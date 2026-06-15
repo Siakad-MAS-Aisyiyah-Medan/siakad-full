@@ -99,10 +99,10 @@ export function usePengumuman() {
     try {
       if (view === 'add') {
         await createPengumuman(formData);
-        toastSuccess('Berhasil', 'Pengumuman berhasil ditambahkan');
+        toastSuccess('Berhasil', 'Pengumuman berhasil dipublikasikan');
       } else {
         await updatePengumuman(currentId, formData);
-        toastSuccess('Berhasil', 'Pengumuman berhasil diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       await loadData();
       setView('list');
@@ -123,7 +123,7 @@ export function usePengumuman() {
     if (!ok) return;
     try {
       await deletePengumuman(id);
-      toastSuccess('Terhapus!', 'Pengumuman telah dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadData();
     } catch {
       toastError('Gagal', 'Gagal menghapus pengumuman.');

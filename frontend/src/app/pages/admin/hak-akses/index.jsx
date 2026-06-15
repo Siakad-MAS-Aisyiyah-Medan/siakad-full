@@ -72,7 +72,7 @@ export default function HakAksesPage() {
     if (result.isConfirmed) {
       try {
         await deleteAdminAkun(id);
-        Swal.fire('Terhapus!', 'Akun berhasil dihapus.', 'success');
+        Swal.fire('Terhapus!', 'Data berhasil dihapus', 'success');
         loadAkun();
       } catch (error) {
         Swal.fire('Gagal', error.message || 'Gagal menghapus akun', 'error');
@@ -110,7 +110,7 @@ export default function HakAksesPage() {
       submitData.username = `${baseUsername}${randomSuffix}`;
 
       await createAdminAkun(submitData);
-      Swal.fire('Sukses', 'Akun baru berhasil ditambahkan', 'success');
+      Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
       handleCloseModal();
       loadAkun();
     } catch (error) {

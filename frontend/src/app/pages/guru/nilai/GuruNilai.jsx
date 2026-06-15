@@ -68,7 +68,7 @@ export default function GuruNilaiPage() {
                 onClick={saveNilai}
                 disabled={saving}
               >
-                <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Nilai'}
+                <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan'}
               </button>
             </div>
           </div>

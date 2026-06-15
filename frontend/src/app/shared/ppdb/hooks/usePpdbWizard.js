@@ -332,6 +332,15 @@ export function usePpdbWizard() {
 
     skipAutoSave.current = true;
     const result = await persistStep(step.key, { advance: true, silent: false });
+    if (result.ok) {
+      await Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: 'Data berhasil disimpan',
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
     skipAutoSave.current = false;
     return result.ok;
   };
@@ -383,7 +392,7 @@ export function usePpdbWizard() {
       setIsLocked(true);
       await Swal.fire({
         icon: 'success',
-        title: 'Pendaftaran Diajukan',
+        title: 'Pendaftaran berhasil dikirim',
         text: 'Formulir terkunci. Menunggu verifikasi admin.',
       });
       navigate('/calon-murid/status', { replace: true });

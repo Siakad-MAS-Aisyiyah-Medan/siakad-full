@@ -258,7 +258,7 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
               ) : (
                 <Save size={18} strokeWidth={2.5} />
               )}
-              {loading ? 'Menyimpan...' : 'Simpan & Publikasikan'}
+              {loading ? 'Menyimpan...' : (view === 'add' ? 'Publikasikan' : 'Simpan Perubahan')}
             </button>
           )}
         </div>

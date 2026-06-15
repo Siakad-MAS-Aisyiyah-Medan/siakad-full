@@ -261,7 +261,7 @@ export default function FormulirPpdbWizard() {
               onSaveDraft={stepKey === 'review' ? undefined : w.saveDraft}
               draftLoading={w.saving}
               onPrimary={stepKey === 'review' ? w.submit : w.saveAndNext}
-              primaryLabel={stepKey === 'review' ? 'Submit Pendaftaran' : 'Simpan & Lanjut'}
+              primaryLabel={stepKey === 'review' ? 'Selesai & Daftarkan Diri' : 'Simpan Data'}
               primaryLoading={w.saving}
               primaryLoadingLabel={stepKey === 'review' ? 'Mengirim...' : 'Menyimpan...'}
               disabled={disabled}

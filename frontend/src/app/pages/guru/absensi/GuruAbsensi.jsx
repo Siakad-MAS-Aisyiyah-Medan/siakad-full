@@ -68,7 +68,7 @@ export default function GuruAbsensiPage() {
                 onClick={saveAbsensi}
                 disabled={saving}
               >
-                <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Absensi'}
+                <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan'}
               </button>
             </div>
           </div>

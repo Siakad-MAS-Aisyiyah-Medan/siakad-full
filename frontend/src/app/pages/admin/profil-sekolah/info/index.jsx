@@ -57,7 +57,7 @@ export default function InfoProfilPage({ readOnly = false }) {
     try {
       setSaving(true);
       await updateProfilSekolah(formData);
-      Swal.fire('Berhasil', 'Profil sekolah berhasil diperbarui', 'success');
+      Swal.fire('Berhasil', 'Data berhasil disimpan', 'success');
       setIsEditing(false);
     } catch (error) {
       console.error('Gagal memperbarui profil:', error);

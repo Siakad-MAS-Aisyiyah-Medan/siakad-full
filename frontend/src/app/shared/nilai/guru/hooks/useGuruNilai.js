@@ -101,7 +101,7 @@ export function useGuruNilai() {
           nilai_sikap: r.nilai_sikap === '' ? null : Number(r.nilai_sikap),
         })),
       });
-      toastSuccess('Berhasil', 'Nilai siswa berhasil disimpan');
+      toastSuccess('Berhasil', 'Data berhasil disimpan');
       setStep('filter');
     } catch (err) {
       toastError('Gagal', err.response?.data?.message || 'Gagal menyimpan nilai');

@@ -103,7 +103,7 @@ export function useGuruAbsensi() {
           keterangan: r.keterangan || null,
         })),
       });
-      toastSuccess('Berhasil', 'Absensi siswa berhasil disimpan');
+      toastSuccess('Berhasil', 'Data berhasil disimpan');
       setStep('filter');
     } catch (err) {
       toastError('Gagal', err.response?.data?.message || 'Gagal menyimpan absensi');

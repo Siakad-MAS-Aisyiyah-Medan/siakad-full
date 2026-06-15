@@ -139,7 +139,7 @@ export function useMurid() {
 
     try {
       await deleteMurid(id_user);
-      toastSuccess('Terhapus!', 'Data Murid berhasil dihapus.');
+      toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadMurid();
     } catch {
       toastError('Gagal', 'Gagal menghapus data murid.');
@@ -195,10 +195,10 @@ export function useMurid() {
     try {
       if (view === 'add') {
         await import('../services/murid.service').then(m => m.createMurid(formData));
-        toastSuccess('Berhasil', 'Murid berhasil ditambahkan');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         await import('../services/murid.service').then(m => m.updateMurid(editId, formData));
-        toastSuccess('Berhasil', 'Data murid berhasil diperbarui');
+        toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       loadMurid();
       cancelForm();

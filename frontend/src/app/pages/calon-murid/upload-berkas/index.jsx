@@ -49,7 +49,7 @@ export default function UploadBerkas() {
       Swal.fire({
         icon: 'success',
         title: 'Berhasil',
-        text: 'Berkas berhasil diunggah',
+        text: 'Data berhasil disimpan',
         timer: 1500,
         showConfirmButton: false,
       });
@@ -76,7 +76,7 @@ export default function UploadBerkas() {
       try {
         await deleteBerkas(jenisKey);
         await loadData();
-        Swal.fire('Terhapus', 'Berkas berhasil dihapus.', 'success');
+        Swal.fire('Terhapus', 'Berkas berhasil dihapus', 'success');
       } catch (err) {
         Swal.fire('Gagal', 'Gagal menghapus berkas', 'error');
       } finally {

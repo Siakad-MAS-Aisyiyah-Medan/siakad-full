@@ -86,11 +86,11 @@ export function useAdminPpdb() {
       if (!catatan) return false;
       return runAction(() => adminRevisi(id, catatan), 'Status revisi diberikan');
     },
-    terima: (id) => runAction(() => adminTerima(id), 'Pendaftar diterima'),
+    terima: (id) => runAction(() => adminTerima(id), 'Pendaftaran berhasil diterima'),
     tolak: async (id) => {
       const catatan = await promptCatatan('Tolak Pendaftar');
       if (!catatan) return false;
-      return runAction(() => adminTolak(id, catatan), 'Pendaftar ditolak');
+      return runAction(() => adminTolak(id, catatan), 'Pendaftaran berhasil ditolak');
     },
     jadikanMurid: (id, idKelas) =>
       runAction(() => adminJadikanMurid(id, idKelas), 'Berhasil menjadi murid aktif'),

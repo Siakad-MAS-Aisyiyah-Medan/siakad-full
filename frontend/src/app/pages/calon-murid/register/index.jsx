@@ -147,8 +147,8 @@ export default function RegisterCalonMurid() {
       await registerCalonSiswa(buildPayload(form));
       await Swal.fire({
         icon: 'success',
-        title: 'Registrasi Berhasil',
-        text: 'Akun login Anda telah dibuat. Silakan login untuk masuk ke portal calon siswa.',
+        title: 'Akun berhasil didaftarkan',
+        text: 'Silakan login untuk masuk ke portal calon siswa.',
         confirmButtonText: 'Ke Halaman Login',
         confirmButtonColor: '#0f7a5c',
       });
@@ -250,7 +250,7 @@ export default function RegisterCalonMurid() {
                   Membuat Akun...
                 </>
               ) : (
-                'Daftar Akun'
+                'Daftarkan Akun'
               )}
             </button>
           </form>
