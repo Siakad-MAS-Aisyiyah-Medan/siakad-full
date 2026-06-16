@@ -11,10 +11,7 @@ export default function HeroSection({ onPendaftaranClick, onLearnMore }) {
 
       <div className="lp-container lp-hero__grid-layout">
         <div className="lp-hero__content lp-reveal">
-          <span className="lp-badge">
-            <Sparkles size={14} aria-hidden="true" />
-            Website Resmi
-          </span>
+
           <h1 className="lp-hero__title">{SCHOOL_NAME}</h1>
           <p className="lp-hero__subtitle">
             Membentuk generasi islami yang unggul dalam IPTEK dan berakhlakul karimah
@@ -29,33 +26,13 @@ export default function HeroSection({ onPendaftaranClick, onLearnMore }) {
               Informasi Pendaftaran
               <ArrowRight size={18} aria-hidden="true" />
             </button>
-            <button
-              type="button"
-              className="lp-btn lp-btn--outline lp-btn--lg"
-              onClick={onLearnMore}
-            >
-              Pelajari Sekolah
-            </button>
           </div>
-          <ul className="lp-hero__highlights">
-            <li>Akreditasi Unggul</li>
-            <li>Kurikulum Nasional + Islam</li>
-            <li>Fasilitas Lengkap</li>
-          </ul>
+
         </div>
 
         <div className="lp-hero__visual lp-reveal lp-reveal--delay">
-          <div className="lp-hero-card">
-            <div className="lp-hero-card__inner">
-              <AppLogo size={120} className="lp-hero-card__logo" />
-              <h2>{SCHOOL_NAME}</h2>
-              <p>Madrasah Aliyah Aisyiyah Medan</p>
-              <div className="lp-hero-card__tags">
-                <span>Islami</span>
-                <span>Unggul</span>
-                <span>Berprestasi</span>
-              </div>
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+            <AppLogo size={320} style={{ filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.1))', opacity: 0.9 }} />
           </div>
         </div>
       </div>

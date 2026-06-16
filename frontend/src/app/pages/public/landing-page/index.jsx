@@ -5,10 +5,7 @@ import LandingNavbar from '@app/pages/public/landing-page/components/LandingNavb
 import HeroSection from '@app/pages/public/landing-page/components/HeroSection';
 import AboutSection from '@app/pages/public/landing-page/components/AboutSection';
 import VisionMissionSection from '@app/pages/public/landing-page/components/VisionMissionSection';
-import StatsSection from '@app/pages/public/landing-page/components/StatsSection';
 import NewsPreview from '@app/pages/public/landing-page/components/NewsPreview';
-import ExtracurricularSection from '@app/pages/public/landing-page/components/ExtracurricularSection';
-import CTASection from '@app/pages/public/landing-page/components/CTASection';
 import LandingFooter from '@app/pages/public/landing-page/components/LandingFooter';
 import '@app/pages/public/landing-page/landing.css';
 
@@ -46,10 +43,7 @@ const LandingPage = () => {
         />
         <AboutSection />
         <VisionMissionSection />
-        <StatsSection />
         <NewsPreview />
-        <ExtracurricularSection />
-        <CTASection onPendaftaranClick={handlePendaftaranClick} />
       </main>
 
       <LandingFooter onScrollToSection={scrollToSection} />
