@@ -10,6 +10,18 @@ export default function MapelTable({
   isFetching = false,
   readOnly = false,
 }) {
+  const handleExport = () => {
+    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
+      const dataToExport = filteredData.map(mapel => ({
+        'Mata Pelajaran': mapel.nama_mapel || '',
+        'Tingkat': mapel.tingkat || 'Semua',
+        'Kelompok': mapel.kelompok_mapel || 'Umum',
+        'Guru Pengampu': mapel.guru?.guru?.nama_guru || 'Belum Ditentukan'
+      }));
+      exportToCsv('data_mapel.csv', dataToExport);
+    });
+  };
+
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
       <div className="px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
@@ -42,6 +54,15 @@ export default function MapelTable({
             >
               <Plus size={18} strokeWidth={2.5} />
               <span className="hidden md:inline">Tambah Mapel</span>
+            </button>
+          )}
+          {readOnly && (
+            <button
+              type="button"
+              onClick={handleExport}
+              className="btn-outline h-10 px-5 rounded-full font-bold flex items-center gap-2 transition-all"
+            >
+              <span className="hidden md:inline">Unduh Data</span>
             </button>
           )}
         </div>

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
 import { User as UserIcon, Save, Check, X, Loader2, MapPin, Phone, Hash, Calendar, Heart, ShieldCheck } from 'lucide-react';
 import { fetchMe } from '@app/shared/services/auth.service';
-import { updateBiodataProfile } from '@app/shared/services/akun.service';
+import { updateBiodataProfile, uploadFotoProfil, deleteFotoProfil } from '@app/shared/services/akun.service';
+import { Camera, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export default function ProfilBiodataPage() {
@@ -10,6 +11,8 @@ export default function ProfilBiodataPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [fotoUrl, setFotoUrl] = useState(null);
+  const [uploadingFoto, setUploadingFoto] = useState(false);
 
   const [form, setForm] = useState({});
 
@@ -21,6 +24,11 @@ export default function ProfilBiodataPage() {
         setUserRole(data.user.role);
         // data.profile contains the biodata specific to the role
         setForm(data.profile || {});
+        if (data.profile?.foto) {
+          setFotoUrl(data.profile.foto.startsWith('http') ? data.profile.foto : `http://localhost:8000${data.profile.foto}`);
+        } else {
+          setFotoUrl(null);
+        }
       }
     } catch (err) {
       Swal.fire('Error', 'Gagal memuat data profil', 'error');
@@ -53,6 +61,58 @@ export default function ProfilBiodataPage() {
       Swal.fire('Error', err?.response?.data?.message || err.message || 'Gagal menyimpan profil', 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+      Swal.fire('Format tidak didukung', 'Harap unggah gambar JPG atau PNG', 'warning');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      Swal.fire('Ukuran terlalu besar', 'Maksimal ukuran foto adalah 2MB', 'warning');
+      return;
+    }
+
+    setUploadingFoto(true);
+    try {
+      const res = await uploadFotoProfil(file);
+      Swal.fire('Sukses', 'Foto profil berhasil diperbarui', 'success');
+      loadData();
+    } catch (err) {
+      Swal.fire('Gagal', err.response?.data?.message || 'Gagal mengunggah foto', 'error');
+    } finally {
+      setUploadingFoto(false);
+    }
+  };
+
+  const handleDeleteFoto = async () => {
+    const result = await Swal.fire({
+      title: 'Hapus Foto Profil?',
+      text: 'Foto profil akan dihapus secara permanen',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonText: 'Batal',
+      confirmButtonText: 'Ya, Hapus'
+    });
+
+    if (result.isConfirmed) {
+      setUploadingFoto(true);
+      try {
+        await deleteFotoProfil();
+        Swal.fire('Sukses', 'Foto profil berhasil dihapus', 'success');
+        setFotoUrl(null);
+        loadData();
+      } catch (err) {
+        Swal.fire('Gagal', 'Gagal menghapus foto profil', 'error');
+      } finally {
+        setUploadingFoto(false);
+      }
     }
   };
 
@@ -155,9 +215,15 @@ export default function ProfilBiodataPage() {
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
           <div className="relative flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
-                <UserIcon size={20} />
-              </div>
+              {fotoUrl ? (
+                <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white/30 shrink-0">
+                  <img src={fotoUrl} alt="Profil" className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
+                  <UserIcon size={20} />
+                </div>
+              )}
               <div className="min-w-0">
                 <h1 className="text-lg font-black text-white tracking-tight">Profil Saya</h1>
                 <p className="text-emerald-100/80 text-xs mt-0.5 truncate font-medium">
@@ -165,14 +231,30 @@ export default function ProfilBiodataPage() {
                 </p>
               </div>
             </div>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10"
-              >
-                Edit
-              </button>
-            )}
+            <div className="flex gap-2">
+              <label className="flex items-center gap-2 px-3 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10 cursor-pointer">
+                {uploadingFoto ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                <span className="hidden sm:inline">Ubah Foto</span>
+                <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg" onChange={handleFotoUpload} disabled={uploadingFoto} />
+              </label>
+              {fotoUrl && (
+                <button
+                  onClick={handleDeleteFoto}
+                  disabled={uploadingFoto}
+                  className="flex items-center gap-2 px-3 py-2 bg-red-500/20 hover:bg-red-500/40 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-red-500/20"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

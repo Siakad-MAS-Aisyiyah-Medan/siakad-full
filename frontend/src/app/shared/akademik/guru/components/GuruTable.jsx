@@ -10,6 +10,21 @@ export default function GuruTable({
   isFetching = false,
   readOnly = false,
 }) {
+  const handleExport = () => {
+    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
+      const dataToExport = filteredData.map(user => ({
+        'NIP/NUPTK': user.guru?.nip_nuptk || '',
+        'Nama Guru': user.guru?.nama_guru || '',
+        'Jenis Kelamin': user.guru?.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan',
+        'No HP': user.guru?.no_hp || '',
+        'Alamat': user.guru?.alamat || '',
+        'Role': user.role === 'wali_kelas' ? 'Wali Kelas' : 'Guru Biasa',
+        'Status': user.guru?.status === 'nonaktif' ? 'Nonaktif' : 'Aktif'
+      }));
+      exportToCsv('data_guru.csv', dataToExport);
+    });
+  };
+
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
       <div className="px-4 md:px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
@@ -42,6 +57,15 @@ export default function GuruTable({
             >
               <Plus size={18} strokeWidth={2.5} />
               <span className="inline">Tambah Guru</span>
+            </button>
+          )}
+          {readOnly && (
+            <button
+              type="button"
+              onClick={handleExport}
+              className="btn-outline h-10 px-5 rounded-full font-bold flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
+            >
+              <span className="inline">Unduh Data</span>
             </button>
           )}
         </div>

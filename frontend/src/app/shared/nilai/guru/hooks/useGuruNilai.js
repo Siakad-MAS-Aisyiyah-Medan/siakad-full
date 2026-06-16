@@ -46,23 +46,52 @@ export function useGuruNilai() {
     setMeta({ ...meta, [e.target.name]: e.target.value });
   };
 
+  const calculateNilaiAkhir = (row) => {
+    const tugas = Number(row.nilai_tugas) || 0;
+    const uts = Number(row.nilai_uts) || 0;
+    const uas = Number(row.nilai_uas) || 0;
+    const praktik = row.nilai_praktik !== '' && row.nilai_praktik != null ? Number(row.nilai_praktik) : null;
+
+    let nilaiAkhir;
+    if (praktik !== null) {
+      nilaiAkhir = Math.round(tugas * 0.25 + uts * 0.25 + uas * 0.30 + praktik * 0.20);
+    } else {
+      nilaiAkhir = Math.round(tugas * 0.30 + uts * 0.30 + uas * 0.40);
+    }
+    return nilaiAkhir;
+  };
+
+  const getPredikat = (nilaiAkhir) => {
+    if (nilaiAkhir >= 90) return 'A';
+    if (nilaiAkhir >= 80) return 'B';
+    if (nilaiAkhir >= 70) return 'C';
+    if (nilaiAkhir >= 60) return 'D';
+    return 'E';
+  };
+
   const handleNilaiChange = (id_user_siswa, field, value) => {
     setSiswaRows((rows) =>
-      rows.map((r) =>
-        r.id_user_siswa === id_user_siswa ? { ...r, [field]: value === '' ? '' : Number(value) } : r
-      )
+      rows.map((r) => {
+        if (r.id_user_siswa === id_user_siswa) {
+          const updatedRow = { ...r, [field]: value === '' ? '' : Number(value) };
+          const nilai_akhir = calculateNilaiAkhir(updatedRow);
+          const predikat = getPredikat(nilai_akhir);
+          return { ...updatedRow, nilai_akhir, predikat };
+        }
+        return r;
+      })
     );
   };
 
-  const loadSiswa = async (e) => {
-    e?.preventDefault();
+  const loadSiswa = async (forcedMeta = null) => {
+    const m = forcedMeta && !forcedMeta.target ? forcedMeta : meta;
     setLoading(true);
     try {
       const data = await fetchNilaiForm({
-        id_kelas: Number(meta.id_kelas),
-        id_mapel: Number(meta.id_mapel),
-        tahun_ajaran: meta.tahun_ajaran,
-        semester: meta.semester,
+        id_kelas: Number(m.id_kelas),
+        id_mapel: Number(m.id_mapel),
+        tahun_ajaran: m.tahun_ajaran,
+        semester: m.semester,
       });
       setSiswaRows(
         (data.siswa || []).map((s) => ({

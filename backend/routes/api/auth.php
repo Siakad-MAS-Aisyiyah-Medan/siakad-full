@@ -26,4 +26,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::put('/akun/profile', [\App\Http\Controllers\AkunController::class, 'updateProfile']);
     Route::put('/biodata/profile', [\App\Http\Controllers\BiodataController::class, 'update']);
+    Route::post('/biodata/foto', [\App\Http\Controllers\FotoProfilController::class, 'upload']);
+    Route::delete('/biodata/foto', [\App\Http\Controllers\FotoProfilController::class, 'delete']);
 });

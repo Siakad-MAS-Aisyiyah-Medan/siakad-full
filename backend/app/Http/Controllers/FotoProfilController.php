@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+
+class FotoProfilController extends Controller
+{
+    public function upload(Request $request): JsonResponse
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = auth()->user();
+        $role = $user->role;
+        $profile = $this->getProfile($user, $role);
+
+        if (!$profile) {
+            return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan.'], 404);
+        }
+
+        if ($profile->foto) {
+            $oldPath = str_replace('/storage/', '', $profile->foto);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        $path = $request->file('foto')->store('profil', 'public');
+        $profile->foto = '/storage/' . $path;
+        $profile->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto profil berhasil diperbarui.',
+            'foto_url' => $profile->foto
+        ]);
+    }
+
+    public function delete(): JsonResponse
+    {
+        $user = auth()->user();
+        $role = $user->role;
+        $profile = $this->getProfile($user, $role);
+
+        if (!$profile) {
+            return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan.'], 404);
+        }
+
+        if ($profile->foto) {
+            $oldPath = str_replace('/storage/', '', $profile->foto);
+            Storage::disk('public')->delete($oldPath);
+            $profile->foto = null;
+            $profile->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto profil berhasil dihapus.'
+        ]);
+    }
+
+    private function getProfile($user, $role)
+    {
+        if (in_array($role, ['guru', 'wali_kelas'])) return $user->guru;
+        if ($role === 'siswa') return $user->siswa;
+        if ($role === 'kepsek') return $user->kepalaSekolah;
+        if ($role === 'admin') return $user->admin;
+        return null;
+    }
+}

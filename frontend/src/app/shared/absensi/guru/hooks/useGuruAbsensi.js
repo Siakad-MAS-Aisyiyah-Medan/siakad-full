@@ -46,18 +46,18 @@ export function useGuruAbsensi() {
     setMeta({ ...meta, [e.target.name]: e.target.value });
   };
 
-  const loadSiswa = async (e) => {
-    e?.preventDefault();
+  const loadSiswa = async (forcedMeta = null) => {
+    const m = forcedMeta && !forcedMeta.target ? forcedMeta : meta;
     setLoading(true);
     try {
       const data = await fetchAbsensiForm({
-        id_kelas: Number(meta.id_kelas),
-        id_mapel: Number(meta.id_mapel),
-        tanggal: meta.tanggal,
-        jam_mulai: meta.jam_mulai,
-        jam_selesai: meta.jam_selesai,
-        tahun_ajaran: meta.tahun_ajaran,
-        semester: meta.semester,
+        id_kelas: Number(m.id_kelas),
+        id_mapel: Number(m.id_mapel),
+        tanggal: m.tanggal,
+        jam_mulai: m.jam_mulai,
+        jam_selesai: m.jam_selesai,
+        tahun_ajaran: m.tahun_ajaran,
+        semester: m.semester,
       });
       setSiswaRows(
         (data.siswa || []).map((s) => ({

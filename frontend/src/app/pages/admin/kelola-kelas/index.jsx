@@ -28,6 +28,19 @@ export default function KelasPage({ readOnly = false }) {
     isFetching,
   } = useKelas();
 
+  const handleExport = () => {
+    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
+      const dataToExport = filteredData.map(kelas => ({
+        'Nama Kelas': kelas.nama_kelas || '',
+        'Tingkat': kelas.tingkat || '',
+        'Jurusan': kelas.jurusan || '',
+        'Wali Kelas': kelas.wali_kelas?.nama_guru || 'Belum Ditugaskan',
+        'Jumlah Murid': kelas.jumlah_murid || 0
+      }));
+      exportToCsv('data_kelas.csv', dataToExport);
+    });
+  };
+
   return (
     <AdminPageShell>
       {view === 'list' && (
@@ -99,6 +112,16 @@ export default function KelasPage({ readOnly = false }) {
                 >
                   <Plus size={18} strokeWidth={2.5} />
                   <span>Tambah Kelas</span>
+                </button>
+              )}
+              {readOnly && (
+                <button 
+                  type="button" 
+                  onClick={handleExport} 
+                  className="w-full md:w-auto btn-outline h-[46px] px-6 rounded-xl font-bold flex items-center justify-center transition-all shrink-0"
+                  style={{ gap: '8px' }}
+                >
+                  <span>Unduh Data</span>
                 </button>
               )}
             </div>

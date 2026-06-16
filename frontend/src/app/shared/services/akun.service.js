@@ -30,3 +30,17 @@ export async function updateBiodataProfile(data) {
   const response = await apiClient.put('/biodata/profile', data);
   return unwrapData(response);
 }
+
+export async function uploadFotoProfil(file) {
+  const formData = new FormData();
+  formData.append('foto', file);
+  const response = await apiClient.post('/biodata/foto', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return unwrapData(response);
+}
+
+export async function deleteFotoProfil() {
+  const response = await apiClient.delete('/biodata/foto');
+  return unwrapData(response);
+}

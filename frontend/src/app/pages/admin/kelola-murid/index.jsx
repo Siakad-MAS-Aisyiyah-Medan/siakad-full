@@ -24,6 +24,20 @@ export default function MuridPage({ readOnly = false }) {
     removeMurid 
   } = useMurid();
 
+  const handleExport = () => {
+    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
+      const dataToExport = filteredData.map(murid => ({
+        'Nama Lengkap': murid.siswa?.nama_siswa || murid.pendaftaran?.nama_lengkap || '',
+        'NISN': murid.siswa?.nisn || '',
+        'NIS': murid.siswa?.nis || '',
+        'Kelas': murid.siswa?.kelas?.nama_kelas || '',
+        'Email': murid.email || '',
+        'Status': murid.role === 'siswa' ? 'Siswa Aktif' : 'Calon Siswa'
+      }));
+      exportToCsv('data_murid.csv', dataToExport);
+    });
+  };
+
   return (
     <AdminPageShell>
       {view === 'list' && (
@@ -46,6 +60,14 @@ export default function MuridPage({ readOnly = false }) {
                 >
                   <Plus size={18} strokeWidth={2.5} />
                   <span className="hidden md:inline">Tambah Murid</span>
+                </button>
+              )}
+              {readOnly && (
+                <button 
+                  onClick={handleExport}
+                  className="btn-outline h-12 px-5 rounded-xl font-bold inline-flex items-center gap-2 transition-all shrink-0"
+                >
+                  <span className="hidden md:inline">Unduh Data</span>
                 </button>
               )}
             </div>

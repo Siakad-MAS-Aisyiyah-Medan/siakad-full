@@ -52,6 +52,41 @@ export default function LaporanPage({
     load({ page: 1 });
   };
 
+  const handleExport = () => {
+    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
+      if (!data?.items) return;
+      
+      const isNilai = jenis === 'nilai';
+      const isAbsensi = jenis === 'absensi';
+      
+      const dataToExport = data.items.map(item => {
+        if (isNilai) {
+          return {
+            'Nama Lengkap': item.siswa?.nama_siswa || '-',
+            'Kelas': item.siswa?.kelas?.nama_kelas || '-',
+            'Mata Pelajaran': item.mapel?.nama_mapel || '-',
+            'Tahun Ajaran': item.tahun_ajaran || '-',
+            'Semester': item.semester || '-',
+            'Nilai Akhir': item.nilai_akhir !== null ? item.nilai_akhir : '-',
+            'Predikat': item.predikat || '-'
+          };
+        }
+        if (isAbsensi) {
+          return {
+            'Tanggal': item.tanggal || '-',
+            'Nama Siswa': item.siswa?.nama_siswa || '-',
+            'Kelas': item.kelas?.nama_kelas || '-',
+            'Status Kehadiran': item.status === 'H' ? 'Hadir' : (item.status === 'A' ? 'Alpa' : (item.status === 'I' ? 'Izin' : (item.status === 'S' ? 'Sakit' : 'Terlambat'))),
+            'Keterangan': item.keterangan || '-'
+          };
+        }
+        return item; // Fallback
+      });
+
+      exportToCsv(`laporan_${jenis}.csv`, dataToExport);
+    });
+  };
+
   const content = (
     <>
       <div className="data-panel view-list">
@@ -62,12 +97,12 @@ export default function LaporanPage({
               <p>{subtitle}</p>
             </div>
             <div className="header-actions gap-2">
-              <ExportPlaceholder message={data?.export_message} />
+              <ExportPlaceholder onExport={handleExport} title="Unduh Laporan" />
             </div>
           </div>
         ) : (
           <div className="flex justify-end mb-2">
-            <ExportPlaceholder message={data?.export_message} />
+            <ExportPlaceholder onExport={handleExport} title="Unduh Laporan" />
           </div>
         )}
 
