@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { login, saveSession, getRedirectPathForRole } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
 import AppLogo from '@app/shared/components/AppLogo';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -12,8 +12,20 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [roleType, setRoleType] = useState('Murid & Calon Murid');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (searchParams.get('expired') === '1') {
@@ -31,6 +43,24 @@ export default function LoginPage() {
     try {
       const result = await login({ login: username.trim(), password });
       const { user, profile, token, permissions, menus, redirect_path } = result;
+
+      const allowedRolesForAdmin = ['admin', 'superadmin'];
+      const allowedRolesForPegawai = ['pegawai', 'guru', 'wali_kelas', 'kepsek', 'staff'];
+      const allowedRolesForMurid = ['siswa', 'calon_siswa'];
+
+      let isRoleValid = false;
+      if (roleType === 'Administrator' && allowedRolesForAdmin.includes(user.role)) {
+        isRoleValid = true;
+      } else if (roleType === 'Pegawai' && allowedRolesForPegawai.includes(user.role)) {
+        isRoleValid = true;
+      } else if (roleType === 'Murid & Calon Murid' && allowedRolesForMurid.includes(user.role)) {
+        isRoleValid = true;
+      }
+
+      if (!isRoleValid) {
+        throw { response: { data: { message: `Akses ditolak: Akun Anda tidak memiliki hak akses sebagai ${roleType}.` } } };
+      }
+
       saveSession({ user, profile, token, permissions, menus, redirect_path });
 
       const displayName = getDisplayName(profile, user.role, user.username);
@@ -85,12 +115,12 @@ export default function LoginPage() {
           </p>
           <div className="stats-grid">
             <div className="stat-card glass">
-              <span className="stat-value">15k+</span>
-              <span className="stat-label">Mahasiswa</span>
+              <span className="stat-value">1k+</span>
+              <span className="stat-label">Siswa</span>
             </div>
             <div className="stat-card glass">
-              <span className="stat-value">450+</span>
-              <span className="stat-label">Dosen</span>
+              <span className="stat-value">50+</span>
+              <span className="stat-label">Guru</span>
             </div>
           </div>
         </div>
@@ -106,28 +136,74 @@ export default function LoginPage() {
             <p>Silakan pilih akses dan masuk ke akun Anda</p>
           </header>
 
-          <div style={{ display: 'flex', marginBottom: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-            {['Administrator', 'Pegawai', 'Murid & Calon Murid'].map((role) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => setRoleType(role)}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 0.5rem',
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: roleType === role ? '2px solid var(--primary)' : '2px solid transparent',
-                  color: roleType === role ? 'var(--primary)' : '#6b7280',
-                  fontWeight: roleType === role ? '600' : '400',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  fontSize: '0.9rem'
-                }}
-              >
-                {role}
-              </button>
-            ))}
+          <div className="input-group" style={{ marginBottom: '1.5rem', position: 'relative' }} ref={dropdownRef}>
+            <label>Pilih Akses</label>
+            <div
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.5rem',
+                border: isDropdownOpen ? '1px solid var(--primary, #0ea5e9)' : '1px solid #e5e7eb',
+                backgroundColor: isDropdownOpen ? '#ffffff' : '#f9fafb',
+                color: '#111827',
+                cursor: 'pointer',
+                boxShadow: isDropdownOpen ? '0 0 0 3px rgba(14, 165, 233, 0.1)' : 'none',
+                transition: 'all 0.2s ease',
+                fontSize: '0.95rem'
+              }}
+            >
+              <span style={{ fontWeight: '500' }}>{roleType}</span>
+              <ChevronDown size={18} style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease', color: '#6b7280' }} />
+            </div>
+
+            {isDropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                marginTop: '0.5rem',
+                backgroundColor: 'white',
+                borderRadius: '0.5rem',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                zIndex: 50,
+                overflow: 'hidden',
+                animation: 'fadeIn 0.2s ease-out'
+              }}>
+                {['Administrator', 'Pegawai', 'Murid & Calon Murid'].map((role) => (
+                  <div
+                    key={role}
+                    onClick={() => { setRoleType(role); setIsDropdownOpen(false); }}
+                    style={{
+                      padding: '0.875rem 1rem',
+                      cursor: 'pointer',
+                      backgroundColor: roleType === role ? '#f0f9ff' : 'transparent',
+                      color: roleType === role ? 'var(--primary, #0ea5e9)' : '#4b5563',
+                      fontWeight: roleType === role ? '600' : '400',
+                      transition: 'all 0.15s ease',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      borderLeft: roleType === role ? '3px solid var(--primary, #0ea5e9)' : '3px solid transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (roleType !== role) e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (roleType !== role) e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {role}
+                    {roleType === role && <Check size={18} />}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleLogin}>
