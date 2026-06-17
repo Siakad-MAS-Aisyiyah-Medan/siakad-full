@@ -68,6 +68,7 @@ class MuridController extends Controller
     public function update(UpdateMuridRequest $request, $id)
     {
         try {
+            $validated = $request->validated();
             $user = $this->updateMurid((int) $id, $validated);
 
             return ApiResponse::success($user, 'Status Murid diperbarui');

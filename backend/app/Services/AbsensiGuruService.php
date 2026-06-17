@@ -91,7 +91,7 @@ class AbsensiGuruService
     private function upsertHarian(int $guruId, callable $mutator): array
     {
         $user = User::findOrFail($guruId);
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
+        if ($user->role !== 'guru') {
             throw new InvalidArgumentException('Hanya guru yang dapat absen.');
         }
 

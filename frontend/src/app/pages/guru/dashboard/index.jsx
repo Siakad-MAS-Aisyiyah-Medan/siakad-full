@@ -3,31 +3,31 @@ import { getDisplayName } from '@app/shared/utils/profile';
 import MainLayout from '@app/shared/layouts/MainLayout';
 import { Users } from 'lucide-react';
 
-export default function WaliKelasDashboard() {
+export default function GuruDashboard() {
   const user = getJsonItem('user');
   const profile = getJsonItem('profile');
-  const name = getDisplayName(profile, user?.role ?? 'wali_kelas', user?.username);
+  const name = getDisplayName(profile, user?.role ?? 'guru', user?.username);
 
   return (
-    <MainLayout role="wali_kelas" name={name}>
+    <MainLayout role="guru" name={name}>
       <div className="welcome-banner glass animate-fade-in">
         <div className="banner-icon">
           <Users size={48} className="text-secondary" />
         </div>
         <div className="banner-text">
-          <h2>Panel Wali Kelas</h2>
-          <p>Kelola kelas perwalian Anda. Pantau absensi harian dan rekapitulasi nilai (Leger) murid dengan mudah.</p>
+          <h2>Panel Guru</h2>
+          <p>Kelola jadwal mengajar, absensi murid, dan nilai akademik sesuai mata pelajaran yang Anda ampu.</p>
         </div>
       </div>
 
       <div className="stats-grid">
         <div className="stat-card glass">
-          <h3>Total Murid Perwalian</h3>
-          <p className="stat-value">32 Murid</p>
+          <h3>Aktivitas Mengajar</h3>
+          <p className="stat-value">Aktif</p>
         </div>
         <div className="stat-card glass">
-          <h3>Kehadiran Hari Ini</h3>
-          <p className="stat-value">95%</p>
+          <h3>Kelola Akademik</h3>
+          <p className="stat-value">Nilai & Absensi</p>
         </div>
       </div>
     </MainLayout>

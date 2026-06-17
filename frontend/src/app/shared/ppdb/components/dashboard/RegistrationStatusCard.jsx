@@ -21,15 +21,13 @@ function StatCard({ icon: Icon, label, value, colorClass, isBadge = false }) {
   );
 }
 
-export default function RegistrationStatusCard({ pendaftaran, progressPercent, dashboardState }) {
+export default function RegistrationStatusCard({ pendaftaran, dashboardState }) {
   const phase = dashboardState?.phase ?? normalizePpdbStatus(pendaftaran);
   const statusForBadge = phase === 'none' ? 'belum' : phase;
   const nomor = pendaftaran?.nomor_pendaftaran || '—';
   const tahun = pendaftaran?.tahun_pelajaran || '2026/2027';
   const lastUpdated = formatLastUpdated(pendaftaran);
   const statusMessage = dashboardState?.statusMessage;
-  const showProgress = dashboardState?.showProgress !== false && phase !== 'none';
-
   return (
     <section className="cm-status-section">
       <div className="cm-stat-cards-grid">
@@ -42,24 +40,6 @@ export default function RegistrationStatusCard({ pendaftaran, progressPercent, d
       {statusMessage ? (
         <div className="cm-status-message">
           <span>{statusMessage}</span>
-        </div>
-      ) : null}
-
-      {showProgress ? (
-        <div className="cm-progress-block">
-          <div className="cm-progress-block__header">
-            <span>Progress Formulir</span>
-            <strong>{progressPercent}%</strong>
-          </div>
-          <div
-            className="cm-progress-track"
-            role="progressbar"
-            aria-valuenow={progressPercent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div className="cm-progress-fill" style={{ width: `${progressPercent}%` }} />
-          </div>
         </div>
       ) : null}
     </section>

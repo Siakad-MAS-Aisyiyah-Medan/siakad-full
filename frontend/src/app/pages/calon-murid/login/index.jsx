@@ -82,7 +82,7 @@ export default function LoginCalonMurid() {
 
       saveSession({ user, profile, token, permissions, menus, redirect_path });
 
-      const displayName = getDisplayName(profile, user.role, user.username);
+      const displayName = getDisplayName(profile, user.role, user.name ?? user.username);
       const target = resolveTargetPath(user, searchParams.get('redirect'));
 
       await Swal.fire({

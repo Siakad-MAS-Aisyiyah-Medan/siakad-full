@@ -29,8 +29,11 @@ export default function FormSelect({
         >
           <option value="" disabled hidden>{placeholder}</option>
           {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
+            <option
+              key={typeof opt === 'object' ? opt.value : opt}
+              value={typeof opt === 'object' ? opt.value : opt}
+            >
+              {typeof opt === 'object' ? opt.label : opt}
             </option>
           ))}
         </select>

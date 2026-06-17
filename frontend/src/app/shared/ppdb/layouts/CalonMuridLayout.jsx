@@ -6,14 +6,14 @@ import AppLogo from '@app/shared/components/AppLogo';
 import { renderMenuIcon } from '@app/shared/constants/icons';
 import { logout } from '@app/shared/services/auth.service';
 import { getJsonItem } from '@app/shared/utils/storage';
-import { ROLE_LABELS } from '@/config/roles.config';
 import { CALON_MURID_NAV } from '../config/calonMuridNav';
 
 export default function CalonMuridLayout({ children }) {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const user = getJsonItem('user');
-  const displayName = user?.name || user?.username || 'Calon Siswa';
+  const profile = getJsonItem('profile');
+  const displayName = user?.name || profile?.nama_lengkap || user?.username || 'Calon Siswa';
   const accountStatus = user?.status_akun || (user?.status_aktif !== false ? 'aktif' : 'nonaktif');
 
   const handleLogout = () => {
@@ -93,7 +93,7 @@ export default function CalonMuridLayout({ children }) {
               Halo, <strong>{displayName}</strong>
             </span>
             <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20 ml-3">
-              {ROLE_LABELS.calon_siswa || 'Calon Siswa'}
+              {displayName}
             </span>
             {accountStatus !== 'aktif' && (
               <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20 ml-2">

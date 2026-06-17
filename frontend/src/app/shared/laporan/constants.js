@@ -11,7 +11,6 @@ export const JENIS_LAPORAN = [
 export const JENIS_BY_ROLE = {
   admin: JENIS_LAPORAN.map((j) => j.value),
   kepsek: JENIS_LAPORAN.map((j) => j.value),
-  wali_kelas: ['siswa', 'absensi_siswa', 'nilai', 'jadwal'],
   guru: ['absensi_siswa', 'nilai', 'jadwal'],
   siswa: ['absensi_siswa', 'nilai', 'jadwal'],
 };
@@ -64,7 +63,7 @@ export const TABLE_COLUMNS = {
     { key: 'mapel', label: 'Mapel', render: (_, r) => r.mapel?.nama_mapel || '-' },
     { key: 'nilai_akhir', label: 'Akhir' },
     { key: 'predikat', label: 'Predikat' },
-    { key: 'validated_by_wali', label: 'Valid', render: (v) => (v ? 'Ya' : 'Belum') },
+    { key: 'validated_by_wali', label: 'Status', render: (v) => (v ? 'Selesai' : 'Tercatat') },
   ],
   jadwal: [
     { key: 'hari', label: 'Hari' },

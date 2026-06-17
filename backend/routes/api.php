@@ -5,7 +5,6 @@ require __DIR__.'/api/ppdb.php';
 require __DIR__.'/api/admin.php';
 require __DIR__.'/api/guru.php';
 require __DIR__.'/api/siswa.php';
-require __DIR__.'/api/wali.php';
 require __DIR__.'/api/kepsek.php';
 require __DIR__.'/api/calon-siswa.php';
 

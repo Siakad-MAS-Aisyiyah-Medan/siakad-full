@@ -55,11 +55,7 @@ export default function GuruTable({
                     <span className="text-secondary">{guru.email}</span>
                   </td>
                   <td>
-                    <span
-                      className={`badge lowercase ${guru.role === 'wali_kelas' ? 'badge-pending' : ''}`}
-                    >
-                      {guru.role.replace('_', ' ')}
-                    </span>
+                    <span className="badge lowercase">guru</span>
                   </td>
                   <td className="actions-cell">
                     <button type="button" onClick={() => onEdit(guru)} className="btn-icon edit" title="Edit Data">

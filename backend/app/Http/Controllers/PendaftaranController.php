@@ -116,6 +116,12 @@ class PendaftaranController extends Controller
      */
     public function saveKeteranganPribadi(\Illuminate\Http\Request $request)
     {
+        $request->merge($this->normalizeNumericInputs($request, [
+            'anak_ke',
+            'jml_saudara_kandung',
+            'jml_saudara_tiri',
+        ]));
+
         $validated = $request->validate([
             'nisn' => 'sometimes|string|max:20',
             'nama_lengkap' => 'sometimes|string|max:255',
@@ -140,6 +146,11 @@ class PendaftaranController extends Controller
      */
     public function saveKesehatan(\Illuminate\Http\Request $request)
     {
+        $request->merge($this->normalizeNumericInputs($request, [
+            'berat_badan',
+            'tinggi_badan',
+        ]));
+
         $validated = $request->validate([
             'berat_badan' => 'sometimes|integer|min:1',
             'tinggi_badan' => 'sometimes|integer|min:1',
@@ -470,6 +481,9 @@ class PendaftaranController extends Controller
 
     public function calonPpdbUploadBerkas(\Illuminate\Http\Request $request)
     {
+        $jenis = implode(',', \App\Services\PpdbBerkasService::allJenisKeys());
+        $maxKb = (int) config('ppdb.berkas.max_size_kb', 2048);
+
         $validated = $request->validate([
             'jenis_berkas' => 'required|string|in:'.$jenis,
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:'.$maxKb,
@@ -478,7 +492,7 @@ class PendaftaranController extends Controller
         try {
             $berkas = $this->uploadBerkas(
                 Auth::user(),
-                $request->validated('jenis_berkas'),
+                $validated['jenis_berkas'],
                 $request->file('file')
             );
 
@@ -983,6 +997,36 @@ class PendaftaranController extends Controller
             $pendaftaran->{$legacyMap[$jenis]} = $path;
             $pendaftaran->save();
         }
+    }
+
+    private function normalizeNumericInputs(Request $request, array $fields): array
+    {
+        $normalized = [];
+
+        foreach ($fields as $field) {
+            if (!$request->exists($field)) {
+                continue;
+            }
+
+            $value = $request->input($field);
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_string($value)) {
+                $value = trim($value);
+                if ($value === '') {
+                    $normalized[$field] = null;
+                    continue;
+                }
+            }
+
+            if (is_numeric($value)) {
+                $normalized[$field] = (int) $value;
+            }
+        }
+
+        return $normalized;
     }
 
 }

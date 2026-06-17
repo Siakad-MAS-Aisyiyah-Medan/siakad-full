@@ -1,10 +1,8 @@
-import { Info, Calendar, Clock, Megaphone, Phone } from 'lucide-react';
+import { Info, Clock, Phone } from 'lucide-react';
 import { formatInfoText } from '../../utils/formatPpdbInfo';
 
 const DEFAULT_INFO = {
-  jadwal: 'Pendaftaran PPDB Tahun Pelajaran 2026/2027',
   batasUpload: 'Unggah seluruh berkas sebelum batas waktu yang ditetapkan sekolah.',
-  pengumuman: 'Pantau halaman pengumuman untuk jadwal tes dan hasil seleksi.',
   kontak: 'Hubungi panitia PPDB melalui kontak resmi sekolah.',
 };
 
@@ -12,9 +10,7 @@ export default function ImportantInfoPanel({ info }) {
   const data = { ...DEFAULT_INFO, ...info };
 
   const items = [
-    { icon: Calendar, title: 'Jadwal PPDB', text: formatInfoText(data.jadwal) || data.jadwal, tone: 'green' },
     { icon: Clock, title: 'Batas Upload Berkas', text: data.batasUpload, tone: 'amber' },
-    { icon: Megaphone, title: 'Pengumuman Terbaru', text: formatInfoText(data.pengumuman) || data.pengumuman, tone: 'blue' },
     { icon: Phone, title: 'Kontak Admin', text: formatInfoText(data.kontak) || data.kontak, tone: 'emerald', highlight: true },
   ];
 

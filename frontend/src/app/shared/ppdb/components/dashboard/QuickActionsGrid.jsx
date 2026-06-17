@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Bell, ClipboardList, FileEdit, Upload, Zap } from 'lucide-react';
+import { ArrowRight, ClipboardList, FileEdit, Upload, Zap } from 'lucide-react';
 
 const SECONDARY_ACTIONS = [
   {
@@ -28,15 +28,6 @@ const SECONDARY_ACTIONS = [
     path: '/calon-murid/status',
     requiresReg: true,
     tone: 'purple',
-  },
-  {
-    key: 'pengumuman',
-    title: 'Pengumuman',
-    description: 'Informasi resmi PPDB.',
-    icon: Bell,
-    path: '/calon-murid/pengumuman',
-    requiresReg: false,
-    tone: 'amber',
   },
 ];
 

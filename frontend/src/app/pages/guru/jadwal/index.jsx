@@ -11,7 +11,7 @@ export default function GuruJadwalPage() {
   const { items, loading, error } = useJadwalGuru();
 
   return (
-    <MainLayout role={user?.role === 'wali_kelas' ? 'wali_kelas' : 'guru'} name={name}>
+    <MainLayout role="guru" name={name}>
       {loading && (
         <div className="glass p-6 text-secondary">Memuat jadwal mengajar...</div>
       )}

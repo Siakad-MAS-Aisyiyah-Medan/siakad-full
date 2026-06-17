@@ -1,9 +1,7 @@
 import FormInput from '../form/FormInput';
 import FormSelect from '../form/FormSelect';
 import FormTextarea from '../form/FormTextarea';
-import { REVIEW_SECTIONS, STATUS_YATIM_OPTIONS, AGAMA_OPTIONS, GOL_DARAH_OPTIONS } from '../../config/ppdbWizardConfig';
-
-
+import { REVIEW_SECTIONS, STATUS_YATIM_OPTIONS, AGAMA_OPTIONS, GOL_DARAH_OPTIONS, JENIS_KELAMIN_OPTIONS } from '../../config/ppdbWizardConfig';
 
 export function StepKeteranganPribadi({ data, onChange, disabled, errors = {} }) {
   const set = (id, v) => onChange('keteranganPribadi', id, v);
@@ -15,14 +13,17 @@ export function StepKeteranganPribadi({ data, onChange, disabled, errors = {} })
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <FormInput label="Tanggal Lahir" id="tgl_lahir" type="date" value={data.tgl_lahir?.slice?.(0, 10) || data.tgl_lahir} onChange={set} disabled={disabled} required error={errors.tgl_lahir} />
+        <FormSelect label="Jenis Kelamin" id="jenis_kelamin" value={data.jenis_kelamin} onChange={set} options={JENIS_KELAMIN_OPTIONS} disabled={disabled} required error={errors.jenis_kelamin} />
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <FormSelect label="Agama" id="agama" value={data.agama} onChange={set} options={AGAMA_OPTIONS} disabled={disabled} required error={errors.agama} />
-      </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <FormInput label="Kewarganegaraan" id="kewarganegaraan" value={data.kewarganegaraan} onChange={set} disabled={disabled} required placeholder="Contoh: Indonesia" error={errors.kewarganegaraan} />
-        <FormInput label="Anak Ke" id="anak_ke" type="number" value={data.anak_ke} onChange={set} disabled={disabled} required placeholder="1" error={errors.anak_ke} />
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <FormInput label="Anak Ke" id="anak_ke" type="number" value={data.anak_ke} onChange={set} disabled={disabled} required placeholder="1" error={errors.anak_ke} />
         <FormInput label="Jumlah Saudara Kandung" id="jml_saudara_kandung" type="number" value={data.jml_saudara_kandung} onChange={set} disabled={disabled} required error={errors.jml_saudara_kandung} />
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <FormInput label="Jumlah Saudara Tiri" id="jml_saudara_tiri" type="number" value={data.jml_saudara_tiri} onChange={set} disabled={disabled} required error={errors.jml_saudara_tiri} />
       </div>
       <FormTextarea label="Alamat" id="alamat" value={data.alamat} onChange={set} disabled={disabled} required placeholder="Alamat lengkap tempat tinggal" className="w-full" error={errors.alamat} />
@@ -68,8 +69,8 @@ export function StepOrtu({ data, onChange, disabled, errors = {} }) {
         <FormInput label="Nama Ibu" id="nama_ibu" value={data.nama_ibu} onChange={set} disabled={disabled} required error={errors.nama_ibu} />
         <FormInput label="Pendidikan Ayah" id="pendidikan_ayah" value={data.pendidikan_ayah} onChange={set} disabled={disabled} />
         <FormInput label="Pendidikan Ibu" id="pendidikan_ibu" value={data.pendidikan_ibu} onChange={set} disabled={disabled} />
-        <FormInput label="Pekerjaan Ayah" id="pekerjaan_ayah" value={data.pekerjaan_ayah} onChange={set} disabled={disabled} />
-        <FormInput label="Pekerjaan Ibu" id="pekerjaan_ibu" value={data.pekerjaan_ibu} onChange={set} disabled={disabled} />
+        <FormInput label="Pekerjaan Ayah" id="pekerjaan_ayah" value={data.pekerjaan_ayah} onChange={set} disabled={disabled} required error={errors.pekerjaan_ayah} />
+        <FormInput label="Pekerjaan Ibu" id="pekerjaan_ibu" value={data.pekerjaan_ibu} onChange={set} disabled={disabled} required error={errors.pekerjaan_ibu} />
         <FormSelect label="Agama Ortu" id="agama_ortu" value={data.agama_ortu} onChange={set} options={AGAMA_OPTIONS} disabled={disabled} />
         <FormInput label="No. HP Ortu" id="no_hp_ortu" value={data.no_hp_ortu} onChange={set} disabled={disabled} required error={errors.no_hp_ortu} />
       </div>
@@ -95,8 +96,15 @@ export function StepKepribadian({ data, onChange, disabled, errors = {} }) {
   );
 }
 
-
 export function StepReview({ forms }) {
+  const displayValue = (value) => {
+    if (value === undefined || value === null) return '-';
+    if (typeof value === 'string' && value.trim() === '') return '-';
+    if (value === 'L') return 'Laki-Laki';
+    if (value === 'P') return 'Perempuan';
+    return String(value);
+  };
+
   return (
     <div className="space-y-6">
       {REVIEW_SECTIONS.map(({ title, section, fields }) => (
@@ -107,7 +115,7 @@ export function StepReview({ forms }) {
               <div key={key} className="min-w-0">
                 <dt className="text-xs font-medium text-gray-500">{label}</dt>
                 <dd className="mt-0.5 text-sm font-semibold text-gray-900 break-words">
-                  {forms[section]?.[key] ?? '—'}
+                  {displayValue(forms[section]?.[key])}
                 </dd>
               </div>
             ))}

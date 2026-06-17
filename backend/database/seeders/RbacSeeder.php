@@ -5,12 +5,32 @@ namespace Database\Seeders;
 use App\Models\MenuItem;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class RbacSeeder extends Seeder
 {
     public function run(): void
     {
+        User::where('role', 'wali_kelas')->update(['role' => 'guru']);
+
+        if ($waliRole = Role::where('key', 'wali_kelas')->first()) {
+            $waliRole->permissions()->detach();
+            $waliRole->delete();
+        }
+
+        Permission::whereIn('key', [
+            'view_dashboard_wali',
+            'view_siswa_kelas',
+            'view_absensi_kelas',
+            'validate_nilai',
+        ])->get()->each(function (Permission $permission) {
+            $permission->roles()->detach();
+            $permission->delete();
+        });
+
+        MenuItem::where('path', 'like', '/wali%')->delete();
+
         $permissions = [
             ['key' => 'manage_all', 'name' => 'Kelola Semua', 'group' => 'admin'],
             ['key' => 'manage_users', 'name' => 'Kelola Pengguna', 'group' => 'admin'],
@@ -32,10 +52,6 @@ class RbacSeeder extends Seeder
             ['key' => 'view_jadwal_mengajar', 'name' => 'Jadwal Mengajar', 'group' => 'guru'],
             ['key' => 'manage_absensi_siswa', 'name' => 'Kelola Absensi Siswa', 'group' => 'guru'],
             ['key' => 'manage_nilai_siswa', 'name' => 'Kelola Nilai Siswa', 'group' => 'guru'],
-            ['key' => 'view_dashboard_wali', 'name' => 'Dashboard Wali Kelas', 'group' => 'wali_kelas'],
-            ['key' => 'view_siswa_kelas', 'name' => 'Lihat Siswa Kelas', 'group' => 'wali_kelas'],
-            ['key' => 'view_absensi_kelas', 'name' => 'Rekap Absensi Kelas', 'group' => 'wali_kelas'],
-            ['key' => 'validate_nilai', 'name' => 'Validasi Nilai', 'group' => 'wali_kelas'],
             ['key' => 'view_dashboard_siswa', 'name' => 'Dashboard Siswa', 'group' => 'siswa'],
             ['key' => 'view_jadwal_siswa', 'name' => 'Jadwal Siswa', 'group' => 'siswa'],
             ['key' => 'view_absensi_pribadi', 'name' => 'Absensi Pribadi', 'group' => 'siswa'],
@@ -58,11 +74,6 @@ class RbacSeeder extends Seeder
             ]],
             ['key' => 'guru', 'name' => 'Guru', 'redirect_path' => '/guru/dashboard', 'permissions' => [
                 'view_dashboard_guru', 'view_jadwal_mengajar', 'manage_absensi_siswa', 'manage_nilai_siswa',
-            ]],
-            ['key' => 'wali_kelas', 'name' => 'Wali Kelas', 'redirect_path' => '/wali/dashboard', 'permissions' => [
-                'view_dashboard_wali', 'view_dashboard_guru', 'view_jadwal_mengajar',
-                'manage_absensi_siswa', 'manage_nilai_siswa',
-                'view_siswa_kelas', 'view_absensi_kelas', 'validate_nilai',
             ]],
             ['key' => 'siswa', 'name' => 'Siswa', 'redirect_path' => '/siswa/dashboard', 'permissions' => [
                 'view_dashboard_siswa', 'view_jadwal_siswa', 'view_absensi_pribadi', 'view_nilai_pribadi',
@@ -122,10 +133,6 @@ class RbacSeeder extends Seeder
             ['permission_key' => 'view_jadwal_mengajar', 'icon_key' => 'Calendar', 'label' => 'Jadwal Mengajar', 'path' => '/guru/jadwal', 'sort_order' => 20],
             ['permission_key' => 'manage_absensi_siswa', 'icon_key' => 'ClipboardList', 'label' => 'Kelola Absensi', 'path' => '/guru/absensi', 'sort_order' => 30],
             ['permission_key' => 'manage_nilai_siswa', 'icon_key' => 'FileText', 'label' => 'Kelola Nilai', 'path' => '/guru/nilai', 'sort_order' => 40],
-            ['permission_key' => 'view_dashboard_wali', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/wali/dashboard', 'sort_order' => 10],
-            ['permission_key' => 'view_siswa_kelas', 'icon_key' => 'Users', 'label' => 'Data Murid Kelas', 'path' => '/wali/murid', 'sort_order' => 20],
-            ['permission_key' => 'view_absensi_kelas', 'icon_key' => 'BarChart3', 'label' => 'Rekap Absensi Kelas', 'path' => '/wali/absensi', 'sort_order' => 30],
-            ['permission_key' => 'validate_nilai', 'icon_key' => 'FileText', 'label' => 'Leger & Validasi Nilai', 'path' => '/wali/nilai', 'sort_order' => 40],
             ['permission_key' => 'view_dashboard_siswa', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/siswa/dashboard', 'sort_order' => 10],
             ['permission_key' => 'view_jadwal_siswa', 'icon_key' => 'Calendar', 'label' => 'Jadwal Pelajaran', 'path' => '/siswa/jadwal', 'sort_order' => 20],
             ['permission_key' => 'view_absensi_pribadi', 'icon_key' => 'ClipboardList', 'label' => 'Riwayat Absensi', 'path' => '/siswa/absensi', 'sort_order' => 30],

@@ -180,8 +180,6 @@ class PpdbBerkasService
             throw new InvalidArgumentException('Berkas tidak dapat diubah pada status pendaftaran saat ini.');
         }
 
-        $this->state->assertEditableByCalon($pendaftaran);
-
         return $pendaftaran;
     }
 
@@ -189,7 +187,7 @@ class PpdbBerkasService
     {
         $status = $pendaftaran->status_pendaftaran ?? $pendaftaran->ppdb_status ?? 'draft';
 
-        return in_array($status, ['draft', 'revision', 'revisi'], true);
+        return in_array($status, ['draft', 'revision', 'revisi', 'submitted', 'diajukan'], true);
     }
 
     protected function assertAllowedFile(UploadedFile $file, string $jenis): void

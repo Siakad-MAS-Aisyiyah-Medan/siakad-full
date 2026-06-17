@@ -45,7 +45,7 @@ export default function LoginPage() {
       const { user, profile, token, permissions, menus, redirect_path } = result;
 
       const allowedRolesForAdmin = ['admin', 'superadmin'];
-      const allowedRolesForPegawai = ['pegawai', 'guru', 'wali_kelas', 'kepsek', 'staff'];
+      const allowedRolesForPegawai = ['pegawai', 'guru', 'kepsek', 'staff'];
       const allowedRolesForMurid = ['siswa', 'calon_siswa'];
 
       let isRoleValid = false;
@@ -63,7 +63,7 @@ export default function LoginPage() {
 
       saveSession({ user, profile, token, permissions, menus, redirect_path });
 
-      const displayName = getDisplayName(profile, user.role, user.username);
+      const displayName = getDisplayName(profile, user.role, user.name ?? user.username);
 
       const redirectParam = searchParams.get('redirect');
       let target = redirectParam || redirect_path || getRedirectPathForRole(user.role);

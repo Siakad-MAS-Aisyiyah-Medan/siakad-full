@@ -172,7 +172,7 @@ class AbsensiSiswaService
     private function assertGuruCanRecord(int $guruId, int $mapelId): void
     {
         $user = User::findOrFail($guruId);
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
+        if ($user->role !== 'guru') {
             throw new InvalidArgumentException('Hanya guru yang dapat mencatat absensi siswa.');
         }
 

@@ -77,6 +77,7 @@ export default function FormulirPpdbWizard() {
   const disabled = w.saving || w.isLocked;
   const totalSteps = w.STEPS.length;
   const err = w.fieldErrors;
+  const completedSet = new Set(w.completedSteps);
 
   const StepIcon = STEP_ICONS[stepKey] || FileEdit;
   const accentClass = STEP_ACCENTS[stepKey] || 'wizard-accent--green';
@@ -169,11 +170,11 @@ export default function FormulirPpdbWizard() {
             <div className="wizard-mini-progress-track">
               <div
                 className="wizard-mini-progress-fill"
-                style={{ width: `${Math.round(((w.activeStep + 1) / totalSteps) * 100)}%` }}
+                style={{ width: `${w.percent}%` }}
               />
             </div>
             <span className="wizard-progress-pct">
-              {Math.round(((w.activeStep + 1) / totalSteps) * 100)}%
+              {w.percent}%
             </span>
           </div>
 
@@ -181,7 +182,7 @@ export default function FormulirPpdbWizard() {
           <div className="wizard-steps-scroll">
             <div className="wizard-steps-row">
               {PPDB_STEPS.map((s, idx) => {
-                const done = idx < w.activeStep;
+                const done = completedSet.has(idx);
                 const active = idx === w.activeStep;
                 const reachable = idx <= w.maxReachableStep;
                 const state = active ? 'active' : done ? 'done' : reachable ? 'reachable' : 'pending';
@@ -197,7 +198,7 @@ export default function FormulirPpdbWizard() {
                     {/* connector line */}
                     {idx > 0 && (
                       <div className="wizard-step-line">
-                        <div className={`wizard-step-line__fill${done || active ? ' wizard-step-line__fill--done' : ''}`} />
+                        <div className={`wizard-step-line__fill${completedSet.has(idx - 1) ? ' wizard-step-line__fill--done' : ''}`} />
                       </div>
                     )}
                     <span className="wizard-step-circle">

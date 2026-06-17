@@ -18,8 +18,8 @@ class GuruPengampuUser implements ValidationRule
             return;
         }
 
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
-            $fail('Guru pengampu harus memiliki role guru atau wali_kelas.');
+        if ($user->role !== 'guru') {
+            $fail('Guru pengampu harus memiliki role guru.');
         }
     }
 }

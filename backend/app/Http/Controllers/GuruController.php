@@ -24,12 +24,13 @@ class GuruController extends Controller
         $validated = $request->validate([
             'search' => 'nullable|string',
             'per_page' => 'nullable|integer',
+            'role' => 'nullable|in:guru',
         ]);
 
         $paginator = $this->listGuru(
-            $request->validated('search'),
-            (int) $request->validated('per_page', 15),
-            $request->validated('role')
+            $validated['search'] ?? null,
+            (int) ($validated['per_page'] ?? 15),
+            $validated['role'] ?? null
         );
 
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data guru');
@@ -47,7 +48,7 @@ class GuruController extends Controller
             'agama' => 'required|string|max:50',
             'alamat' => 'required|string',
             'no_hp' => 'required|string|max:20',
-            'role' => 'required|in:guru,wali_kelas',
+            'role' => 'required|in:guru',
             'status' => 'required|in:aktif,nonaktif',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -63,8 +64,24 @@ class GuruController extends Controller
         }
     }
 
-    public function update(UpdateGuruRequest $request, $id)
+    public function update(\Illuminate\Http\Request $request, $id)
     {
+        $validated = $request->validate([
+            'username' => 'required|unique:users,username,' . $id . ',id_user',
+            'email' => 'required|email|unique:users,email,' . $id . ',id_user',
+            'password' => 'nullable|min:8',
+            'nama_guru' => 'required|string|max:255',
+            'nip_nuptk' => 'required|string|max:50|unique:guru,nip_nuptk,' . $id . ',id_user',
+            'jenis_kelamin' => 'required|in:L,P',
+            'agama' => 'required|string|max:50',
+            'alamat' => 'required|string',
+            'no_hp' => 'required|string|max:20',
+            'role' => 'required|in:guru',
+            'status' => 'required|in:aktif,nonaktif',
+            'status_aktif' => 'nullable|boolean',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
         try {
             $guru = $this->updateGuru((int) $id, $validated);
 
@@ -98,11 +115,7 @@ class GuruController extends Controller
     use AuditsAdminActions;
     private function listGuru(?string $search = null, int $perPage = 15, ?string $role = null): LengthAwarePaginator
     {
-        $roles = $role && in_array($role, ['guru', 'wali_kelas'], true)
-            ? [$role]
-            : ['guru', 'wali_kelas'];
-
-        $query = User::with('guru')->whereIn('role', $roles);
+        $query = User::with('guru')->where('role', 'guru');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -156,13 +169,8 @@ class GuruController extends Controller
         return DB::transaction(function () use ($id, $data) {
             $user = User::findOrFail($id);
 
-            if (!in_array($user->role, ['guru', 'wali_kelas'], true)
-                && !in_array($data['role'] ?? '', ['guru', 'wali_kelas'], true)) {
-                throw new InvalidArgumentException('User bukan guru/wali kelas.');
-            }
-
-            if ($user->role === 'wali_kelas' && $data['role'] === 'guru') {
-                $this->assertNotAssignedAsWaliKelas($id);
+            if ($user->role !== 'guru' && ($data['role'] ?? '') !== 'guru') {
+                throw new InvalidArgumentException('User bukan guru.');
             }
 
             $user->fill([
@@ -217,8 +225,8 @@ class GuruController extends Controller
         DB::transaction(function () use ($id) {
             $user = User::findOrFail($id);
 
-            if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
-                throw new InvalidArgumentException('User bukan guru/wali kelas.');
+            if ($user->role !== 'guru') {
+                throw new InvalidArgumentException('User bukan guru.');
             }
 
             $this->assertCanDeleteGuru($id);
@@ -226,15 +234,6 @@ class GuruController extends Controller
             $this->auditAdmin('guru.delete', $user, ['username' => $user->username]);
             $user->delete();
         });
-    }
-
-    private function assertNotAssignedAsWaliKelas(int $userId): void
-    {
-        if (Kelas::where('id_wali_kelas', $userId)->exists()) {
-            throw new InvalidArgumentException(
-                'Guru masih ditugaskan sebagai wali kelas. Lepaskan penugasan di menu Kelas terlebih dahulu.'
-            );
-        }
     }
 
     private function assertCanDeleteGuru(int $userId): void

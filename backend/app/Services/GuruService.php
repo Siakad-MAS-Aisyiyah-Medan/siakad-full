@@ -18,11 +18,7 @@ class GuruService
     use AuditsAdminActions;
     public function listGuru(?string $search = null, int $perPage = 15, ?string $role = null): LengthAwarePaginator
     {
-        $roles = $role && in_array($role, ['guru', 'wali_kelas'], true)
-            ? [$role]
-            : ['guru', 'wali_kelas'];
-
-        $query = User::with('guru')->whereIn('role', $roles);
+        $query = User::with('guru')->where('role', 'guru');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -76,13 +72,8 @@ class GuruService
         return DB::transaction(function () use ($id, $data) {
             $user = User::findOrFail($id);
 
-            if (!in_array($user->role, ['guru', 'wali_kelas'], true)
-                && !in_array($data['role'] ?? '', ['guru', 'wali_kelas'], true)) {
-                throw new InvalidArgumentException('User bukan guru/wali kelas.');
-            }
-
-            if ($user->role === 'wali_kelas' && $data['role'] === 'guru') {
-                $this->assertNotAssignedAsWaliKelas($id);
+            if ($user->role !== 'guru' && ($data['role'] ?? '') !== 'guru') {
+                throw new InvalidArgumentException('User bukan guru.');
             }
 
             $user->fill([
@@ -137,8 +128,8 @@ class GuruService
         DB::transaction(function () use ($id) {
             $user = User::findOrFail($id);
 
-            if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
-                throw new InvalidArgumentException('User bukan guru/wali kelas.');
+            if ($user->role !== 'guru') {
+                throw new InvalidArgumentException('User bukan guru.');
             }
 
             $this->assertCanDeleteGuru($id);
@@ -146,15 +137,6 @@ class GuruService
             $this->auditAdmin('guru.delete', $user, ['username' => $user->username]);
             $user->delete();
         });
-    }
-
-    private function assertNotAssignedAsWaliKelas(int $userId): void
-    {
-        if (Kelas::where('id_wali_kelas', $userId)->exists()) {
-            throw new InvalidArgumentException(
-                'Guru masih ditugaskan sebagai wali kelas. Lepaskan penugasan di menu Kelas terlebih dahulu.'
-            );
-        }
     }
 
     private function assertCanDeleteGuru(int $userId): void

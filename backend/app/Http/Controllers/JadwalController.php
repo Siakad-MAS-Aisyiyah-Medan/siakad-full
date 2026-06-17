@@ -169,7 +169,7 @@ class JadwalController extends Controller
     {
         $user = $request->user();
 
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
+        if ($user->role !== 'guru') {
             return ApiResponse::error('Akses jadwal mengajar hanya untuk guru.', 403);
         }
 

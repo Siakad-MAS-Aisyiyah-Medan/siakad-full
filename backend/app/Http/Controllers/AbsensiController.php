@@ -8,6 +8,7 @@ use App\Http\Resources\AbsensiResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\AbsensiGuru;
@@ -33,7 +34,7 @@ class AbsensiController extends Controller
 
         $paginator = $this->listAdmin(
             $validated,
-            (int) $request->validated('per_page', 15)
+            (int) $request->input('per_page', 15)
         );
 
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data absensi guru');
@@ -143,7 +144,7 @@ class AbsensiController extends Controller
         try {
             $data = $this->checkIn(
                 (int) $request->user()->id_user,
-                $request->validated('keterangan')
+                $request->input('keterangan')
             );
 
             return ApiResponse::success($data, 'Absen masuk berhasil dicatat');
@@ -161,7 +162,7 @@ class AbsensiController extends Controller
         try {
             $data = $this->checkOut(
                 (int) $request->user()->id_user,
-                $request->validated('keterangan')
+                $request->input('keterangan')
             );
 
             return ApiResponse::success($data, 'Absen pulang berhasil dicatat');
@@ -241,34 +242,6 @@ class AbsensiController extends Controller
             'total' => $total,
             'breakdown' => $breakdown,
         ];
-    }
-
-    public function waliRekapKelas(Request $request)
-    {
-        $user = $request->user();
-        if ($user->role !== 'wali_kelas') {
-            return ApiResponse::error('Akses hanya untuk wali kelas.', 403);
-        }
-
-        $kelas = Kelas::where('id_wali_kelas', $user->id_user)->first();
-        if (!$kelas) {
-            return ApiResponse::error('Anda belum ditugaskan sebagai wali kelas.', 422);
-        }
-
-        $filters = array_merge(
-            $request->only(['id_mapel', 'tanggal_dari', 'tanggal_sampai', 'semester', 'tahun_ajaran']),
-            ['id_kelas' => $kelas->id_kelas]
-        );
-
-        $rekap = $this->rekapSiswa($filters);
-
-        return ApiResponse::success([
-            'kelas' => [
-                'id_kelas' => $kelas->id_kelas,
-                'nama_kelas' => $kelas->nama_kelas,
-            ],
-            'rekap' => $rekap,
-        ], 'Berhasil mengambil rekap absensi kelas');
     }
 
     public function kepsekSiswa(Request $request)
@@ -368,7 +341,7 @@ class AbsensiController extends Controller
     private function upsertHarian(int $guruId, callable $mutator): array
     {
         $user = User::findOrFail($guruId);
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
+        if ($user->role !== 'guru') {
             throw new InvalidArgumentException('Hanya guru yang dapat absen.');
         }
 
@@ -481,7 +454,7 @@ class AbsensiController extends Controller
             return;
         }
 
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
+        if ($user->role !== 'guru') {
             throw new InvalidArgumentException('Hanya guru yang dapat mencatat absensi siswa.');
         }
 

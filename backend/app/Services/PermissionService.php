@@ -76,7 +76,7 @@ class PermissionService
     public function clearCache(): void
     {
         Cache::forget('rbac.menu_items.active');
-        foreach (['admin', 'kepsek', 'guru', 'wali_kelas', 'siswa', 'calon_siswa'] as $role) {
+        foreach (['admin', 'kepsek', 'guru', 'siswa', 'calon_siswa'] as $role) {
             Cache::forget("rbac.permissions.role.{$role}");
         }
     }
@@ -87,7 +87,6 @@ class PermissionService
             'admin' => ['/admin/'],
             'kepsek' => ['/kepsek/'],
             'guru' => ['/guru/'],
-            'wali_kelas' => ['/wali/', '/guru/'],
             'siswa' => ['/siswa/'],
             'calon_siswa' => ['/calon-siswa/'],
             default => [],

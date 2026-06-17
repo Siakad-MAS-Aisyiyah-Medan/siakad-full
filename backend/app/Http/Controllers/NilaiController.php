@@ -73,7 +73,7 @@ class NilaiController extends Controller
             'id_mapel' => 'nullable|exists:mata_pelajaran,id_mapel',
         ]);
 
-        $items = $this->nilaiService->listForSiswa((int) $request->user()->id_user, $validated, true);
+        $items = $this->nilaiService->listForSiswa((int) $request->user()->id_user, $validated);
         return ApiResponse::success($items, 'Berhasil mengambil nilai');
     }
 
@@ -91,41 +91,6 @@ class NilaiController extends Controller
         );
 
         return ApiResponse::success($raport, 'Berhasil mengambil raport');
-    }
-
-    public function waliLeger(Request $request)
-    {
-        $validated = $request->validate([
-            'semester' => 'required|in:Ganjil,Genap',
-            'tahun_ajaran' => 'required|string|max:20',
-            'id_mapel' => 'nullable|exists:mata_pelajaran,id_mapel',
-            'id_kelas' => 'nullable|exists:kelas,id_kelas',
-        ]);
-
-        try {
-            $data = $this->nilaiService->legerForWali((int) $request->user()->id_user, $validated);
-            return ApiResponse::success($data, 'Berhasil mengambil leger nilai kelas');
-        } catch (InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 422);
-        }
-    }
-
-    public function waliValidateNilai(Request $request)
-    {
-        $validated = $request->validate([
-            'semester' => 'required|in:Ganjil,Genap',
-            'tahun_ajaran' => 'required|string|max:20',
-            'id_kelas' => 'nullable|exists:kelas,id_kelas',
-            'id_nilai' => 'nullable|array',
-            'id_nilai.*' => 'integer|exists:nilai,id_nilai',
-        ]);
-
-        try {
-            $result = $this->nilaiService->validateByWali((int) $request->user()->id_user, $validated);
-            return ApiResponse::success($result, 'Nilai berhasil divalidasi');
-        } catch (InvalidArgumentException $e) {
-            return ApiResponse::error($e->getMessage(), 422);
-        }
     }
 
     public function kepsekIndex(Request $request)

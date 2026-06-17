@@ -43,36 +43,24 @@ export default function AdminDashboard() {
 
     const stats = [
         { 
-            label: 'Total Murid', 
+            label: 'TOTAL MURID', 
             value: realStats.total_murid, 
-            icon: <GraduationCap className="w-8 h-8" />, 
-            colorClass: 'text-slate-600', 
-            bgClass: 'bg-slate-100',
-            subtext: 'Data murid aktif'
+            icon: <GraduationCap className="w-6 h-6" />, 
         },
         { 
-            label: 'Total Guru', 
+            label: 'TOTAL GURU', 
             value: realStats.total_guru, 
-            icon: <Users className="w-8 h-8" />, 
-            colorClass: 'text-slate-600', 
-            bgClass: 'bg-slate-100',
-            subtext: 'Tenaga pengajar'
+            icon: <Users className="w-6 h-6" />, 
         },
         { 
-            label: 'Total Kelas', 
-            value: realStats.total_kelas, 
-            icon: <BookOpen className="w-8 h-8" />, 
-            colorClass: 'text-slate-600', 
-            bgClass: 'bg-slate-100',
-            subtext: 'Rombongan belajar'
-        },
-        { 
-            label: 'Mata Pelajaran', 
+            label: 'MATA PELAJARAN', 
             value: realStats.total_mapel, 
-            icon: <ClipboardList className="w-8 h-8" />, 
-            colorClass: 'text-slate-600', 
-            bgClass: 'bg-slate-100',
-            subtext: 'Kurikulum berjalan'
+            icon: <ClipboardList className="w-6 h-6" />, 
+        },
+        { 
+            label: 'TOTAL KELAS', 
+            value: realStats.total_kelas, 
+            icon: <BookOpen className="w-6 h-6" />, 
         },
     ];
 
@@ -145,223 +133,91 @@ export default function AdminDashboard() {
 
     return (
         <AdminPageShell>
-            {/* Wrapper utama dengan Flexbox dan gap-10 (40px) untuk vertical rhythm yang lega */}
-            <div className="p-6 max-w-7xl mx-auto font-sans pb-16 flex flex-col gap-10">
+            <div className="p-6 max-w-7xl mx-auto font-sans pb-16 flex flex-col gap-8">
                 
-                {/* WELCOME SECTION (HERO) */}
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-3xl p-8 text-white shadow-sm relative overflow-hidden">
-                    <div className="relative z-10 flex justify-between items-center">
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight mb-2">Selamat Datang, Admin 👋</h1>
-                            <p className="text-emerald-100 text-sm max-w-2xl leading-relaxed">
-                                Berikut adalah ringkasan aktivitas dan data terkini pada sistem hari ini.
-                            </p>
-                        </div>
-                    </div>
-                    {/* Decorative overlay */}
-                    <div className="absolute right-0 top-0 w-64 h-full opacity-10 pointer-events-none transform translate-x-12 -translate-y-8">
-                        <BookOpenCheck className="w-full h-full" />
-                    </div>
-                </div>
+                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard</h1>
 
-                {/* 1. STATISTIK CARDS - Menggunakan gap-8 (32px) agar lebar menyamping tidak sesak */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
+                {/* 1. STATISTIK CARDS */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     {stats.map((stat, index) => (
-                        <div key={index} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 group cursor-default">
-                            <div className="flex justify-between items-start mb-6 gap-4">
+                        <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                            <div className="flex justify-between items-start mb-2">
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-semibold text-slate-500 mb-2 truncate">{stat.label}</p>
-                                    <h3 className="text-4xl font-bold text-slate-800 tracking-tight">
+                                    <h3 className="text-3xl font-medium text-slate-800 tracking-tight mb-3">
                                         {isLoading ? (
-                                            <div className="w-8 h-8 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin my-1"></div>
+                                            <div className="w-6 h-6 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin"></div>
                                         ) : (
                                             stat.value || 0
                                         )}
                                     </h3>
+                                    <p className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest">{stat.label}</p>
                                 </div>
-                                <div className={`p-4 rounded-xl ${stat.bgClass} ${stat.colorClass} group-hover:scale-110 transition-transform duration-300 ease-out`}>
+                                <div className="p-2.5 border border-slate-200 rounded-lg text-slate-600">
                                     {stat.icon}
                                 </div>
-                            </div>
-                            <div className="flex items-center text-sm font-medium text-slate-400 pt-5 border-t border-slate-50">
-                                {stat.subtext}
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* 3. AUDIT LOG (TIMELINE ACTIVITY FEED) */}
-                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:justify-between md:items-center bg-slate-50/30 gap-4">
-                        <div>
-                            <div className="flex items-center gap-3 mb-1.5">
-                                <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Aktivitas Sistem Terbaru</h2>
-                                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    Live
-                                </span>
-                            </div>
-                            <p className="text-sm text-slate-500 font-medium">Pantau riwayat tindakan dan interaksi pengguna secara aktual</p>
-                        </div>
-                        <div className="p-2.5 bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400">
-                            <History className="w-5 h-5" />
-                        </div>
+                {/* 2. AUDIT LOG (TABLE) */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-200">
+                        <h2 className="text-lg font-bold text-slate-800">Audit Log</h2>
                     </div>
                     
-                    <div className="p-8">
-                        {isLoading ? (
-                            <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                                <div className="w-10 h-10 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin"></div>
-                                <span className="text-slate-500 font-medium">Memuat data aktivitas...</span>
-                            </div>
-                        ) : auditLogs.length > 0 ? (
-                            <div className="relative px-2">
-                                <div className="space-y-8">
-                                    {auditLogs.map((log, index) => {
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm text-slate-600">
+                            <thead className="bg-slate-100 text-[11px] uppercase font-bold text-slate-700 border-b border-slate-200">
+                                <tr>
+                                    <th className="px-6 py-4 whitespace-nowrap">WAKTU</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">AKTOR</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">AKSI</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">SUBJEK</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-200">
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
+                                            <div className="flex justify-center mb-2">
+                                                <div className="w-6 h-6 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin"></div>
+                                            </div>
+                                            Memuat data...
+                                        </td>
+                                    </tr>
+                                ) : auditLogs.length > 0 ? (
+                                    auditLogs.map((log, index) => {
                                         const formattedTime = formatDate(log.waktu || log.created_at);
                                         const actorName = log.aktor || log.user_name || log.user || 'Admin System';
+                                        const actionTitle = formatActionTitle(log.aksi || log.action, log.subjek || log.description || log.subject);
                                         
-                                        // Tentukan warna dan ikon berdasarkan aksi
-                                        const act = (log.aksi || log.action || '').toLowerCase();
-                                        let IconObj = Activity;
-                                        let colorClass = 'bg-slate-100 text-slate-600';
-                                        
-                                        if (act.includes('create') || act.includes('tambah') || act.includes('insert')) {
-                                            IconObj = Plus;
-                                            colorClass = 'bg-emerald-100 text-emerald-600';
-                                        } else if (act.includes('update') || act.includes('ubah') || act.includes('edit')) {
-                                            IconObj = Edit2;
-                                            colorClass = 'bg-blue-100 text-blue-600';
-                                        } else if (act.includes('delete') || act.includes('hapus')) {
-                                            IconObj = Trash2;
-                                            colorClass = 'bg-red-100 text-red-600';
-                                        } else if (act.includes('login') || act.includes('akses')) {
-                                            IconObj = LogIn;
-                                            colorClass = 'bg-purple-100 text-purple-600';
-                                        }
-
                                         return (
-                                            <div key={index} className="flex gap-5 relative group">
-                                                {/* Garis Vertikal Timeline (hanya jika bukan item terakhir) */}
-                                                {index !== auditLogs.length - 1 && (
-                                                    <div className="absolute left-[1.2rem] top-10 bottom-[-2.5rem] w-0.5 bg-slate-100 z-0"></div>
-                                                )}
-
-                                                {/* Node pada Timeline */}
-                                                <div className="relative z-10 flex-shrink-0 mt-0.5">
-                                                    <div className={`w-10 h-10 rounded-full ${colorClass} flex items-center justify-center ring-4 ring-white shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                                                        <IconObj className="w-4 h-4" strokeWidth={2.5} />
-                                                    </div>
-                                                </div>
-                                                
-                                                {/* Konten Aktivitas */}
-                                                <div className="flex-grow pt-1.5">
-                                                    <p className="text-[15px] font-bold text-slate-800 leading-snug">
-                                                        {formatActionTitle(log.aksi || log.action, log.subjek || log.description || log.subject)}
-                                                    </p>
-                                                    <p className="text-sm font-medium text-slate-500 mt-1.5 flex items-center gap-2">
-                                                        <span className="text-slate-700 font-semibold">{actorName}</span>
-                                                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                                        <span>{formattedTime}</span>
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            <tr key={index} className="hover:bg-slate-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap">{formattedTime}</td>
+                                                <td className="px-6 py-4 font-medium text-slate-800">{actorName}</td>
+                                                <td className="px-6 py-4">{actionTitle}</td>
+                                                <td className="px-6 py-4">{(log.subjek || log.description || log.subject) || '-'}</td>
+                                            </tr>
                                         );
-                                    })}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-16 space-y-4">
-                                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-2">
-                                    <FileText className="w-10 h-10 text-slate-300" />
-                                </div>
-                                <h3 className="text-lg font-bold text-slate-700">Belum ada aktivitas terbaru</h3>
-                                <p className="text-slate-500 max-w-sm text-center">
-                                    Aktivitas pengguna seperti penambahan murid, pengubahan jadwal, atau aksi sistem lainnya akan muncul di sini.
-                                </p>
-                            </div>
-                        )}
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
+                                            Belum ada entri audit log
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-{/* 2. MIDDLE SECTION: CHART & AGENDA - Menggunakan gap-10 antar kolom */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    {/* Chart Section */}
-                    <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                        <div className="flex justify-between items-center mb-8">
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-800">Tren Pendaftaran Siswa Baru</h2>
-                                <p className="text-sm text-slate-500 mt-1.5">Statistik pendaftaran 6 bulan terakhir</p>
-                            </div>
-                            <div className="p-2.5 bg-slate-50 rounded-xl">
-                                <TrendingUp className="w-5 h-5 text-emerald-500" />
-                            </div>
-                        </div>
-                        
-                        {/* Mock Chart Visualization */}
-                        <div className="mt-10 flex flex-col justify-end h-56 border-l border-b border-slate-100 pl-4 pb-2 relative">
-                            {/* Grid lines */}
-                            <div className="absolute w-full border-t border-slate-100 border-dashed top-0 left-0"></div>
-                            <div className="absolute w-full border-t border-slate-100 border-dashed top-1/3 left-0"></div>
-                            <div className="absolute w-full border-t border-slate-100 border-dashed top-2/3 left-0"></div>
-                            
-                            <div className="flex items-end justify-between gap-6 h-full w-full z-10 px-4">
-                                {[35, 45, 60, 50, 85, 100].map((val, i) => {
-                                    const count = val * 12;
-                                    return (
-                                        <div key={i} className="w-full bg-emerald-100 hover:bg-emerald-200 rounded-t-lg relative group transition-colors duration-300 flex justify-center" style={{ height: `${val}%` }}>
-                                            {/* Number above bar */}
-                                            <div className="absolute -top-7 text-xs font-bold text-slate-600">
-                                                {count}
-                                            </div>
-                                            <div className="w-full bg-emerald-500 rounded-t-lg absolute bottom-0 transition-all duration-500" style={{ height: '4px' }}></div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                        <div className="flex justify-between mt-4 text-sm font-medium text-slate-400 px-8">
-                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>Mei</span><span>Jun</span>
-                        </div>
-                    </div>
-
-                    {/* Agenda Section */}
-                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col">
-                        <div className="flex justify-between items-start mb-8">
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-800">Agenda Hari Ini</h2>
-                                <p className="text-sm text-slate-500 mt-1 font-medium bg-blue-50 text-blue-600 inline-block px-2.5 py-1 rounded mt-2">Total agenda: 3 kegiatan</p>
-                            </div>
-                            <div className="p-2.5 bg-slate-50 rounded-xl">
-                                <Calendar className="w-5 h-5 text-blue-500" />
-                            </div>
-                        </div>
-
-                        <div className="space-y-6 flex-grow">
-                            {mockAgenda.map((agenda) => (
-                                <div key={agenda.id} className="flex gap-5 group cursor-pointer">
-                                    <div className="flex flex-col items-center">
-                                        <div className={`w-3.5 h-3.5 rounded-full ${agenda.color} ring-4 ring-blue-50 mt-1`}></div>
-                                        <div className="w-0.5 h-full bg-slate-100 mt-2 group-last:hidden"></div>
-                                    </div>
-                                    <div className="pb-5 group-last:pb-0">
-                                        <h4 className="text-sm font-bold text-slate-800 mb-1.5 group-hover:text-blue-600 transition-colors">{agenda.title}</h4>
-                                        <div className="flex items-center text-xs font-medium text-slate-500">
-                                            <Clock className="w-3.5 h-3.5 mr-1.5" />
-                                            {agenda.time}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <button className="w-full mt-8 py-3.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-sm font-bold transition-colors flex items-center justify-center gap-2">
-                            Lihat Semua Kalender
-                            <ChevronRight className="w-4 h-4" />
-                        </button>
+                    
+                    <div className="px-6 py-4 bg-white text-xs text-slate-500">
+                        Total {auditLogs.length} entri
                     </div>
                 </div>
 
-                            </div>
+            </div>
         </AdminPageShell>
     );
 }

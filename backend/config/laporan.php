@@ -18,7 +18,6 @@ return [
         'admin' => ['siswa', 'guru', 'ppdb', 'absensi_siswa', 'absensi_guru', 'nilai', 'jadwal'],
         'kepsek' => ['siswa', 'guru', 'ppdb', 'absensi_siswa', 'absensi_guru', 'nilai', 'jadwal'],
         'guru' => ['absensi_siswa', 'nilai', 'jadwal'],
-        'wali_kelas' => ['siswa', 'absensi_siswa', 'nilai', 'jadwal'],
         'siswa' => ['absensi_siswa', 'nilai', 'jadwal'],
     ],
 ];

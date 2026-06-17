@@ -249,8 +249,7 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-xl px-4 h-11 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer disabled:bg-slate-100"
                   disabled={readOnly}
                 >
-                  <option value="guru">Guru Biasa / Mata Pelajaran</option>
-                  <option value="wali_kelas">Guru & Wali Kelas</option>
+                  <option value="guru">Guru</option>
                 </select>
               </div>
 

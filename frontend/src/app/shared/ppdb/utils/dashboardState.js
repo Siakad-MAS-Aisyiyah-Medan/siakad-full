@@ -1,3 +1,5 @@
+import { UPLOAD_BERKAS_ITEMS, normalizeBerkasJenis } from '../config/calonMuridNav';
+
 /**
  * Algoritma dashboard calon siswa — cabang berdasarkan keberadaan & status pendaftaran PPDB.
  */
@@ -12,7 +14,7 @@ const STATUS_ALIASES = {
   ditolak: 'rejected',
 };
 
-/** @typedef {'none'|'draft'|'revision'|'submitted'|'verified'|'accepted'|'rejected'} PpdbPhase */
+/** @typedef {'none'|'draft'|'revision'|'documents'|'submitted'|'verified'|'accepted'|'rejected'} PpdbPhase */
 
 const PHASE_CONFIG = {
   none: {
@@ -45,6 +47,16 @@ const PHASE_CONFIG = {
     tone: 'warning',
     timelineIndex: 3,
   },
+  documents: {
+    primaryLabel: 'Lengkapi Berkas',
+    primaryDescription: 'Formulir sudah diajukan. Unggah seluruh berkas wajib sebelum proses verifikasi admin.',
+    statusLabel: 'Upload Berkas',
+    statusMessage: 'Lengkapi berkas PPDB terlebih dahulu agar panitia dapat memverifikasi pendaftaran Anda.',
+    primaryHandler: 'navigate',
+    primaryPath: '/calon-murid/upload-berkas',
+    tone: 'warning',
+    timelineIndex: 4,
+  },
   submitted: {
     primaryLabel: 'Menunggu Verifikasi',
     primaryDescription: 'Pendaftaran telah dikirim. Pantau status verifikasi di halaman status.',
@@ -53,7 +65,7 @@ const PHASE_CONFIG = {
     primaryHandler: 'navigate',
     primaryPath: '/calon-murid/status',
     tone: 'pending',
-    timelineIndex: 4,
+    timelineIndex: 5,
   },
   verified: {
     primaryLabel: 'Menunggu Verifikasi',
@@ -63,15 +75,15 @@ const PHASE_CONFIG = {
     primaryHandler: 'navigate',
     primaryPath: '/calon-murid/status',
     tone: 'pending',
-    timelineIndex: 5,
+    timelineIndex: 6,
   },
   accepted: {
     primaryLabel: 'Selamat Anda Diterima',
-    primaryDescription: 'Selamat! Anda dinyatakan diterima. Ikuti instruksi daftar ulang di pengumuman.',
+    primaryDescription: 'Selamat! Anda dinyatakan diterima. Lihat detail kelulusan dan instruksi berikutnya di halaman status.',
     statusLabel: 'Diterima',
-    statusMessage: 'Pendaftaran Anda disetujui. Lihat detail di halaman status & pengumuman.',
+    statusMessage: 'Pendaftaran Anda disetujui. Lihat detail di halaman status.',
     primaryHandler: 'navigate',
-    primaryPath: '/calon-murid/pengumuman',
+    primaryPath: '/calon-murid/status',
     tone: 'success',
     timelineIndex: 6,
   },
@@ -92,9 +104,23 @@ export const PPDB_TIMELINE_STEPS = [
   { key: 'mulai', label: 'Mulai Pendaftaran', description: 'Membuat data pendaftaran PPDB' },
   { key: 'formulir', label: 'Lengkapi Formulir', description: 'Isi biodata & dokumen' },
   { key: 'submit', label: 'Ajukan Pendaftaran', description: 'Kirim formulir ke panitia' },
+  { key: 'berkas', label: 'Upload Berkas', description: 'Lengkapi dokumen persyaratan' },
   { key: 'verifikasi', label: 'Verifikasi Admin', description: 'Peninjauan oleh panitia' },
   { key: 'hasil', label: 'Pengumuman Hasil', description: 'Keputusan penerimaan' },
 ];
+
+function hasUploadedAllRequiredBerkas(pendaftaran) {
+  const items = Array.isArray(pendaftaran?.berkas) ? pendaftaran.berkas : [];
+  if (!items.length) return false;
+
+  const uploadedJenis = new Set(
+    items
+      .filter((item) => item?.url || item?.file_path)
+      .map((item) => normalizeBerkasJenis(item.jenis_berkas))
+  );
+
+  return UPLOAD_BERKAS_ITEMS.every((item) => uploadedJenis.has(item.key));
+}
 
 /**
  * Normalisasi status dari API (status_pendaftaran atau legacy ppdb_status).
@@ -113,17 +139,21 @@ export function normalizePpdbStatus(pendaftaran) {
  */
 export function resolveDashboardState(reg) {
   const hasRegistration = Boolean(reg?.has_registration && reg?.pendaftaran);
-  const phase = hasRegistration ? normalizePpdbStatus(reg.pendaftaran) : 'none';
+  const rawPhase = hasRegistration ? normalizePpdbStatus(reg.pendaftaran) : 'none';
+  const berkasComplete = hasUploadedAllRequiredBerkas(reg?.pendaftaran);
+  const phase = rawPhase === 'submitted' && !berkasComplete ? 'documents' : rawPhase;
   const config = PHASE_CONFIG[phase] ?? PHASE_CONFIG.draft;
 
   const canEditForm = ['none', 'draft', 'revision'].includes(phase);
-  const canUpload = hasRegistration && !['none'].includes(phase);
+  const canUpload = hasRegistration && !['none', 'accepted', 'rejected'].includes(phase);
   const showProgress = hasRegistration && !['accepted', 'rejected'].includes(phase);
   const primaryDisabled = ['submitted', 'verified', 'accepted', 'rejected'].includes(phase);
 
   return {
     phase,
+    rawPhase,
     hasRegistration,
+    berkasComplete,
     pendaftaran: reg?.pendaftaran ?? null,
     ...config,
     canEditForm,

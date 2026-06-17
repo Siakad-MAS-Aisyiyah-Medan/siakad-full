@@ -22,9 +22,9 @@ class AuditLogController extends Controller
         ]);
 
         $paginator = $this->list(
-            $request->validated('action'),
-            $request->validated('search'),
-            (int) $request->validated('per_page', 20)
+            null,
+            $validated['search'] ?? null,
+            (int) ($validated['per_page'] ?? 20)
         );
 
         $paginator->getCollection()->transform(

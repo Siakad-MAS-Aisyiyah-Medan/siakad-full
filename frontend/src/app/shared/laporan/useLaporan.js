@@ -87,6 +87,5 @@ export function useLaporan(apiPath, initialJenis = 'siswa') {
     loadOptions,
     handleFilterChange,
     setPage,
-    setFilters,
   };
 }

@@ -22,6 +22,7 @@ import {
 import { startOrResumePpdb } from '../utils/startOrResumePpdb';
 import {
   getStepPayload,
+  parseRequiredFieldMessage,
   validateAllFormSteps,
   validateStep,
 } from '../utils/ppdbWizardValidation';
@@ -64,6 +65,12 @@ export function extractApiError(err) {
     message: res?.data?.message || err?.message || 'Terjadi kesalahan pada proses PPDB.',
     fieldErrors: {},
   };
+}
+
+function parseMissingBerkasMessage(message) {
+  const match = String(message || '').match(/Berkas\s+(.+?)\s+wajib diunggah/i);
+  if (!match) return null;
+  return match[1];
 }
 
 function mapRegistrationToForms(p) {
@@ -398,7 +405,26 @@ export function usePpdbWizard() {
       navigate('/calon-murid/status', { replace: true });
       return true;
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Gagal submit', text: extractApiError(err).message });
+      const parsed = extractApiError(err);
+      const missingField = parseRequiredFieldMessage(parsed.message);
+      const missingBerkas = parseMissingBerkasMessage(parsed.message);
+
+      if (missingField && missingField.stepIndex >= 0) {
+        setActiveStep(missingField.stepIndex);
+        setFieldErrors({
+          [missingField.field]: `${missingField.label} wajib diisi`,
+        });
+      }
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal submit',
+        text: missingField
+          ? `${missingField.label} wajib diisi sebelum submit.`
+          : missingBerkas
+            ? `Berkas ${missingBerkas} belum diunggah. Lengkapi dulu di menu Upload Berkas.`
+            : parsed.message,
+      });
       return false;
     } finally {
       setSaving(false);

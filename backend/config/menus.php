@@ -120,30 +120,6 @@ return [
         'path' => '/guru/nilai',
     ],
     [
-        'permission' => 'view_dashboard_wali',
-        'iconKey' => 'LayoutDashboard',
-        'label' => 'Dashboard',
-        'path' => '/wali/dashboard',
-    ],
-    [
-        'permission' => 'view_siswa_kelas',
-        'iconKey' => 'Users',
-        'label' => 'Data Murid Kelas',
-        'path' => '/wali/murid',
-    ],
-    [
-        'permission' => 'view_absensi_kelas',
-        'iconKey' => 'BarChart3',
-        'label' => 'Rekap Absensi Kelas',
-        'path' => '/wali/absensi',
-    ],
-    [
-        'permission' => 'validate_nilai',
-        'iconKey' => 'FileText',
-        'label' => 'Leger & Validasi Nilai',
-        'path' => '/wali/nilai',
-    ],
-    [
         'permission' => 'view_dashboard_siswa',
         'iconKey' => 'LayoutDashboard',
         'label' => 'Dashboard',

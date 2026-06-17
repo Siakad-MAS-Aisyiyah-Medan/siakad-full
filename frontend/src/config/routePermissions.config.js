@@ -24,7 +24,6 @@ export const ROUTE_PERMISSIONS = {
   '/kepsek/laporan-absensi': 'view_laporan',
   '/kepsek/laporan-nilai': 'view_laporan',
   '/kepsek/laporan': 'view_laporan',
-  '/wali/laporan': 'view_absensi_kelas',
 
   '/guru/dashboard': 'view_dashboard_guru',
   '/guru/jadwal': 'view_jadwal_mengajar',
@@ -33,14 +32,9 @@ export const ROUTE_PERMISSIONS = {
   '/guru/nilai': 'manage_nilai_siswa',
   '/guru/riwayat-absensi': 'view_dashboard_guru',
 
-  '/wali/dashboard': 'view_dashboard_wali',
-  '/wali/murid': 'view_siswa_kelas',
-  '/wali/absensi': 'view_absensi_kelas',
-  '/wali/nilai': 'validate_nilai',
-  '/wali/ekskul': 'view_siswa_kelas',
-
   '/siswa/dashboard': 'view_dashboard_siswa',
   '/siswa/jadwal': 'view_jadwal_siswa',
+  '/siswa/mapel': 'view_jadwal_siswa',
   '/siswa/absensi': 'view_absensi_pribadi',
   '/siswa/nilai': 'view_nilai_pribadi',
 
@@ -60,12 +54,6 @@ export const ROUTE_PERMISSIONS = {
   '/kepala-sekolah/laporan': 'view_laporan',
   '/kepala-sekolah/laporan-absensi': 'view_laporan',
   '/kepala-sekolah/laporan-nilai': 'view_laporan',
-  '/wali-kelas/dashboard': 'view_dashboard_wali',
-  '/wali-kelas/murid': 'view_siswa_kelas',
-  '/wali-kelas/absensi': 'view_absensi_kelas',
-  '/wali-kelas/nilai': 'validate_nilai',
-  '/wali-kelas/laporan': 'view_absensi_kelas',
-  '/wali-kelas/ekskul': 'view_siswa_kelas',
 };
 
 export function getPermissionForPath(path) {

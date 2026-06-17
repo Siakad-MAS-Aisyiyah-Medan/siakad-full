@@ -4,12 +4,8 @@ import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
 import DashboardWelcomeHeader from '@app/shared/ppdb/components/dashboard/DashboardWelcomeHeader';
 import RegistrationStatusCard from '@app/shared/ppdb/components/dashboard/RegistrationStatusCard';
 import DashboardPrimaryAction from '@app/shared/ppdb/components/dashboard/DashboardPrimaryAction';
-import PpdbProgressStepper from '@app/shared/ppdb/components/dashboard/PpdbProgressStepper';
 import PpdbTimeline from '@app/shared/ppdb/components/dashboard/PpdbTimeline';
-import QuickActionsGrid from '@app/shared/ppdb/components/dashboard/QuickActionsGrid';
-import DashboardAnnouncementsPreview from '@app/shared/ppdb/components/dashboard/DashboardAnnouncementsPreview';
 import ImportantInfoPanel from '@app/shared/ppdb/components/dashboard/ImportantInfoPanel';
-import { computePpdbProgress } from '@app/shared/ppdb/utils/ppdbProgress';
 import { resolveDashboardState } from '@app/shared/ppdb/utils/dashboardState';
 import { mapPpdbInfoToPanel } from '@app/shared/ppdb/utils/formatPpdbInfo';
 import { fetchMyRegistration, fetchPpdbInfo } from "@app/shared/services/ppdb.service";
@@ -25,7 +21,7 @@ export default function DashboardCalonMurid() {
   const [starting, setStarting] = useState(false);
 
   const user = getStoredUser();
-  const name = user?.name || user?.username;
+  const name = user?.name || user?.username || 'Calon Siswa';
 
   useEffect(() => {
     Promise.all([
@@ -41,7 +37,6 @@ export default function DashboardCalonMurid() {
 
   const dashboardState = useMemo(() => resolveDashboardState(reg), [reg]);
   const p = dashboardState.pendaftaran;
-  const { activeIndex, percent, steps } = computePpdbProgress(p);
   const timelineActiveIndex = dashboardState.timelineIndex ?? 0;
 
   const handleStart = async () => {
@@ -77,7 +72,6 @@ export default function DashboardCalonMurid() {
               <div className="animate-stagger-2 hover-lift">
                 <RegistrationStatusCard
                   pendaftaran={p}
-                  progressPercent={percent}
                   dashboardState={dashboardState}
                 />
               </div>
@@ -90,27 +84,13 @@ export default function DashboardCalonMurid() {
                   starting={starting}
                 />
               </div>
-
-              {dashboardState.showProgress ? (
-                <div className="animate-stagger-4">
-                  <PpdbProgressStepper steps={steps} activeIndex={activeIndex} percent={percent} />
-                </div>
-              ) : null}
-
               <div className="animate-stagger-4">
                 <PpdbTimeline activeIndex={timelineActiveIndex} />
-              </div>
-
-              <div className="animate-stagger-4 hover-lift">
-                <QuickActionsGrid dashboardState={dashboardState} />
               </div>
             </div>
 
             <aside className="calon-murid-dashboard-aside animate-stagger-3">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="hover-lift">
-                  <DashboardAnnouncementsPreview ppdbInfo={ppdbInfo} />
-                </div>
                 <div className="hover-lift">
                   <ImportantInfoPanel info={infoPanelData} />
                 </div>

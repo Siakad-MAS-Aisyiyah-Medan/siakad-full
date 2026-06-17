@@ -29,6 +29,9 @@ class BerkasController extends Controller
 
     public function store(\Illuminate\Http\Request $request)
     {
+        $jenis = implode(',', self::allJenisKeys());
+        $maxKb = 2048;
+
         $validated = $request->validate([
             'jenis_berkas' => 'required|string|in:'.$jenis,
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:'.$maxKb,
@@ -37,7 +40,7 @@ class BerkasController extends Controller
         try {
             $item = $this->upload(
                 Auth::user(),
-                $request->validated('jenis_berkas'),
+                $validated['jenis_berkas'],
                 $request->file('file')
             );
 
@@ -223,8 +226,6 @@ class BerkasController extends Controller
             throw new InvalidArgumentException('Berkas tidak dapat diubah pada status pendaftaran saat ini.');
         }
 
-        $this->state->assertEditableByCalon($pendaftaran);
-
         return $pendaftaran;
     }
 
@@ -232,7 +233,7 @@ class BerkasController extends Controller
     {
         $status = $pendaftaran->status_pendaftaran ?? $pendaftaran->ppdb_status ?? 'draft';
 
-        return in_array($status, ['draft', 'revision', 'revisi'], true);
+        return in_array($status, ['draft', 'revision', 'revisi', 'submitted', 'diajukan'], true);
     }
 
     private function assertAllowedFile(UploadedFile $file, string $jenis): void

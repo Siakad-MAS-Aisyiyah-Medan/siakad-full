@@ -58,6 +58,10 @@ export const FINAL_STATUSES = ['submitted', 'verified', 'accepted', 'rejected'];
 export const STATUS_YATIM_OPTIONS = ['Yatim', 'Piatu', 'Yatim Piatu', 'Tidak'];
 
 export const AGAMA_OPTIONS = ['Islam', 'Kristen Protestan', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'];
+export const JENIS_KELAMIN_OPTIONS = [
+  { value: 'L', label: 'Laki-Laki' },
+  { value: 'P', label: 'Perempuan' },
+];
 
 export const GOL_DARAH_OPTIONS = ['A', 'B', 'AB', 'O', 'Tidak Tahu', '-'];
 
@@ -74,6 +78,7 @@ export const STEP_REQUIRED = {
     'nama_lengkap',
     'tempat_lahir',
     'tgl_lahir',
+    'jenis_kelamin',
     'agama',
     'kewarganegaraan',
     'anak_ke',
@@ -85,7 +90,7 @@ export const STEP_REQUIRED = {
   ],
   kesehatan: ['berat_badan', 'tinggi_badan', 'gol_darah'],
   'pendidikan-asal': ['sekolah_asal', 'no_sttb'],
-  'orang-tua-wali': ['nama_ayah', 'nama_ibu', 'no_hp_ortu'],
+  'orang-tua-wali': ['nama_ayah', 'nama_ibu', 'pekerjaan_ayah', 'pekerjaan_ibu', 'no_hp_ortu'],
   kepribadian: ['hobi', 'cita_cita'],
 };
 
@@ -96,6 +101,7 @@ export const REVIEW_SECTIONS = [
     ['nama_lengkap', 'Nama Lengkap'],
     ['tempat_lahir', 'Tempat Lahir'],
     ['tgl_lahir', 'Tanggal Lahir'],
+    ['jenis_kelamin', 'Jenis Kelamin'],
     ['agama', 'Agama'],
     ['kewarganegaraan', 'Kewarganegaraan'],
     ['anak_ke', 'Anak Ke'],

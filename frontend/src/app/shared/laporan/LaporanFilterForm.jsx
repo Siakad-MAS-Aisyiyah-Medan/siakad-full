@@ -105,7 +105,6 @@ export default function LaporanFilterForm({
             <select name="role" value={filters.role} onChange={onChange}>
               <option value="">Semua</option>
               <option value="guru">Guru</option>
-              <option value="wali_kelas">Wali Kelas</option>
             </select>
           </div>
         )}

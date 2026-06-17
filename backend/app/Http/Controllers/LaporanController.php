@@ -142,11 +142,7 @@ class LaporanController extends Controller
 
     private function laporanGuru(array $filters, int $perPage): array
     {
-        $roles = !empty($filters['role']) && in_array($filters['role'], ['guru', 'wali_kelas'], true)
-            ? [$filters['role']]
-            : ['guru', 'wali_kelas'];
-
-        $query = User::with('guru')->whereIn('role', $roles);
+        $query = User::with('guru')->where('role', 'guru');
 
         if (!empty($filters['search'])) {
             $s = $filters['search'];
@@ -166,19 +162,13 @@ class LaporanController extends Controller
             'status_aktif' => $u->status_aktif,
         ])->values()->all();
 
-        $perRole = User::query()
-            ->whereIn('role', ['guru', 'wali_kelas'])
-            ->selectRaw('role, COUNT(*) as total')
-            ->groupBy('role')
-            ->pluck('total', 'role');
-
         return [
             'summary' => [
-                'total' => User::whereIn('role', ['guru', 'wali_kelas'])->count(),
-                'per_role' => collect(['guru', 'wali_kelas'])->map(fn ($r) => [
-                    'role' => $r,
-                    'total' => (int) ($perRole[$r] ?? 0),
-                ])->values()->all(),
+                'total' => User::where('role', 'guru')->count(),
+                'per_role' => [[
+                    'role' => 'guru',
+                    'total' => User::where('role', 'guru')->count(),
+                ]],
             ],
             'items' => $items,
             'meta' => $this->metaFromPaginator($paginator),
@@ -358,20 +348,7 @@ class LaporanController extends Controller
             return $filters;
         }
 
-        if ($actor->role === 'wali_kelas') {
-            $kelas = Kelas::where('id_wali_kelas', $actor->id_user)->first();
-            if (!$kelas) {
-                throw new InvalidArgumentException('Anda belum ditugaskan sebagai wali kelas.');
-            }
-            if (in_array($jenis, ['siswa', 'absensi_siswa', 'nilai', 'jadwal'], true)) {
-                $filters['id_kelas'] = $kelas->id_kelas;
-            }
-            if ($jenis === 'jadwal') {
-                return $filters;
-            }
-        }
-
-        if (in_array($actor->role, ['guru', 'wali_kelas'], true)) {
+        if ($actor->role === 'guru') {
             if (in_array($jenis, ['absensi_siswa', 'nilai', 'jadwal'], true)) {
                 $mapelIds = Mapel::where('id_guru', $actor->id_user)->pluck('id_mapel')->all();
                 $kelasIds = JadwalPelajaran::where('id_guru', $actor->id_user)

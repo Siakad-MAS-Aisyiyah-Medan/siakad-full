@@ -39,8 +39,7 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
               Jabatan <span className="text-red-500">*</span>
             </label>
             <select name="role" value={formData.role} onChange={onChange} required>
-              <option value="guru">Guru Mata Pelajaran</option>
-              <option value="wali_kelas">Wali Kelas</option>
+              <option value="guru">Guru</option>
             </select>
           </div>
           <div className="input-group">

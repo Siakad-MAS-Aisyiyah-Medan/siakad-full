@@ -108,7 +108,7 @@ class NilaiService
         });
     }
 
-    public function listForSiswa(int $userId, array $filters = [], bool $onlyValidated = true): Collection
+    public function listForSiswa(int $userId, array $filters = [], bool $onlyValidated = false): Collection
     {
         $query = Nilai::with(['mapel', 'guruInput.guru'])
             ->where('id_user_siswa', $userId);
@@ -130,7 +130,6 @@ class NilaiService
             ->where('id_user_siswa', $userId)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahunAjaran)
-            ->where('validated_by_wali', true)
             ->orderBy('id_mapel')
             ->get();
 
@@ -147,67 +146,6 @@ class NilaiService
             'mapel' => $items->map(fn ($n) => (new NilaiResource($n))->resolve())->values()->all(),
             'rata_rata' => $items->isEmpty() ? null : (int) round($items->avg('nilai_akhir')),
         ];
-    }
-
-    public function legerForWali(int $waliUserId, array $filters): array
-    {
-        $kelas = $this->resolveWaliKelas($waliUserId, $filters['id_kelas'] ?? null);
-
-        $query = Nilai::with(['siswa.siswa', 'mapel', 'guruInput.guru'])
-            ->whereIn('id_user_siswa', function ($q) use ($kelas) {
-                $q->select('id_user')->from('siswa')->where('id_kelas', $kelas->id_kelas);
-            });
-
-        $this->applyFilters($query, $filters);
-
-        $rows = $query->orderBy('id_mapel')->orderBy('id_user_siswa')->get();
-
-        return [
-            'kelas' => [
-                'id_kelas' => $kelas->id_kelas,
-                'nama_kelas' => $kelas->nama_kelas,
-            ],
-            'filters' => [
-                'semester' => $filters['semester'] ?? null,
-                'tahun_ajaran' => $filters['tahun_ajaran'] ?? null,
-                'id_mapel' => $filters['id_mapel'] ?? null,
-            ],
-            'items' => $rows->map(fn ($n) => (new NilaiResource($n))->resolve())->values()->all(),
-            'summary' => $this->buildSummary($rows),
-        ];
-    }
-
-    public function validateByWali(int $waliUserId, array $payload): array
-    {
-        $kelas = $this->resolveWaliKelas($waliUserId, $payload['id_kelas'] ?? null);
-        $semester = $payload['semester'];
-        $tahunAjaran = $payload['tahun_ajaran'];
-
-        $query = Nilai::query()
-            ->whereIn('id_user_siswa', function ($q) use ($kelas) {
-                $q->select('id_user')->from('siswa')->where('id_kelas', $kelas->id_kelas);
-            })
-            ->where('semester', $semester)
-            ->where('tahun_ajaran', $tahunAjaran);
-
-        if (!empty($payload['id_nilai']) && is_array($payload['id_nilai'])) {
-            $query->whereIn('id_nilai', $payload['id_nilai']);
-        }
-
-        $updated = 0;
-        $query->each(function (Nilai $nilai) use ($waliUserId, &$updated) {
-            if ($nilai->nilai_akhir === null) {
-                return;
-            }
-            $nilai->update([
-                'validated_by_wali' => true,
-                'id_wali_validator' => $waliUserId,
-                'validated_at' => now(),
-            ]);
-            $updated++;
-        });
-
-        return ['validated_count' => $updated];
     }
 
     public function laporan(array $filters = []): array
@@ -243,7 +181,7 @@ class NilaiService
             return;
         }
 
-        if (!in_array($user->role, ['guru', 'wali_kelas'], true)) {
+        if ($user->role !== 'guru') {
             throw new InvalidArgumentException('Hanya guru yang dapat menginput nilai siswa.');
         }
 
@@ -251,29 +189,6 @@ class NilaiService
         if ((int) $mapel->id_guru !== $guruId) {
             throw new InvalidArgumentException('Anda bukan pengampu mata pelajaran ini.');
         }
-    }
-
-    private function resolveWaliKelas(int $userId, ?int $targetIdKelas = null): Kelas
-    {
-        $user = User::findOrFail($userId);
-        
-        if ($user->role === 'admin') {
-            if (!$targetIdKelas) {
-                throw new InvalidArgumentException('Pilih kelas terlebih dahulu.');
-            }
-            return Kelas::findOrFail($targetIdKelas);
-        }
-
-        if ($user->role !== 'wali_kelas') {
-            throw new InvalidArgumentException('Akses hanya untuk wali kelas.');
-        }
-
-        $kelas = Kelas::where('id_wali_kelas', $userId)->first();
-        if (!$kelas) {
-            throw new InvalidArgumentException('Anda belum ditugaskan sebagai wali kelas.');
-        }
-
-        return $kelas;
     }
 
     private function buildSummary(Collection $rows): array

@@ -29,7 +29,7 @@ export function useKelas() {
       const [kelas, statsData, guru] = await Promise.all([
         fetchKelasList(params),
         fetchKelasStats(),
-        fetchGuruList({ role: 'wali_kelas', per_page: 100 }),
+        fetchGuruList({ role: 'guru', per_page: 100 }),
       ]);
       setKelasData(kelas);
       setStats(statsData);

@@ -63,7 +63,7 @@ class FotoProfilController extends Controller
 
     private function getProfile($user, $role)
     {
-        if (in_array($role, ['guru', 'wali_kelas'])) return $user->guru;
+        if ($role === 'guru') return $user->guru;
         if ($role === 'siswa') return $user->siswa;
         if ($role === 'kepsek') return $user->kepalaSekolah;
         if ($role === 'admin') return $user->admin;

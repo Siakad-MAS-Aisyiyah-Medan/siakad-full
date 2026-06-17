@@ -12,12 +12,11 @@ export function getDisplayName(profile, role, fallbackUsername = '') {
     case 'kepsek':
       return profile.nama_kepsek || fallbackUsername || 'Kepala Sekolah';
     case 'guru':
-    case 'wali_kelas':
       return profile.nama_guru || fallbackUsername || 'Guru';
     case 'siswa':
       return profile.nama_siswa || fallbackUsername || 'Siswa';
     case 'calon_siswa':
-      return profile.nama_lengkap || fallbackUsername || 'Calon Siswa';
+      return fallbackUsername || profile.nama_lengkap || 'Calon Siswa';
     default:
       return fallbackUsername || 'Pengguna';
   }

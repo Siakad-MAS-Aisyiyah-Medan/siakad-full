@@ -4,7 +4,6 @@ export const CALON_MURID_NAV = [
   { iconKey: 'FileText', label: 'Formulir Pendaftaran', path: '/ppdb/registrasi' },
   { iconKey: 'Upload', label: 'Upload Berkas', path: '/calon-murid/upload-berkas' },
   { iconKey: 'ClipboardList', label: 'Status Pendaftaran', path: '/calon-murid/status' },
-  { iconKey: 'Bell', label: 'Pengumuman', path: '/calon-murid/pengumuman' },
 ];
 
 /** Jenis berkas untuk halaman upload (key = jenis_berkas API) */

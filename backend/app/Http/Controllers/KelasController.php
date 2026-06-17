@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use App\Utils\SearchInput;
+use App\Utils\WaliKelasUser;
 use App\Models\Kelas;
 use App\Http\Resources\KelasResource;
 use App\Utils\AuditsAdminActions;
@@ -47,8 +48,17 @@ class KelasController extends Controller
         return ApiResponse::success($kelas, 'Kelas berhasil ditambahkan', 201);
     }
 
-    public function update(UpdateKelasRequest $request, $id)
+    public function update(\Illuminate\Http\Request $request, $id)
     {
+        $validated = $request->validate([
+            'nama_kelas' => 'required|string|max:50',
+            'tingkat' => 'required|in:X,XI,XII',
+            'jurusan' => 'required|in:IPA,IPS',
+            'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser()],
+            'kapasitas_maksimal' => 'required|integer|min:1|max:100',
+            'ruangan' => 'nullable|string|max:100',
+        ]);
+
         $kelas = $this->processUpdate((int) $id, $validated);
 
         return ApiResponse::success($kelas, 'Kelas berhasil diperbarui');

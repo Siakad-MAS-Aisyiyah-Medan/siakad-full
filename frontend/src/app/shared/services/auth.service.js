@@ -101,7 +101,6 @@ export function getRedirectPathForRole(role) {
     admin: '/admin/dashboard',
     kepsek: '/kepala-sekolah/dashboard',
     guru: '/guru/dashboard',
-    wali_kelas: '/wali-kelas/dashboard',
     siswa: '/siswa/dashboard',
     calon_siswa: '/calon-murid/dashboard',
   };

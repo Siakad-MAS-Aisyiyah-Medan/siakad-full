@@ -11,7 +11,7 @@ export default function GuruRiwayatAbsensiPage() {
   const user = getStoredUser();
   const profile = getStoredProfile();
   const name = getDisplayName(profile, user?.role, user?.username);
-  const role = user?.role === 'wali_kelas' ? 'wali_kelas' : 'guru';
+  const role = 'guru';
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);

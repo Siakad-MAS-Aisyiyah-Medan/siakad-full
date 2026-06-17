@@ -18,7 +18,13 @@ export default function UploadBerkas() {
   const loadData = async () => {
     try {
       const data = await fetchBerkasList();
-      setBerkas(data || {});
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const mapped = Object.fromEntries(
+        items
+          .filter((item) => item?.jenis_berkas && item?.url)
+          .map((item) => [item.jenis_berkas, item])
+      );
+      setBerkas(mapped);
     } catch (err) {
       console.error(err);
     } finally {
@@ -109,6 +115,7 @@ export default function UploadBerkas() {
           {UPLOAD_BERKAS_ITEMS.map((item) => {
             const uploadedFile = berkas[item.key];
             const isUploading = uploading === item.key;
+            const hasFile = Boolean(uploadedFile?.url);
 
             return (
               <div key={item.key} className="ub-card">
@@ -117,12 +124,12 @@ export default function UploadBerkas() {
                     <FileText size={18} className="text-slate-400" />
                     <strong>{item.label}</strong>
                   </div>
-                  {uploadedFile && (
+                  {hasFile && (
                     <span className="ub-badge ub-badge--success">
                       <CheckCircle2 size={14} /> Terunggah
                     </span>
                   )}
-                  {!uploadedFile && (
+                  {!hasFile && (
                     <span className="ub-badge ub-badge--warning">
                       <AlertCircle size={14} /> Wajib
                     </span>
@@ -130,10 +137,10 @@ export default function UploadBerkas() {
                 </div>
 
                 <div className="ub-card__body">
-                  {uploadedFile ? (
+                  {hasFile ? (
                     <div className="ub-uploaded">
                       <div className="ub-uploaded__info">
-                        <span className="truncate">{uploadedFile.path_berkas.split('/').pop()}</span>
+                        <span className="truncate">{uploadedFile.file_name || uploadedFile.file_path?.split('/').pop() || 'File terunggah'}</span>
                         <a href={uploadedFile.url} target="_blank" rel="noreferrer" className="text-emerald-600 hover:underline text-xs">
                           Lihat file
                         </a>

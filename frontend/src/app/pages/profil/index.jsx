@@ -119,7 +119,7 @@ export default function ProfilBiodataPage() {
   const renderFields = () => {
     if (!userRole) return null;
 
-    if (userRole === 'guru' || userRole === 'wali_kelas') {
+    if (userRole === 'guru') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field name="nip_nuptk" label="NIP / NUPTK" value={form.nip_nuptk} icon={Hash} disabled={!isEditing} />

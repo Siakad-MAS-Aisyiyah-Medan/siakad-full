@@ -58,7 +58,7 @@ export default function StatusPendaftaran() {
           </div>
           
           <div className="status-card-main__info">
-            <h2>{user?.name || 'Calon Siswa'}</h2>
+            <h2>{user?.name || user?.username || 'Calon Siswa'}</h2>
             <p><strong>No. Pendaftaran:</strong> {statusData?.no_pendaftaran || '-'}</p>
             <p><strong>Tanggal Submit:</strong> {statusData?.submitted_at ? new Date(statusData.submitted_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</p>
           </div>

@@ -22,8 +22,8 @@ class WaliKelasUser implements ValidationRule
             return;
         }
 
-        if ($user->role !== 'wali_kelas') {
-            $fail('Wali kelas harus memiliki role wali_kelas.');
+        if ($user->role !== 'guru') {
+            $fail('Wali kelas harus dipilih dari akun guru.');
         }
     }
 }

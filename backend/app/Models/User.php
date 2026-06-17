@@ -113,7 +113,7 @@ class User extends Authenticatable
         return match ($role) {
             'admin' => ['admin'],
             'kepsek' => ['kepalaSekolah'],
-            'guru', 'wali_kelas' => ['guru'],
+            'guru' => ['guru'],
             'siswa' => ['siswa.kelas'],
             'calon_siswa' => ['pendaftaran'],
             default => [],
@@ -140,7 +140,7 @@ class User extends Authenticatable
         return match ($this->role) {
             'admin' => $this->admin,
             'kepsek' => $this->kepalaSekolah,
-            'guru', 'wali_kelas' => $this->guru,
+            'guru' => $this->guru,
             'siswa' => $this->siswa,
             'calon_siswa' => $this->pendaftaran,
             default => null,
@@ -152,7 +152,7 @@ class User extends Authenticatable
         return match ($this->role) {
             'admin' => 'admin',
             'kepsek' => 'kepalaSekolah',
-            'guru', 'wali_kelas' => 'guru',
+            'guru' => 'guru',
             'siswa' => 'siswa',
             'calon_siswa' => 'pendaftaran',
             default => null,

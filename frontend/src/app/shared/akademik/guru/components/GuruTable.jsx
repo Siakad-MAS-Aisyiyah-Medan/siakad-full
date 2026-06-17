@@ -18,7 +18,7 @@ export default function GuruTable({
         'Jenis Kelamin': user.guru?.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan',
         'No HP': user.guru?.no_hp || '',
         'Alamat': user.guru?.alamat || '',
-        'Role': user.role === 'wali_kelas' ? 'Wali Kelas' : 'Guru Biasa',
+        'Role': 'Guru',
         'Status': user.guru?.status === 'nonaktif' ? 'Nonaktif' : 'Aktif'
       }));
       exportToCsv('data_guru.csv', dataToExport);
@@ -131,12 +131,8 @@ export default function GuruTable({
 
                     <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
                       <div className="flex flex-col gap-2 items-start">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                          user.role === 'wali_kelas'
-                            ? 'bg-purple-50 text-purple-600 border border-purple-100'
-                            : 'bg-slate-100 text-slate-600 border border-slate-200'
-                        }`}>
-                          {user.role === 'wali_kelas' ? 'Wali Kelas' : 'Guru Biasa'}
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                          Guru
                         </span>
                         
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${

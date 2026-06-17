@@ -12,7 +12,7 @@ class BiodataController extends Controller
         $user = auth()->user();
         $role = $user->role;
 
-        if ($role === 'guru' || $role === 'wali_kelas') {
+        if ($role === 'guru') {
             $validated = $request->validate([
                 'nip_nuptk' => 'nullable|string|max:50',
                 'nama_guru' => 'required|string|max:255',
