@@ -10,7 +10,8 @@ class Siswa extends Model
     protected $primaryKey = 'id_siswa';
     protected $fillable = [
         'id_user', 'nisn', 'nis', 'nama_siswa', 'tempat_lahir',
-        'tgl_lahir', 'jenis_kelamin', 'agama', 'alamat', 'nama_wali', 'no_hp_wali', 'id_kelas',
+        'tgl_lahir', 'jenis_kelamin', 'agama', 'alamat', 'nama_wali', 'no_hp_wali',
+        'no_hp', 'tahun_masuk', 'tahun_lulus', 'id_kelas',
     ];
 
     protected $casts = [

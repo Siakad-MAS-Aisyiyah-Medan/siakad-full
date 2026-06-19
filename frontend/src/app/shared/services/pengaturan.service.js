@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import { unwrapData, unwrapList } from './apiHelpers';
+import { unwrapData } from './apiHelpers';
 
 export async function fetchAllSettings() {
   const response = await apiClient.get('/settings');

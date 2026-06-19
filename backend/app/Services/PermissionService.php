@@ -85,10 +85,10 @@ class PermissionService
     {
         return match ($roleKey) {
             'admin' => ['/admin/'],
-            'kepsek' => ['/kepsek/'],
+            'kepsek' => ['/kepala-sekolah/', '/kepsek/'],
             'guru' => ['/guru/'],
             'siswa' => ['/siswa/'],
-            'calon_siswa' => ['/calon-siswa/'],
+            'calon_siswa' => ['/calon-murid/', '/calon-siswa/', '/ppdb/'],
             default => [],
         };
     }

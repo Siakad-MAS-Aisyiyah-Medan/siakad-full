@@ -804,19 +804,25 @@ class PendaftaranController extends Controller
     {
         $total = Pendaftaran::count();
         $verified = Pendaftaran::where('ppdb_status', 'terverifikasi')->count();
-        $accepted = Pendaftaran::where('ppdb_status', 'diterima')->count();
+        $accepted = Pendaftaran::whereIn('ppdb_status', ['diterima', 'accepted'])->count();
+        $rejected = Pendaftaran::whereIn('ppdb_status', ['ditolak', 'rejected'])->count();
+        $waiting = Pendaftaran::whereIn('ppdb_status', ['draft', 'submitted', 'diajukan', 'terverifikasi', 'verified'])->count();
         
         return ApiResponse::success([
             'total' => $total,
             'verified' => $verified,
             'accepted' => $accepted,
+            'diterima' => $accepted,
+            'ditolak' => $rejected,
+            'menunggu' => $waiting,
         ]);
     }
 
     public function adminPpdbIndex(\Illuminate\Http\Request $request)
     {
-        return ApiResponse::success(
-            $this->adminList($request->query('search'), $request->query('status'), (int) $request->query('per_page', 10))
+        return ApiResponse::paginated(
+            $this->adminList($request->query('search'), $request->query('status'), (int) $request->query('per_page', 10)),
+            'Berhasil mengambil data PPDB'
         );
     }
 
@@ -824,7 +830,13 @@ class PendaftaranController extends Controller
     {
         $query = Pendaftaran::with(['user', 'berkas'])->orderByDesc('updated_at');
 
-        if ($status) {
+        if ($status === 'submitted') {
+            $query->whereIn('ppdb_status', ['submitted', 'diajukan', 'terverifikasi', 'verified']);
+        } elseif ($status === 'diterima') {
+            $query->whereIn('ppdb_status', ['diterima', 'accepted']);
+        } elseif ($status === 'ditolak') {
+            $query->whereIn('ppdb_status', ['ditolak', 'rejected']);
+        } elseif ($status) {
             $query->where('ppdb_status', $status);
         }
 

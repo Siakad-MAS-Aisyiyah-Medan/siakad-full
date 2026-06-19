@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Save, Plus, Edit2, Trash2, CheckCircle } from 'lucide-react';
 import MainLayout from '@app/shared/layouts/MainLayout';
 import { getStoredUser, getStoredProfile } from '@app/shared/services/auth.service';
@@ -28,16 +28,10 @@ export default function GuruNilaiPage() {
     reset,
   } = useGuruNilai();
 
-  const [daftarList, setDaftarList] = useState([]);
+  const [daftarList, setDaftarList] = useState(() =>
+    JSON.parse(localStorage.getItem('mock_daftar_nilai') || '[]')
+  );
   const [showAddModal, setShowAddModal] = useState(false);
-
-  // Mock list for UI purposes
-  useEffect(() => {
-    // Whenever we return to filter step, we simulate loading the existing "Daftar Nilai"
-    // For now we just mock one if they saved it
-    const storedDaftar = JSON.parse(localStorage.getItem('mock_daftar_nilai') || '[]');
-    setDaftarList(storedDaftar);
-  }, [step]);
 
   const handleAddDaftar = async (e) => {
     e.preventDefault();

@@ -44,6 +44,7 @@ class ProfilSekolahController extends Controller
             'npsn' => 'nullable|string|max:20',
             'akreditasi' => 'nullable|string|max:10',
             'hero_subtitle' => 'nullable|string|max:255',
+            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'tentang_kami' => 'nullable|string',
             'alamat' => 'nullable|string',
             'kata_sambutan' => 'nullable|string',
@@ -63,13 +64,20 @@ class ProfilSekolahController extends Controller
             $profil = new ProfilSekolah();
         }
 
-        $data = $request->except('foto_kepsek');
+        $data = $request->except(['foto_kepsek', 'hero_image']);
 
         if ($request->hasFile('foto_kepsek')) {
             if ($profil->foto_kepsek) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($profil->foto_kepsek);
             }
             $data['foto_kepsek'] = $request->file('foto_kepsek')->store('profil_sekolah', 'public');
+        }
+
+        if ($request->hasFile('hero_image')) {
+            if ($profil->hero_image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($profil->hero_image);
+            }
+            $data['hero_image'] = $request->file('hero_image')->store('profil_sekolah', 'public');
         }
 
         $profil->fill($data);

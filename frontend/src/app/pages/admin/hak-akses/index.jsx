@@ -1,300 +1,279 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, X, UserPlus, User, AtSign, Mail, Shield, Lock, Eye, EyeOff, Info, Check, Search, Filter, Trash2, Edit2, Users } from 'lucide-react';
-import Swal from 'sweetalert2';
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Pencil,
+  Plus,
+  Save,
+  Search,
+  ShieldCheck,
+  Trash2,
+  UserRoundCog,
+  Users,
+  X,
+} from 'lucide-react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
-import FormInput from '@app/shared/components/FormInput';
-import { fetchAdminAkunList, createAdminAkun, deleteAdminAkun, updateAdminAkun } from '@app/shared/services/akun.service';
+import { confirmAction, toastError, toastSuccess, toastValidation } from '@app/shared/hooks/useConfirm';
+import { createAdminAkun, deleteAdminAkun, fetchAdminAkunList, updateAdminAkun } from '@app/shared/services/akun.service';
+
+const EMPTY_FORM = {
+  nip_nisn: '',
+  name: '',
+  email: '',
+  no_hp: '',
+  password: '',
+  confirmPassword: '',
+  role: 'admin',
+  status: 'aktif',
+};
 
 export default function HakAksesPage() {
   const [akunData, setAkunData] = useState([]);
-  const [stats, setStats] = useState({ total_akun: '-', role_aktif: '-' });
-  const [isAkunLoading, setIsAkunLoading] = useState(true);
-  
-  // Filters & Pagination
+  const [stats, setStats] = useState({ total_akun: 0, role_aktif: 0 });
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ last_page: 1, total: 0 });
-
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'admin',
-    status: 'aktif'
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState(EMPTY_FORM);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const loadAkun = async (page = currentPage, search = searchQuery, role = roleFilter, status = statusFilter) => {
-    setIsAkunLoading(true);
+  const loadAkun = useCallback(async (page = currentPage, search = searchQuery) => {
+    setIsLoading(true);
     try {
-      const data = await fetchAdminAkunList({ page, search, role, status });
-      console.log('API Response data:', data);
-      if (data) {
-        const usersArray = Array.isArray(data.users) ? data.users : (data.users ? Object.values(data.users) : []);
-        setAkunData(usersArray);
-        setStats({
-          total_akun: data.total_akun,
-          role_aktif: data.role_aktif,
-        });
-        if (data.pagination) setPagination(data.pagination);
-      }
-    } catch (error) {
-      console.error('Failed to load accounts:', error);
+      const data = await fetchAdminAkunList({ page, search });
+      const usersArray = Array.isArray(data?.users) ? data.users : [];
+      setAkunData(usersArray);
+      setStats({
+        total_akun: data?.total_akun || usersArray.length,
+        role_aktif: data?.role_aktif || 0,
+      });
+      if (data?.pagination) setPagination(data.pagination);
+    } catch {
+      toastError('Gagal', 'Data akun gagal dimuat.');
     } finally {
-      setIsAkunLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, [currentPage, searchQuery]);
 
   useEffect(() => {
-    const timer = setTimeout(() => loadAkun(currentPage, searchQuery, roleFilter, statusFilter), 300);
+    const timer = setTimeout(() => loadAkun(currentPage, searchQuery), 250);
     return () => clearTimeout(timer);
-  }, [searchQuery, roleFilter, statusFilter, currentPage]);
+  }, [currentPage, loadAkun, searchQuery]);
 
-  const handleDelete = async (id, name) => {
-    const result = await Swal.fire({
-      title: 'Hapus Akun?',
-      text: `Anda yakin ingin menghapus akun ${name}? Tindakan ini tidak dapat dibatalkan.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Ya, Hapus!',
-      cancelButtonText: 'Batal'
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deleteAdminAkun(id);
-        Swal.fire('Terhapus!', 'Data berhasil dihapus', 'success');
-        loadAkun();
-      } catch (error) {
-        Swal.fire('Gagal', error.message || 'Gagal menghapus akun', 'error');
-      }
-    }
-  };
-
-  const handleAdd = () => {
+  const closeModal = () => {
+    setModalOpen(false);
     setIsEditMode(false);
     setEditId(null);
-    setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'admin', status: 'aktif' });
-    setIsModalOpen(true);
+    setFormData(EMPTY_FORM);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  };
+
+  const openCreateModal = () => {
+    setFormData(EMPTY_FORM);
+    setIsEditMode(false);
+    setEditId(null);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!formData.name.trim() || !formData.email.trim()) {
+      toastValidation('Periksa Kembali', 'Nama lengkap dan e-mail wajib diisi.');
+      return;
+    }
+
+    if (!isEditMode && !formData.password.trim()) {
+      toastValidation('Periksa Kembali', 'Password wajib diisi untuk akun baru.');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toastValidation('Periksa Kembali', 'Konfirmasi password belum sama.');
+      return;
+    }
+
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        status: formData.status,
+        no_hp: formData.no_hp,
+      };
+
+      if (formData.password) {
+        payload.password = formData.password;
+      }
+
+      if (isEditMode) {
+        await updateAdminAkun(editId, payload);
+        toastSuccess('Berhasil', 'Data akun berhasil diperbarui.');
+      } else {
+        const baseUsername = formData.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '') || 'admin';
+        payload.username = formData.nip_nisn.trim() || `${baseUsername}${Math.floor(1000 + Math.random() * 9000)}`;
+        await createAdminAkun(payload);
+        toastSuccess('Berhasil', 'Akun baru berhasil ditambahkan.');
+      }
+
+      closeModal();
+      await loadAkun();
+    } catch (error) {
+      toastError('Gagal', error?.response?.data?.message || 'Data akun gagal disimpan.');
+    }
   };
 
   const handleEdit = (akun) => {
     setIsEditMode(true);
     setEditId(akun.id);
-    setFormData({ 
-      name: akun.name, 
-      email: akun.email, 
-      password: '', 
-      confirmPassword: '', 
-      role: akun.role,
-      status: akun.status === 'aktif' ? 'aktif' : 'nonaktif'
+    setFormData({
+      nip_nisn: akun.nip_nisn || '',
+      name: akun.name || '',
+      email: akun.email || '',
+      no_hp: akun.no_hp || '',
+      password: '',
+      confirmPassword: '',
+      role: akun.role || 'admin',
+      status: akun.status || 'aktif',
     });
-    setIsModalOpen(true);
+    setModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'admin', status: 'aktif' });
-    setShowPassword(false);
-    setShowConfirmPassword(false);
-    setIsEditMode(false);
-    setEditId(null);
-  };
+  const handleDelete = async (id) => {
+    const confirmed = await confirmAction({
+      title: 'Apakah Anda Yakin?',
+      text: 'Akun yang dihapus tidak dapat dikembalikan.',
+      confirmText: 'Yakin',
+      cancelText: 'Batal',
+    });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      Swal.fire('Error', 'Konfirmasi password tidak cocok', 'error');
-      return;
-    }
+    if (!confirmed) return;
 
-    setIsSubmitting(true);
     try {
-      const submitData = { ...formData };
-      delete submitData.confirmPassword;
-
-      if (!isEditMode) {
-        const baseUsername = formData.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-        submitData.username = `${baseUsername}${randomSuffix}`;
-        
-        await createAdminAkun(submitData);
-      } else {
-        if (!submitData.password) {
-          delete submitData.password;
-        }
-        await updateAdminAkun(editId, submitData);
-      }
-
-      Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
-      handleCloseModal();
-      loadAkun();
+      await deleteAdminAkun(id);
+      toastSuccess('Berhasil', 'Akun berhasil dihapus.');
+      await loadAkun();
     } catch (error) {
-      console.error(error);
-      Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan akun. Periksa data Anda.', 'error');
-    } finally {
-      setIsSubmitting(false);
+      toastError('Gagal', error?.response?.data?.message || 'Akun gagal dihapus.');
     }
   };
 
   return (
     <AdminPageShell>
-      {/* Real implementation of Akun List */}
-      <div className="data-panel view-list">
-        <div className="panel-header glass">
+      <div className="animate-fade-in">
+        {/* Panel Header */}
+        <div className="panel-header mb-4">
           <div className="header-text">
             <h2>Manajemen Pengguna</h2>
-            <p>Kelola peran pengguna dan akun di sistem SIAKAD.</p>
+            <p>Kelola akun dan hak akses pengguna sistem</p>
           </div>
           <div className="header-actions">
-            <button type="button" onClick={handleAdd} className="btn-primary flex items-center gap-2">
-              <Plus size={18} /> Tambah Akun
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+              <input
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                placeholder="Cari akun..."
+                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+              />
+            </div>
+            <button type="button" onClick={openCreateModal} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Plus size={16} />
+              Tambah Akun
             </button>
           </div>
         </div>
 
-        <div className="stats-info-grid mt-6">
-          <div className="stat-box glass border-blue flex gap-4 items-center p-5 safe-p-5">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-              <Users size={24} strokeWidth={2} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-value text-2xl font-bold">{isAkunLoading ? '...' : stats.total_akun}</div>
-              <div className="stat-label text-sm text-slate-500">Total Akun</div>
-            </div>
-          </div>
-          <div className="stat-box glass border-green flex gap-4 items-center p-5 safe-p-5">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <Shield size={24} strokeWidth={2} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-value text-2xl font-bold">{isAkunLoading ? '...' : stats.role_aktif}</div>
-              <div className="stat-label text-sm text-slate-500">Role Aktif</div>
-            </div>
-          </div>
+        {/* Stat Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <StatCard
+            value={stats.total_akun}
+            label="Total Akun"
+            icon={<Users size={22} />}
+            gradient="linear-gradient(135deg, #059669, #10b981)"
+          />
+          <StatCard
+            value={stats.role_aktif}
+            label="Role Aktif"
+            icon={<ShieldCheck size={22} />}
+            gradient="linear-gradient(135deg, #3b82f6, #60a5fa)"
+          />
         </div>
 
-        {/* Filters */}
-        <div className="glass mt-6 p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-white rounded-2xl border border-slate-200">
-          <div className="search-box w-full md:w-auto md:min-w-[300px]">
-            <Search size={18} className="text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Cari username, email, NIP/NISN..." 
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full bg-transparent border-none outline-none text-sm"
-            />
-          </div>
-          <div className="flex flex-wrap gap-3 w-full md:w-auto">
-            <div className="relative min-w-[170px]">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Filter size={16} className="text-slate-400" />
-              </div>
-              <select 
-                value={roleFilter} 
-                onChange={(e) => { setRoleFilter(e.target.value); setCurrentPage(1); }}
-                className="w-full appearance-none bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-medium rounded-xl pl-10 pr-10 py-2.5 outline-none transition-all cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500"
-                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
-              >
-                <option value="">Semua Role</option>
-                <option value="admin">Administrator</option>
-                <option value="kepsek">Kepala Sekolah</option>
-                <option value="guru">Guru</option>
-                <option value="siswa">Siswa</option>
-                <option value="calon_siswa">Calon Siswa</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m6 9 6 6 6-6"/></svg>
-              </div>
-            </div>
-
-            <div className="relative min-w-[170px]">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Filter size={16} className="text-slate-400" />
-              </div>
-              <select 
-                value={statusFilter} 
-                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-                className="w-full appearance-none bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-medium rounded-xl pl-10 pr-10 py-2.5 outline-none transition-all cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500"
-                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
-              >
-                <option value="">Semua Status</option>
-                <option value="aktif">Aktif</option>
-                <option value="nonaktif">Nonaktif</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m6 9 6 6 6-6"/></svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="table-container glass mt-4 overflow-hidden rounded-2xl border border-slate-200">
-          <table className="data-table w-full text-left border-collapse kelas-table">
+        {/* Table */}
+        <div className="table-container">
+          <table className="data-table">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 rounded-tl-xl w-[20%]">
-                      NIP/NISN
-                    </th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 w-[25%]">
-                      Email
-                    </th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 w-[20%]">
-                      Role
-                    </th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 w-[20%]">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100 text-right rounded-tr-xl w-[15%]">
-                      Aksi
-                    </th>
+              <tr>
+                <th>No</th>
+                <th>NIP/NISN</th>
+                <th>E-mail</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Aksi</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-slate-100">
-              {isAkunLoading ? (
+            <tbody>
+              {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="p-8 text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2 w-full">
-                      <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-sm text-center">Memuat data akun...</span>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                      <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                      Memuat data akun...
                     </div>
                   </td>
                 </tr>
               ) : akunData.length > 0 ? (
-                akunData.map((akun) => (
-                  <tr key={akun.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-slate-600">{akun.nip_nisn || '-'}</td>
-                    <td className="px-6 py-4 text-slate-600">{akun.email}</td>
-                    <td className="px-6 py-4">
-                      <span className="badge badge-success" style={{ background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)' }}>
-                        {akun.role.replace('_', ' ').toUpperCase()}
+                akunData.map((akun, idx) => (
+                  <tr key={akun.id}>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{akun.nip_nisn || akun.username || '-'}</td>
+                    <td>{akun.email}</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '50px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: getRoleColor(akun.role).bg,
+                        color: getRoleColor(akun.role).text,
+                        border: `1px solid ${getRoleColor(akun.role).border}`,
+                      }}>
+                        <UserRoundCog size={11} />
+                        {formatRole(akun.role)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`badge ${akun.status === 'aktif' ? 'badge-success' : 'badge-pending'}`}>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '50px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: akun.status === 'aktif' ? 'var(--color-primary-soft)' : '#fef2f2',
+                        color: akun.status === 'aktif' ? 'var(--color-primary-dark)' : '#991b1b',
+                        border: `1px solid ${akun.status === 'aktif' ? 'var(--color-primary-light)' : '#fecaca'}`,
+                      }}>
                         {akun.status === 'aktif' ? 'Aktif' : 'Nonaktif'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => handleEdit(akun)} title="Edit">
-                          <Edit2 size={16} />
+                    <td>
+                      <div className="actions-cell">
+                        <button type="button" onClick={() => handleEdit(akun)} className="btn-icon edit" title="Edit">
+                          <Pencil size={15} />
                         </button>
-                        <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={() => handleDelete(akun.id, akun.name)} title="Hapus">
-                          <Trash2 size={16} />
+                        <button type="button" onClick={() => handleDelete(akun.id)} className="btn-icon delete" title="Hapus">
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>
@@ -302,199 +281,215 @@ export default function HakAksesPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center py-16 text-slate-500 text-sm">Tidak ada data akun yang ditemukan</td>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ fontSize: '2rem' }}>👤</div>
+                      <p style={{ fontWeight: 600 }}>Tidak ada data akun</p>
+                    </div>
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
-          
-          {/* Pagination */}
-          {pagination.last_page > 1 && (
-            <div className="px-6 py-4 bg-white border-t border-slate-100 flex items-center justify-between">
-              <span className="text-sm text-slate-500">
-                Total {pagination.total} akun
-              </span>
-              <div className="flex gap-1">
-                {[...Array(pagination.last_page)].map((_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                      currentPage === i + 1
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        </div>
+
+        <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+          Menampilkan {akunData.length} dari {pagination.total || akunData.length} akun
         </div>
       </div>
 
-      {isModalOpen && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-custom-0f172a-40 backdrop-blur-md transition-all">
-          <div className="bg-white rounded-[20px] shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 border border-slate-100 flex flex-col max-h-screen">
-            {/* Header Section */}
-            <div className="flex justify-between items-start p-8 pb-6 border-b border-slate-100 bg-white">
-              <div className="flex gap-4 items-center">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                  <UserPlus size={24} />
+      {/* Modal */}
+      {modalOpen && createPortal(
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.45)', padding: '1rem' }}>
+          <div style={{ width: '100%', maxWidth: '680px', maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: '20px', boxShadow: '0 24px 60px rgba(0,0,0,0.2)' }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+              <button
+                type="button"
+                onClick={closeModal}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '10px', border: '1px solid var(--color-border)', background: '#fff', cursor: 'pointer', color: 'var(--color-text-dark)' }}
+              >
+                <ArrowLeft size={18} />
+              </button>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>
+                  {isEditMode ? 'Edit Akun' : 'Tambah Akun Baru'}
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                  {isEditMode ? 'Perbarui informasi akun pengguna' : 'Isi data untuk membuat akun baru'}
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit}>
+              <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                <div>
+                  <FormLabel>NIP/NISN</FormLabel>
+                  <input
+                    value={formData.nip_nisn}
+                    onChange={(e) => setFormData(p => ({ ...p, nip_nisn: e.target.value }))}
+                    disabled={isEditMode}
+                    placeholder="Isi jika tersedia"
+                    className="form-control"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-[22px] font-bold text-slate-900 font-inter">{isEditMode ? 'Edit Akun Pengguna' : 'Tambah Akun Baru'}</h3>
-                  <p className="text-[14px] text-slate-500 mt-0.5">Lengkapi informasi akun untuk memberikan akses ke sistem.</p>
+                  <FormLabel required>E-mail</FormLabel>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
+                    placeholder="Masukkan e-mail"
+                    className="form-control"
+                    required
+                  />
+                </div>
+
+                <div style={{ gridColumn: '1/-1' }}>
+                  <FormLabel required>Nama Lengkap</FormLabel>
+                  <input
+                    value={formData.name}
+                    onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+                    placeholder="Masukkan nama lengkap"
+                    className="form-control"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <FormLabel required>Role</FormLabel>
+                  <select value={formData.role} onChange={(e) => setFormData(p => ({ ...p, role: e.target.value }))} className="form-control">
+                    <option value="admin">Administrator</option>
+                    <option value="kepsek">Kepala Sekolah</option>
+                    <option value="guru">Guru</option>
+                    <option value="siswa">Murid</option>
+                  </select>
+                </div>
+                <div>
+                  <FormLabel>No. Handphone</FormLabel>
+                  <input
+                    value={formData.no_hp}
+                    onChange={(e) => setFormData(p => ({ ...p, no_hp: e.target.value }))}
+                    placeholder="Masukkan nomor HP"
+                    className="form-control"
+                  />
+                </div>
+
+                <div>
+                  <FormLabel required>Status</FormLabel>
+                  <select value={formData.status} onChange={(e) => setFormData(p => ({ ...p, status: e.target.value }))} className="form-control">
+                    <option value="aktif">Aktif</option>
+                    <option value="nonaktif">Nonaktif</option>
+                  </select>
+                </div>
+                <div />
+
+                <div style={{ gridColumn: '1/-1' }}>
+                  <FormLabel>Password {isEditMode ? '(kosongkan jika tidak ingin mengubah)' : ''}</FormLabel>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
+                      placeholder="Masukkan password"
+                      className="form-control"
+                      style={{ paddingRight: '2.5rem' }}
+                    />
+                    <button type="button" onClick={() => setShowPassword(p => !p)} style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ gridColumn: '1/-1' }}>
+                  <FormLabel>Konfirmasi Password</FormLabel>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData(p => ({ ...p, confirmPassword: e.target.value }))}
+                      placeholder="Konfirmasi password"
+                      className="form-control"
+                      style={{ paddingRight: '2.5rem' }}
+                    />
+                    <button type="button" onClick={() => setShowConfirmPassword(p => !p)} style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </div>
               </div>
-              <button 
-                onClick={handleCloseModal} 
-                className="text-slate-400 hover:text-slate-700 transition-colors bg-slate-50 hover:bg-slate-100 rounded-full p-2"
-              >
-                <X size={20} />
-              </button>
-            </div>
 
-            {/* Form Content */}
-            <div className="overflow-y-auto p-8">
-              <form id="addAccountForm" onSubmit={handleSubmit} className="flex flex-col gap-6">
-                {/* Row 1: Nama Lengkap */}
-                <div className="grid grid-cols-1 gap-6">
-                  <FormInput 
-                    label="Nama Lengkap"
-                    icon={User}
-                    placeholder="Mis: Budi Santoso"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                  />
-                </div>
-
-                {/* Row 2: Email & Role */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormInput 
-                    label="Email Pribadi"
-                    type="email"
-                    icon={Mail}
-                    placeholder="budi@email.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required
-                  />
-                  <FormInput 
-                    label="Role Pengguna"
-                    type="select"
-                    icon={Shield}
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    options={[
-                      { value: 'admin', label: 'Administrator' },
-                      { value: 'kepsek', label: 'Kepala Sekolah' },
-                      { value: 'guru', label: 'Guru' },
-                      { value: 'siswa', label: 'Siswa' },
-                      { value: 'calon_siswa', label: 'Calon Siswa' }
-                    ]}
-                  />
-                  {isEditMode && (
-                    <FormInput 
-                      label="Status Akun"
-                      type="select"
-                      icon={Shield}
-                      value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
-                      options={[
-                        { value: 'aktif', label: 'Aktif' },
-                        { value: 'nonaktif', label: 'Nonaktif' }
-                      ]}
-                    />
-                  )}
-                </div>
-
-                {/* Row 3: Passwords */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <FormInput 
-                      label={isEditMode ? "Password Baru (Opsional)" : "Password"}
-                      type="password"
-                      icon={Lock}
-                      placeholder="Minimal 6 karakter"
-                      value={formData.password}
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      required={!isEditMode}
-                      minLength="6"
-                    />
-                    {/* Password Strength pseudo-indicator */}
-                    {formData.password.length > 0 && (
-                      <div className="mt-2 flex gap-1 items-center">
-                        <div className={`h-1.5 flex-1 rounded-full ${formData.password.length > 0 ? 'bg-orange-400' : 'bg-slate-200'}`}></div>
-                        <div className={`h-1.5 flex-1 rounded-full ${formData.password.length >= 6 ? 'bg-amber-400' : 'bg-slate-200'}`}></div>
-                        <div className={`h-1.5 flex-1 rounded-full ${formData.password.length >= 8 && /[A-Z]/.test(formData.password) && /[0-9]/.test(formData.password) ? 'bg-emerald-500' : 'bg-slate-200'}`}></div>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <FormInput 
-                      label="Konfirmasi Password"
-                      type="password"
-                      icon={Lock}
-                      placeholder="Ulangi password"
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                      required
-                      inputState={
-                        formData.confirmPassword 
-                          ? (formData.password === formData.confirmPassword ? 'success' : 'error') 
-                          : 'default'
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Security Hint */}
-                <div className="flex items-start gap-3 bg-emerald-50/50 border border-emerald-100 p-3 rounded-xl mt-4">
-                  <div className="mt-0.5">
-                    <Info size={16} className="text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-[12px] text-emerald-800 font-semibold">Informasi Keamanan</p>
-                    <p className="text-[11px] text-emerald-600 mt-0.5">Password yang Anda masukkan akan dienkripsi secara otomatis oleh sistem. Pastikan untuk menggunakan kombinasi yang kuat.</p>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="flex justify-end items-center gap-[12px] px-[40px] py-[20px] bg-custom-F8FAFC border-t border-custom-E5E7EB">
-              <button 
-                type="button" 
-                onClick={handleCloseModal} 
-                className="flex items-center justify-center h-[44px] min-w-[96px] px-[18px] rounded-xl bg-custom-FFFFFF border border-custom-CBD5E1 text-custom-334155 font-semibold hover-bg-F1F5F9 hover-border-94A3B8 transition-all text-[14px]"
-              >
-                Batal
-              </button>
-              <button 
-                type="submit" 
-                form="addAccountForm"
-                disabled={isSubmitting} 
-                className="flex items-center justify-center gap-[8px] h-[44px] min-w-[150px] px-[20px] rounded-xl bg-custom-059669 text-white font-bold whitespace-nowrap hover-bg-047857 transition-all text-[14px]"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  <>
-                    <Check size={18} />
-                    {isEditMode ? 'Simpan Perubahan' : 'Tambahkan'}
-                  </>
-                )}
-              </button>
-            </div>
+              {/* Modal Footer */}
+              <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', background: 'var(--color-background)', borderRadius: '0 0 20px 20px' }}>
+                <button type="button" onClick={closeModal} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <X size={16} /> Batal
+                </button>
+                <button type="submit" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Save size={16} />
+                  {isEditMode ? 'Simpan Perubahan' : 'Tambahkan Akun'}
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
-      , document.body)}
+        </div>,
+        document.body
+      )}
     </AdminPageShell>
   );
+}
+
+function StatCard({ value, label, icon, gradient }) {
+  return (
+    <div style={{
+      background: gradient,
+      borderRadius: '16px',
+      padding: '1.25rem 1.5rem',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      color: '#fff',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '80px', height: '80px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }} />
+      <div>
+        <p style={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1, marginBottom: '0.35rem' }}>{value}</p>
+        <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.85 }}>{label}</p>
+      </div>
+      <div style={{ background: 'rgba(255,255,255,0.2)', width: '46px', height: '46px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {icon}
+      </div>
+    </div>
+  );
+}
+
+function FormLabel({ children, required }) {
+  return (
+    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-dark)', marginBottom: '0.4rem' }}>
+      {children} {required && <span style={{ color: 'var(--color-danger)' }}>*</span>}
+    </label>
+  );
+}
+
+function formatRole(role) {
+  const map = {
+    admin: 'Administrator',
+    kepsek: 'Kepala Sekolah',
+    guru: 'Guru',
+    siswa: 'Murid',
+    calon_siswa: 'Calon Murid',
+  };
+  return map[role] || role;
+}
+
+function getRoleColor(role) {
+  const map = {
+    admin: { bg: '#fef3c7', text: '#92400e', border: '#fde68a' },
+    kepsek: { bg: '#f5f3ff', text: '#5b21b6', border: '#c4b5fd' },
+    guru: { bg: '#eff6ff', text: '#1d4ed8', border: '#bfdbfe' },
+    siswa: { bg: '#ecfdf5', text: '#064e3b', border: '#a7f3d0' },
+    calon_siswa: { bg: '#fdf2f8', text: '#831843', border: '#f9a8d4' },
+  };
+  return map[role] || { bg: '#f8fafc', text: '#475569', border: '#e2e8f0' };
 }

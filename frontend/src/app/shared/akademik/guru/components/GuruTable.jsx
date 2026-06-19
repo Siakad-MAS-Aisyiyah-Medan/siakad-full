@@ -1,4 +1,4 @@
-import { Search, Plus, Edit2, Trash2, UserX, ShieldCheck, Mail, MapPin, Phone } from 'lucide-react';
+import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 export default function GuruTable({
   filteredData,
@@ -10,178 +10,141 @@ export default function GuruTable({
   isFetching = false,
   readOnly = false,
 }) {
-  const handleExport = () => {
-    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
-      const dataToExport = filteredData.map(user => ({
-        'NIP/NUPTK': user.guru?.nip_nuptk || '',
-        'Nama Guru': user.guru?.nama_guru || '',
-        'Jenis Kelamin': user.guru?.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan',
-        'No HP': user.guru?.no_hp || '',
-        'Alamat': user.guru?.alamat || '',
-        'Role': 'Guru',
-        'Status': user.guru?.status === 'nonaktif' ? 'Nonaktif' : 'Aktif'
-      }));
-      exportToCsv('data_guru.csv', dataToExport);
-    });
-  };
-
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
-      <div className="px-4 md:px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-800">
-            Data Guru & Pegawai
-          </h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">
-            Manajemen tenaga pendidik beserta hak akses sistem.
-          </p>
+    <div className="admin-page-wrapper animate-fade-in">
+      {/* Panel Header */}
+      <div className="panel-header mb-4">
+        <div className="header-text">
+          <h2>Data Guru</h2>
+          <p>Kelola data guru MAS Aisyiyah Medan</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-          <div className="relative w-full sm:w-auto">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <Search size={16} strokeWidth={2.5} />
-            </div>
+        <div className="header-actions">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} style={{ position: 'absolute', left: '1rem', color: '#94a3b8', pointerEvents: 'none', transition: 'color 0.2s ease' }} className="search-icon" />
             <input
               type="text"
-              placeholder="Cari guru..."
+              placeholder="Cari data guru..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full sm:w-64 bg-white border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-full pl-10 pr-4 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:font-medium placeholder:text-slate-400"
+              style={{
+                paddingLeft: '2.75rem', paddingRight: '1rem', height: '42px',
+                border: '1px solid var(--color-border)', borderRadius: '12px',
+                fontSize: '0.9rem', outline: 'none', width: '260px',
+                background: '#f8fafc', color: 'var(--color-text-dark)',
+                transition: 'all 0.2s ease', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
+              }}
+              onFocus={(e) => { 
+                e.target.style.background = '#fff'; 
+                e.target.style.borderColor = 'var(--color-primary)'; 
+                e.target.style.boxShadow = '0 0 0 3px var(--color-primary-soft)';
+                e.target.previousElementSibling.style.color = 'var(--color-primary)';
+              }}
+              onBlur={(e) => { 
+                e.target.style.background = '#f8fafc'; 
+                e.target.style.borderColor = 'var(--color-border)'; 
+                e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.02)';
+                e.target.previousElementSibling.style.color = '#94a3b8';
+              }}
             />
           </div>
-          {!readOnly && (
-            <button
-              type="button"
-              onClick={onAdd}
-              className="btn-primary h-10 px-5 rounded-full font-bold flex items-center justify-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all w-full sm:w-auto"
-            >
-              <Plus size={18} strokeWidth={2.5} />
-              <span className="inline">Tambah Guru</span>
+          {readOnly ? (
+            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
             </button>
-          )}
-          {readOnly && (
-            <button
-              type="button"
-              onClick={handleExport}
-              className="btn-outline h-10 px-5 rounded-full font-bold flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
-            >
-              <span className="inline">Unduh Data</span>
+          ) : (
+            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Plus size={16} />
+              Tambah Guru
             </button>
           )}
         </div>
       </div>
 
-      <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      {/* Table */}
+      <div className="table-container">
+        <table className="data-table">
           <thead>
-            <tr className="bg-slate-50/80 border-b border-slate-100">
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Profil Guru</th>
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Kontak & Alamat</th>
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Status & Posisi</th>
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest text-right" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Aksi</th>
+            <tr>
+              <th>No</th>
+              <th>Nama Guru</th>
+              <th>NIP/NUPTK</th>
+              <th>Jenis Kelamin</th>
+              <th>No HP</th>
+              <th>Alamat</th>
+              <th>Status</th>
+              {!readOnly ? <th style={{ textAlign: 'right' }}>Aksi</th> : null}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody>
             {isFetching ? (
               <tr>
-                <td colSpan="4" className="py-20">
-                  <div className="flex flex-col items-center justify-center w-full">
-                    <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-3"></div>
-                    <p className="text-sm font-semibold text-slate-500 text-center">Memuat data guru...</p>
+                <td colSpan={readOnly ? 7 : 8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                    Memuat data guru...
                   </div>
                 </td>
               </tr>
             ) : filteredData.length > 0 ? (
-              filteredData.map((user) => {
+              filteredData.map((user, idx) => {
                 const profile = user.guru || user.profile || {};
+                const isAktif = profile.status !== 'nonaktif';
                 return (
-                  <tr key={user.id_user} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-200">
-                          {profile.foto ? (
-                            <img src={profile.foto} alt="Foto" className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-lg font-bold text-slate-400">
-                              {(profile.nama_guru || 'G').charAt(0).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-800 text-[15px]">{profile.nama_guru || '-'}</p>
-                          <p className="text-xs font-medium text-slate-500 mt-1 flex items-center gap-1.5">
-                            <span className="text-slate-700 font-semibold">{profile.nip_nuptk || '-'}</span>
-                            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                            <span>{profile.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'}</span>
-                          </p>
-                        </div>
-                      </div>
+                  <tr key={user.id_user}>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{profile.nama_guru || '-'}</td>
+                    <td>{profile.nip_nuptk || '-'}</td>
+                    <td>{profile.jenis_kelamin === 'L' ? 'Laki-laki' : profile.jenis_kelamin === 'P' ? 'Perempuan' : '-'}</td>
+                    <td>{profile.no_hp || '-'}</td>
+                    <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.alamat || '-'}</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '50px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: isAktif ? 'var(--color-primary-soft)' : '#fef2f2',
+                        color: isAktif ? 'var(--color-primary-dark)' : '#991b1b',
+                        border: `1px solid ${isAktif ? 'var(--color-primary-light)' : '#fecaca'}`,
+                      }}>
+                        {isAktif ? 'Aktif' : 'Nonaktif'}
+                      </span>
                     </td>
-                    
-                    <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <div className="space-y-1.5">
-                        <p className="text-xs font-semibold text-slate-600 flex items-center gap-2">
-                          <Phone size={12} className="text-slate-400 shrink-0" /> {profile.no_hp || '-'}
-                        </p>
-                        <p className="text-[11px] font-semibold text-slate-500 flex items-start gap-2 max-w-[200px]">
-                          <MapPin size={12} className="text-slate-400 mt-0.5 shrink-0" /> <span className="line-clamp-2">{profile.alamat || '-'}</span>
-                        </p>
-                      </div>
-                    </td>
-
-                    <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <div className="flex flex-col gap-2 items-start">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
-                          Guru
-                        </span>
-                        
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                          (!profile.status || profile.status === 'aktif')
-                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                            : 'bg-rose-50 text-rose-600 border border-rose-100'
-                        }`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${(!profile.status || profile.status === 'aktif') ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
-                          {profile.status === 'nonaktif' ? 'Nonaktif' : 'Aktif'}
-                        </span>
-                      </div>
-                    </td>
-
-                    <td className="py-5 text-right" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => onEdit && onEdit(user)}
-                          className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition-colors"
-                          title={readOnly ? "Detail Guru" : "Edit Guru"}
-                        >
-                          {readOnly ? <Search size={14} strokeWidth={2.5} /> : <Edit2 size={14} strokeWidth={2.5} />}
-                        </button>
-                        {!readOnly && (
-                          <button
-                            onClick={() => onDelete && onDelete(user.id_user)}
-                            className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
-                            title="Hapus Guru"
-                          >
-                            <Trash2 size={14} strokeWidth={2.5} />
+                    {!readOnly ? (
+                      <td>
+                        <div className="actions-cell">
+                          <button type="button" onClick={() => onEdit && onEdit(user)} className="btn-icon edit" title="Edit">
+                            <Pencil size={15} />
                           </button>
-                        )}
-                      </div>
-                    </td>
+                          <button type="button" onClick={() => onDelete && onDelete(user.id_user)} className="btn-icon delete" title="Hapus">
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    ) : null}
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan="4" className="text-center py-20">
-                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <UserX size={24} className="text-slate-300" />
+                <td colSpan={readOnly ? 7 : 8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '2rem' }}>👩‍🏫</div>
+                    <p style={{ fontWeight: 600 }}>Tidak ada data guru</p>
+                    <p style={{ fontSize: '0.875rem' }}>Tambah guru baru untuk memulai</p>
                   </div>
-                  <p className="text-sm font-bold text-slate-600">Tidak ada data guru</p>
-                  <p className="text-xs font-medium text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Footer info */}
+      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+        Menampilkan {filteredData.length} data guru
       </div>
     </div>
   );

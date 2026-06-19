@@ -1,35 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
-import { Settings, Save, Check, X, AlertCircle, Loader2, ShieldCheck, User as UserIcon, Mail, Lock } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Loader2, Save, X, UserCircle2, Mail, Lock, ShieldCheck, KeyRound } from 'lucide-react';
 import { fetchMe } from '@app/shared/services/auth.service';
 import { updateAdminProfile } from '@app/shared/services/akun.service';
 
-function Toast({ message, type = 'success', onClose }) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3500);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-  const styles = {
-    success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-  };
-  const icons = { success: Check, error: X, warning: AlertCircle };
-  const Icon = icons[type] || Check;
+function InfoCard({ label, value, icon: Icon, isPassword = false }) {
   return (
-    <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-xl backdrop-blur-sm animate-in slide-in-from-right-2 fade-in duration-300 ${styles[type]}`}>
-      <Icon size={18} className="shrink-0" />
-      <span className="text-sm font-bold">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:opacity-70 transition-opacity"><X size={14} /></button>
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem',
+      borderRadius: '16px', border: '1px solid var(--color-border)',
+      background: 'rgba(255, 255, 255, 0.5)', transition: 'all 0.2s ease',
+    }}>
+      <div style={{
+        width: '48px', height: '48px', borderRadius: '12px',
+        background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0
+      }}>
+        <Icon size={24} />
+      </div>
+      <div>
+        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+        {isPassword ? (
+          <p style={{ fontSize: '1.25rem', color: 'var(--color-text-dark)', letterSpacing: '0.2em', lineHeight: 1, margin: 0, marginTop: '0.3rem' }}>••••••••</p>
+        ) : (
+          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-dark)', margin: 0 }}>{value || '-'}</p>
+        )}
+      </div>
     </div>
   );
 }
 
-export default function PengaturanSistemPage() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState(null);
+function FormLabel({ children, required = false }) {
+  return (
+    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-dark)', marginBottom: '0.4rem' }}>
+      {children} {required && <span style={{ color: 'var(--color-danger)' }}>*</span>}
+    </label>
+  );
+}
 
+export default function PengaturanSistemPage() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [initialForm, setInitialForm] = useState(null);
   const [form, setForm] = useState({
     name: '',
     username: '',
@@ -39,34 +54,41 @@ export default function PengaturanSistemPage() {
     new_password_confirmation: '',
   });
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const userData = await fetchMe();
-      if (userData) {
-        setForm(prev => ({
-          ...prev,
-          name: userData.name || '',
-          username: userData.username || '',
-          email: userData.email || '',
-        }));
-      }
-    } catch (err) {
-      setToast({ message: 'Gagal memuat profil', type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchMe();
+        const payload = {
+          name: data?.user?.name || data?.profile?.nama_lengkap || data?.profile?.nama_kepala_sekolah || data?.user?.username || 'Pengguna',
+          username: data?.user?.username || '',
+          email: data?.user?.email || '',
+          current_password: '',
+          new_password: '',
+          new_password_confirmation: '',
+        };
+        setForm(payload);
+        setInitialForm(payload);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadData();
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
+  const handleCancel = () => {
+    if (initialForm) setForm(initialForm);
+    setIsEditing(false);
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
     setSaving(true);
     try {
       const payload = {
@@ -75,203 +97,200 @@ export default function PengaturanSistemPage() {
         email: form.email,
       };
       if (form.new_password) {
-        payload.current_password = form.current_password;
-        payload.new_password = form.new_password;
-        payload.new_password_confirmation = form.new_password_confirmation;
+        payload.password = form.new_password;
       }
-      const res = await updateAdminProfile(payload);
-      
-      setToast({ message: 'Data berhasil disimpan', type: 'success' });
+      await updateAdminProfile(payload);
+      const nextState = { ...form, current_password: '', new_password: '', new_password_confirmation: '' };
+      setInitialForm(nextState);
+      setForm(nextState);
       setIsEditing(false);
-      setForm(prev => ({ ...prev, current_password: '', new_password: '', new_password_confirmation: '' }));
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-
-    } catch (err) {
-      setToast({ message: err?.response?.data?.message || err.message || 'Gagal menyimpan profil', type: 'error' });
     } finally {
       setSaving(false);
     }
   };
 
+  if (loading) {
+    return (
+      <AdminPageShell>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--color-text-muted)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+            <p>Memuat profil admin...</p>
+          </div>
+        </div>
+      </AdminPageShell>
+    );
+  }
+
+  // Get initials for avatar
+  const initials = form.name.substring(0, 2).toUpperCase() || 'AD';
+
   return (
     <AdminPageShell>
-      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-5 lg:py-6 flex flex-col gap-6 animate-in fade-in duration-500">
-        
-        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
-        {/* HEADER */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 px-6 py-4 shadow-lg shadow-emerald-500/15">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-          <div className="relative flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
-                <Settings size={20} />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg font-black text-white tracking-tight">Pengaturan</h1>
-                <p className="text-emerald-100/80 text-xs mt-0.5 truncate font-medium">
-                  Kelola informasi akun dan kata sandi administrator
-                </p>
-              </div>
-            </div>
-            {!isEditing && (
+      <div className="admin-page-wrapper animate-fade-in">
+        <div className="panel-header mb-4">
+          <div className="header-text" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {isEditing && (
               <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10"
+                type="button"
+                onClick={handleCancel}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: '40px', height: '40px',
+                  borderRadius: '10px', border: '1px solid var(--color-border)',
+                  background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
+                }}
               >
-                Edit
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <div>
+              <h2>{isEditing ? 'Edit Profil Akun' : 'Pengaturan Akun'}</h2>
+              <p>{isEditing ? 'Perbarui informasi profil dan keamanan akun Anda' : 'Kelola informasi profil dan keamanan akun Anda'}</p>
+            </div>
+          </div>
+          <div className="header-actions">
+            {!isEditing && (
+              <button type="button" onClick={() => setIsEditing(true)} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <PencilIcon /> Edit Profil
               </button>
             )}
           </div>
         </div>
 
-        {/* CONTENT */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center gap-4 px-6 sm:px-8 py-5 border-b border-slate-100 bg-slate-50/50">
-             <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-               <ShieldCheck size={20} />
-             </div>
-             <div>
-               <h2 className="text-base font-bold text-slate-700">Profil Administrator</h2>
-               <p className="text-sm text-slate-400 font-medium">Informasi utama akun Anda</p>
-             </div>
-          </div>
+        {isEditing ? (
+          <form onSubmit={handleSave} className="form-panel" style={{ padding: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid var(--color-border)' }}>
+              <div style={{
+                width: '80px', height: '80px', borderRadius: '20px',
+                background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
+                color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em',
+                boxShadow: '0 8px 24px rgba(5, 150, 105, 0.25)'
+              }}>
+                {initials}
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}>Profil Utama</h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.2rem' }}>Informasi dasar akun Anda</p>
+              </div>
+            </div>
 
-          <div className="p-6 sm:p-8 space-y-6">
-             {loading && !isEditing ? (
-               <div className="flex justify-center items-center py-10">
-                 <Loader2 size={24} className="text-emerald-500 animate-spin" />
-               </div>
-             ) : (
-               <>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Nama Akun */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        <UserIcon size={12} className="text-emerald-500"/> Nama Akun
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
-                        placeholder="Admin MAS Aisyiyah Medan"
-                      />
-                    </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+              <div>
+                <FormLabel required>Nama Lengkap</FormLabel>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><UserCircle2 size={18} /></div>
+                  <input name="name" value={form.name} onChange={handleChange} className="form-control" style={{ paddingLeft: '2.75rem' }} placeholder="Nama Lengkap" required />
+                </div>
+              </div>
+              <div>
+                <FormLabel required>Alamat Email</FormLabel>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><Mail size={18} /></div>
+                  <input type="email" name="email" value={form.email} onChange={handleChange} className="form-control" style={{ paddingLeft: '2.75rem' }} placeholder="Alamat Email" required />
+                </div>
+              </div>
+              <div>
+                <FormLabel required>Username</FormLabel>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><ShieldCheck size={18} /></div>
+                  <input name="username" value={form.username} onChange={handleChange} className="form-control" style={{ paddingLeft: '2.75rem' }} placeholder="Username" disabled title="Username tidak dapat diubah" />
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>*Username digunakan untuk login dan tidak dapat diubah.</p>
+              </div>
+            </div>
 
-                    {/* Username */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        <Lock size={12} className="text-emerald-500"/> Username
-                      </label>
-                      <input
-                        type="text"
-                        name="username"
-                        value={form.username}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
-                        placeholder="admin123"
-                      />
-                    </div>
+            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <KeyRound size={16} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}>Ganti Password</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.1rem' }}>Kosongkan jika tidak ingin mengubah password</p>
+                </div>
+              </div>
 
-                    {/* Email */}
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        <Mail size={12} className="text-emerald-500"/> Email
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
-                        placeholder="admin@email.com"
-                      />
-                    </div>
-                 </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div>
+                  <FormLabel>Password Baru</FormLabel>
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><Lock size={18} /></div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="new_password"
+                      value={form.new_password}
+                      onChange={handleChange}
+                      className="form-control"
+                      style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
+                      placeholder="Masukkan password baru"
+                    />
+                    <button type="button" onClick={() => setShowPassword((prev) => !prev)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                 {/* Change Password Section */}
-                 {isEditing && (
-                   <div className="pt-5 border-t border-slate-100">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Lock size={14} className="text-emerald-500" />
-                        <h3 className="text-sm font-bold text-slate-700">Ubah Kata Sandi (Opsional)</h3>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <div className="md:col-span-2">
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password Saat Ini</label>
-                            <input
-                              type="password"
-                              name="current_password"
-                              value={form.current_password}
-                              onChange={handleChange}
-                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all"
-                              placeholder="Masukkan password saat ini untuk keamanan"
-                            />
-                         </div>
-                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password Baru</label>
-                            <input
-                              type="password"
-                              name="new_password"
-                              value={form.new_password}
-                              onChange={handleChange}
-                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all"
-                              placeholder="Minimal 6 karakter"
-                            />
-                         </div>
-                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Konfirmasi Password Baru</label>
-                            <input
-                              type="password"
-                              name="new_password_confirmation"
-                              value={form.new_password_confirmation}
-                              onChange={handleChange}
-                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all"
-                              placeholder="Ulangi password baru"
-                            />
-                         </div>
-                      </div>
-                   </div>
-                 )}
-               </>
-             )}
-          </div>
-
-          {/* Footer Actions */}
-          {isEditing && (
-            <div className="px-5 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3">
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  loadData(); // Reset
-                  setForm(prev => ({ ...prev, current_password: '', new_password: '', new_password_confirmation: '' }));
-                }}
-                disabled={saving}
-                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
-              >
-                Batal
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
+              <button type="button" onClick={handleCancel} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 2rem' }}>
+                <X size={18} /> Batal
               </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-500/20 disabled:shadow-none"
-              >
-                {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-                {saving ? 'Menyimpan...' : 'Simpan'}
+              <button type="submit" disabled={saving} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 2rem', opacity: saving ? 0.7 : 1 }}>
+                <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Profil'}
               </button>
             </div>
-          )}
-        </div>
+          </form>
+        ) : (
+          <div className="form-panel" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ height: '140px', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'radial-gradient(#fff 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
+            </div>
+            
+            <div style={{ padding: '0 2.5rem 2.5rem', position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                <div style={{
+                  width: '110px', height: '110px', borderRadius: '24px',
+                  background: '#fff',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+                  marginTop: '-55px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <div style={{
+                    width: '94px', height: '94px', borderRadius: '18px',
+                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
+                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '2.5rem', fontWeight: 800, letterSpacing: '0.05em'
+                  }}>
+                    {initials}
+                  </div>
+                </div>
+                <div style={{ marginTop: '-1rem' }}>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0 }}>{form.name}</h1>
+                </div>
+              </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                <InfoCard label="Nama Lengkap" value={form.name} icon={UserCircle2} />
+                <InfoCard label="Alamat Email" value={form.email} icon={Mail} />
+                <InfoCard label="Username Login" value={form.username} icon={ShieldCheck} />
+                <InfoCard label="Password Akun" value="***" icon={Lock} isPassword={true} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AdminPageShell>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+      <path d="m15 5 4 4"/>
+    </svg>
   );
 }

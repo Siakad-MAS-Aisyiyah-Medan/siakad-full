@@ -14,7 +14,7 @@ class User extends Authenticatable
 
     protected $primaryKey = 'id_user';
 
-    /** Role akun — data PPDB terpisah di tabel pendaftaran (hanya untuk calon_siswa yang mulai PPDB). */
+    /** Role akun - data PPDB terpisah di tabel pendaftaran (hanya untuk calon_siswa yang mulai PPDB). */
     public const ROLES = [
         'admin',
         'calon_siswa',
@@ -132,8 +132,8 @@ class User extends Authenticatable
 
     /**
      * Profil aktif sesuai role (bukan relasi generik).
-     * - calon_siswa → pendaftaran
-     * - siswa → siswa
+     * - calon_siswa -> pendaftaran
+     * - siswa -> siswa
      */
     public function resolveProfile(): ?Model
     {

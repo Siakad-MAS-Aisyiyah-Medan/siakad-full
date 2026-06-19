@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { Info, Clock, Phone } from 'lucide-react';
 import { formatInfoText } from '../../utils/formatPpdbInfo';
 
@@ -25,13 +26,13 @@ export default function ImportantInfoPanel({ info }) {
         </div>
       </div>
       <ul className="cm-info-list">
-        {items.map(({ icon: Icon, title, text, tone, highlight }) => (
+        {items.map(({ icon, title, text, tone, highlight }) => (
           <li
             key={title}
             className={`cm-info-item${highlight ? ' cm-info-item--highlight' : ''}`}
           >
             <span className={`cm-info-item__icon cm-info-item__icon--${tone}`}>
-              <Icon size={16} />
+              {createElement(icon, { size: 16 })}
             </span>
             <div className="cm-info-item__content">
               <strong>{title}</strong>

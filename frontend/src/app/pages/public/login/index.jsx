@@ -147,13 +147,14 @@ export default function LoginPage() {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 borderRadius: '0.5rem',
-                border: isDropdownOpen ? '1px solid var(--primary, #0ea5e9)' : '1px solid #e5e7eb',
-                backgroundColor: isDropdownOpen ? '#ffffff' : '#f9fafb',
-                color: '#111827',
+                border: isDropdownOpen ? '1px solid #059669' : '1px solid #e2e8f0',
+                backgroundColor: isDropdownOpen ? '#ffffff' : '#f8fafb',
+                color: '#0f172a',
                 cursor: 'pointer',
-                boxShadow: isDropdownOpen ? '0 0 0 3px rgba(14, 165, 233, 0.1)' : 'none',
-                transition: 'all 0.2s ease',
-                fontSize: '0.95rem'
+                boxShadow: isDropdownOpen ? '0 0 0 4px rgba(5, 150, 105, 0.12)' : 'none',
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontSize: '0.9rem',
+                borderRadius: '12px',
               }}
             >
               <span style={{ fontWeight: '500' }}>{roleType}</span>
@@ -168,9 +169,9 @@ export default function LoginPage() {
                 right: 0,
                 marginTop: '0.5rem',
                 backgroundColor: 'white',
-                borderRadius: '0.5rem',
-                border: '1px solid #e5e7eb',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
                 zIndex: 50,
                 overflow: 'hidden',
                 animation: 'fadeIn 0.2s ease-out'
@@ -182,14 +183,15 @@ export default function LoginPage() {
                     style={{
                       padding: '0.875rem 1rem',
                       cursor: 'pointer',
-                      backgroundColor: roleType === role ? '#f0f9ff' : 'transparent',
-                      color: roleType === role ? 'var(--primary, #0ea5e9)' : '#4b5563',
+                      backgroundColor: roleType === role ? '#ecfdf5' : 'transparent',
+                      color: roleType === role ? '#059669' : '#4b5563',
                       fontWeight: roleType === role ? '600' : '400',
                       transition: 'all 0.15s ease',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      borderLeft: roleType === role ? '3px solid var(--primary, #0ea5e9)' : '3px solid transparent'
+                      borderLeft: roleType === role ? '3px solid #059669' : '3px solid transparent',
+                      borderRadius: '4px',
                     }}
                     onMouseEnter={(e) => {
                       if (roleType !== role) e.currentTarget.style.backgroundColor = '#f3f4f6';

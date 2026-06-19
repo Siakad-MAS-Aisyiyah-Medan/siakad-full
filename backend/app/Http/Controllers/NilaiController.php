@@ -133,4 +133,20 @@ class NilaiController extends Controller
     {
         return $this->kepsekIndex($request);
     }
+
+    public function adminStudentRaport(Request $request, int $idUserSiswa)
+    {
+        $validated = $request->validate([
+            'semester' => 'required|in:Ganjil,Genap',
+            'tahun_ajaran' => 'required|string|max:20',
+        ]);
+
+        $raport = $this->nilaiService->raportForStudent(
+            $idUserSiswa,
+            $validated['semester'],
+            $validated['tahun_ajaran']
+        );
+
+        return ApiResponse::success($raport, 'Berhasil mengambil transkrip akademik murid');
+    }
 }

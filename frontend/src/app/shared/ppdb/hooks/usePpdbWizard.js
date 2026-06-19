@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
-  buildInitialCompletedSteps,
   computeMaxReachableStep,
   computeWizardPercent,
   EDITABLE_STATUSES,
@@ -11,7 +10,6 @@ import {
 } from '../config/ppdbWizardConfig';
 import {
   fetchMyRegistration,
-  saveStepDokumen,
   saveStepKepribadian,
   saveStepKesehatan,
   saveStepKeteranganPribadi,
@@ -43,8 +41,6 @@ const EMPTY_FORMS = {
   kepribadian: {},
   meta: {},
 };
-
-const AUTO_SAVE_MS = 2500;
 
 export function extractApiError(err) {
   const res = err?.response;
@@ -162,7 +158,6 @@ export function usePpdbWizard() {
 
   const formsRef = useRef(forms);
   const activeStepRef = useRef(activeStep);
-  const autoSaveTimer = useRef(null);
   const skipAutoSave = useRef(false);
 
   formsRef.current = forms;
@@ -175,8 +170,6 @@ export function usePpdbWizard() {
     const locked = FINAL_STATUSES.includes(status);
     setIsLocked(locked);
 
-    const safeStep = 0; // Default ke step 0, hitung maxReachable nanti
-    
     const computedCompleted = recalculateCompletedSteps(formsData);
     setCompletedSteps(computedCompleted);
     
@@ -246,7 +239,7 @@ export function usePpdbWizard() {
         if (!silent) setSaving(false);
       }
     },
-    [applyRegistration],
+    [syncFromServer],
   );
 
   const initialize = useCallback(async () => {

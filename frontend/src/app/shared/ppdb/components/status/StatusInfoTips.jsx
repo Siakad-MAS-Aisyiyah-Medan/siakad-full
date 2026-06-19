@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { Lightbulb, CheckCircle2, Clock, Phone } from 'lucide-react';
 import Card from '../portal/Card';
 
@@ -17,10 +18,10 @@ export default function StatusInfoTips() {
         <h2 className="text-lg font-bold text-slate-900">Informasi Penting</h2>
       </div>
       <ul className="space-y-3">
-        {TIPS.map(({ icon: Icon, text, tone }) => (
+        {TIPS.map(({ icon, text, tone }) => (
           <li key={text} className={`cm-tip-item cm-tip-item--${tone}`}>
             <div className={`cm-tip-item__icon cm-tip-item__icon--${tone}`}>
-              <Icon size={15} />
+              {createElement(icon, { size: 15 })}
             </div>
             <span>{text}</span>
           </li>

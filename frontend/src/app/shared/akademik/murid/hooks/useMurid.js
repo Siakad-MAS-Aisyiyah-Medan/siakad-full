@@ -85,7 +85,7 @@ export function useMurid() {
     if (!['diterima', 'daftar_ulang'].includes(ppdbStatus)) {
       Swal.fire(
         'Belum Dapat Dipromosikan',
-        'PPDB harus berstatus Diterima terlebih dahulu. Gunakan menu Verifikasi PPDB.',
+        'PPDB harus berstatus Diterima terlebih dahulu. Gunakan menu Data PPDB.',
         'warning'
       );
       return;
@@ -163,7 +163,7 @@ export function useMurid() {
       nis: s.nis || '',
       jenis_kelamin: s.jenis_kelamin || 'L',
       tempat_lahir: s.tempat_lahir || '',
-      tanggal_lahir: s.tanggal_lahir || '',
+      tanggal_lahir: s.tanggal_lahir || s.tgl_lahir || '',
       alamat: s.alamat || '',
       no_hp: s.no_hp || '',
       tahun_masuk: s.tahun_masuk || new Date().getFullYear(),
@@ -194,7 +194,14 @@ export function useMurid() {
     setLoading(true);
     try {
       if (view === 'add') {
-        await import('../services/murid.service').then(m => m.createMurid(formData));
+        const generatedUsername = formData.username || formData.nisn || formData.no_hp;
+        const payload = {
+          ...formData,
+          username: generatedUsername,
+          email: formData.email || (generatedUsername ? `${generatedUsername}@mas.sch.id` : ''),
+          password: formData.password || String(formData.nisn || formData.no_hp || '123456'),
+        };
+        await import('../services/murid.service').then(m => m.createMurid(payload));
         toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         await import('../services/murid.service').then(m => m.updateMurid(editId, formData));

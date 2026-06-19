@@ -1,5 +1,5 @@
 import apiClient from '@app/shared/services/apiClient';
-import { unwrapList, unwrapPaginated } from '@app/shared/services/apiHelpers';
+import { unwrapPaginated } from '@app/shared/services/apiHelpers';
 
 export async function fetchMuridList(params = {}) {
   const response = await apiClient.get('/murid', { params });

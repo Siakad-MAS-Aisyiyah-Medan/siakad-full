@@ -1,13 +1,14 @@
+import { createElement } from 'react';
 import { Hash, Calendar, BadgeCheck, Clock } from 'lucide-react';
 import StatusBadge from '../StatusBadge';
 import { formatLastUpdated } from '../../utils/ppdbProgress';
 import { normalizePpdbStatus } from '../../utils/dashboardState';
 
-function StatCard({ icon: Icon, label, value, colorClass, isBadge = false }) {
+function StatCard({ icon, label, value, colorClass, isBadge = false }) {
   return (
     <div className={`cm-stat-card ${colorClass}`}>
       <div className="cm-stat-card__icon">
-        <Icon size={20} />
+        {createElement(icon, { size: 20 })}
       </div>
       <div className="cm-stat-card__body">
         <span className="cm-stat-card__label">{label}</span>

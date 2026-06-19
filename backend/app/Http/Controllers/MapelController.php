@@ -39,8 +39,15 @@ class MapelController extends Controller
         return ApiResponse::success($mapel, 'Mata pelajaran berhasil ditambahkan', 201);
     }
 
-    public function update(UpdateMapelRequest $request, $id)
+    public function update(\Illuminate\Http\Request $request, $id)
     {
+        $validated = $request->validate([
+            'nama_mapel' => 'required|string|max:100',
+            'id_guru' => 'required|exists:users,id_user',
+            'tingkat' => 'required|in:X,XI,XII',
+            'kelompok_mapel' => 'nullable|string|max:100',
+        ]);
+
         $mapel = $this->processUpdate((int) $id, $validated);
 
         return ApiResponse::success($mapel, 'Mata pelajaran berhasil diperbarui');

@@ -126,6 +126,11 @@ class NilaiService
 
     public function raportForSiswa(int $userId, string $semester, string $tahunAjaran): array
     {
+        return $this->raportForStudent($userId, $semester, $tahunAjaran);
+    }
+
+    public function raportForStudent(int $userId, string $semester, string $tahunAjaran): array
+    {
         $items = Nilai::with('mapel')
             ->where('id_user_siswa', $userId)
             ->where('semester', $semester)

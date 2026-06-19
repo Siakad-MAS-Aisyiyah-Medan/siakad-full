@@ -1,92 +1,118 @@
 import { Link } from 'react-router-dom';
-import StatusBadge from './StatusBadge';
-import { Eye, Check, X, User } from 'lucide-react';
+import { CheckCircle2, Eye, XCircle } from 'lucide-react';
 
-export default function PendaftarTable({ ppdb }) {
-  const { items, loading, isFetching } = ppdb;
+function statusLabel(status) {
+  const value = status || 'submitted';
+  if (['diterima', 'accepted'].includes(value)) return 'Diterima';
+  if (['ditolak', 'rejected'].includes(value)) return 'Ditolak';
+  return 'Menunggu';
+}
 
-  if (loading && !isFetching) {
-    return <p className="text-center p-6 text-slate-500 font-medium">Memproses...</p>;
+function getStatusStyle(status) {
+  const value = statusLabel(status);
+  if (value === 'Diterima') {
+    return { bg: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', border: 'var(--color-primary-light)' };
   }
+  if (value === 'Ditolak') {
+    return { bg: '#fef2f2', color: '#991b1b', border: '#fecaca' };
+  }
+  return { bg: '#fffbeb', color: '#92400e', border: '#fde68a' };
+}
+
+export default function PendaftarTable({ ppdb, readOnly = false }) {
+  const items = Array.isArray(ppdb?.items) ? ppdb.items : [];
+  const loading = Boolean(ppdb?.loading);
+  const isFetching = Boolean(ppdb?.isFetching);
+  const stats = ppdb?.stats || {};
+  const terima = ppdb?.terima || (() => {});
+  const tolak = ppdb?.tolak || (() => {});
 
   return (
-    <table className="w-full text-left border-collapse">
-      <thead>
-        <tr className="bg-slate-50/80 border-b border-slate-100">
-          <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest pl-8 pr-4">Pendaftar</th>
-          <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-4">Status</th>
-          <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-4 text-center">Detail</th>
-          <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest text-right pr-8 pl-4">Aksi</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-slate-100">
-        {isFetching ? (
-          <tr>
-            <td colSpan="4" className="py-16 text-slate-500">
-              <div className="flex flex-col items-center justify-center w-full">
-                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-3" />
-                <p className="font-semibold text-sm text-center">Memuat data pendaftar...</p>
-              </div>
-            </td>
-          </tr>
-        ) : !items?.length ? (
-          <tr>
-            <td colSpan="4" className="text-center py-20">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User size={24} className="text-slate-300" />
-              </div>
-              <p className="text-sm font-bold text-slate-600">Belum ada data pendaftar</p>
-            </td>
-          </tr>
-        ) : (
-          items.map((row) => (
-            <tr key={row.id || row.id_pendaftaran} className="hover:bg-slate-50/80 transition-colors group">
-              <td className="py-4 pl-8 pr-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 font-bold text-sm border border-slate-300">
-                    {row.nama_lengkap?.charAt(0)?.toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800 text-[14px]">{row.nama_lengkap}</p>
-                    <p className="text-[11px] font-semibold text-slate-500 mt-0.5">NISN: {row.nisn || row.user?.username}</p>
-                  </div>
-                </div>
-              </td>
-              <td className="py-4 px-4">
-                <StatusBadge status={row.status || row.ppdb_status} />
-              </td>
-              <td className="py-4 px-4 text-center">
-                <Link 
-                  to={`/admin/ppdb/${row.id || row.id_pendaftaran}`} 
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                >
-                  <Eye size={14} strokeWidth={2.5} /> Lihat
-                </Link>
-              </td>
-              <td className="py-4 pr-8 pl-4 text-right">
-                <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                  {(row.status === 'submitted' || row.ppdb_status === 'diajukan' || row.status === 'verified' || row.ppdb_status === 'terverifikasi') && (
-                    <>
-                      <button
-                        onClick={() => ppdb.terima(row.id || row.id_pendaftaran)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm text-xs font-bold"
-                      >
-                        <Check size={14} strokeWidth={3} /> Terima
-                      </button>
-                      <button
-                        onClick={() => ppdb.tolak(row.id || row.id_pendaftaran)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm text-xs font-bold"
-                      >
-                        <X size={14} strokeWidth={3} /> Tolak
-                      </button>
-                    </>
-                  )}
-                </div>
-              </td>
+    <>
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Calon Murid</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'right' }}>Aksi</th>
             </tr>
-          ))
-        )}
-      </tbody>
-    </table>
+          </thead>
+          <tbody>
+            {loading || isFetching ? (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                    Memuat data pendaftar...
+                  </div>
+                </td>
+              </tr>
+            ) : items?.length ? (
+              items.map((row, idx) => {
+                const style = getStatusStyle(row.status || row.ppdb_status);
+                return (
+                  <tr key={row.id || row.id_pendaftaran}>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{row.nama_lengkap}</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '50px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: style.bg,
+                        color: style.color,
+                        border: `1px solid ${style.border}`,
+                      }}>
+                        {statusLabel(row.status || row.ppdb_status)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="actions-cell">
+                        <Link 
+                          to={`${readOnly ? '/kepala-sekolah/data-ppdb' : '/admin/ppdb'}/${row.id || row.id_pendaftaran}`} 
+                          className="btn-icon" 
+                          title="Detail Pendaftar"
+                          style={{ background: 'var(--color-primary-soft)', borderColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '0.4rem 0.75rem', width: 'auto', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', textDecoration: 'none' }}
+                        >
+                          <Eye size={14} />
+                          Detail
+                        </Link>
+                        {!readOnly && statusLabel(row.status || row.ppdb_status) === 'Menunggu' && (
+                          <>
+                            <button type="button" onClick={() => terima(row.id || row.id_pendaftaran)} className="btn-icon" title="Terima" style={{ color: '#16a34a', borderColor: '#bbf7d0', background: '#f0fdf4' }}>
+                              <CheckCircle2 size={15} />
+                            </button>
+                            <button type="button" onClick={() => tolak(row.id || row.id_pendaftaran)} className="btn-icon delete" title="Tolak">
+                              <XCircle size={15} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '2rem' }}>📁</div>
+                    <p style={{ fontWeight: 600 }}>Belum ada data pendaftar</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+        Menampilkan {items.length || 0} dari {stats.total || items.length || 0} data
+      </div>
+    </>
   );
 }

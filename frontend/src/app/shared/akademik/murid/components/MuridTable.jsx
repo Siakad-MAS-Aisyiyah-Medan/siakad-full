@@ -1,144 +1,133 @@
-import { Trash2, ShieldCheck, UserSearch, Edit2, Eye } from 'lucide-react';
+import { Download, Pencil, Plus, Search, ShieldCheck, Trash2 } from 'lucide-react';
 
-const PPDB_LABELS = {
-  draft: 'Draft',
-  diajukan: 'Diajukan',
-  revisi: 'Revisi',
-  terverifikasi: 'Terverifikasi',
-  diterima: 'Diterima',
-  ditolak: 'Ditolak',
-  daftar_ulang: 'Daftar Ulang',
-  menjadi_murid: 'Menjadi Murid',
-};
-
-export default function MuridTable({ data, onPromote, onDelete, onEdit, isFetching = false, readOnly = false }) {
+export default function MuridTable({
+  data,
+  searchQuery,
+  onSearchChange,
+  onPromote,
+  onDelete,
+  onEdit,
+  isFetching = false,
+  readOnly = false,
+  onAdd,
+}) {
   return (
-    <div className="table-container glass mt-6">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[5%]">No</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[25%]">Nama Lengkap</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">NISN / NIS</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[15%]">Kelas</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Status</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right w-[15%]">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {isFetching ? (
-            <tr>
-              <td colSpan="8" className="py-16 text-secondary">
-                <div className="flex flex-col items-center justify-center w-full">
-                  <div style={{ display: 'inline-block', width: '2rem', height: '2rem', border: '3px solid #e2e8f0', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  <p className="mt-2 text-center">Memuat data murid...</p>
-                </div>
-                <style>
-                  {`
-                    @keyframes spin {
-                      to { transform: rotate(360deg); }
-                    }
-                  `}
-                </style>
-              </td>
-            </tr>
-          ) : data.length > 0 ? (
-            data.map((murid, index) => {
-              const nama =
-                murid.siswa?.nama_siswa || murid.pendaftaran?.nama_lengkap || '-';
-              const ppdbStatus = murid.pendaftaran?.ppdb_status;
-              const canPromote =
-                murid.role === 'calon_siswa' &&
-                ['diterima', 'daftar_ulang'].includes(ppdbStatus) &&
-                ppdbStatus !== 'menjadi_murid' &&
-                !murid.siswa;
+    <div className="admin-page-wrapper animate-fade-in">
+      {/* Panel Header */}
+      <div className="panel-header mb-4">
+        <div className="header-text">
+          <h2>Data Murid</h2>
+          <p>Kelola data siswa MAS Aisyiyah Medan</p>
+        </div>
+        <div className="header-actions">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+              placeholder="Cari data murid..."
+              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+            />
+          </div>
+          {readOnly ? (
+            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Plus size={16} />
+              Tambah Murid
+            </button>
+          )}
+        </div>
+      </div>
 
-              return (
-                <tr key={murid.id_user} className="hover:bg-slate-50/50 transition-colors group">
-                  <td className="px-6 py-4 text-sm text-slate-500">{index + 1}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-800">{nama}</span>
-                      <span className="text-xs text-slate-500 mt-0.5">{murid.email || '-'}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-slate-700">{murid.siswa?.nisn || '-'}</span>
-                      {murid.siswa?.nis && (
-                        <span className="text-xs text-slate-500 mt-0.5">NIS: {murid.siswa.nis}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-700">
-                    {murid.siswa?.kelas?.nama_kelas || '-'}
-                  </td>
-                  <td className="px-6 py-4">
-                    {murid.role === 'siswa' ? (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
-                        Siswa Aktif
+      {/* Table */}
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>No HP</th>
+              <th>Tahun Masuk</th>
+              <th>Tahun Lulus</th>
+              <th>Status</th>
+              {!readOnly ? <th style={{ textAlign: 'right' }}>Aksi</th> : null}
+            </tr>
+          </thead>
+          <tbody>
+            {isFetching ? (
+              <tr>
+                <td colSpan={readOnly ? 5 : 6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                    Memuat data murid...
+                  </div>
+                </td>
+              </tr>
+            ) : data.length > 0 ? (
+              data.map((murid, idx) => {
+                const isAktif = murid.status_aktif !== false;
+                return (
+                  <tr key={murid.id_user}>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                    <td>{murid.siswa?.no_hp || murid.pendaftaran?.no_hp || '-'}</td>
+                    <td>{murid.siswa?.tahun_masuk || murid.pendaftaran?.tahun_masuk || '-'}</td>
+                    <td>{murid.siswa?.tahun_lulus || '-'}</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '50px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: isAktif ? 'var(--color-primary-soft)' : '#fef2f2',
+                        color: isAktif ? 'var(--color-primary-dark)' : '#991b1b',
+                        border: `1px solid ${isAktif ? 'var(--color-primary-light)' : '#fecaca'}`,
+                      }}>
+                        {isAktif ? 'Aktif' : 'Nonaktif'}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">
-                        {ppdbStatus && !['diterima', 'daftar_ulang', 'menjadi_murid'].includes(ppdbStatus) 
-                          ? 'Belum Diverifikasi' 
-                          : 'Calon Siswa'}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {readOnly ? (
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid" onClick={() => onEdit && onEdit(murid)}>
-                          <Eye size={16} />
-                        </button>
-                      ) : (
-                        <>
-                          <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Detail Murid">
-                            <Eye size={16} />
+                    </td>
+                    {!readOnly ? (
+                      <td>
+                        <div className="actions-cell">
+                          <button type="button" onClick={() => onEdit && onEdit(murid)} className="btn-icon edit" title="Edit">
+                            <Pencil size={15} />
                           </button>
-                          <button 
-                            type="button"
-                            onClick={() => onEdit && onEdit(murid)}
-                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Data"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          {canPromote && (
-                            <button
-                              type="button"
-                              onClick={() => onPromote && onPromote(murid)}
-                              className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
-                              title="Jadikan Siswa Aktif"
-                            >
-                              <ShieldCheck size={16} />
+                          {onPromote && murid.role !== 'siswa' && (
+                            <button type="button" onClick={() => onPromote(murid)} className="btn-icon" title="Promosikan" style={{ background: 'var(--color-primary-soft)', borderColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                              <ShieldCheck size={15} />
                             </button>
                           )}
-                          <button
-                            type="button"
-                            onClick={() => onDelete && onDelete(murid.id_user)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Hapus Permanen"
-                          >
-                            <Trash2 size={16} />
+                          <button type="button" onClick={() => onDelete && onDelete(murid.id_user)} className="btn-icon delete" title="Hapus">
+                            <Trash2 size={15} />
                           </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center py-16 text-secondary">
-                <UserSearch size={48} className="mx-auto mb-2 opacity-50" />
-                Data murid tidak ditemukan.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+                        </div>
+                      </td>
+                    ) : null}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={readOnly ? 5 : 6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '2rem' }}>🎓</div>
+                    <p style={{ fontWeight: 600 }}>Data murid tidak ditemukan</p>
+                    <p style={{ fontSize: '0.875rem' }}>Tambah murid baru untuk memulai</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+        Menampilkan {data.length} data murid
+      </div>
     </div>
   );
 }

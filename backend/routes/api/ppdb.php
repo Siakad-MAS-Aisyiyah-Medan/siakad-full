@@ -23,7 +23,7 @@ Route::get('/ppdb/info', [PendaftaranController::class, 'publicInfo']);
 
 Route::middleware([
     'auth:sanctum',
-    'permission:manage_pendaftaran_pribadi,view_status_pendaftaran',
+    'permission:manage_pendaftaran_pribadi,manage_formulir_pendaftaran,manage_berkas_pendaftaran,submit_pendaftaran,view_status_pendaftaran',
 ])->prefix('ppdb')->group(function () {
     Route::get('/my-registration', [PendaftaranController::class, 'myRegistration']);
     Route::post('/start', [PendaftaranController::class, 'start']);
@@ -46,10 +46,13 @@ Route::middleware([
     Route::get('/bukti', [PendaftaranController::class, 'calonPpdbBukti']);
 });
 
-Route::middleware(['auth:sanctum', 'permission:manage_ppdb'])->prefix('admin/ppdb')->group(function () {
+Route::middleware(['auth:sanctum', 'permission:manage_ppdb,view_data_ppdb'])->prefix('admin/ppdb')->group(function () {
     Route::get('/stats', [PendaftaranController::class, 'adminPpdbStats']);
     Route::get('/', [PendaftaranController::class, 'adminPpdbIndex']);
     Route::get('/{id}', [PendaftaranController::class, 'adminPpdbShow']);
+});
+
+Route::middleware(['auth:sanctum', 'permission:manage_ppdb'])->prefix('admin/ppdb')->group(function () {
     Route::post('/{id}/verifikasi', [PendaftaranController::class, 'adminPpdbVerifikasi']);
     Route::post('/{id}/revisi', [PendaftaranController::class, 'adminPpdbRevisi']);
     Route::post('/{id}/terima', [PendaftaranController::class, 'adminPpdbTerima']);

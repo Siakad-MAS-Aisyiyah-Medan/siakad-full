@@ -26,7 +26,7 @@ class SiakadSeeder extends Seeder
         Admin::create([
             'id_user' => $adminUser->id_user,
             'nip' => '123456789',
-            'nama_admin' => 'Administrator Utama',
+            'nama_admin' => 'Administrator',
             'no_hp' => '081234567890',
         ]);
 

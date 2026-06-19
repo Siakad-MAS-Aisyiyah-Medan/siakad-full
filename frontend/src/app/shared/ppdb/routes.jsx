@@ -11,6 +11,7 @@ import RegisterCalonMurid from '@app/pages/calon-murid/register';
 import DashboardCalonMurid from '@app/pages/calon-murid/dashboard';
 import FormulirPpdbWizard from '@app/pages/calon-murid/formulir-ppdb-wizard';
 import UploadBerkas from '@app/pages/calon-murid/upload-berkas';
+import KirimPendaftaranPage from '@app/pages/calon-murid/kirim-pendaftaran';
 import StatusPendaftaran from '@app/pages/calon-murid/status';
 import PengumumanPpdb from '@app/pages/calon-murid/pengumuman';
 import AdminDaftarPendaftar from '@app/pages/admin/admin-daftar-pendaftar';
@@ -69,6 +70,14 @@ export const ppdbCalonRoutes = (
       element={
         <RoleRoute allowedRoles={['calon_siswa']} {...calonGuard}>
           <StatusPendaftaran />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/calon-murid/kirim-pendaftaran"
+      element={
+        <RoleRoute allowedRoles={['calon_siswa']} {...calonGuard}>
+          <KirimPendaftaranPage />
         </RoleRoute>
       }
     />

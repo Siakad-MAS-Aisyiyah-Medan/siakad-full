@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import StatusBadge from '../StatusBadge';
 import Card from '../portal/Card';
 import { PPDB_STEPS } from '../../config/ppdbWizardConfig';
@@ -9,11 +10,11 @@ function formatStepLabel(step) {
   return found?.label || step.replace(/-/g, ' ');
 }
 
-function InfoCell({ icon: Icon, label, children }) {
+function InfoCell({ icon, label, children }) {
   return (
     <div className="cm-info-cell">
       <div className="cm-info-cell__icon">
-        <Icon size={16} />
+        {createElement(icon, { size: 16 })}
       </div>
       <div className="cm-info-cell__body">
         <dt className="cm-info-cell__label">{label}</dt>

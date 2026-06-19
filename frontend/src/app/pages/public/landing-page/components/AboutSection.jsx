@@ -1,49 +1,36 @@
-import { MapPin, School, Users } from 'lucide-react';
-import SectionHeader from './SectionHeader';
+import { School, Quote } from 'lucide-react';
+import AppLogo from '@app/shared/components/AppLogo';
 
 export default function AboutSection() {
   return (
     <section id="profil" className="lp-section lp-section--soft">
       <div className="lp-container">
-        <SectionHeader
-          eyebrow="Tentang Kami"
-          title="Profil Madrasah Aliyah Aisyiyah Medan"
-          subtitle="Lembaga pendidikan Islam yang berkomitmen mencetak generasi cerdas, berkarakter, dan siap menghadapi tantangan masa depan."
-        />
+        <div className="lp-section-header">
+          <span className="lp-eyebrow">Tentang Kami</span>
+          <h2 className="lp-section-title">Profil Sekolah</h2>
+          <p className="lp-section-subtitle">
+            MAS Aisyiyah Medan berkomitmen untuk memberikan pendidikan berkualitas
+            berlandaskan nilai-nilai Islam dan berorientasi pada pengembangan potensi
+            peserta didik secara menyeluruh.
+          </p>
+        </div>
 
-        <div className="lp-about-grid lp-reveal">
-          <article className="lp-card lp-about-card">
-            <div className="lp-about-card__icon">
-              <School size={28} aria-hidden="true" />
-            </div>
-            <h3>Identitas Sekolah</h3>
-            <p>
-              MAS Aisyiyah Medan berdiri sejak 1985 di bawah naungan Aisyiyah, mengintegrasikan
-              kurikulum nasional dengan penguatan nilai keislaman, kedisiplinan, dan kepemimpinan.
-            </p>
-            <div className="lp-about-meta">
-              <span>
-                <MapPin size={16} aria-hidden="true" />
-                Jl. Pendidikan No. 12, Medan
-              </span>
-            </div>
-          </article>
-
-          <article className="lp-card lp-sambutan-card">
+        <div className="lp-about-grid" style={{ gridTemplateColumns: '1fr', maxWidth: '800px', margin: '0 auto' }}>
+          <div className="lp-card lp-sambutan-card">
             <div className="lp-sambutan-card__photo">
-              <Users size={72} strokeWidth={1.25} aria-hidden="true" />
+              <AppLogo size={80} />
               <span>Kepala Sekolah</span>
             </div>
-            <div className="lp-sambutan-card__body">
-              <h3>Kata Sambutan</h3>
+            <div>
+              <h3>Kata Sambutan Kepala Sekolah</h3>
               <blockquote>
-                &ldquo;Assalamu&apos;alaikum Warahmatullahi Wabarakatuh. Selamat datang di MAS
-                Aisyiyah Medan. Kami berkomitmen memberikan pendidikan terbaik yang menggabungkan
-                kurikulum nasional dengan nilai-nilai keislaman yang kuat.&rdquo;
+                Dengan semangat Islam dan kecintaan terhadap ilmu pengetahuan, kami terus berupaya
+                menciptakan lingkungan belajar yang kondusif dan menyenangkan bagi seluruh peserta didik.
+                Bersama-sama kita wujudkan generasi unggul yang berakhlak mulia.
               </blockquote>
-              <cite>Dr. H. Budi Santoso, M.Pd.</cite>
+              <cite>Kepala MAS Aisyiyah Medan</cite>
             </div>
-          </article>
+          </div>
         </div>
       </div>
     </section>

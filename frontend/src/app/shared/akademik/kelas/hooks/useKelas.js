@@ -3,7 +3,16 @@ import { fetchKelasList, fetchKelasStats, createKelas, updateKelas, deleteKelas 
 import { fetchGuruList } from '@app/shared/akademik/guru/services/guru.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
-const emptyForm = { nama_kelas: '', tingkat: '', jurusan: '', id_wali_kelas: '', kapasitas_maksimal: 36, ruangan: '' };
+const emptyForm = {
+  tahun_ajaran: '',
+  nama_kelas: '',
+  tingkat: '',
+  jurusan: '',
+  id_wali_kelas: '',
+  status: 'aktif',
+  kapasitas_maksimal: 36,
+  ruangan: '',
+};
 
 export function useKelas() {
   const [view, setView] = useState('list');
@@ -59,9 +68,11 @@ export function useKelas() {
     setCurrentId(kelas.id_kelas);
     setFormData({
       nama_kelas: kelas.nama_kelas,
+      tahun_ajaran: kelas.tahun_ajaran || '',
       tingkat: kelas.tingkat || '',
       jurusan: kelas.jurusan || '',
       id_wali_kelas: kelas.id_wali_kelas || '',
+      status: kelas.status || 'aktif',
       kapasitas_maksimal: kelas.kapasitas_maksimal || 36,
       ruangan: kelas.ruangan || '',
     });
@@ -82,8 +93,10 @@ export function useKelas() {
     setLoading(true);
     const payload = {
       nama_kelas: formData.nama_kelas,
+      tahun_ajaran: formData.tahun_ajaran || null,
       tingkat: formData.tingkat,
       jurusan: formData.jurusan,
+      status: formData.status || 'aktif',
       kapasitas_maksimal: Number(formData.kapasitas_maksimal) || 36,
       ruangan: formData.ruangan || null,
       id_wali_kelas: formData.id_wali_kelas ? Number(formData.id_wali_kelas) : null,

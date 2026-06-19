@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pengaturan;
+use App\Models\SystemSetting;
 use App\Models\TahunAjaran;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
@@ -39,6 +39,16 @@ class TahunAjaranController extends Controller
         $tahunAjaran = TahunAjaran::create($validator->validated());
 
         return ApiResponse::success($tahunAjaran, 'Tahun ajaran berhasil ditambahkan', 201);
+    }
+
+    public function show($id)
+    {
+        $tahunAjaran = TahunAjaran::find($id);
+        if (!$tahunAjaran) {
+            return ApiResponse::error('Tahun ajaran tidak ditemukan', 404);
+        }
+
+        return ApiResponse::success($tahunAjaran, 'Data tahun ajaran berhasil diambil');
     }
 
     public function update(Request $request, $id)
@@ -102,13 +112,13 @@ class TahunAjaranController extends Controller
 
     private function updatePengaturanAktif($tahun_ajaran, $semester)
     {
-        Pengaturan::updateOrCreate(
+        SystemSetting::updateOrCreate(
             ['group' => 'akademik', 'key' => 'tahun_ajaran_aktif'],
-            ['value' => $tahun_ajaran, 'type' => 'string']
+            ['value' => $tahun_ajaran, 'type' => 'string', 'label' => 'Tahun Ajaran Aktif']
         );
-        Pengaturan::updateOrCreate(
+        SystemSetting::updateOrCreate(
             ['group' => 'akademik', 'key' => 'semester_aktif'],
-            ['value' => $semester, 'type' => 'string']
+            ['value' => $semester, 'type' => 'string', 'label' => 'Semester Aktif']
         );
     }
 }

@@ -39,9 +39,12 @@ class KelasController extends Controller
             'tingkat' => 'required|in:X,XI,XII',
             'jurusan' => 'required|in:IPA,IPS',
             'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser()],
+            'tahun_ajaran' => 'nullable|string|max:20',
+            'status' => 'nullable|in:aktif,nonaktif,Aktif,Nonaktif',
             'kapasitas_maksimal' => 'required|integer|min:1|max:100',
             'ruangan' => 'nullable|string|max:100',
         ]);
+        $validated['status'] = strtolower($validated['status'] ?? 'aktif');
 
         $kelas = $this->create($validated);
 
@@ -55,9 +58,14 @@ class KelasController extends Controller
             'tingkat' => 'required|in:X,XI,XII',
             'jurusan' => 'required|in:IPA,IPS',
             'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser()],
+            'tahun_ajaran' => 'nullable|string|max:20',
+            'status' => 'nullable|in:aktif,nonaktif,Aktif,Nonaktif',
             'kapasitas_maksimal' => 'required|integer|min:1|max:100',
             'ruangan' => 'nullable|string|max:100',
         ]);
+        if (array_key_exists('status', $validated)) {
+            $validated['status'] = strtolower($validated['status'] ?? 'aktif');
+        }
 
         $kelas = $this->processUpdate((int) $id, $validated);
 

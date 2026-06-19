@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Save, Plus, Edit2, Trash2 } from 'lucide-react';
 import MainLayout from '@app/shared/layouts/MainLayout';
 import { getStoredUser, getStoredProfile } from '@app/shared/services/auth.service';
@@ -28,13 +28,10 @@ export default function GuruAbsensiPage() {
     reset,
   } = useGuruAbsensi();
 
-  const [daftarList, setDaftarList] = useState([]);
+  const [daftarList, setDaftarList] = useState(() =>
+    JSON.parse(localStorage.getItem('mock_daftar_absensi') || '[]')
+  );
   const [showAddModal, setShowAddModal] = useState(false);
-
-  useEffect(() => {
-    const storedDaftar = JSON.parse(localStorage.getItem('mock_daftar_absensi') || '[]');
-    setDaftarList(storedDaftar);
-  }, [step]);
 
   const handleAddDaftar = async (e) => {
     e.preventDefault();

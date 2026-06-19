@@ -2,8 +2,6 @@ import AdminPageShell from '@app/shared/components/AdminPageShell';
 import GuruTable from '@app/shared/akademik/guru/components/GuruTable';
 import GuruForm from '@app/shared/akademik/guru/components/GuruForm';
 import { useGuru } from '@app/shared/akademik/guru/hooks/useGuru';
-import { useState } from 'react';
-import AbsensiGuruView from './AbsensiGuruView';
 
 export default function GuruPage({ readOnly = false }) {
   const {

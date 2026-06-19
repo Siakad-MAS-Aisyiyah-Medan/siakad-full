@@ -1,41 +1,72 @@
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { Sparkles, BookOpen, Users, Award } from 'lucide-react';
 import AppLogo from '@app/shared/components/AppLogo';
 import { SCHOOL_NAME } from '../data/landingData';
 
 export default function HeroSection({ onPendaftaranClick, onLearnMore }) {
   return (
-    <section id="home" className="lp-hero">
-      <div className="lp-hero__bg" aria-hidden="true">
+    <section className="lp-hero" id="home">
+      <div className="lp-hero__bg">
         <div className="lp-hero__grid" />
       </div>
 
       <div className="lp-container lp-hero__grid-layout">
-        <div className="lp-hero__content lp-reveal">
+        <div>
+          <div className="lp-badge">
+            <Sparkles size={14} />
+            <span>Penerimaan Murid Baru 2026/2027</span>
+          </div>
 
-          <h1 className="lp-hero__title">{SCHOOL_NAME}</h1>
+          <h1 className="lp-hero__title">
+            {SCHOOL_NAME}
+          </h1>
+
           <p className="lp-hero__subtitle">
             Membentuk generasi islami yang unggul dalam IPTEK dan berakhlakul karimah
             melalui pendidikan bermutu dan lingkungan yang religius.
           </p>
+
           <div className="lp-hero__actions">
             <button
               type="button"
-              className="lp-btn lp-btn--primary lp-btn--lg"
               onClick={onPendaftaranClick}
+              className="lp-btn lp-btn--primary lp-btn--lg"
             >
               Informasi Pendaftaran
-              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={onLearnMore}
+              className="lp-btn lp-btn--outline lp-btn--lg"
+            >
+              Profil Sekolah
             </button>
           </div>
 
+          <ul className="lp-hero__highlights">
+            <li><BookOpen size={14} style={{ marginRight: '0.25rem', display: 'inline' }} /> Kurikulum Merdeka</li>
+            <li><Users size={14} style={{ marginRight: '0.25rem', display: 'inline' }} /> Guru Berkualitas</li>
+            <li><Award size={14} style={{ marginRight: '0.25rem', display: 'inline' }} /> Terakreditasi</li>
+          </ul>
         </div>
 
-        <div className="lp-hero__visual lp-reveal lp-reveal--delay">
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-            <AppLogo size={320} style={{ filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.1))', opacity: 0.9 }} />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ 
+            padding: '3rem', 
+            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
+            borderRadius: '50%',
+            animation: 'float 6s ease-in-out infinite'
+          }}>
+            <AppLogo size={320} style={{ filter: 'drop-shadow(0 20px 40px rgba(16, 185, 129, 0.15))' }} />
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+          100% { transform: translateY(0px); }
+        }
+      `}</style>
     </section>
   );
 }

@@ -3,10 +3,9 @@
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\NilaiController;
-use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum', 'permission:view_jadwal_mengajar'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:view_dashboard_guru,view_murid_diajar,view_kelas_diajar,view_mapel_diampu'])->group(function () {
     Route::get('/guru/jadwal', [JadwalController::class, 'adminIndex']);
 });
 
@@ -19,14 +18,4 @@ Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa'])->group(fu
 Route::middleware(['auth:sanctum', 'permission:manage_nilai_siswa'])->group(function () {
     Route::get('/guru/nilai/form', [NilaiController::class, 'guruFormData']);
     Route::post('/guru/nilai/bulk', [NilaiController::class, 'guruBulkStore']);
-});
-
-Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa,manage_nilai_siswa'])->group(function () {
-    Route::get('/guru/laporan', [LaporanController::class, 'index']);
-});
-
-Route::middleware(['auth:sanctum', 'permission:view_dashboard_guru'])->group(function () {
-    Route::post('/guru/absensi/self/check-in', [AbsensiController::class, 'guruCheckIn']);
-    Route::post('/guru/absensi/self/check-out', [AbsensiController::class, 'guruCheckOut']);
-    Route::get('/guru/absensi/self/riwayat', [AbsensiController::class, 'guruRiwayatGuru']);
 });

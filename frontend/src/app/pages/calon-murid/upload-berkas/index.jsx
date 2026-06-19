@@ -83,7 +83,7 @@ export default function UploadBerkas() {
         await deleteBerkas(jenisKey);
         await loadData();
         Swal.fire('Terhapus', 'Berkas berhasil dihapus', 'success');
-      } catch (err) {
+      } catch {
         Swal.fire('Gagal', 'Gagal menghapus berkas', 'error');
       } finally {
         setUploading(null);

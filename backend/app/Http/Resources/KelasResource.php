@@ -16,6 +16,8 @@ class KelasResource extends JsonResource
             'jurusan' => $this->jurusan,
             'kapasitas_maksimal' => $this->kapasitas_maksimal,
             'ruangan' => $this->ruangan,
+            'tahun_ajaran' => $this->tahun_ajaran,
+            'status' => $this->status,
             'id_wali_kelas' => $this->id_wali_kelas,
             'wali_kelas' => $this->whenLoaded('waliKelas', fn () => [
                 'id_user' => $this->waliKelas?->id_user,

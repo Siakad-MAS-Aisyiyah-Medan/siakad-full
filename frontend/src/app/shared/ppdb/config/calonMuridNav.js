@@ -2,7 +2,8 @@
 export const CALON_MURID_NAV = [
   { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/calon-murid/dashboard', end: true },
   { iconKey: 'FileText', label: 'Formulir Pendaftaran', path: '/ppdb/registrasi' },
-  { iconKey: 'Upload', label: 'Upload Berkas', path: '/calon-murid/upload-berkas' },
+  { iconKey: 'Folder', label: 'Berkas Pendaftaran', path: '/calon-murid/upload-berkas' },
+  { iconKey: 'Send', label: 'Kirim Pendaftaran', path: '/calon-murid/kirim-pendaftaran' },
   { iconKey: 'ClipboardList', label: 'Status Pendaftaran', path: '/calon-murid/status' },
 ];
 

@@ -1,206 +1,191 @@
-import { Search, Plus, Edit2, Trash2, Megaphone, Users, Lock, FileText } from 'lucide-react';
+import { CalendarDays, Eye, Megaphone, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
-export default function PengumumanTable({
-  items = [],
-  filteredData,
-  searchQuery,
-  onSearchChange,
-  filterAkses,
-  setFilterAkses,
-  onAdd,
-  onEdit,
-  onDelete,
-  isFetching = false,
-  readOnly = false,
-}) {
-  const totalPengumuman = items.length;
-  const pengumumanUmum = items.filter((p) => p.akses === 'umum').length;
-  const pengumumanInternal = items.filter((p) => p.akses === 'internal').length;
-
+function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd, onEdit, onDelete, isFetching }) {
   return (
-    <div className="flex flex-col gap-6">
-      {/* HEADER RINGKAS */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-800">Pengumuman Sekolah</h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">Kelola informasi penting untuk ekosistem sekolah.</p>
+    <div className="admin-page-wrapper animate-fade-in">
+      {/* Panel Header */}
+      <div className="panel-header mb-4">
+        <div className="header-text">
+          <h2>Pengumuman Sekolah</h2>
+          <p>Kelola pengumuman untuk civitas MAS Aisyiyah Medan</p>
         </div>
-        {!readOnly && (
-          <button type="button" onClick={onAdd} className="btn-primary w-full md:w-auto justify-center py-2.5 px-6 rounded-xl font-bold flex items-center gap-2 shadow-sm shadow-primary/30 hover:shadow-primary/50 transition-all">
-            <Plus size={18} strokeWidth={2.5} /> Tambah Pengumuman
-          </button>
-        )}
-      </div>
-
-      {/* STATISTIK */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
-          <div className="w-14 h-14 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center">
-            <Megaphone size={26} />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Pengumuman</p>
-            <h3 className="text-3xl font-extrabold text-slate-800 mt-0.5">{totalPengumuman}</h3>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
-          <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-            <Users size={26} />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Pengumuman Umum</p>
-            <h3 className="text-3xl font-extrabold text-slate-800 mt-0.5">{pengumumanUmum}</h3>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
-          <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-            <Lock size={26} />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Pengumuman Internal</p>
-            <h3 className="text-3xl font-extrabold text-slate-800 mt-0.5">{pengumumanInternal}</h3>
-          </div>
-        </div>
-      </div>
-
-      {/* FILTER & TABEL */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-        {/* Toolbar */}
-        <div className="border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white min-h-[76px] px-4 md:px-8 py-4 md:py-0">
-          
-          {/* Tabs */}
-          <div className="flex items-center gap-2 h-full py-4 overflow-x-auto w-full md:w-auto hide-scrollbar">
-            {['semua', 'umum', 'internal'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilterAkses(tab)}
-                className={`flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-bold capitalize transition-all ${
-                  filterAkses === tab
-                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 border border-slate-200'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Search */}
-          <div className="flex items-center bg-white border border-slate-200 hover:border-emerald-300 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.03)] rounded-xl px-4 h-12 focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500 transition-all w-full md:w-[340px] mt-2 md:mt-0 mr-0 group shrink-0">
-            <Search className="text-slate-400 group-focus-within:text-emerald-500 mr-3 shrink-0 transition-colors" size={18} strokeWidth={2.5} />
+        <div className="header-actions">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
             <input
               type="text"
               placeholder="Cari pengumuman..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="bg-transparent border-none outline-none w-full text-[14px] font-medium text-slate-700 placeholder:text-slate-400"
+              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
             />
           </div>
+          {onAdd && (
+            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Plus size={16} />
+              Tambah Pengumuman
+            </button>
+          )}
         </div>
+      </div>
 
-        <div className="overflow-x-auto p-1">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            {filteredData.length > 0 && !isFetching && (
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] uppercase tracking-widest text-slate-500">
-                  <th className="py-4 font-bold w-[35%]" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Judul Pengumuman</th>
-                  <th className="py-4 font-bold w-[15%] whitespace-nowrap" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Tanggal</th>
-                  <th className="py-4 font-bold w-[15%]" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Akses</th>
-                  <th className="py-4 font-bold w-[25%]" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Cuplikan</th>
-                  <th className="py-4 font-bold text-right w-[10%]" style={{ paddingLeft: '32px', paddingRight: '32px' }}>Aksi</th>
+      {/* Table */}
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Judul Pengumuman</th>
+              <th>Tanggal Publikasi</th>
+              <th>Akses</th>
+              <th style={{ textAlign: 'right' }}>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isFetching ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                    Memuat pengumuman...
+                  </div>
+                </td>
+              </tr>
+            ) : filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
+                <tr key={item.id}>
+                  <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{index + 1}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{item.judul}</td>
+                  <td>{item.tanggal_publikasi || '-'}</td>
+                  <td>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '50px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      background: item.akses === 'semua' ? 'var(--color-primary-soft)' : '#eff6ff',
+                      color: item.akses === 'semua' ? 'var(--color-primary-dark)' : '#1d4ed8',
+                      border: `1px solid ${item.akses === 'semua' ? 'var(--color-primary-light)' : '#bfdbfe'}`,
+                      textTransform: 'capitalize',
+                    }}>
+                      {item.akses || 'umum'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="actions-cell">
+                      <button type="button" className="btn-icon" title="Lihat Isi" style={{ background: 'var(--color-primary-soft)', borderColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                        <Eye size={15} />
+                      </button>
+                      <button type="button" onClick={() => onEdit?.(item)} className="btn-icon edit" title="Edit">
+                        <Pencil size={15} />
+                      </button>
+                      <button type="button" onClick={() => onDelete?.(item.id)} className="btn-icon delete" title="Hapus">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '2rem' }}>📢</div>
+                    <p style={{ fontWeight: 600 }}>Belum ada pengumuman</p>
+                    <p style={{ fontSize: '0.875rem' }}>Tambah pengumuman baru untuk memulai</p>
+                  </div>
+                </td>
+              </tr>
             )}
-            <tbody className="divide-y divide-slate-100">
-              {isFetching ? (
-                <tr>
-                  <td colSpan="5" className="p-0">
-                    <div className="py-20 flex flex-col items-center justify-center w-full">
-                      <div className="w-10 h-10 border-4 border-slate-100 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                      <p className="text-slate-500 font-medium text-center">Memuat data pengumuman...</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredData.length > 0 ? (
-                filteredData.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <p className="font-bold text-slate-800 text-[15px] flex items-center gap-2">
-                        {item.thumbnail ? (
-                          <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
-                            <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
-                          </div>
-                        ) : (
-                          <Megaphone size={16} className="text-slate-400 shrink-0" />
-                        )}
-                        <span className="truncate max-w-xs md:max-w-sm">{item.judul}</span>
-                      </p>
-                      <p className="text-xs font-medium text-slate-500 mt-1.5 flex items-center gap-2 ml-10">
-                        Oleh: <span className="text-slate-700 font-semibold">{item.penulis?.name || 'Admin System'}</span>
-                        {item.kategori && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                            <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold tracking-wide uppercase" style={{ fontSize: '10px' }}>{item.kategori}</span>
-                          </>
-                        )}
-                      </p>
-                    </td>
-                    <td className="py-5 text-sm font-semibold text-slate-600" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      {item.tanggal_publikasi || '-'}
-                    </td>
-                    <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${
-                        item.akses === 'umum' 
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
-                          : 'bg-blue-50 text-blue-600 border border-blue-100'
-                      }`}>
-                        {item.akses === 'umum' ? <Users size={12} strokeWidth={2.5} /> : <Lock size={12} strokeWidth={2.5} />}
-                        {item.akses}
-                      </span>
-                    </td>
-                    <td className="py-5 text-sm font-medium text-slate-500 max-w-[200px] truncate" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      {item.isi}
-                    </td>
-                    <td className="py-5 text-right" style={{ paddingLeft: '32px', paddingRight: '32px' }}>
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => onEdit && onEdit(item)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title={readOnly ? "Detail" : "Edit"}>
-                          {readOnly ? <Search size={18} /> : <Edit2 size={18} />}
-                        </button>
-                        {!readOnly && (
-                          <button onClick={() => onDelete && onDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Hapus">
-                            <Trash2 size={18} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="p-0">
-                    <div className="flex flex-col items-center justify-center text-center" style={{ paddingTop: '80px', paddingBottom: '80px', paddingLeft: '24px', paddingRight: '24px' }}>
-                      <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6 ring-8 ring-emerald-50/50">
-                        <Megaphone className="w-10 h-10 text-emerald-600" />
-                      </div>
-                      <h3 className="text-xl font-extrabold text-slate-800 mb-2">
-                          {filterAkses !== 'semua' ? `Belum ada pengumuman ${filterAkses}` : 'Belum ada pengumuman'}
-                      </h3>
-                      <p className="text-slate-500 mb-8 max-w-sm mx-auto text-sm leading-relaxed">
-                          Mulai bagikan informasi, agenda, atau pemberitahuan penting pertama ke seluruh ekosistem sekolah.
-                      </p>
-                      {!readOnly && (
-                        <button type="button" onClick={onAdd} className="btn-primary py-2.5 px-6 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all" style={{ marginBottom: '10px' }}>
-                          <Plus size={18} strokeWidth={2.5} /> Buat Pengumuman
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+        Menampilkan {filteredData.length} pengumuman
       </div>
     </div>
   );
+}
+
+function ReadOnlyPengumumanCards({ filteredData, searchQuery, onSearchChange, isFetching }) {
+  return (
+    <div className="admin-page-wrapper animate-fade-in">
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-primary-dark)', marginBottom: '0.5rem' }}>
+          📢 Pengumuman Sekolah
+        </h2>
+        <p style={{ color: 'var(--color-text-muted)' }}>Informasi terbaru dari MAS Aisyiyah Medan</p>
+      </div>
+
+      {/* Search */}
+      <div style={{ position: 'relative', marginBottom: '1.5rem', maxWidth: '480px', margin: '0 auto 1.5rem' }}>
+        <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+        <input
+          type="text"
+          placeholder="Cari pengumuman..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          style={{ paddingLeft: '2.5rem', height: '42px', border: '1.5px solid var(--color-border)', borderRadius: '10px', fontSize: '0.9rem', outline: 'none', width: '100%', background: '#fff', color: 'var(--color-text-dark)' }}
+        />
+      </div>
+
+      {/* Cards */}
+      {isFetching ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>Memuat pengumuman...</div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+          {filteredData.length > 0 ? (
+            filteredData.slice(0, 8).map((item) => (
+              <article key={item.id} style={{
+                background: '#fff',
+                border: '1px solid var(--color-border)',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                transition: 'all 0.2s ease',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
+              >
+                {/* Thumbnail */}
+                <div style={{ height: '160px', background: 'var(--color-primary-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  {item.thumbnail ? (
+                    <img src={item.thumbnail} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <Megaphone size={40} style={{ color: 'var(--color-primary)', opacity: 0.5 }} />
+                  )}
+                </div>
+                {/* Body */}
+                <div style={{ padding: '1rem' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '0.5rem', lineClamp: 2 }}>{item.judul}</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.isi}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
+                    <CalendarDays size={13} />
+                    {item.tanggal_publikasi || '-'}
+                  </div>
+                  <button type="button" className="btn-outline" style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
+                    Baca Selengkapnya →
+                  </button>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '16px' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📢</div>
+              <p style={{ fontWeight: 600 }}>Belum ada pengumuman</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function PengumumanTable(props) {
+  if (props.readOnly) {
+    return <ReadOnlyPengumumanCards {...props} />;
+  }
+  return <AdminPengumumanTable {...props} />;
 }

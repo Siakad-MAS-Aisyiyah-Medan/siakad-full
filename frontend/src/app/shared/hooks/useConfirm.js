@@ -1,21 +1,43 @@
 import Swal from 'sweetalert2';
 
+function buildMessageHtml(text) {
+  if (!text) return '';
+  return `<p class="siakad-alert-message">"${text}"</p>`;
+}
+
+function getBaseOptions() {
+  return {
+    customClass: {
+      container: 'siakad-alert-container',
+      popup: 'siakad-alert-popup',
+      icon: 'siakad-alert-icon',
+      title: 'siakad-alert-title',
+      htmlContainer: 'siakad-alert-html',
+      actions: 'siakad-alert-actions',
+      confirmButton: 'siakad-alert-btn siakad-alert-btn--primary',
+      cancelButton: 'siakad-alert-btn siakad-alert-btn--secondary',
+      input: 'siakad-alert-input',
+      inputLabel: 'siakad-alert-input-label',
+      validationMessage: 'siakad-alert-validation-message',
+    },
+    buttonsStyling: false,
+    backdrop: 'rgba(148, 148, 148, 0.72)',
+  };
+}
+
 export async function confirmAction({
   title,
   text,
   icon = 'warning',
   confirmText = 'Ya',
-  cancelText = 'Batal',
-  confirmColor = '#198754',
-  cancelColor = '#6c757d',
+  cancelText = 'Batal'
 }) {
   const result = await Swal.fire({
+    ...getBaseOptions(),
     title,
-    text,
+    html: buildMessageHtml(text),
     icon,
     showCancelButton: true,
-    confirmButtonColor: confirmColor,
-    cancelButtonColor: cancelColor,
     confirmButtonText: confirmText,
     cancelButtonText: cancelText,
   });
@@ -23,9 +45,44 @@ export async function confirmAction({
 }
 
 export function toastSuccess(title, text) {
-  return Swal.fire({ icon: 'success', title, text, timer: 1500, showConfirmButton: false });
+  return Swal.fire({
+    ...getBaseOptions(),
+    icon: 'success',
+    title,
+    html: buildMessageHtml(text),
+    confirmButtonText: 'OK',
+  });
 }
 
 export function toastError(title, text) {
-  return Swal.fire({ icon: 'error', title, text });
+  return Swal.fire({
+    ...getBaseOptions(),
+    icon: 'error',
+    title,
+    html: buildMessageHtml(text),
+    confirmButtonText: 'OK',
+  });
+}
+
+export function toastValidation(title, text) {
+  return Swal.fire({
+    ...getBaseOptions(),
+    icon: 'warning',
+    title,
+    html: buildMessageHtml(text),
+    confirmButtonText: 'OK',
+  });
+}
+
+export function showLoadingAlert(title = 'Memproses...') {
+  return Swal.fire({
+    ...getBaseOptions(),
+    title,
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+}
+
+export function closeAlert() {
+  Swal.close();
 }

@@ -1,310 +1,138 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
-import { User as UserIcon, Save, Check, X, Loader2, MapPin, Phone, Hash, Calendar, Heart, ShieldCheck } from 'lucide-react';
+import { Edit3, Loader2, UserCircle2, MapPin, Phone, CalendarDays, IdCard, ShieldCheck } from 'lucide-react';
 import { fetchMe } from '@app/shared/services/auth.service';
-import { updateBiodataProfile, uploadFotoProfil, deleteFotoProfil } from '@app/shared/services/akun.service';
-import { Camera, Trash2 } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { toastError } from '@app/shared/hooks/useConfirm';
 
-export default function ProfilBiodataPage() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [userRole, setUserRole] = useState(null);
-  const [fotoUrl, setFotoUrl] = useState(null);
-  const [uploadingFoto, setUploadingFoto] = useState(false);
-
-  const [form, setForm] = useState({});
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchMe();
-      if (data && data.user) {
-        setUserRole(data.user.role);
-        // data.profile contains the biodata specific to the role
-        setForm(data.profile || {});
-        if (data.profile?.foto) {
-          setFotoUrl(data.profile.foto.startsWith('http') ? data.profile.foto : `http://localhost:8000${data.profile.foto}`);
-        } else {
-          setFotoUrl(null);
-        }
-      }
-    } catch (err) {
-      Swal.fire('Error', 'Gagal memuat data profil', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await updateBiodataProfile(form);
-      Swal.fire({
-        icon: 'success',
-        title: 'Sukses',
-        text: 'Data berhasil disimpan',
-        confirmButtonColor: '#10b981'
-      });
-      setIsEditing(false);
-      loadData();
-    } catch (err) {
-      Swal.fire('Error', err?.response?.data?.message || err.message || 'Gagal menyimpan profil', 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleFotoUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-      Swal.fire('Format tidak didukung', 'Harap unggah gambar JPG atau PNG', 'warning');
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      Swal.fire('Ukuran terlalu besar', 'Maksimal ukuran foto adalah 2MB', 'warning');
-      return;
-    }
-
-    setUploadingFoto(true);
-    try {
-      const res = await uploadFotoProfil(file);
-      Swal.fire('Sukses', 'Foto profil berhasil diperbarui', 'success');
-      loadData();
-    } catch (err) {
-      Swal.fire('Gagal', err.response?.data?.message || 'Gagal mengunggah foto', 'error');
-    } finally {
-      setUploadingFoto(false);
-    }
-  };
-
-  const handleDeleteFoto = async () => {
-    const result = await Swal.fire({
-      title: 'Hapus Foto Profil?',
-      text: 'Foto profil akan dihapus secara permanen',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonText: 'Batal',
-      confirmButtonText: 'Ya, Hapus'
-    });
-
-    if (result.isConfirmed) {
-      setUploadingFoto(true);
-      try {
-        await deleteFotoProfil();
-        Swal.fire('Sukses', 'Foto profil berhasil dihapus', 'success');
-        setFotoUrl(null);
-        loadData();
-      } catch (err) {
-        Swal.fire('Gagal', 'Gagal menghapus foto profil', 'error');
-      } finally {
-        setUploadingFoto(false);
-      }
-    }
-  };
-
-  const renderFields = () => {
-    if (!userRole) return null;
-
-    if (userRole === 'guru') {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field name="nip_nuptk" label="NIP / NUPTK" value={form.nip_nuptk} icon={Hash} disabled={!isEditing} />
-          <Field name="nama_guru" label="Nama Lengkap" value={form.nama_guru} icon={UserIcon} disabled={!isEditing} required />
-          <Field name="jenis_kelamin" label="Jenis Kelamin" type="select" options={[{label:'Laki-laki', value:'L'}, {label:'Perempuan', value:'P'}]} value={form.jenis_kelamin} icon={Heart} disabled={!isEditing} />
-          <Field name="agama" label="Agama" value={form.agama} icon={Heart} disabled={!isEditing} />
-          <Field name="no_hp" label="Nomor HP" value={form.no_hp} icon={Phone} disabled={!isEditing} />
-          <Field name="alamat" label="Alamat" value={form.alamat} icon={MapPin} disabled={!isEditing} isTextArea />
-        </div>
-      );
-    }
-
-    if (userRole === 'siswa') {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field name="nisn" label="NISN" value={form.nisn} icon={Hash} disabled={!isEditing} />
-          <Field name="nis" label="NIS" value={form.nis} icon={Hash} disabled={!isEditing} />
-          <Field name="nama_siswa" label="Nama Lengkap" value={form.nama_siswa} icon={UserIcon} disabled={!isEditing} required />
-          <Field name="tempat_lahir" label="Tempat Lahir" value={form.tempat_lahir} icon={MapPin} disabled={!isEditing} />
-          <Field name="tgl_lahir" label="Tanggal Lahir" type="date" value={form.tgl_lahir ? form.tgl_lahir.split('T')[0] : ''} icon={Calendar} disabled={!isEditing} />
-          <Field name="jenis_kelamin" label="Jenis Kelamin" type="select" options={[{label:'Laki-laki', value:'L'}, {label:'Perempuan', value:'P'}]} value={form.jenis_kelamin} icon={Heart} disabled={!isEditing} />
-          <Field name="agama" label="Agama" value={form.agama} icon={Heart} disabled={!isEditing} />
-          <Field name="no_hp_wali" label="Nomor HP Wali" value={form.no_hp_wali} icon={Phone} disabled={!isEditing} />
-          <Field name="nama_wali" label="Nama Wali" value={form.nama_wali} icon={UserIcon} disabled={!isEditing} />
-          <Field name="alamat" label="Alamat" value={form.alamat} icon={MapPin} disabled={!isEditing} isTextArea />
-        </div>
-      );
-    }
-
-    if (userRole === 'kepsek' || userRole === 'admin') {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field name="nip" label="NIP" value={form.nip} icon={Hash} disabled={!isEditing} />
-          <Field name="nama_lengkap" label="Nama Lengkap" value={form.nama_lengkap} icon={UserIcon} disabled={!isEditing} required />
-          {userRole === 'kepsek' && (
-            <>
-              <Field name="jenis_kelamin" label="Jenis Kelamin" type="select" options={[{label:'Laki-laki', value:'L'}, {label:'Perempuan', value:'P'}]} value={form.jenis_kelamin} icon={Heart} disabled={!isEditing} />
-              <Field name="alamat" label="Alamat" value={form.alamat} icon={MapPin} disabled={!isEditing} isTextArea />
-            </>
-          )}
-          <Field name="no_hp" label="Nomor HP" value={form.no_hp} icon={Phone} disabled={!isEditing} />
-        </div>
-      );
-    }
-    
-    return <div className="text-slate-500 italic">Profil tidak tersedia untuk role ini.</div>;
-  };
-
-  const Field = ({ name, label, value, icon: Icon, disabled, type = 'text', options, isTextArea, required }) => (
-    <div className={isTextArea ? "md:col-span-2" : ""}>
-      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-        {Icon && <Icon size={12} className="text-emerald-500"/>} {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {type === 'select' ? (
-        <select
-          name={name}
-          value={value || ''}
-          onChange={handleChange}
-          disabled={disabled}
-          className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
-        >
-          <option value="">Pilih {label}</option>
-          {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-      ) : isTextArea ? (
-        <textarea
-          name={name}
-          value={value || ''}
-          onChange={handleChange}
-          disabled={disabled}
-          rows="3"
-          className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
-        ></textarea>
-      ) : (
-        <input
-          type={type}
-          name={name}
-          value={value || ''}
-          onChange={handleChange}
-          disabled={disabled}
-          className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/50 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-100"
-        />
-      )}
+function InfoCard({ label, value, icon: Icon }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.25rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#fff', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+        <Icon size={22} />
+      </div>
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', margin: 0, marginBottom: '0.25rem' }}>{label}</p>
+        <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0, wordBreak: 'break-word', lineHeight: 1.4 }}>{value || '-'}</p>
+      </div>
     </div>
   );
+}
+
+export default function ProfilBiodataPage() {
+  const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState('');
+  const [profile, setProfile] = useState({});
+
+  useEffect(() => {
+    fetchMe()
+      .then((data) => {
+        setRole(data?.user?.role || '');
+        setProfile(data?.profile || {});
+      })
+      .catch(() => toastError('Gagal', 'Gagal memuat data profil'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const display = useMemo(() => {
+    if (role === 'siswa') {
+      return {
+        nama: profile.nama_siswa,
+        nomor: profile.nisn,
+        nomorLabel: 'NISN',
+        alamat: profile.alamat,
+        noHp: profile.no_hp || profile.no_hp_wali,
+        tanggalLahir: profile.tgl_lahir || profile.tanggal_lahir,
+        kelas: profile.kelas?.nama_kelas || profile.nama_kelas || 'X IPA 1',
+      };
+    }
+
+    if (role === 'guru') {
+      return {
+        nama: profile.nama_guru,
+        nomor: profile.nip_nuptk,
+        nomorLabel: 'NIP',
+        alamat: profile.alamat,
+        noHp: profile.no_hp,
+        tanggalLahir: profile.tanggal_lahir || profile.tgl_lahir || '-',
+        kelas: profile.role_label || 'Guru',
+      };
+    }
+
+    return {
+      nama: profile.nama_lengkap || profile.nama_kepala_sekolah || 'Kepala Sekolah',
+      nomor: profile.nip || profile.nip_nuptk,
+      nomorLabel: 'NIP',
+      alamat: profile.alamat,
+      noHp: profile.no_hp,
+      tanggalLahir: profile.tanggal_lahir || '-',
+      kelas: role === 'kepsek' ? 'Kepala Sekolah' : 'Administrator',
+    };
+  }, [profile, role]);
+
+  const initials = display.nama
+    ? display.nama.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+    : 'U';
 
   return (
     <AdminPageShell>
-      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-5 lg:py-6 flex flex-col gap-6 animate-in fade-in duration-500">
-        
-        {/* HEADER */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 px-6 py-4 shadow-lg shadow-emerald-500/15">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-          <div className="relative flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              {fotoUrl ? (
-                <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white/30 shrink-0">
-                  <img src={fotoUrl} alt="Profil" className="w-full h-full object-cover" />
+      <div className="admin-page-wrapper animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>Profil Saya</h1>
+            <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.5rem' }}>Informasi detail biodata dan peran Anda di sistem.</p>
+          </div>
+          <button type="button" className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '50px' }}>
+            <Edit3 size={18} />
+            <span style={{ fontWeight: 600 }}>Edit Profil</span>
+          </button>
+        </div>
+
+        {loading ? (
+          <div style={{ display: 'flex', height: '300px', alignItems: 'center', justifyContent: 'center' }}>
+            <Loader2 className="animate-spin text-slate-500" size={32} />
+          </div>
+        ) : (
+          <div className="form-panel" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ height: '140px', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'radial-gradient(#fff 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
+            </div>
+            
+            <div style={{ padding: '0 2.5rem 2.5rem', position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                <div style={{
+                  width: '110px', height: '110px', borderRadius: '24px',
+                  background: '#fff',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+                  marginTop: '-55px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <div style={{
+                    width: '94px', height: '94px', borderRadius: '18px',
+                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
+                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '2.5rem', fontWeight: 800, letterSpacing: '0.05em'
+                  }}>
+                    {initials}
+                  </div>
                 </div>
-              ) : (
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shrink-0">
-                  <UserIcon size={20} />
+                <div style={{ marginTop: '-1rem' }}>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0 }}>{display.nama}</h1>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 700, marginTop: '0.5rem' }}>
+                    <ShieldCheck size={14} /> {display.kelas}
+                  </div>
                 </div>
-              )}
-              <div className="min-w-0">
-                <h1 className="text-lg font-black text-white tracking-tight">Profil Saya</h1>
-                <p className="text-emerald-100/80 text-xs mt-0.5 truncate font-medium">
-                  Kelola biodata dan informasi pribadi Anda
-                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                <InfoCard label="Nama Lengkap" value={display.nama} icon={UserCircle2} />
+                <InfoCard label={display.nomorLabel} value={display.nomor} icon={IdCard} />
+                <InfoCard label="Nomor Handphone" value={display.noHp} icon={Phone} />
+                <InfoCard label="Tanggal Lahir" value={display.tanggalLahir} icon={CalendarDays} />
+                <InfoCard label="Alamat Tempat Tinggal" value={display.alamat} icon={MapPin} />
               </div>
             </div>
-            <div className="flex gap-2">
-              <label className="flex items-center gap-2 px-3 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10 cursor-pointer">
-                {uploadingFoto ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-                <span className="hidden sm:inline">Ubah Foto</span>
-                <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg" onChange={handleFotoUpload} disabled={uploadingFoto} />
-              </label>
-              {fotoUrl && (
-                <button
-                  onClick={handleDeleteFoto}
-                  disabled={uploadingFoto}
-                  className="flex items-center gap-2 px-3 py-2 bg-red-500/20 hover:bg-red-500/40 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-red-500/20"
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl text-xs font-bold transition-all border border-white/10"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
           </div>
-        </div>
-
-        {/* CONTENT */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center gap-4 px-6 sm:px-8 py-5 border-b border-slate-100 bg-slate-50/50">
-             <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-               <ShieldCheck size={20} />
-             </div>
-             <div>
-               <h2 className="text-base font-bold text-slate-700">Informasi Biodata</h2>
-               <p className="text-sm text-slate-400 font-medium">Lengkapi profil untuk keperluan administrasi</p>
-             </div>
-          </div>
-
-          <div className="p-6 sm:p-8 space-y-6">
-             {loading && !isEditing ? (
-               <div className="flex justify-center items-center py-10">
-                 <Loader2 size={24} className="text-emerald-500 animate-spin" />
-               </div>
-             ) : (
-               renderFields()
-             )}
-          </div>
-
-          {/* Footer Actions */}
-          {isEditing && (
-            <div className="px-5 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3">
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  loadData(); // Reset
-                }}
-                disabled={saving}
-                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-500/20 disabled:shadow-none"
-              >
-                {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-                {saving ? 'Menyimpan...' : 'Simpan'}
-              </button>
-            </div>
-          )}
-        </div>
-
+        )}
       </div>
     </AdminPageShell>
   );

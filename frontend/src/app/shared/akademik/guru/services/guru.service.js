@@ -15,9 +15,16 @@ export async function createGuru(payload) {
 }
 
 export async function updateGuru(id, payload) {
-  let isFormData = payload instanceof FormData;
-  const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
-  const response = await apiClient.post(`/guru/${id}?_method=PUT`, payload, config);
+  const isFormData = payload instanceof FormData;
+  if (isFormData) {
+    if (!payload.has('_method')) payload.append('_method', 'PUT');
+    const response = await apiClient.post(`/guru/${id}`, payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  }
+
+  const response = await apiClient.put(`/guru/${id}`, payload);
   return response.data;
 }
 

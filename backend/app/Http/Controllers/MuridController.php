@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Siswa;
 use App\Models\User;
 use App\Utils\AuditsAdminActions;
+use App\Services\EnrollmentService;
 
 use App\Http\Controllers\Controller;
 use App\Utils\ApiResponse;
@@ -14,7 +15,9 @@ use InvalidArgumentException;
 
 class MuridController extends Controller
 {
-    
+    public function __construct(private EnrollmentService $enrollment)
+    {
+    }
 
     public function index(\Illuminate\Http\Request $request)
     {
@@ -65,10 +68,27 @@ class MuridController extends Controller
         }
     }
 
-    public function update(UpdateMuridRequest $request, $id)
+    public function update(\Illuminate\Http\Request $request, $id)
     {
         try {
-            $validated = $request->validated();
+            $validated = $request->validate([
+                'username' => 'nullable|string',
+                'email' => 'nullable|email',
+                'password' => 'nullable|string|min:6',
+                'role' => 'nullable|in:siswa,calon_siswa',
+                'nama_siswa' => 'required|string',
+                'nisn' => 'nullable|string|unique:siswa,nisn,' . $id . ',id_user',
+                'nis' => 'nullable|string',
+                'jenis_kelamin' => 'required|in:L,P',
+                'tempat_lahir' => 'nullable|string',
+                'tanggal_lahir' => 'nullable|date',
+                'alamat' => 'nullable|string',
+                'no_hp' => 'nullable|string',
+                'tahun_masuk' => 'nullable|integer',
+                'tahun_lulus' => 'nullable|integer',
+                'id_kelas' => 'nullable|exists:kelas,id_kelas',
+                'status_aktif' => 'nullable|boolean',
+            ]);
             $user = $this->updateMurid((int) $id, $validated);
 
             return ApiResponse::success($user, 'Status Murid diperbarui');
@@ -77,10 +97,13 @@ class MuridController extends Controller
         }
     }
 
-    public function enroll(EnrollMuridRequest $request, $id)
+    public function enroll(\Illuminate\Http\Request $request, $id)
     {
         try {
-            $result = $this->enrollMurid((int) $id, $request->validated('id_kelas'));
+            $validated = $request->validate([
+                'id_kelas' => 'nullable|exists:kelas,id_kelas',
+            ]);
+            $result = $this->enrollMurid((int) $id, $validated['id_kelas'] ?? null);
 
             return ApiResponse::success($result, 'Calon siswa berhasil dipromosikan menjadi siswa');
         } catch (InvalidArgumentException $e) {
@@ -149,9 +172,12 @@ class MuridController extends Controller
                 'nisn' => $data['nisn'] ?? null,
                 'nis' => $data['nis'] ?? null,
                 'jenis_kelamin' => $data['jenis_kelamin'],
-                'tempat_lahir' => $data['tempat_lahir'] ?? null,
-                'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
+                'tempat_lahir' => $data['tempat_lahir'] ?? '-',
+                'tgl_lahir' => $data['tanggal_lahir'] ?? now()->toDateString(),
+                'agama' => $data['agama'] ?? 'Islam',
                 'alamat' => $data['alamat'] ?? null,
+                'nama_wali' => $data['nama_wali'] ?? '-',
+                'no_hp_wali' => $data['no_hp_wali'] ?? ($data['no_hp'] ?? '-'),
                 'no_hp' => $data['no_hp'] ?? null,
                 'tahun_masuk' => $data['tahun_masuk'],
                 'tahun_lulus' => $data['tahun_lulus'] ?? null,
@@ -190,7 +216,7 @@ class MuridController extends Controller
                 $fields = ['nama_siswa', 'nisn', 'nis', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp', 'tahun_masuk', 'tahun_lulus', 'id_kelas'];
                 foreach ($fields as $field) {
                     if (array_key_exists($field, $data)) {
-                        $siswaData[$field] = $data[$field];
+                        $siswaData[$field === 'tanggal_lahir' ? 'tgl_lahir' : $field] = $data[$field];
                     }
                 }
                 

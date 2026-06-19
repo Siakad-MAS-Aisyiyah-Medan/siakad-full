@@ -11,10 +11,9 @@ export async function updateProfilSekolah(data) {
   
   for (const key in data) {
     if (data[key] !== null && data[key] !== undefined) {
-      // If it's a file and we are not clearing it
       if (key === 'foto_kepsek' && data[key] instanceof File) {
         formData.append(key, data[key]);
-      } else if (key !== 'foto_kepsek' || typeof data[key] === 'string') {
+      } else if (key !== 'foto_kepsek') {
         formData.append(key, data[key]);
       }
     }

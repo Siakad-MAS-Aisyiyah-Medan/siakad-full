@@ -1,4 +1,4 @@
-import { Search, Plus, Edit2, Trash2, BookOpen, User, Layers, GraduationCap } from 'lucide-react';
+import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 export default function MapelTable({
   filteredData,
@@ -10,163 +10,111 @@ export default function MapelTable({
   isFetching = false,
   readOnly = false,
 }) {
-  const handleExport = () => {
-    import('@app/shared/utils/exportCsv').then(({ exportToCsv }) => {
-      const dataToExport = filteredData.map(mapel => ({
-        'Mata Pelajaran': mapel.nama_mapel || '',
-        'Tingkat': mapel.tingkat || 'Semua',
-        'Kelompok': mapel.kelompok_mapel || 'Umum',
-        'Guru Pengampu': mapel.guru?.guru?.nama_guru || 'Belum Ditentukan'
-      }));
-      exportToCsv('data_mapel.csv', dataToExport);
-    });
-  };
-
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
-      <div className="px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-800">
-            Mata Pelajaran
-          </h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">
-            Daftar mata pelajaran, tingkatan, dan guru pengampu.
-          </p>
+    <div className="admin-page-wrapper animate-fade-in">
+      {/* Panel Header */}
+      <div className="panel-header mb-4">
+        <div className="header-text">
+          <h2>Mata Pelajaran</h2>
+          <p>Kelola data mata pelajaran MAS Aisyiyah Medan</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <Search size={16} strokeWidth={2.5} />
-            </div>
-            <input
-              type="text"
-              placeholder="Cari mata pelajaran..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-              className="w-full md:w-64 bg-white border border-slate-200 text-slate-800 text-[14px] font-semibold rounded-full pl-10 pr-4 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:font-medium placeholder:text-slate-400"
-            />
-          </div>
-          {!readOnly && (
-            <button
-              type="button"
-              onClick={onAdd}
-              className="btn-primary h-10 px-5 rounded-full font-bold flex items-center gap-2 shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
-            >
-              <Plus size={18} strokeWidth={2.5} />
-              <span className="hidden md:inline">Tambah Mapel</span>
-            </button>
-          )}
+        <div className="header-actions">
           {readOnly && (
-            <button
-              type="button"
-              onClick={handleExport}
-              className="btn-outline h-10 px-5 rounded-full font-bold flex items-center gap-2 transition-all"
-            >
-              <span className="hidden md:inline">Unduh Data</span>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+              <input
+                type="text"
+                placeholder="Cari mata pelajaran..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+              />
+            </div>
+          )}
+          {readOnly ? (
+            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Plus size={16} />
+              Tambah Mapel
             </button>
           )}
         </div>
       </div>
 
-      <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      {/* Table */}
+      <div className="table-container">
+        <table className="data-table">
           <thead>
-            <tr className="bg-slate-50/80 border-b border-slate-100">
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest" style={{ paddingLeft: '32px', paddingRight: '16px' }}>Mata Pelajaran</th>
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-4">Tingkat & Kelompok</th>
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-4">Guru Pengampu</th>
-              <th className="py-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest text-right" style={{ paddingLeft: '16px', paddingRight: '32px' }}>Aksi</th>
+            <tr>
+              <th>No</th>
+              <th>Nama Mata Pelajaran</th>
+              <th>Guru Pengampu</th>
+              <th>Tingkatan</th>
+              {readOnly ? <th>Status</th> : <th style={{ textAlign: 'right' }}>Aksi</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody>
             {isFetching ? (
               <tr>
-                <td colSpan="4" className="text-center py-20">
-                  <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-3"></div>
-                  <p className="text-sm font-semibold text-slate-500">Memuat mata pelajaran...</p>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                    Memuat mata pelajaran...
+                  </div>
                 </td>
               </tr>
             ) : filteredData.length > 0 ? (
-              filteredData.map((mapel) => (
-                <tr key={mapel.id_mapel} className="hover:bg-slate-50/80 transition-colors group">
-                  <td className="py-5" style={{ paddingLeft: '32px', paddingRight: '16px' }}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-                        <BookOpen size={20} strokeWidth={2.5} />
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-800 text-[15px]">{mapel.nama_mapel}</p>
-                      </div>
-                    </div>
+              filteredData.map((mapel, idx) => (
+                <tr key={mapel.id_mapel}>
+                  <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{mapel.nama_mapel}</td>
+                  <td>{mapel.guru?.nama_guru || 'Belum ditentukan'}</td>
+                  <td>
+                    <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)' }}>
+                      {mapel.tingkat || '-'}
+                    </span>
                   </td>
-
-                  <td className="py-5 px-4">
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-slate-700 flex items-center gap-2">
-                        <GraduationCap size={14} className="text-slate-400" /> Kelas {mapel.tingkat || 'Semua'}
-                      </p>
-                      <p className="text-xs font-semibold text-slate-600 flex items-center gap-2">
-                        <Layers size={14} className="text-slate-400" /> {mapel.kelompok_mapel || <span className="text-slate-400 italic">Umum</span>}
-                      </p>
-                    </div>
-                  </td>
-
-                  <td className="py-5 px-4">
-                    {mapel.guru?.guru?.nama_guru ? (
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 overflow-hidden font-bold text-xs border border-slate-300">
-                          {mapel.guru.guru.foto ? (
-                            <img src={mapel.guru.guru.foto} alt="Guru" className="w-full h-full object-cover" />
-                          ) : (
-                            mapel.guru.guru.nama_guru.charAt(0).toUpperCase()
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-700">{mapel.guru.guru.nama_guru}</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
-                        <User size={12} strokeWidth={3} /> Belum Ditentukan
+                  {readOnly ? (
+                    <td>
+                      <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 700, background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', border: '1px solid var(--color-primary-light)' }}>
+                        Aktif
                       </span>
-                    )}
-                  </td>
-
-                  <td className="py-5 text-right" style={{ paddingLeft: '16px', paddingRight: '32px' }}>
-                    <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => onEdit && onEdit(mapel)}
-                        className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition-colors"
-                        title={readOnly ? "Detail Mapel" : "Edit Mapel"}
-                      >
-                        {readOnly ? <Search size={14} strokeWidth={2.5} /> : <Edit2 size={14} strokeWidth={2.5} />}
-                      </button>
-                      {!readOnly && (
-                        <button
-                          onClick={() => onDelete && onDelete(mapel.id_mapel)}
-                          className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 flex items-center justify-center transition-colors"
-                          title="Hapus Mapel"
-                        >
-                          <Trash2 size={14} strokeWidth={2.5} />
+                    </td>
+                  ) : (
+                    <td>
+                      <div className="actions-cell">
+                        <button type="button" onClick={() => onEdit && onEdit(mapel)} className="btn-icon edit" title="Edit">
+                          <Pencil size={15} />
                         </button>
-                      )}
-                    </div>
-                  </td>
+                        <button type="button" onClick={() => onDelete && onDelete(mapel.id_mapel)} className="btn-icon delete" title="Hapus">
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center py-20">
-                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <BookOpen size={24} className="text-slate-300" />
+                <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '2rem' }}>📚</div>
+                    <p style={{ fontWeight: 600 }}>Tidak ada data mata pelajaran</p>
+                    <p style={{ fontSize: '0.875rem' }}>Tambah mata pelajaran untuk memulai</p>
                   </div>
-                  <p className="text-sm font-bold text-slate-600">Tidak ada data mata pelajaran</p>
-                  <p className="text-xs font-medium text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+        Menampilkan {filteredData.length} mata pelajaran
       </div>
     </div>
   );

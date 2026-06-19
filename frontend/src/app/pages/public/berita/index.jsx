@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, BookOpen, Clock, Calendar } from 'lucide-react';
+import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { getPublicNews } from '@app/shared/services/publicNews.service';
 import LandingNavbar from '@app/pages/public/landing-page/components/LandingNavbar';
 import LandingFooter from '@app/pages/public/landing-page/components/LandingFooter';
-import '@app/pages/public/landing-page/landing.css';
 
 export default function PublicNewsList() {
   const navigate = useNavigate();
@@ -12,132 +11,97 @@ export default function PublicNewsList() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  // State untuk drawer mobile
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  // Panggil API saat pertama kali halaman dibuka
   useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await getPublicNews();
+        setNews(response.data || []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchNews();
     window.scrollTo(0, 0);
   }, []);
 
-  const fetchNews = async () => {
-    try {
-      setLoading(true);
-      // Kita memanggil fungsi dari service yang mengambil data dari public API backend
-      const response = await getPublicNews();
-      setNews(response.data);
-    } catch (error) {
-      console.error('Gagal mengambil berita:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fungsi untuk memfilter berita berdasarkan kata kunci pencarian
   const filteredNews = news.filter((item) =>
     item.judul.toLowerCase().includes(search.toLowerCase()) ||
     item.isi.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Jika klik menu di navbar, karena kita di halaman berita, kita kembali ke home
-  const handleScrollToSection = (id) => {
-    setMenuOpen(false);
-    navigate(`/home`);
-  };
-
   return (
-    <div className="landing-page">
-      {/* Kita gunakan Navbar yang sama dengan Landing Page */}
-      <LandingNavbar 
-        activeSection="berita" 
-        menuOpen={menuOpen}
-        onToggleMenu={() => setMenuOpen(!menuOpen)}
-        onCloseMenu={() => setMenuOpen(false)}
-        onScrollToSection={handleScrollToSection}
-        scrolled={true}
-      />
+    <div className="min-h-screen bg-white">
+      <LandingNavbar activeSection="berita" onScrollToSection={() => navigate('/home')} />
 
-      <main style={{ paddingTop: '100px', minHeight: '80vh', backgroundColor: '#f8fafc' }}>
-        <div className="lp-container">
-          
-          {/* Header seperti referensi Mikroskil */}
-          <div style={{ textAlign: 'center', marginBottom: '3rem', marginTop: '2rem' }}>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>
-              Cari dan Baca <span style={{ color: 'var(--color-primary)' }}>Berita</span> di bawah ini.
-            </h1>
-            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>
-              Ayo luangkan waktu membaca Berita untuk mengetahui kabar lebih lanjut.
-            </p>
-          </div>
+      <main className="mx-auto max-w-7xl px-6 py-12">
+        <div className="text-center">
+          <h1 className="text-5xl font-semibold text-slate-900">Pengumuman</h1>
+          <p className="mt-4 text-2xl text-slate-500">Informasi terbaru dari MAS Aisyiyah Medan</p>
+        </div>
 
-          {/* Kotak Pencarian */}
-          <div className="lp-search" style={{ maxWidth: '600px', margin: '0 auto 4rem', backgroundColor: '#fff' }}>
-            <Search size={20} color="#64748b" />
-            <input
-              type="text"
-              placeholder="Tuliskan yang ingin kamu cari..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ padding: '0.5rem', fontSize: '1rem', width: '100%' }}
-            />
-          </div>
+        <div className="relative mx-auto mt-10 max-w-5xl rounded-2xl border border-slate-300 bg-white">
+          <Search className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Cari pengumuman berdasarkan judul..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="w-full rounded-2xl bg-transparent py-5 pl-16 pr-6 text-2xl text-slate-900 outline-none"
+          />
+        </div>
 
-          {/* Menampilkan status loading jika sedang memuat data */}
+        <div className="mt-10 flex items-center justify-center gap-6">
+          <button type="button" className="rounded-xl border border-slate-300 p-4 text-slate-700">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button type="button" className="rounded-xl border border-slate-300 bg-slate-300 px-5 py-4 text-xl text-slate-700">1</button>
+          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">2</button>
+          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">3</button>
+          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">4</button>
+          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">5</button>
+          <span className="text-2xl text-slate-700">...</span>
+          <button type="button" className="rounded-xl border border-slate-300 p-4 text-slate-700">
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-4">
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
-              <p>Memuat berita terbaru...</p>
-            </div>
-          ) : (
-            <>
-              {/* Grid Berita */}
-              <div className="lp-news-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
-                {filteredNews.map((item) => (
-                  <article key={item.id} className="lp-card lp-news-card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column' }} onClick={() => navigate(`/berita/${item.id}`)}>
-                    {/* Bagian Atas Kartu (Gambar/Ilustrasi) */}
-                    <div className="lp-news-card__thumb" style={{ height: '160px', background: 'linear-gradient(135deg, var(--color-primary-soft), #e2e8f0)' }}>
-                      <BookOpen size={48} color="var(--color-primary)" opacity={0.5} />
-                    </div>
-                    
-                    {/* Bagian Bawah Kartu (Konten) */}
-                    <div className="lp-news-card__body" style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <span className="lp-tag" style={{ alignSelf: 'flex-start', marginBottom: '1rem' }}>
-                        {item.kategori || 'Berita'}
-                      </span>
-                      
-                      <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', lineHeight: '1.4' }}>
-                        {item.judul}
-                      </h3>
-                      
-                      <div className="lp-news-card__meta" style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-start', gap: '1.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <Calendar size={14} />
-                          <span>{item.tanggal_publikasi}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <Clock size={14} />
-                          <span>08:00</span>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-
-              {/* Tampilan jika tidak ada berita */}
-              {!loading && filteredNews.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '4rem', color: '#64748b', background: '#fff', borderRadius: '16px', marginTop: '2rem' }}>
-                  <p style={{ fontSize: '1.2rem', fontWeight: '600' }}>Tidak ada berita atau pengumuman saat ini.</p>
-                  <p style={{ marginTop: '0.5rem' }}>Coba ubah kata kunci pencarian Anda.</p>
+            <div className="col-span-full py-12 text-center text-slate-500">Memuat pengumuman terbaru...</div>
+          ) : filteredNews.length > 0 ? (
+            filteredNews.slice(0, 8).map((item) => (
+              <article key={item.id} className="rounded-[18px] border border-slate-300 bg-white p-5">
+                <div className="flex h-[220px] items-center justify-center border border-slate-300 bg-slate-50" />
+                <h2 className="mt-6 text-3xl font-semibold text-slate-900">{item.judul}</h2>
+                <div className="mt-4 space-y-3">
+                  <div className="h-2 rounded-full bg-slate-300" />
+                  <div className="h-2 w-5/6 rounded-full bg-slate-300" />
+                  <div className="h-2 w-2/3 rounded-full bg-slate-300" />
                 </div>
-              )}
-            </>
+                <div className="mt-5 flex items-center gap-3 text-lg text-slate-500">
+                  <CalendarDays className="h-4 w-4" />
+                  {item.tanggal_publikasi || '08 Mei 2024'}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/pengumuman/${item.id}`)}
+                  className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 px-5 py-4 text-2xl text-slate-700"
+                >
+                  Baca Selengkapnya
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+              </article>
+            ))
+          ) : (
+            <div className="col-span-full rounded-[18px] border border-slate-300 bg-white px-8 py-16 text-center text-slate-500">
+              Tidak ada pengumuman saat ini.
+            </div>
           )}
         </div>
       </main>
 
-      <LandingFooter />
+      <LandingFooter onScrollToSection={() => navigate('/home')} />
     </div>
   );
 }
-

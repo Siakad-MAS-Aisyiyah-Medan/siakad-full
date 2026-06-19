@@ -109,32 +109,87 @@ export function getRedirectPathForRole(role) {
 
 export function getMenuItems() {
   const menus = getStoredMenus();
-  const items = menus?.length > 0 ? menus : getMenuForRole(getStoredUser()?.role);
-  const finalItems = items.filter((item) => {
+  const role = getStoredUser()?.role;
+  const fallbackMenus = getMenuForRole(role);
+  const items = menus?.length > 0 ? menus : fallbackMenus;
+  const normalizedItems = items.map((item) => {
+    const labelOverrides = {
+      '/admin/ppdb': 'Data PPDB',
+      '/admin/hak-akses': 'Akun Pengguna & Hak Akses',
+      '/admin/pengaturan': 'Pengaturan Akun',
+      '/admin/transkrip-akademik': 'Transkrip Akademik Murid',
+      '/kepala-sekolah/data-ppdb': 'Data PPDB',
+      '/kepala-sekolah/profil-saya': 'Profil Saya',
+      '/kepala-sekolah/transkrip-akademik': 'Transkrip Akademik',
+      '/kepala-sekolah/pengaturan': 'Pengaturan Akun',
+      '/guru/profil-saya': 'Profil Saya',
+      '/guru/nilai': 'Daftar Nilai Murid',
+      '/guru/pengaturan': 'Pengaturan Akun',
+      '/siswa/profil-saya': 'Profil Saya',
+      '/siswa/nilai': 'Transkrip Akademik',
+      '/siswa/pengaturan': 'Pengaturan Akun',
+      '/calon-murid/pengaturan': 'Pengaturan Akun',
+    };
+
+    const iconOverrides = {
+      '/admin/transkrip-akademik': 'FileText',
+      '/admin/pengaturan/tahun-ajaran': 'CalendarDays',
+      '/kepala-sekolah/transkrip-akademik': 'BarChart3',
+      '/siswa/nilai': 'ClipboardList',
+    };
+
+    const pathOverrides = {
+      '/kepsek/dashboard': '/kepala-sekolah/dashboard',
+      '/kepsek/data-diri': '/kepala-sekolah/profil-saya',
+      '/kepsek/profil-sekolah': '/kepala-sekolah/profil-sekolah',
+      '/kepsek/pengumuman': '/kepala-sekolah/pengumuman',
+      '/kepsek/data-ppdb': '/kepala-sekolah/data-ppdb',
+      '/kepsek/data-murid': '/kepala-sekolah/data-murid',
+      '/kepsek/data-guru': '/kepala-sekolah/data-guru',
+      '/kepsek/data-kelas': '/kepala-sekolah/data-kelas',
+      '/kepsek/transkrip-akademik': '/kepala-sekolah/transkrip-akademik',
+      '/kepsek/pengaturan': '/kepala-sekolah/pengaturan',
+      '/ppdb/dashboard': '/calon-murid/dashboard',
+    };
+
+    const path = pathOverrides[item.path] || item.path;
+
+    return {
+      ...item,
+      path,
+      label: labelOverrides[path] || item.label,
+      iconKey: iconOverrides[path] || item.iconKey,
+    };
+  });
+
+  const finalItems = normalizedItems.filter((item) => {
     if (item.label === 'Absensi Guru') return false;
+    if (item.label === 'Riwayat Absensi') return false;
+    if (item.label === 'Nilai Pribadi') return false;
+    if (item.label === 'Data PPDB Baru') return false;
+    if (role === 'calon_siswa' && item.path === '/calon-murid/pengumuman') return false;
     if (item.permission) return hasPermission(item.permission);
     return true;
   });
 
-  // Force inject Pengaturan Sistem for admin if it's missing from DB/Cache
-  if (getStoredUser()?.role === 'admin' && !finalItems.some(i => i.path === '/admin/pengaturan')) {
-    const insertIndex = finalItems.findIndex(i => i.path === '/admin/hak-akses');
-    if (insertIndex !== -1) {
-      finalItems.splice(insertIndex + 1, 0, {
-        iconKey: 'Settings2',
-        label: 'Pengaturan Sistem',
-        path: '/admin/pengaturan',
-        permission: 'manage_all'
-      });
-    } else {
-      finalItems.push({
-        iconKey: 'Settings2',
-        label: 'Pengaturan Sistem',
-        path: '/admin/pengaturan',
-        permission: 'manage_all'
-      });
+  // Merge fallback menu use cases with DB menus, so stale seeded menus do not hide new UC items.
+  fallbackMenus.forEach((fallbackItem) => {
+    if (!finalItems.some((item) => item.path === fallbackItem.path) && hasPermission(fallbackItem.permission)) {
+      finalItems.push(fallbackItem);
     }
-  }
+  });
 
-  return finalItems;
+  const orderMap = new Map(fallbackMenus.map((item, index) => [item.path, index]));
+  finalItems.sort((a, b) => {
+    const aOrder = orderMap.has(a.path) ? orderMap.get(a.path) : Number.MAX_SAFE_INTEGER;
+    const bOrder = orderMap.has(b.path) ? orderMap.get(b.path) : Number.MAX_SAFE_INTEGER;
+    return aOrder - bOrder;
+  });
+
+  const seen = new Set();
+  return finalItems.filter((item) => {
+    if (seen.has(item.path)) return false;
+    seen.add(item.path);
+    return true;
+  });
 }

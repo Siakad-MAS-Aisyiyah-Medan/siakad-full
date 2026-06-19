@@ -49,8 +49,17 @@ class PengumumanController extends Controller
         return ApiResponse::success($item, 'Pengumuman berhasil ditambahkan', 201);
     }
 
-    public function adminUpdate(UpdatePengumumanRequest $request, $id)
+    public function adminUpdate(\Illuminate\Http\Request $request, $id)
     {
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'isi' => 'required|string',
+            'tanggal_publikasi' => 'nullable|date',
+            'akses' => 'required|in:umum,internal',
+            'kategori' => 'nullable|string|max:100',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $item = $this->processUpdate((int) $id, $validated);
 
         return ApiResponse::success($item, 'Pengumuman berhasil diperbarui');
@@ -69,8 +78,8 @@ class PengumumanController extends Controller
      */
     public function publicIndex()
     {
-        // Ambil pengumuman yang di-publish, urutkan dari yang terbaru
-        $pengumuman = Pengumuman::where('is_published', true)
+        // Hanya pengumuman dengan akses umum yang boleh tampil di halaman publik.
+        $pengumuman = Pengumuman::where('akses', 'umum')
             ->orderByDesc('tanggal_publikasi')
             ->orderByDesc('id')
             ->paginate(12);
@@ -87,8 +96,8 @@ class PengumumanController extends Controller
      */
     public function publicShow($id)
     {
-        // Pastikan hanya pengumuman yang di-publish yang bisa dilihat publik
-        $pengumuman = Pengumuman::where('is_published', true)->findOrFail($id);
+        // Pastikan hanya pengumuman dengan akses umum yang bisa dilihat publik.
+        $pengumuman = Pengumuman::where('akses', 'umum')->findOrFail($id);
 
         return ApiResponse::success(
             (new PengumumanResource($pengumuman))->resolve(),

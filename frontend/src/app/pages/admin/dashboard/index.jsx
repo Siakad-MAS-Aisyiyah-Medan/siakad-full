@@ -1,223 +1,196 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { BookOpen, ClipboardList, GraduationCap, Users, Activity } from 'lucide-react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
-import { 
-    Users, GraduationCap, ClipboardList, BookOpen, 
-    History, Clock, Calendar, TrendingUp,
-    ChevronRight, BookOpenCheck,
-    Plus, Edit2, Trash2, LogIn, Activity, FileText, User
-} from 'lucide-react';
 import { fetchAdminDashboardStats } from '@app/shared/services/dashboard.service';
+import { useAuditLogs } from '@app/shared/akademik/audit-logs/hooks/useAuditLogs';
+
+const CARD_THEMES = [
+  { gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.3)' },
+  { gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', shadow: 'rgba(59, 130, 246, 0.3)' },
+  { gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'rgba(245, 158, 11, 0.3)' },
+  { gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', shadow: 'rgba(139, 92, 246, 0.3)' },
+];
+
+function StatCard({ label, value, icon, loading, theme, delay }) {
+  return (
+    <div
+      className="animate-fade-in-up"
+      style={{
+        borderRadius: '18px',
+        padding: '1.5rem 1.5rem',
+        background: theme.gradient,
+        boxShadow: `0 8px 24px ${theme.shadow}`,
+        color: '#ffffff',
+        position: 'relative',
+        overflow: 'hidden',
+        animationDelay: `${delay}s`,
+        opacity: 0,
+      }}
+    >
+      <div style={{
+        position: 'absolute', top: '-20%', right: '-10%',
+        width: '120px', height: '120px', borderRadius: '50%',
+        background: 'rgba(255,255,255,0.1)',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-30%', left: '-5%',
+        width: '80px', height: '80px', borderRadius: '50%',
+        background: 'rgba(255,255,255,0.08)',
+      }} />
+      <div className="flex items-center justify-between gap-4" style={{ position: 'relative', zIndex: 1 }}>
+        <div>
+          <p style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }}>
+            {loading ? '...' : value || 0}
+          </p>
+          <p style={{ marginTop: '0.5rem', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.9 }}>
+            {label}
+          </p>
+        </div>
+        <div style={{
+          width: '52px', height: '52px', borderRadius: '14px',
+          background: 'rgba(255,255,255,0.2)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(8px)',
+        }}>
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
-    const [realStats, setRealStats] = useState({
-        total_guru: 0,
-        total_murid: 0,
-        total_mapel: 0,
-        total_kelas: 0,
-    });
-    const [auditLogs, setAuditLogs] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+  const [realStats, setRealStats] = useState({
+    total_guru: 0,
+    total_murid: 0,
+    total_mapel: 0,
+    total_kelas: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const audit = useAuditLogs();
 
-    useEffect(() => {
-        const loadDashboardData = async () => {
-            try {
-                const data = await fetchAdminDashboardStats();
-                if (data) {
-                    setRealStats(data.stats || {
-                        total_guru: 0,
-                        total_murid: 0,
-                        total_mapel: 0,
-                        total_kelas: 0,
-                    });
-                    setAuditLogs(data.audit_logs || []);
-                }
-            } catch (error) {
-                console.error('Failed to fetch dashboard stats', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadDashboardData();
-    }, []);
-
-    const stats = [
-        { 
-            label: 'TOTAL MURID', 
-            value: realStats.total_murid, 
-            icon: <GraduationCap className="w-6 h-6" />, 
-        },
-        { 
-            label: 'TOTAL GURU', 
-            value: realStats.total_guru, 
-            icon: <Users className="w-6 h-6" />, 
-        },
-        { 
-            label: 'MATA PELAJARAN', 
-            value: realStats.total_mapel, 
-            icon: <ClipboardList className="w-6 h-6" />, 
-        },
-        { 
-            label: 'TOTAL KELAS', 
-            value: realStats.total_kelas, 
-            icon: <BookOpen className="w-6 h-6" />, 
-        },
-    ];
-
-    const mockAgenda = [
-        { id: 1, title: 'Rapat Evaluasi Guru Bulanan', time: '10:00 WIB', type: 'internal', color: 'bg-blue-500' },
-        { id: 2, title: 'Batas Akhir PPDB Gelombang 1', time: '15:00 WIB', type: 'urgent', color: 'bg-blue-400' },
-        { id: 3, title: 'Persiapan Ujian Tengah Semester', time: 'Besok', type: 'info', color: 'bg-blue-300' }
-    ];
-
-    const formatDate = (dateString) => {
-        if (!dateString) return 'Hari ini • 14:30 WIB'; // Default mock fallback
-        const date = new Date(dateString);
-        
-        const today = new Date();
-        const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-        
-        const timeString = new Intl.DateTimeFormat('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit'
-        }).format(date) + ' WIB';
-
-        if (isToday) return `Hari ini • ${timeString}`;
-        
-        const dateStr = new Intl.DateTimeFormat('id-ID', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        }).format(date);
-        
-        return `${dateStr} • ${timeString}`;
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const data = await fetchAdminDashboardStats();
+        setRealStats((previousStats) => data?.stats || previousStats);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    const formatActionTitle = (action, subject) => {
-        if (!action) return 'Aktivitas sistem';
-        const act = action.toLowerCase();
-        
-        let prefix = 'Memperbarui data';
-        
-        if (act.includes('create') || act.includes('insert') || act.includes('tambah')) prefix = 'Menambahkan data';
-        else if (act.includes('update') || act.includes('edit') || act.includes('ubah')) prefix = 'Memperbarui data';
-        else if (act.includes('delete') || act.includes('hapus')) prefix = 'Menghapus data';
-        else if (act.includes('login') || act.includes('masuk')) return `Berhasil login ke sistem`;
-        else if (act.includes('logout') || act.includes('keluar')) return `Keluar dari sistem`;
-        
-        let entity = '';
-        if (act.includes('.')) {
-            entity = act.split('.')[0];
-        }
+    loadDashboardData();
+  }, []);
 
-        const subjectDesc = subject ? subject : '';
-        const entityDesc = entity ? entity : 'sistem';
-        
-        const result = `${prefix} ${entityDesc} ${subjectDesc}`.trim();
-        return result.charAt(0).toUpperCase() + result.slice(1);
-    };
+  const stats = [
+    { label: 'Total Murid', value: realStats.total_murid, icon: <GraduationCap className="h-7 w-7" /> },
+    { label: 'Total Guru', value: realStats.total_guru, icon: <Users className="h-7 w-7" /> },
+    { label: 'Mata Pelajaran', value: realStats.total_mapel, icon: <ClipboardList className="h-7 w-7" /> },
+    { label: 'Total Kelas', value: realStats.total_kelas, icon: <BookOpen className="h-7 w-7" /> },
+  ];
 
-    const renderTimelineIcon = (action) => {
-        const act = (action || '').toLowerCase();
-        if (act.includes('create') || act.includes('tambah') || act.includes('insert')) {
-            return <div className="p-3 bg-emerald-100 text-emerald-600 rounded-xl shadow-sm relative z-10"><Plus className="w-5 h-5" strokeWidth={2.5} /></div>;
-        } else if (act.includes('update') || act.includes('ubah') || act.includes('edit')) {
-            return <div className="p-3 bg-blue-100 text-blue-600 rounded-xl shadow-sm relative z-10"><Edit2 className="w-5 h-5" strokeWidth={2.5} /></div>;
-        } else if (act.includes('delete') || act.includes('hapus')) {
-            return <div className="p-3 bg-red-100 text-red-600 rounded-xl shadow-sm relative z-10"><Trash2 className="w-5 h-5" strokeWidth={2.5} /></div>;
-        } else if (act.includes('login') || act.includes('akses')) {
-            return <div className="p-3 bg-purple-100 text-purple-600 rounded-xl shadow-sm relative z-10"><LogIn className="w-5 h-5" strokeWidth={2.5} /></div>;
-        }
-        return <div className="p-3 bg-slate-100 text-slate-600 rounded-xl shadow-sm relative z-10"><Activity className="w-5 h-5" strokeWidth={2.5} /></div>;
-    };
+  return (
+    <AdminPageShell>
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
+        <div className="animate-fade-in">
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#064e3b', letterSpacing: '-0.02em' }}>
+            Dashboard
+          </h1>
+          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.25rem' }}>
+            Selamat datang di panel administrasi SIAKAD
+          </p>
+        </div>
 
-    return (
-        <AdminPageShell>
-            <div className="p-6 max-w-7xl mx-auto font-sans pb-16 flex flex-col gap-8">
-                
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard</h1>
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {stats.map((stat, i) => (
+            <StatCard key={stat.label} {...stat} theme={CARD_THEMES[i]} loading={isLoading} delay={i * 0.08} />
+          ))}
+        </div>
 
-                {/* 1. STATISTIK CARDS */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                    {stats.map((stat, index) => (
-                        <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                            <div className="flex justify-between items-start mb-2">
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="text-3xl font-medium text-slate-800 tracking-tight mb-3">
-                                        {isLoading ? (
-                                            <div className="w-6 h-6 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin"></div>
-                                        ) : (
-                                            stat.value || 0
-                                        )}
-                                    </h3>
-                                    <p className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest">{stat.label}</p>
-                                </div>
-                                <div className="p-2.5 border border-slate-200 rounded-lg text-slate-600">
-                                    {stat.icon}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* 2. AUDIT LOG (TABLE) */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-6 border-b border-slate-200">
-                        <h2 className="text-lg font-bold text-slate-800">Audit Log</h2>
-                    </div>
-                    
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm text-slate-600">
-                            <thead className="bg-slate-100 text-[11px] uppercase font-bold text-slate-700 border-b border-slate-200">
-                                <tr>
-                                    <th className="px-6 py-4 whitespace-nowrap">WAKTU</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">AKTOR</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">AKSI</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">SUBJEK</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200">
-                                {isLoading ? (
-                                    <tr>
-                                        <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
-                                            <div className="flex justify-center mb-2">
-                                                <div className="w-6 h-6 border-4 border-slate-100 border-t-slate-500 rounded-full animate-spin"></div>
-                                            </div>
-                                            Memuat data...
-                                        </td>
-                                    </tr>
-                                ) : auditLogs.length > 0 ? (
-                                    auditLogs.map((log, index) => {
-                                        const formattedTime = formatDate(log.waktu || log.created_at);
-                                        const actorName = log.aktor || log.user_name || log.user || 'Admin System';
-                                        const actionTitle = formatActionTitle(log.aksi || log.action, log.subjek || log.description || log.subject);
-                                        
-                                        return (
-                                            <tr key={index} className="hover:bg-slate-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap">{formattedTime}</td>
-                                                <td className="px-6 py-4 font-medium text-slate-800">{actorName}</td>
-                                                <td className="px-6 py-4">{actionTitle}</td>
-                                                <td className="px-6 py-4">{(log.subjek || log.description || log.subject) || '-'}</td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
-                                            Belum ada entri audit log
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div className="px-6 py-4 bg-white text-xs text-slate-500">
-                        Total {auditLogs.length} entri
-                    </div>
-                </div>
-
+        <div
+          className="animate-fade-in-up"
+          style={{
+            borderRadius: '18px',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            overflow: 'hidden',
+            animationDelay: '0.3s',
+            opacity: 0,
+          }}
+        >
+          <div style={{
+            padding: '1.15rem 1.5rem',
+            borderBottom: '1px solid #f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+          }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '10px',
+              background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#059669',
+            }}>
+              <Activity className="h-4 w-4" />
             </div>
-        </AdminPageShell>
-    );
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#064e3b' }}>Audit Log</h2>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: '#f8fafb' }}>
+                  <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Waktu</th>
+                  <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Aktor</th>
+                  <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Aksi</th>
+                  <th style={{ padding: '0.75rem 1.5rem', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Subjek</th>
+                </tr>
+              </thead>
+              <tbody>
+                {audit.loading ? (
+                  <tr>
+                    <td colSpan="4" style={{ padding: '2.5rem 1.5rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.875rem' }}>
+                      <div className="animate-pulse" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                        <div className="animate-spin" style={{ width: '18px', height: '18px', border: '2px solid #e2e8f0', borderTopColor: '#059669', borderRadius: '50%' }} />
+                        Memuat audit log...
+                      </div>
+                    </td>
+                  </tr>
+                ) : audit.items.length ? (
+                  audit.items.slice(0, 5).map((item, index) => (
+                    <tr key={item.id || index} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{item.created_at || item.waktu || '-'}</td>
+                      <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.actor_name || item.aktor || '-'}</td>
+                      <td style={{ padding: '0.85rem 1.5rem' }}>
+                        <span style={{ padding: '0.25rem 0.65rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, background: '#ecfdf5', color: '#059669' }}>
+                          {item.action || item.aksi || '-'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{item.subject || item.subjek || '-'}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ padding: '2.5rem 1.5rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.875rem' }}>
+                      Belum ada aktivitas tercatat
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div style={{
+            padding: '0.75rem 1.5rem',
+            borderTop: '1px solid #f1f5f9',
+            fontSize: '0.78rem',
+            color: '#94a3b8',
+          }}>
+            Total {audit.meta?.total || 0} entri
+          </div>
+        </div>
+      </div>
+    </AdminPageShell>
+  );
 }

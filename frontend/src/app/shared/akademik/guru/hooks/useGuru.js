@@ -6,7 +6,6 @@ import {
   deleteGuru,
 } from '../services/guru.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
-import Swal from 'sweetalert2';
 
 const emptyForm = {
   username: '',
@@ -102,15 +101,19 @@ export function useGuru() {
     setLoading(true);
     try {
       if (view === 'add') {
-        if (!formData.password) {
-          Swal.fire('Opps', 'Password wajib diisi untuk pengguna baru!', 'warning');
-          return;
-        }
-        
         const payload = new FormData();
-        Object.keys(formData).forEach(key => {
-          if (formData[key] !== null && formData[key] !== '') {
-            payload.append(key, formData[key]);
+        const generatedUsername = formData.username || formData.nip_nuptk || formData.no_hp;
+        const generatedEmail = formData.email || `${generatedUsername}@mas.sch.id`;
+        const generatedPassword = formData.password || String(formData.nip_nuptk || formData.no_hp || 'password123');
+        const normalized = {
+          ...formData,
+          username: generatedUsername,
+          email: generatedEmail,
+          password: generatedPassword.length >= 8 ? generatedPassword : `${generatedPassword}12345678`.slice(0, 8),
+        };
+        Object.keys(normalized).forEach(key => {
+          if (normalized[key] !== null && normalized[key] !== '') {
+            payload.append(key, normalized[key]);
           }
         });
 
@@ -120,6 +123,7 @@ export function useGuru() {
         const payload = new FormData();
         Object.keys(formData).forEach(key => {
           if (key === 'password' && !formData.password) return; // skip empty password on edit
+          if (key === 'foto' && !(formData.foto instanceof File)) return;
           if (formData[key] !== null && formData[key] !== '') {
             payload.append(key, formData[key]);
           }

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LogOut, Menu } from 'lucide-react';
+import { Bell, CircleUserRound, LogOut, Menu } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AppLogo from '@app/shared/components/AppLogo';
 import { renderMenuIcon } from '@app/shared/constants/icons';
 import { logout } from '@app/shared/services/auth.service';
+import { confirmAction, showLoadingAlert, closeAlert } from '@app/shared/hooks/useConfirm';
 import { getJsonItem } from '@app/shared/utils/storage';
 import { CALON_MURID_NAV } from '../config/calonMuridNav';
 
@@ -13,27 +14,28 @@ export default function CalonMuridLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const user = getJsonItem('user');
   const profile = getJsonItem('profile');
-  const displayName = user?.name || profile?.nama_lengkap || user?.username || 'Calon Siswa';
+  const displayName = user?.name || profile?.nama_lengkap || user?.username || 'Calon Murid';
   const accountStatus = user?.status_akun || (user?.status_aktif !== false ? 'aktif' : 'nonaktif');
+  const navItems = useMemo(() => {
+    return CALON_MURID_NAV.filter((item, index, arr) => arr.findIndex((row) => row.path === item.path) === index);
+  }, []);
 
-  const handleLogout = () => {
-    Swal.fire({
-      title: 'Keluar dari akun?',
-      text: 'Anda akan keluar dari portal PPDB.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#198754',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Ya, Keluar',
-      cancelButtonText: 'Batal',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        await logout();
-        Swal.close();
-        navigate('/login', { replace: true });
-      }
+  const handleLogout = async () => {
+    const ok = await confirmAction({
+      title: 'Apakah Anda Yakin?',
+      text: 'Anda akan keluar dari akun calon murid.',
+      confirmText: 'Yakin',
+      cancelText: 'Batal',
     });
+    if (!ok) return;
+
+    showLoadingAlert('Memproses...');
+    try {
+      await logout();
+    } finally {
+      closeAlert();
+      navigate('/login', { replace: true });
+    }
   };
 
   return (
@@ -50,12 +52,12 @@ export default function CalonMuridLayout({ children }) {
       <aside className={`sidebar${mobileOpen ? ' is-open' : ''}`}>
         <div className="sidebar-brand">
           <AppLogo size="md" variant="sidebar" />
-          <span>SIAKAD</span>
+          <span>MAS Aisyiyah Medan</span>
         </div>
-        <p className="calon-murid-sidebar-sub">Portal PPDB</p>
+        <p className="calon-murid-sidebar-sub">Calon Murid</p>
 
         <nav className="sidebar-nav">
-          {CALON_MURID_NAV.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -76,7 +78,7 @@ export default function CalonMuridLayout({ children }) {
       </aside>
 
       <main className="dashboard-content bg-slate-50 min-h-screen">
-        <header className="content-header sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm transition-all">
+        <header className="content-header sticky top-0 z-30 bg-white border-b border-slate-200 px-6 py-5 shadow-none transition-all">
           <div className="content-header-left">
             <button
               type="button"
@@ -86,15 +88,25 @@ export default function CalonMuridLayout({ children }) {
             >
               <Menu size={22} />
             </button>
-            <h1>Sistem Informasi Akademik</h1>
+            <div className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>
+                Halo, {displayName.split(' ')[0]} 👋
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem' }}>
+                Selamat datang di PPDB Online
+              </p>
+            </div>
           </div>
-          <div className="user-info">
-            <span>
-              Halo, <strong>{displayName}</strong>
+          <div className="content-header__right">
+            <span className="content-header__bell">
+              <Bell size={20} />
             </span>
-            <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20 ml-3">
-              {displayName}
-            </span>
+            <div className="user-info">
+              <span className="user-info__avatar">
+                <CircleUserRound size={22} />
+              </span>
+              <span className="user-info__name">{displayName}</span>
+            </div>
             {accountStatus !== 'aktif' && (
               <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20 ml-2">
                 Nonaktif
