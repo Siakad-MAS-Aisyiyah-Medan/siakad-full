@@ -1,184 +1,234 @@
-import { useState } from 'react';
-import { Save, Plus, Edit2, Trash2 } from 'lucide-react';
+// GuruAbsensi.jsx
+// PERBAIKAN UTAMA:
+// Sebelumnya: daftarList diambil dari localStorage('mock_daftar_absensi') → data palsu
+// Sesudahnya:  daftarList diambil dari API /api/guru/absensi/siswa/rekap → data nyata
+
+import { useGuruAbsensi } from './hooks/useGuruAbsensi';
 import MainLayout from '@app/shared/layouts/MainLayout';
 import { getStoredUser, getStoredProfile } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
-import { useGuruAbsensi } from './hooks/useGuruAbsensi';
-import AbsensiFilterForm from './components/AbsensiFilterForm';
-import AbsensiSiswaTable from './components/AbsensiSiswaTable';
-import Swal from 'sweetalert2';
 
-export default function GuruAbsensiPage() {
+export default function GuruAbsensi() {
   const user = getStoredUser();
   const profile = getStoredProfile();
   const name = getDisplayName(profile, user?.role, user?.username);
 
   const {
-    step,
-    meta,
-    kelasList,
-    mapelList,
-    siswaRows,
-    loading,
-    saving,
-    handleMetaChange,
-    loadSiswa,
+    // State data
+    jadwalList,
+    daftarList,        // ← sekarang dari API, bukan localStorage
+    formData,
+    siswaList,
+
+    // State UI
+    isLoading,
+    isLoadingDaftar,   // ← loading state khusus untuk daftarList
+    isSubmitting,
+    error,
+
+    // Filter & form state
+    filter,
+    selectedJadwal,
+    absensiMap,
+
+    // Handler
+    handleFilterChange,
+    handleJadwalSelect,
     handleStatusChange,
-    saveAbsensi,
-    reset,
+    handleSubmit,
+    handleIsiAbsensi,
+    resetForm,
   } = useGuruAbsensi();
-
-  const [daftarList, setDaftarList] = useState(() =>
-    JSON.parse(localStorage.getItem('mock_daftar_absensi') || '[]')
-  );
-  const [showAddModal, setShowAddModal] = useState(false);
-
-  const handleAddDaftar = async (e) => {
-    e.preventDefault();
-    setShowAddModal(false);
-    
-    const newList = [...daftarList, { ...meta, id_daftar: Date.now() }];
-    localStorage.setItem('mock_daftar_absensi', JSON.stringify(newList));
-    setDaftarList(newList);
-    
-    Swal.fire('Sukses', 'Data Absensi berhasil ditambahkan', 'success');
-  };
-
-  const handleDelete = (id_daftar) => {
-    Swal.fire({
-      title: 'Hapus Data Absensi?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, Hapus'
-    }).then((res) => {
-      if (res.isConfirmed) {
-        const newList = daftarList.filter(d => d.id_daftar !== id_daftar);
-        localStorage.setItem('mock_daftar_absensi', JSON.stringify(newList));
-        setDaftarList(newList);
-        Swal.fire('Sukses', 'Data Absensi dihapus', 'success');
-      }
-    });
-  };
-
-  const handleIsi = (daftar) => {
-    handleMetaChange({ target: { name: 'id_kelas', value: daftar.id_kelas } });
-    handleMetaChange({ target: { name: 'id_mapel', value: daftar.id_mapel } });
-    handleMetaChange({ target: { name: 'tanggal', value: daftar.tanggal } });
-    handleMetaChange({ target: { name: 'jam_mulai', value: daftar.jam_mulai } });
-    handleMetaChange({ target: { name: 'jam_selesai', value: daftar.jam_selesai } });
-    
-    loadSiswa(daftar);
-  };
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="data-panel view-list">
-        <div className="panel-header glass">
-          <div className="header-text">
-            <h2>Kelola Absensi Siswa</h2>
-            <p>Manajemen data absensi murid pada setiap pertemuan.</p>
-          </div>
-          {step === 'filter' && (
-            <div className="header-actions">
-              <button onClick={() => setShowAddModal(true)} className="btn-primary">
-                <Plus size={18} /> Tambah Data Absensi
-              </button>
-            </div>
-          )}
+      <div className="guru-absensi-page">
+        <div className="page-header">
+          <h1>Input Absensi Siswa</h1>
+          <p className="text-muted">Pilih jadwal dan tanggal untuk mengisi atau melihat absensi</p>
         </div>
 
-        {step === 'filter' && !showAddModal && (
-          <div className="mt-6 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tanggal & Waktu</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Kelas & Mapel</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {daftarList.length > 0 ? daftarList.map(daftar => {
-                  const kelas = kelasList.find(k => Number(k.id_kelas) === Number(daftar.id_kelas))?.nama_kelas || 'Semua';
-                  const mapel = mapelList.find(m => Number(m.id_mapel) === Number(daftar.id_mapel))?.nama_mapel || 'Semua';
-                  return (
-                    <tr key={daftar.id_daftar} className="hover:bg-slate-50/50">
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-slate-700">{daftar.tanggal}</div>
-                        <div className="text-sm text-slate-500">{daftar.jam_mulai} - {daftar.jam_selesai}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-slate-800">{mapel}</div>
-                        <div className="text-sm text-slate-500">Kelas: {kelas}</div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => handleIsi(daftar)} className="btn-outline h-8 px-3 text-xs">
-                            <Edit2 size={14} className="mr-1" /> Isi Absensi
-                          </button>
-                          <button onClick={() => handleDelete(daftar.id_daftar)} className="p-2 text-slate-400 hover:text-red-500 rounded-lg">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+        {/* ── Filter Panel ── */}
+        <div className="card filter-panel">
+          <div className="filter-grid">
+            <div className="form-group">
+              <label>Tahun Ajaran</label>
+              <select
+                value={filter.id_tahun_ajaran}
+                onChange={(e) => handleFilterChange('id_tahun_ajaran', e.target.value)}
+              >
+                <option value="">-- Pilih Tahun Ajaran --</option>
+                {filter.tahunAjaranOptions?.map((ta) => (
+                  <option key={ta.id} value={ta.id}>{ta.nama}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Mata Pelajaran / Jadwal</label>
+              <select
+                value={filter.id_jadwal}
+                onChange={(e) => handleFilterChange('id_jadwal', e.target.value)}
+                disabled={!filter.id_tahun_ajaran}
+              >
+                <option value="">-- Pilih Jadwal --</option>
+                {jadwalList.map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.nama_mapel} – {j.nama_kelas} ({j.hari}, {j.jam_mulai})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Daftar Pertemuan (dari API, bukan localStorage) ── */}
+        <div className="card">
+          <div className="card-header">
+            <h2>Riwayat Pertemuan</h2>
+            <button
+              className="btn btn-primary"
+              onClick={() => handleIsiAbsensi()}
+              disabled={!filter.id_jadwal || !filter.id_tahun_ajaran}
+            >
+              + Isi Absensi Baru
+            </button>
+          </div>
+
+          <div className="card-body">
+            {isLoadingDaftar ? (
+              <div className="loading-state">
+                <span className="spinner" />
+                <p>Memuat riwayat pertemuan...</p>
+              </div>
+            ) : daftarList.length === 0 ? (
+              <div className="empty-state">
+                <p>Belum ada absensi yang diinput untuk jadwal ini.</p>
+              </div>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Tanggal</th>
+                    <th>Pertemuan ke-</th>
+                    <th>Hadir</th>
+                    <th>Izin</th>
+                    <th>Sakit</th>
+                    <th>Alfa</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {daftarList.map((item, index) => (
+                    <tr key={item.id ?? item.tanggal}>
+                      <td>{index + 1}</td>
+                      <td>{item.tanggal}</td>
+                      <td>{item.pertemuan_ke ?? '-'}</td>
+                      <td className="text-success">{item.hadir ?? 0}</td>
+                      <td className="text-warning">{item.izin ?? 0}</td>
+                      <td className="text-info">{item.sakit ?? 0}</td>
+                      <td className="text-danger">{item.alfa ?? 0}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline"
+                          onClick={() => handleJadwalSelect(item)}
+                        >
+                          Lihat / Edit
+                        </button>
                       </td>
                     </tr>
-                  )
-                }) : (
-                  <tr>
-                    <td colSpan="3" className="text-center py-12 text-slate-500">Belum ada data absensi. Klik Tambah Data Absensi.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-        )}
+        </div>
 
-        {showAddModal && (
-          <div className="mt-4 form-panel glass p-6">
-            <h3 className="font-semibold text-lg mb-4">Tambah Data Absensi Baru</h3>
-            <form onSubmit={handleAddDaftar}>
-              <AbsensiFilterForm
-                meta={meta}
-                kelasList={kelasList}
-                mapelList={mapelList}
-                loading={loading}
-                onChange={handleMetaChange}
-                onSubmit={handleAddDaftar}
-              />
-              <div className="flex justify-end mt-4 gap-2">
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn-outline">Batal</button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {step === 'input' && (
-          <div className="mt-4 form-panel glass p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-lg">Mengisi Absensi Murid</h3>
-              <button type="button" onClick={reset} className="btn-outline text-sm">
-                Kembali
-              </button>
+        {/* ── Form Input Absensi (muncul setelah jadwal dipilih) ── */}
+        {selectedJadwal && (
+          <div className="card form-absensi">
+            <div className="card-header">
+              <h2>
+                Input Absensi – {selectedJadwal.tanggal}
+              </h2>
+              <button className="btn btn-ghost" onClick={resetForm}>✕ Tutup</button>
             </div>
-            
-            <AbsensiSiswaTable siswaRows={siswaRows} onStatusChange={handleStatusChange} />
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                className="btn-outline"
-                onClick={reset}
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={saveAbsensi}
-                disabled={saving}
-              >
-                <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Absensi'}
-              </button>
+            <div className="card-body">
+              {isLoading ? (
+                <div className="loading-state">
+                  <span className="spinner" />
+                  <p>Memuat data siswa...</p>
+                </div>
+              ) : (
+                <>
+                  <table className="table table-absensi">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Nama Siswa</th>
+                        <th>NIS</th>
+                        <th>H</th>
+                        <th>I</th>
+                        <th>S</th>
+                        <th>A</th>
+                        <th>T</th>
+                        <th>Keterangan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {siswaList.map((siswa, index) => {
+                        const current = absensiMap[siswa.id] ?? { status: 'H', keterangan: '' };
+                        return (
+                          <tr key={siswa.id}>
+                            <td>{index + 1}</td>
+                            <td>{siswa.nama}</td>
+                            <td>{siswa.nis}</td>
+                            {['H', 'I', 'S', 'A', 'T'].map((status) => (
+                              <td key={status} className="text-center">
+                                <input
+                                  type="radio"
+                                  name={`status_${siswa.id}`}
+                                  value={status}
+                                  checked={current.status === status}
+                                  onChange={() => handleStatusChange(siswa.id, 'status', status)}
+                                />
+                              </td>
+                            ))}
+                            <td>
+                              <input
+                                type="text"
+                                className="input-keterangan"
+                                placeholder="opsional"
+                                value={current.keterangan}
+                                onChange={(e) =>
+                                  handleStatusChange(siswa.id, 'keterangan', e.target.value)
+                                }
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+
+                  {error && <p className="text-danger">{error}</p>}
+
+                  <div className="form-actions">
+                    <button className="btn btn-ghost" onClick={resetForm}>
+                      Batal
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || siswaList.length === 0}
+                    >
+                      {isSubmitting ? 'Menyimpan...' : 'Simpan Absensi'}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

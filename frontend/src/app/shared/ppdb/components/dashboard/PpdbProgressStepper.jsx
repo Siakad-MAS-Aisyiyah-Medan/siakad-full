@@ -1,17 +1,12 @@
 import { Check } from 'lucide-react';
+import PageHeader from '@app/shared/components/PageHeader';
 
 export default function PpdbProgressStepper({ steps, activeIndex, percent }) {
   return (
-    <div className="data-panel view-list calon-murid-panel">
-      <div className="panel-header glass">
-        <div className="header-text">
-          <h2>Progres Pendaftaran</h2>
-          <p>Lacak kelengkapan setiap tahap formulir PPDB.</p>
-        </div>
-        <div className="header-actions">
-          <span className="calon-murid-percent-pill">{percent}% selesai</span>
-        </div>
-      </div>
+    <div className="data-panel view-list calon-murid-panel" style={{ paddingTop: '1rem' }}>
+      <PageHeader title="Progres Pendaftaran" subtitle="Lacak kelengkapan setiap tahap formulir PPDB.">
+        <span className="calon-murid-percent-pill">{percent}% selesai</span>
+      </PageHeader>
 
       <div className="calon-murid-stepper-wrap">
         <ol className="calon-murid-stepper">

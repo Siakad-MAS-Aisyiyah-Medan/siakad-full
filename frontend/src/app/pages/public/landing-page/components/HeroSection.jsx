@@ -33,20 +33,9 @@ export default function HeroSection({ onPendaftaranClick, onLearnMore }) {
             >
               Informasi Pendaftaran
             </button>
-            <button
-              type="button"
-              onClick={onLearnMore}
-              className="lp-btn lp-btn--outline lp-btn--lg"
-            >
-              Profil Sekolah
-            </button>
           </div>
 
-          <ul className="lp-hero__highlights">
-            <li><BookOpen size={14} style={{ marginRight: '0.25rem', display: 'inline' }} /> Kurikulum Merdeka</li>
-            <li><Users size={14} style={{ marginRight: '0.25rem', display: 'inline' }} /> Guru Berkualitas</li>
-            <li><Award size={14} style={{ marginRight: '0.25rem', display: 'inline' }} /> Terakreditasi</li>
-          </ul>
+
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

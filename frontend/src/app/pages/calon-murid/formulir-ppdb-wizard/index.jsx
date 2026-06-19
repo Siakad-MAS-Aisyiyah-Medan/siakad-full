@@ -4,6 +4,7 @@ import {
   FileEdit, User, Heart, School, Users, Star, FileText, ClipboardCheck,
 } from 'lucide-react';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
+import PageHeader from '@app/shared/components/PageHeader';
 import FormActions from '@app/shared/ppdb/components/form/FormActions';
 import {
   StepKepribadian,
@@ -99,6 +100,10 @@ export default function FormulirPpdbWizard() {
   if (w.loading) {
     return (
       <CalonMuridLayout>
+        <PageHeader 
+          title="Formulir Pendaftaran PPDB"
+          subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
+        />
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-slate-400">
           <div className="wizard-loading-ring" />
           <p className="text-sm font-medium">Memuat formulir pendaftaran...</p>
@@ -111,6 +116,10 @@ export default function FormulirPpdbWizard() {
   if (w.initError) {
     return (
       <CalonMuridLayout>
+        <PageHeader 
+          title="Formulir Pendaftaran PPDB"
+          subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
+        />
         <div className="mx-auto max-w-lg mt-16 text-center">
           <div className="wizard-error-card">
             <AlertCircle size={40} className="text-red-400 mx-auto mb-4" />
@@ -129,36 +138,20 @@ export default function FormulirPpdbWizard() {
     <CalonMuridLayout>
       <div className="wizard-root animate-stagger-1">
         {/* ── Wizard Page Header ── */}
-        <div className="wizard-page-header">
-          <div className="wizard-page-header__left">
-            <div className="wizard-page-header__icon">
-              <FileEdit size={26} strokeWidth={1.5} />
-            </div>
-            <div>
-              <h1 className="wizard-page-header__title">Formulir Pendaftaran PPDB</h1>
-              <p className="wizard-page-header__subtitle">
-                Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi.
-              </p>
-            </div>
-          </div>
-          <div className="wizard-page-header__actions">
-            <button
-              type="button"
-              className="wizard-btn-ghost"
-              onClick={() => navigate('/calon-murid/dashboard')}
-            >
-              <ArrowLeft size={15} />
-              Dashboard
-            </button>
-            <button
-              type="button"
-              className="wizard-btn-outline"
-              onClick={() => navigate('/calon-murid/status')}
-            >
-              Lihat Status
-            </button>
-          </div>
-        </div>
+        {/* ── Wizard Page Header ── */}
+        <PageHeader 
+          title="Formulir Pendaftaran PPDB"
+          subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
+        >
+          <button
+            type="button"
+            className="wizard-btn-outline"
+            style={{ padding: '0.45rem 1rem' }}
+            onClick={() => navigate('/calon-murid/status')}
+          >
+            Lihat Status
+          </button>
+        </PageHeader>
 
         {/* ── Step Progress Bar ── */}
         <div className="wizard-progress-wrap animate-stagger-2">
@@ -261,10 +254,10 @@ export default function FormulirPpdbWizard() {
               onBack={w.goBack}
               onSaveDraft={stepKey === 'review' ? undefined : w.saveDraft}
               draftLoading={w.saving}
-              onPrimary={stepKey === 'review' ? w.submit : w.saveAndNext}
-              primaryLabel={stepKey === 'review' ? 'Selesai & Daftarkan Diri' : 'Simpan Data'}
+              onPrimary={stepKey === 'review' ? () => navigate('/calon-murid/upload-berkas') : w.saveAndNext}
+              primaryLabel={stepKey === 'review' ? 'Selesai & Lanjut ke Berkas' : 'Simpan Data'}
               primaryLoading={w.saving}
-              primaryLoadingLabel={stepKey === 'review' ? 'Mengirim...' : 'Menyimpan...'}
+              primaryLoadingLabel={stepKey === 'review' ? 'Menyimpan...' : 'Menyimpan...'}
               disabled={disabled}
               isReview={stepKey === 'review'}
               showSaveDraft={stepKey !== 'review'}

@@ -1,33 +1,28 @@
 import { CalendarDays, Eye, Megaphone, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd, onEdit, onDelete, isFetching }) {
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Panel Header */}
-      <div className="panel-header mb-4">
-        <div className="header-text">
-          <h2>Pengumuman Sekolah</h2>
-          <p>Kelola pengumuman untuk civitas MAS Aisyiyah Medan</p>
+      <PageHeader title="Pengumuman Sekolah" subtitle="Kelola pengumuman untuk civitas MAS Aisyiyah Medan">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            placeholder="Cari pengumuman..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+          />
         </div>
-        <div className="header-actions">
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-            <input
-              type="text"
-              placeholder="Cari pengumuman..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-            />
-          </div>
-          {onAdd && (
-            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Pengumuman
-            </button>
-          )}
-        </div>
-      </div>
+        {onAdd && (
+          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Pengumuman
+          </button>
+        )}
+      </PageHeader>
 
       {/* Table */}
       <div className="table-container">
@@ -111,26 +106,19 @@ function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd
 
 function ReadOnlyPengumumanCards({ filteredData, searchQuery, onSearchChange, isFetching }) {
   return (
-    <div className="admin-page-wrapper animate-fade-in">
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-primary-dark)', marginBottom: '0.5rem' }}>
-          📢 Pengumuman Sekolah
-        </h2>
-        <p style={{ color: 'var(--color-text-muted)' }}>Informasi terbaru dari MAS Aisyiyah Medan</p>
-      </div>
-
-      {/* Search */}
-      <div style={{ position: 'relative', marginBottom: '1.5rem', maxWidth: '480px', margin: '0 auto 1.5rem' }}>
-        <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-        <input
-          type="text"
-          placeholder="Cari pengumuman..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={{ paddingLeft: '2.5rem', height: '42px', border: '1.5px solid var(--color-border)', borderRadius: '10px', fontSize: '0.9rem', outline: 'none', width: '100%', background: '#fff', color: 'var(--color-text-dark)' }}
-        />
-      </div>
+    <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+      <PageHeader title="Pengumuman Sekolah" subtitle="Informasi terbaru dari MAS Aisyiyah Medan">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            placeholder="Cari pengumuman..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+          />
+        </div>
+      </PageHeader>
 
       {/* Cards */}
       {isFetching ? (

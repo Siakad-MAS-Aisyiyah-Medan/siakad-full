@@ -1,134 +1,204 @@
-import { useState, useCallback, useEffect } from 'react';
-import { fetchKelasList } from '@app/shared/akademik/kelas/services/kelas.service';
-import { fetchMapelList } from '@app/shared/akademik/mapel/services/mapel.service';
-import { fetchAbsensiForm, saveAbsensiBulk } from '../services/absensi.service';
-import { getStoredUser } from '@app/shared/services/auth.service';
-import { toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
+// useGuruAbsensi.js
+// PERBAIKAN UTAMA:
+// Sebelumnya: daftarList diisi dari localStorage('mock_daftar_absensi')
+// Sesudahnya:  daftarList diisi dari GET /api/guru/absensi/siswa/rekap
+//              yang memanggil AbsensiSiswaService::getRekap() di backend
 
-const today = new Date().toISOString().slice(0, 10);
-
-const emptyMeta = {
-  id_kelas: '',
-  id_mapel: '',
-  tanggal: today,
-  jam_mulai: '07:00',
-  jam_selesai: '08:30',
-  tahun_ajaran: '2025/2026',
-  semester: 'Ganjil',
-};
+import { useState, useEffect, useCallback } from 'react';
+import { absensiService } from '../services/absensi.service';
 
 export function useGuruAbsensi() {
-  const [step, setStep] = useState('filter');
-  const [meta, setMeta] = useState(emptyMeta);
-  const [kelasList, setKelasList] = useState([]);
-  const [mapelList, setMapelList] = useState([]);
-  const [siswaRows, setSiswaRows] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  // ── Filter State ──────────────────────────────────────────────
+  const [filter, setFilter] = useState({
+    id_tahun_ajaran: '',
+    id_jadwal: '',
+    tahunAjaranOptions: [],
+  });
 
-  const userId = getStoredUser()?.id_user;
-  const userRole = getStoredUser()?.role;
+  // ── Data State ────────────────────────────────────────────────
+  const [jadwalList, setJadwalList]   = useState([]);
+  const [daftarList, setDaftarList]   = useState([]); // ← dari API, bukan localStorage
+  const [siswaList, setSiswaList]     = useState([]);
+  const [formData, setFormData]       = useState(null);
+  const [selectedJadwal, setSelectedJadwal] = useState(null);
+  const [absensiMap, setAbsensiMap]   = useState({});
 
-  const loadOptions = useCallback(async () => {
-    try {
-      const [kelas, mapel] = await Promise.all([fetchKelasList(), fetchMapelList()]);
-      setKelasList(kelas);
-      setMapelList(
-        userRole === 'admin'
-          ? mapel
-          : mapel.filter((m) => Number(m.id_guru) === Number(userId))
-      );
-    } catch (e) {
-      console.error(e);
-    }
-  }, [userId, userRole]);
+  // ── UI State ──────────────────────────────────────────────────
+  const [isLoading, setIsLoading]           = useState(false);
+  const [isLoadingDaftar, setIsLoadingDaftar] = useState(false); // khusus daftarList
+  const [isSubmitting, setIsSubmitting]     = useState(false);
+  const [error, setError]                   = useState(null);
 
+  // ── 1. Load Tahun Ajaran saat mount ───────────────────────────
   useEffect(() => {
-    loadOptions();
-  }, [loadOptions]);
+    absensiService.getTahunAjaran?.()
+      .then((res) => {
+        setFilter((prev) => ({
+          ...prev,
+          tahunAjaranOptions: res.data ?? [],
+        }));
+      })
+      .catch(() => {});
+  }, []);
 
-  const handleMetaChange = (e) => {
-    setMeta({ ...meta, [e.target.name]: e.target.value });
-  };
-
-  const loadSiswa = async (e) => {
-    e?.preventDefault();
-    setLoading(true);
-    try {
-      const data = await fetchAbsensiForm({
-        id_kelas: Number(meta.id_kelas),
-        id_mapel: Number(meta.id_mapel),
-        tanggal: meta.tanggal,
-        jam_mulai: meta.jam_mulai,
-        jam_selesai: meta.jam_selesai,
-        tahun_ajaran: meta.tahun_ajaran,
-        semester: meta.semester,
-      });
-      setSiswaRows(
-        (data.siswa || []).map((s) => ({
-          ...s,
-          status: s.status || 'H',
-        }))
-      );
-      setStep('input');
-    } catch (err) {
-      toastError('Gagal', err.response?.data?.message || 'Gagal memuat daftar siswa');
-    } finally {
-      setLoading(false);
+  // ── 2. Load Jadwal saat Tahun Ajaran berubah ─────────────────
+  useEffect(() => {
+    if (!filter.id_tahun_ajaran) {
+      setJadwalList([]);
+      setDaftarList([]);
+      return;
     }
-  };
 
-  const handleStatusChange = (id_user_siswa, status) => {
-    setSiswaRows((rows) =>
-      rows.map((r) => (r.id_user_siswa === id_user_siswa ? { ...r, status } : r))
-    );
-  };
+    absensiService.getJadwalGuru(filter.id_tahun_ajaran)
+      .then((res) => setJadwalList(res.data ?? []))
+      .catch(() => setJadwalList([]));
+  }, [filter.id_tahun_ajaran]);
 
-  const saveAbsensi = async () => {
-    setSaving(true);
-    try {
-      await saveAbsensiBulk({
-        meta: {
-          id_kelas: Number(meta.id_kelas),
-          id_mapel: Number(meta.id_mapel),
-          tanggal: meta.tanggal,
-          jam_mulai: meta.jam_mulai,
-          jam_selesai: meta.jam_selesai,
-          tahun_ajaran: meta.tahun_ajaran,
-          semester: meta.semester,
-        },
-        items: siswaRows.map((r) => ({
-          id_user_siswa: r.id_user_siswa,
-          status: r.status,
-          keterangan: r.keterangan || null,
-        })),
-      });
-      toastSuccess('Berhasil', 'Data berhasil disimpan');
-      setStep('filter');
-    } catch (err) {
-      toastError('Gagal', err.response?.data?.message || 'Gagal menyimpan absensi');
-    } finally {
-      setSaving(false);
+  // ── 3. Load Daftar Pertemuan (rekap) saat Jadwal berubah ─────
+  // PERBAIKAN: sebelumnya membaca localStorage('mock_daftar_absensi')
+  // Sekarang memanggil API /api/guru/absensi/siswa/rekap
+  useEffect(() => {
+    if (!filter.id_jadwal || !filter.id_tahun_ajaran) {
+      setDaftarList([]);
+      return;
     }
-  };
 
-  const reset = () => {
-    setStep('filter');
-    setSiswaRows([]);
-  };
+    setIsLoadingDaftar(true);
+    setError(null);
+
+    absensiService.getRekap({
+      id_jadwal:       filter.id_jadwal,
+      id_tahun_ajaran: filter.id_tahun_ajaran,
+    })
+      .then((res) => setDaftarList(res.data ?? []))
+      .catch((err) => {
+        setError('Gagal memuat riwayat absensi.');
+        setDaftarList([]);
+      })
+      .finally(() => setIsLoadingDaftar(false));
+  }, [filter.id_jadwal, filter.id_tahun_ajaran]);
+
+  // ── Handler: perubahan filter ─────────────────────────────────
+  const handleFilterChange = useCallback((key, value) => {
+    setFilter((prev) => {
+      const next = { ...prev, [key]: value };
+      // Reset jadwal jika tahun ajaran berubah
+      if (key === 'id_tahun_ajaran') next.id_jadwal = '';
+      return next;
+    });
+    setSelectedJadwal(null);
+    setAbsensiMap({});
+    setSiswaList([]);
+  }, []);
+
+  // ── Handler: klik "Isi Absensi Baru" atau "Lihat/Edit" ────────
+  const handleIsiAbsensi = useCallback((itemRekap = null) => {
+    const tanggal = itemRekap?.tanggal ?? new Date().toISOString().split('T')[0];
+
+    setIsLoading(true);
+    setError(null);
+
+    absensiService.getFormData({
+      id_jadwal:       filter.id_jadwal,
+      id_tahun_ajaran: filter.id_tahun_ajaran,
+      tanggal,
+    })
+      .then((res) => {
+        const { siswa, absensi_existing } = res.data ?? {};
+
+        setSiswaList(siswa ?? []);
+        setFormData(res.data);
+        setSelectedJadwal({ ...filter, tanggal });
+
+        // Pre-fill status jika sudah ada absensi sebelumnya
+        const map = {};
+        (absensi_existing ?? []).forEach((a) => {
+          map[a.id_siswa] = { status: a.status, keterangan: a.keterangan ?? '' };
+        });
+        // Default H untuk siswa yang belum ada
+        (siswa ?? []).forEach((s) => {
+          if (!map[s.id]) map[s.id] = { status: 'H', keterangan: '' };
+        });
+        setAbsensiMap(map);
+      })
+      .catch(() => setError('Gagal memuat data form absensi.'))
+      .finally(() => setIsLoading(false));
+  }, [filter]);
+
+  const handleJadwalSelect = useCallback((item) => {
+    handleIsiAbsensi(item);
+  }, [handleIsiAbsensi]);
+
+  // ── Handler: perubahan status / keterangan per siswa ─────────
+  const handleStatusChange = useCallback((idSiswa, field, value) => {
+    setAbsensiMap((prev) => ({
+      ...prev,
+      [idSiswa]: { ...prev[idSiswa], [field]: value },
+    }));
+  }, []);
+
+  // ── Handler: submit bulk absensi ──────────────────────────────
+  const handleSubmit = useCallback(async () => {
+    if (!selectedJadwal) return;
+
+    setIsSubmitting(true);
+    setError(null);
+
+    const payload = {
+      id_jadwal:       filter.id_jadwal,
+      id_tahun_ajaran: filter.id_tahun_ajaran,
+      tanggal:         selectedJadwal.tanggal,
+      absensi: siswaList.map((s) => ({
+        id_siswa:    s.id,
+        status:      absensiMap[s.id]?.status      ?? 'H',
+        keterangan:  absensiMap[s.id]?.keterangan  ?? '',
+      })),
+    };
+
+    try {
+      await absensiService.bulkStore(payload);
+
+      // Refresh daftar pertemuan dari API setelah simpan berhasil
+      const res = await absensiService.getRekap({
+        id_jadwal:       filter.id_jadwal,
+        id_tahun_ajaran: filter.id_tahun_ajaran,
+      });
+      setDaftarList(res.data ?? []);
+      setSelectedJadwal(null);
+      setAbsensiMap({});
+      setSiswaList([]);
+    } catch (err) {
+      setError(err?.response?.data?.message ?? 'Gagal menyimpan absensi.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [selectedJadwal, filter, siswaList, absensiMap]);
+
+  // ── Handler: reset form ───────────────────────────────────────
+  const resetForm = useCallback(() => {
+    setSelectedJadwal(null);
+    setAbsensiMap({});
+    setSiswaList([]);
+    setError(null);
+  }, []);
 
   return {
-    step,
-    meta,
-    kelasList,
-    mapelList,
-    siswaRows,
-    loading,
-    saving,
-    handleMetaChange,
-    loadSiswa,
+    jadwalList,
+    daftarList,
+    formData,
+    siswaList,
+    isLoading,
+    isLoadingDaftar,
+    isSubmitting,
+    error,
+    filter,
+    selectedJadwal,
+    absensiMap,
+    handleFilterChange,
+    handleJadwalSelect,
     handleStatusChange,
-    saveAbsensi,
-    reset,
+    handleSubmit,
+    handleIsiAbsensi,
+    resetForm,
   };
 }

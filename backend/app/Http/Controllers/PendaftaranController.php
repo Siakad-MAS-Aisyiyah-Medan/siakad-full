@@ -247,11 +247,20 @@ class PendaftaranController extends Controller
             return ApiResponse::error('Pendaftaran sudah dikirim atau sedang diproses.', 422);
         }
 
-        // Validasi kelengkapan minimal
         $required = ['nama_lengkap', 'tempat_lahir', 'tgl_lahir', 'jenis_kelamin', 'agama', 'alamat', 'sekolah_asal', 'nama_ayah', 'nama_ibu', 'pekerjaan_ayah', 'pekerjaan_ibu'];
         foreach ($required as $field) {
             if (empty(trim((string) $pendaftaran->$field))) {
                 return ApiResponse::error("Field {$field} wajib diisi sebelum submit.", 422);
+            }
+        }
+
+        // Validasi kelengkapan berkas
+        $uploaded = $pendaftaran->berkas()->pluck('jenis_berkas')->all();
+        foreach (\App\Services\PpdbBerkasService::allJenisKeys() as $jenis) {
+            $normalized = \App\Services\PpdbBerkasService::normalizeJenis($jenis);
+            if (!in_array($normalized, $uploaded, true)) {
+                $label = \App\Services\PpdbBerkasService::JENIS[$jenis] ?? $jenis;
+                return ApiResponse::error("Berkas {$label} wajib diunggah sebelum submit.", 422);
             }
         }
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Users, Search } from 'lucide-react';
 import MainLayout from '@app/shared/layouts/MainLayout';
+import PageHeader from '@app/shared/components/PageHeader';
 import { getStoredUser, getStoredProfile } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
 import AbsensiFilterForm from '../absensi/components/AbsensiFilterForm';
@@ -32,13 +33,8 @@ export default function GuruMuridPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="data-panel view-list">
-        <div className="panel-header glass">
-          <div className="header-text">
-            <h2>Data Murid</h2>
-            <p>Daftar murid pada kelas dan mata pelajaran yang Anda ampu.</p>
-          </div>
-        </div>
+      <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Data Murid" subtitle="Daftar murid pada kelas dan mata pelajaran yang Anda ampu." />
 
         {step === 'filter' && (
           <div className="mt-4">

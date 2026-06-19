@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
+import PageHeader from '@app/shared/components/PageHeader';
 import { fetchMyRegistration, submitPendaftaran } from '@app/shared/services/ppdb.service';
+import { STEP_REQUIRED } from '@app/shared/ppdb/config/ppdbWizardConfig';
+import { UPLOAD_BERKAS_ITEMS } from '@app/shared/ppdb/config/calonMuridNav';
 import { confirmAction, toastSuccess, toastValidation, toastError } from '@app/shared/hooks/useConfirm';
 import { CheckCircle2, FileText, Send, FolderOpen } from 'lucide-react';
 
@@ -48,16 +51,35 @@ export default function KirimPendaftaranPage() {
   }, []);
 
   const formProgress = useMemo(() => {
-    const step = registration?.current_step_key || registration?.current_step || '';
-    if (['review', 'dokumen', 'submitted'].includes(step)) return 100;
-    if (step) return 50;
-    return 0;
+    if (!registration) return 0;
+    if (['diajukan', 'terverifikasi', 'diterima', 'ditolak'].includes(registration.ppdb_status)) return 100;
+    
+    let totalFields = 0;
+    let filledFields = 0;
+
+    Object.values(STEP_REQUIRED).forEach((fields) => {
+      fields.forEach((field) => {
+        totalFields++;
+        const val = registration[field];
+        if (val !== null && val !== undefined && String(val).trim() !== '') {
+          filledFields++;
+        }
+      });
+    });
+
+    if (totalFields === 0) return 0;
+    return Math.min(100, Math.round((filledFields / totalFields) * 100));
   }, [registration]);
 
   const berkasProgress = useMemo(() => {
+    if (['diajukan', 'terverifikasi', 'diterima', 'ditolak'].includes(registration?.ppdb_status)) return 100;
     const berkas = Array.isArray(registration?.berkas) ? registration.berkas : [];
-    if (berkas.length === 0) return 40;
-    return Math.min(100, Math.round((berkas.filter((item) => item.path_file || item.file_url).length / Math.max(berkas.length, 1)) * 100));
+    if (berkas.length === 0) return 0;
+    
+    const uploadedCount = berkas.filter((item) => item.file_path || item.path_file || item.file_url).length;
+    const totalRequired = UPLOAD_BERKAS_ITEMS.length;
+    
+    return Math.min(100, Math.round((uploadedCount / totalRequired) * 100));
   }, [registration]);
 
   const handleSubmit = async () => {
@@ -89,11 +111,11 @@ export default function KirimPendaftaranPage() {
 
   return (
     <CalonMuridLayout>
+      <PageHeader 
+        title="Kirim Pendaftaran"
+        subtitle="Periksa kembali progres kelengkapan data dan dokumen sebelum mengirim formulir secara final."
+      />
       <div className="admin-page-wrapper animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '1rem' }}>
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>Kirim Pendaftaran</h1>
-          <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.5rem' }}>Periksa kembali progres kelengkapan data dan dokumen sebelum mengirim formulir secara final.</p>
-        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <ProgressCard 
@@ -117,8 +139,9 @@ export default function KirimPendaftaranPage() {
               disabled={submitting || loading || !isReadyToSubmit}
               className="btn-primary"
               style={{ 
+                margin: '0 auto',
                 width: '100%', maxWidth: '400px', padding: '1rem', fontSize: '1.05rem', 
-                borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', 
+                borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', 
                 opacity: (!isReadyToSubmit || submitting || loading) ? 0.6 : 1,
                 cursor: (!isReadyToSubmit || submitting || loading) ? 'not-allowed' : 'pointer'
               }}

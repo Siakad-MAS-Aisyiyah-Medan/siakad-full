@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, CircleUserRound, LogOut, Menu } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AppLogo from '@app/shared/components/AppLogo';
@@ -11,11 +11,15 @@ import { CALON_MURID_NAV } from '../config/calonMuridNav';
 
 export default function CalonMuridLayout({ children }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const user = getJsonItem('user');
   const profile = getJsonItem('profile');
   const displayName = user?.name || profile?.nama_lengkap || user?.username || 'Calon Murid';
   const accountStatus = user?.status_akun || (user?.status_aktif !== false ? 'aktif' : 'nonaktif');
+  
+  const isDashboard = location.pathname === '/calon-murid' || location.pathname.includes('/dashboard') || location.pathname === '/ppdb';
+
   const navItems = useMemo(() => {
     return CALON_MURID_NAV.filter((item, index, arr) => arr.findIndex((row) => row.path === item.path) === index);
   }, []);
@@ -88,29 +92,38 @@ export default function CalonMuridLayout({ children }) {
             >
               <Menu size={22} />
             </button>
-            <div className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>
-                Halo, {displayName.split(' ')[0]} 👋
-              </h2>
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem' }}>
-                Selamat datang di PPDB Online
-              </p>
-            </div>
+            {isDashboard ? (
+              <div className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>
+                  Halo, {displayName.split(' ')[0]} 👋
+                </h2>
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem' }}>
+                  Selamat datang di PPDB Online
+                </p>
+              </div>
+            ) : (
+              <div id="global-header-title" className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}></div>
+            )}
           </div>
-          <div className="content-header__right">
-            <span className="content-header__bell">
-              <Bell size={20} />
-            </span>
-            <div className="user-info">
-              <span className="user-info__avatar">
-                <CircleUserRound size={22} />
-              </span>
-              <span className="user-info__name">{displayName}</span>
-            </div>
-            {accountStatus !== 'aktif' && (
-              <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20 ml-2">
-                Nonaktif
-              </span>
+          <div className="content-header__right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div id="global-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}></div>
+            {isDashboard && (
+              <>
+                <span className="content-header__bell">
+                  <Bell size={20} />
+                </span>
+                <div className="user-info">
+                  <span className="user-info__avatar">
+                    <CircleUserRound size={22} />
+                  </span>
+                  <span className="user-info__name">{displayName}</span>
+                </div>
+                {accountStatus !== 'aktif' && (
+                  <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20 ml-2">
+                    Nonaktif
+                  </span>
+                )}
+              </>
             )}
           </div>
         </header>

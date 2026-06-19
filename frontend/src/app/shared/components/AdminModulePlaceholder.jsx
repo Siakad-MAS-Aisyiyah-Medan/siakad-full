@@ -1,4 +1,5 @@
-﻿import { Plus, Inbox } from 'lucide-react';
+import { Plus, Inbox } from 'lucide-react';
+import PageHeader from '@app/shared/components/PageHeader';
 
 export default function AdminModulePlaceholder({
   title,
@@ -10,20 +11,14 @@ export default function AdminModulePlaceholder({
   onAdd,
 }) {
   return (
-    <div className="data-panel view-list">
-      <div className="panel-header glass">
-        <div className="header-text">
-          <h2>{title}</h2>
-          {subtitle && <p>{subtitle}</p>}
-        </div>
+    <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+      <PageHeader title={title} subtitle={subtitle}>
         {onAdd && (
-          <div className="header-actions">
-            <button type="button" onClick={onAdd} className="btn-primary">
-              <Plus size={18} /> {addLabel}
-            </button>
-          </div>
+          <button type="button" onClick={onAdd} className="btn-primary">
+            <Plus size={18} /> {addLabel}
+          </button>
         )}
-      </div>
+      </PageHeader>
 
       {stats.length > 0 && (
         <div className="stats-info-grid mt-6">

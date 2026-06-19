@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
+import PageHeader from '@app/shared/components/PageHeader';
 import { ArrowLeft, Pencil, Plus, Save, Trash2, X } from 'lucide-react';
 import {
   createTahunAjaran,
@@ -40,29 +41,23 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
 
   return (
     <AdminPageShell>
-      <div className="admin-page-wrapper animate-fade-in">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+        <PageHeader 
+          title={isAdd ? 'Tambah Tahun Ajaran' : 'Ubah Status Tahun Ajaran'} 
+          subtitle={isAdd ? 'Buat tahun ajaran baru untuk sistem' : 'Perbarui status tahun ajaran ini'}
+        >
           <button
             type="button"
             onClick={onClose}
+            className="btn-outline"
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: '40px', height: '40px',
-              borderRadius: '10px', border: '1px solid var(--color-border)',
-              background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              height: '38px', background: '#fff'
             }}
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} /> Batal
           </button>
-          <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>
-              {isAdd ? 'Tambah Tahun Ajaran' : 'Ubah Status Tahun Ajaran'}
-            </h2>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0 }}>
-              {isAdd ? 'Buat tahun ajaran baru untuk sistem' : 'Perbarui status tahun ajaran ini'}
-            </p>
-          </div>
-        </div>
+        </PageHeader>
 
         <div className="form-panel">
           <form onSubmit={onSubmit}>
@@ -213,19 +208,13 @@ export default function TahunAjaranPage() {
 
   return (
     <AdminPageShell>
-      <div className="admin-page-wrapper animate-fade-in">
-        <div className="panel-header mb-4">
-          <div className="header-text">
-            <h2>Tahun Ajaran</h2>
-            <p>Kelola tahun ajaran dan semester aktif</p>
-          </div>
-          <div className="header-actions">
-            <button type="button" onClick={openAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Tahun Ajaran
-            </button>
-          </div>
-        </div>
+      <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Tahun Ajaran" subtitle="Kelola tahun ajaran dan semester aktif">
+          <button type="button" onClick={openAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Tahun Ajaran
+          </button>
+        </PageHeader>
 
         <div className="table-container">
           <table className="data-table">

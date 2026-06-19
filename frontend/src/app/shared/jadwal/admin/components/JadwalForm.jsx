@@ -1,5 +1,6 @@
-import { Save, X } from 'lucide-react';
+import { Save, X, ArrowLeft } from 'lucide-react';
 import { guruLabel } from '@app/shared/utils/guruLabel';
+import PageHeader from '@app/shared/components/PageHeader';
 
 const HARI = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
@@ -15,10 +16,20 @@ export default function JadwalForm({
   onCancel,
 }) {
   return (
-    <div className="form-panel glass">
-      <div className="panel-header border-b">
-        <h2>{view === 'add' ? 'Tambah Jadwal' : 'Edit Jadwal'}</h2>
-      </div>
+    <div className="form-panel glass" style={{ paddingTop: '1rem', border: 'none' }}>
+      <PageHeader 
+        title={view === 'add' ? 'Tambah Jadwal' : 'Edit Jadwal'}
+        subtitle="Lengkapi informasi jadwal pelajaran di bawah ini"
+      >
+        <button
+          type="button"
+          onClick={onCancel}
+          className="btn-outline"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '38px', background: '#fff' }}
+        >
+          <ArrowLeft size={16} /> Kembali
+        </button>
+      </PageHeader>
 
       <form onSubmit={onSubmit} className="custom-form p-6 mt-4">
         <div className="input-group full">

@@ -1,5 +1,7 @@
 import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function GuruTable({
   filteredData,
   searchQuery,
@@ -12,54 +14,47 @@ export default function GuruTable({
 }) {
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Panel Header */}
-      <div className="panel-header mb-4">
-        <div className="header-text">
-          <h2>Data Guru</h2>
-          <p>Kelola data guru MAS Aisyiyah Medan</p>
+      <PageHeader title="Data Guru" subtitle="Kelola data guru MAS Aisyiyah Medan">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '1rem', color: '#94a3b8', pointerEvents: 'none', transition: 'color 0.2s ease' }} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Cari data guru..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{
+              paddingLeft: '2.75rem', paddingRight: '1rem', height: '42px',
+              border: '1px solid var(--color-border)', borderRadius: '12px',
+              fontSize: '0.9rem', outline: 'none', width: '260px',
+              background: '#f8fafc', color: 'var(--color-text-dark)',
+              transition: 'all 0.2s ease', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
+            }}
+            onFocus={(e) => { 
+              e.target.style.background = '#fff'; 
+              e.target.style.borderColor = 'var(--color-primary)'; 
+              e.target.style.boxShadow = '0 0 0 3px var(--color-primary-soft)';
+              e.target.previousElementSibling.style.color = 'var(--color-primary)';
+            }}
+            onBlur={(e) => { 
+              e.target.style.background = '#f8fafc'; 
+              e.target.style.borderColor = 'var(--color-border)'; 
+              e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.02)';
+              e.target.previousElementSibling.style.color = '#94a3b8';
+            }}
+          />
         </div>
-        <div className="header-actions">
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={16} style={{ position: 'absolute', left: '1rem', color: '#94a3b8', pointerEvents: 'none', transition: 'color 0.2s ease' }} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Cari data guru..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              style={{
-                paddingLeft: '2.75rem', paddingRight: '1rem', height: '42px',
-                border: '1px solid var(--color-border)', borderRadius: '12px',
-                fontSize: '0.9rem', outline: 'none', width: '260px',
-                background: '#f8fafc', color: 'var(--color-text-dark)',
-                transition: 'all 0.2s ease', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
-              }}
-              onFocus={(e) => { 
-                e.target.style.background = '#fff'; 
-                e.target.style.borderColor = 'var(--color-primary)'; 
-                e.target.style.boxShadow = '0 0 0 3px var(--color-primary-soft)';
-                e.target.previousElementSibling.style.color = 'var(--color-primary)';
-              }}
-              onBlur={(e) => { 
-                e.target.style.background = '#f8fafc'; 
-                e.target.style.borderColor = 'var(--color-border)'; 
-                e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.02)';
-                e.target.previousElementSibling.style.color = '#94a3b8';
-              }}
-            />
-          </div>
-          {readOnly ? (
-            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Download size={16} />
-              Unduh Data
-            </button>
-          ) : (
-            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Guru
-            </button>
-          )}
-        </div>
-      </div>
+        {readOnly ? (
+          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Download size={16} />
+            Unduh Data
+          </button>
+        ) : (
+          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Guru
+          </button>
+        )}
+      </PageHeader>
 
       {/* Table */}
       <div className="table-container">

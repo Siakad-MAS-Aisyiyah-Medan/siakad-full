@@ -5,6 +5,8 @@ import { getDisplayName } from '@app/shared/utils/profile';
 import { BookOpen } from 'lucide-react';
 import apiClient from '@app/shared/services/apiClient';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function GuruKelasPage() {
   const user = getStoredUser();
   const profile = getStoredProfile();
@@ -40,9 +42,8 @@ export default function GuruKelasPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-        <h2 className="text-xl font-extrabold text-slate-800 mb-2">Data Kelas yang Diajar</h2>
-        <p className="text-slate-500 mb-6">Daftar kelas di mana Anda mengajar berdasarkan jadwal pelajaran.</p>
+      <PageHeader title="Data Kelas yang Diajar" subtitle="Daftar kelas di mana Anda mengajar berdasarkan jadwal pelajaran." />
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8" style={{ marginTop: '1rem' }}>
         
         {loading ? (
           <div className="py-10 text-center text-slate-400">Memuat data kelas...</div>

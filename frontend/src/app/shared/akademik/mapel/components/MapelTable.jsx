@@ -1,5 +1,7 @@
 import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function MapelTable({
   filteredData,
   searchQuery,
@@ -12,38 +14,31 @@ export default function MapelTable({
 }) {
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Panel Header */}
-      <div className="panel-header mb-4">
-        <div className="header-text">
-          <h2>Mata Pelajaran</h2>
-          <p>Kelola data mata pelajaran MAS Aisyiyah Medan</p>
-        </div>
-        <div className="header-actions">
-          {readOnly && (
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-              <input
-                type="text"
-                placeholder="Cari mata pelajaran..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-              />
-            </div>
-          )}
-          {readOnly ? (
-            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Download size={16} />
-              Unduh Data
-            </button>
-          ) : (
-            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Mapel
-            </button>
-          )}
-        </div>
-      </div>
+      <PageHeader title="Mata Pelajaran" subtitle="Kelola data mata pelajaran MAS Aisyiyah Medan">
+        {readOnly && (
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+            <input
+              type="text"
+              placeholder="Cari mata pelajaran..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+            />
+          </div>
+        )}
+        {readOnly ? (
+          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Download size={16} />
+            Unduh Data
+          </button>
+        ) : (
+          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Mapel
+          </button>
+        )}
+      </PageHeader>
 
       {/* Table */}
       <div className="table-container">

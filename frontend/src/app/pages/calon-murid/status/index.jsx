@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ClipboardList, CheckCircle2, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
+import PageHeader from '@app/shared/components/PageHeader';
 import { fetchPpdbStatus, PPDB_STATUS_LABELS } from '@app/shared/services/ppdb.service';
 import { getJsonItem } from '@app/shared/utils/storage';
 import './status-pendaftaran.css';
@@ -31,20 +32,14 @@ export default function StatusPendaftaran() {
 
   return (
     <CalonMuridLayout>
-      <div className="status-header animate-stagger-1">
-        <div className="status-header__icon">
-          <ClipboardList size={28} />
-        </div>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-emerald-900">Status Pendaftaran</h1>
-          <p className="text-emerald-700/80">
-            Pantau perkembangan dan hasil verifikasi pendaftaran Anda di sini.
-          </p>
-        </div>
-        <button onClick={loadData} disabled={loading} className="status-refresh-btn" aria-label="Refresh status">
-          <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+      <PageHeader 
+        title="Status Pendaftaran"
+        subtitle="Pantau perkembangan dan hasil verifikasi pendaftaran Anda di sini."
+      >
+        <button onClick={loadData} disabled={loading} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 1rem' }} aria-label="Refresh status">
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
-      </div>
+      </PageHeader>
 
       <div className="status-content animate-stagger-2">
         {/* Kartu Status Utama */}

@@ -1,4 +1,5 @@
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
+import PageHeader from '@app/shared/components/PageHeader';
 
 function formatJam(mulai, selesai) {
   const a = (mulai || '').slice(0, 5);
@@ -15,27 +16,22 @@ export default function JadwalTable({
   onDelete,
 }) {
   return (
-    <div className="data-panel view-list">
-      <div className="panel-header glass">
-        <div className="header-text">
-          <h2>Jadwal Pelajaran Sekolah</h2>
-          <p>Kelola jadwal pertemuan tatap muka di setiap kelas.</p>
+    <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+      <PageHeader title="Jadwal Pelajaran Sekolah" subtitle="Kelola jadwal pertemuan tatap muka di setiap kelas.">
+        <div className="search-box" style={{ background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '0.25rem 0.5rem', display: 'flex', alignItems: 'center' }}>
+          <Search size={18} style={{ color: 'var(--color-text-muted)', marginRight: '0.5rem' }} />
+          <input
+            type="text"
+            placeholder="Cari kelas, mapel, guru..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{ border: 'none', outline: 'none', background: 'transparent' }}
+          />
         </div>
-        <div className="header-actions">
-          <div className="search-box">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Cari kelas, mapel, guru..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-          <button type="button" onClick={onAdd} className="btn-primary">
-            <Plus size={18} /> Tambah Jadwal
-          </button>
-        </div>
-      </div>
+        <button type="button" onClick={onAdd} className="btn-primary">
+          <Plus size={18} /> Tambah Jadwal
+        </button>
+      </PageHeader>
 
       <div className="table-container glass mt-6">
         <table className="data-table">

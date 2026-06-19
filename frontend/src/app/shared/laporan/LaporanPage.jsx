@@ -10,6 +10,8 @@ import LaporanSummary from './LaporanSummary';
 import LaporanTable from './LaporanTable';
 import ExportPlaceholder from './ExportPlaceholder';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function LaporanPage({
   apiPath,
   layoutRole,
@@ -89,22 +91,10 @@ export default function LaporanPage({
 
   const content = (
     <>
-      <div className="data-panel view-list">
-        {!useAdminShell ? (
-          <div className="panel-header glass">
-            <div className="header-text">
-              <h2>{title}</h2>
-              <p>{subtitle}</p>
-            </div>
-            <div className="header-actions gap-2">
-              <ExportPlaceholder onExport={handleExport} title="Unduh Laporan" />
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-end mb-2">
-            <ExportPlaceholder onExport={handleExport} title="Unduh Laporan" />
-          </div>
-        )}
+      <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+        <PageHeader title={title} subtitle={subtitle}>
+          <ExportPlaceholder onExport={handleExport} title="Unduh Laporan" />
+        </PageHeader>
 
         <div className="form-panel glass p-4 mt-4">
           <div className="input-group max-w-md">

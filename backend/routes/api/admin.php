@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index']);
+    Route::get('/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index']);
 
     Route::get('/murid/stats', [MuridController::class, 'stats'])->middleware('permission:manage_murid,view_data_siswa');
     Route::get('/murid', [MuridController::class, 'index'])->middleware('permission:manage_murid,view_data_siswa');
@@ -69,8 +70,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/transkrip-akademik/{idUserSiswa}/raport', [NilaiController::class, 'adminStudentRaport']);
     });
 
+    Route::get('/tahun-ajaran', [\App\Http\Controllers\TahunAjaranController::class, 'index']);
     Route::middleware('permission:manage_tahun_ajaran')->group(function () {
-        Route::apiResource('/tahun-ajaran', \App\Http\Controllers\TahunAjaranController::class);
+        Route::apiResource('/tahun-ajaran', \App\Http\Controllers\TahunAjaranController::class)->except(['index']);
         Route::put('/tahun-ajaran/{id}/activate', [\App\Http\Controllers\TahunAjaranController::class, 'activate']);
     });
 

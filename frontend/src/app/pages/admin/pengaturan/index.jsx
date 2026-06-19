@@ -3,6 +3,7 @@ import AdminPageShell from '@app/shared/components/AdminPageShell';
 import { ArrowLeft, Eye, EyeOff, Loader2, Save, X, UserCircle2, Mail, Lock, ShieldCheck, KeyRound } from 'lucide-react';
 import { fetchMe } from '@app/shared/services/auth.service';
 import { updateAdminProfile } from '@app/shared/services/akun.service';
+import { ROLE_LABELS } from '@/config/roles.config';
 
 function InfoCard({ label, value, icon: Icon, isPassword = false }) {
   return (
@@ -39,11 +40,14 @@ function FormLabel({ children, required = false }) {
   );
 }
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function PengaturanSistemPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState('');
   const [initialForm, setInitialForm] = useState(null);
   const [form, setForm] = useState({
     name: '',
@@ -59,6 +63,7 @@ export default function PengaturanSistemPage() {
       setLoading(true);
       try {
         const data = await fetchMe();
+        setRole(data?.user?.role || '');
         const payload = {
           name: data?.user?.name || data?.profile?.nama_lengkap || data?.profile?.nama_kepala_sekolah || data?.user?.username || 'Pengguna',
           username: data?.user?.username || '',
@@ -123,40 +128,36 @@ export default function PengaturanSistemPage() {
   }
 
   // Get initials for avatar
-  const initials = form.name.substring(0, 2).toUpperCase() || 'AD';
+  const displayName = form.name.charAt(0).toUpperCase() + form.name.slice(1);
+  const initials = displayName.substring(0, 2).toUpperCase() || 'U';
+  const roleLabel = ROLE_LABELS[role] || 'Pengguna';
 
   return (
     <AdminPageShell>
-      <div className="admin-page-wrapper animate-fade-in">
-        <div className="panel-header mb-4">
-          <div className="header-text" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {isEditing && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: '40px', height: '40px',
-                  borderRadius: '10px', border: '1px solid var(--color-border)',
-                  background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
-                }}
-              >
-                <ArrowLeft size={20} />
-              </button>
-            )}
-            <div>
-              <h2>{isEditing ? 'Edit Profil Akun' : 'Pengaturan Akun'}</h2>
-              <p>{isEditing ? 'Perbarui informasi profil dan keamanan akun Anda' : 'Kelola informasi profil dan keamanan akun Anda'}</p>
-            </div>
-          </div>
-          <div className="header-actions">
-            {!isEditing && (
-              <button type="button" onClick={() => setIsEditing(true)} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                <PencilIcon /> Edit Profil
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+        <PageHeader 
+          title={isEditing ? 'Edit Profil Akun' : 'Pengaturan Akun'} 
+          subtitle={isEditing ? 'Perbarui informasi profil dan keamanan akun Anda' : 'Kelola informasi profil dan keamanan akun Anda'}
+          backTo=""
+        >
+          {isEditing ? (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="btn-outline"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                height: '38px', background: '#fff'
+              }}
+            >
+              <ArrowLeft size={16} /> Batal Edit
+            </button>
+          ) : (
+            <button type="button" onClick={() => setIsEditing(true)} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <PencilIcon /> Edit Profil
+            </button>
+          )}
+        </PageHeader>
 
         {isEditing ? (
           <form onSubmit={handleSave} className="form-panel" style={{ padding: '2rem' }}>
@@ -245,33 +246,35 @@ export default function PengaturanSistemPage() {
           </form>
         ) : (
           <div className="form-panel" style={{ padding: 0, overflow: 'hidden' }}>
-            <div style={{ height: '140px', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative' }}>
+            <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'radial-gradient(#fff 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
-            </div>
-            
-            <div style={{ padding: '0 2.5rem 2.5rem', position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1.5rem', zIndex: 1 }}>
                 <div style={{
-                  width: '110px', height: '110px', borderRadius: '24px',
+                  width: '90px', height: '90px', borderRadius: '50%',
                   background: '#fff',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
-                  marginTop: '-55px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px',
+                  flexShrink: 0
                 }}>
                   <div style={{
-                    width: '94px', height: '94px', borderRadius: '18px',
+                    width: '100%', height: '100%', borderRadius: '50%',
                     background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
                     color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '2.5rem', fontWeight: 800, letterSpacing: '0.05em'
+                    fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em'
                   }}>
                     {initials}
                   </div>
                 </div>
-                <div style={{ marginTop: '-1rem' }}>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0 }}>{form.name}</h1>
+                <div>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>{displayName}</h1>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '0.35rem 0.85rem', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 600, marginTop: '0.6rem', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <ShieldCheck size={15} /> {roleLabel}
+                  </div>
                 </div>
               </div>
-
+            </div>
+            
+            <div style={{ padding: '2.5rem', position: 'relative' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                 <InfoCard label="Nama Lengkap" value={form.name} icon={UserCircle2} />
                 <InfoCard label="Alamat Email" value={form.email} icon={Mail} />

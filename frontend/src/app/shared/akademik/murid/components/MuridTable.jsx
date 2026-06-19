@@ -1,5 +1,7 @@
 import { Download, Pencil, Plus, Search, ShieldCheck, Trash2 } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function MuridTable({
   data,
   searchQuery,
@@ -13,36 +15,29 @@ export default function MuridTable({
 }) {
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Panel Header */}
-      <div className="panel-header mb-4">
-        <div className="header-text">
-          <h2>Data Murid</h2>
-          <p>Kelola data siswa MAS Aisyiyah Medan</p>
+      <PageHeader title="Data Murid" subtitle="Kelola data siswa MAS Aisyiyah Medan">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            placeholder="Cari data murid..."
+            style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+          />
         </div>
-        <div className="header-actions">
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-              placeholder="Cari data murid..."
-              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-            />
-          </div>
-          {readOnly ? (
-            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Download size={16} />
-              Unduh Data
-            </button>
-          ) : (
-            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Murid
-            </button>
-          )}
-        </div>
-      </div>
+        {readOnly ? (
+          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Download size={16} />
+            Unduh Data
+          </button>
+        ) : (
+          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Murid
+          </button>
+        )}
+      </PageHeader>
 
       {/* Table */}
       <div className="table-container">

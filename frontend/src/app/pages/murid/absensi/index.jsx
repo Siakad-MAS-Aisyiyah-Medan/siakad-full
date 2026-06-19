@@ -5,6 +5,8 @@ import { getDisplayName } from '@app/shared/utils/profile';
 import { fetchAbsensiSiswa } from '@app/shared/absensi/siswa/services/absensi.service';
 import { absensiStatusLabel } from '@app/shared/constants/absensiStatus';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function SiswaAbsensiPage() {
   const user = getStoredUser();
   const profile = getStoredProfile();
@@ -34,13 +36,8 @@ export default function SiswaAbsensiPage() {
 
   return (
     <MainLayout role="siswa" name={name}>
-      <div className="data-panel view-list">
-        <div className="panel-header glass">
-          <div className="header-text">
-            <h2>Riwayat Absensi</h2>
-            <p>Kehadiran Anda per mata pelajaran.</p>
-          </div>
-        </div>
+      <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Riwayat Absensi" subtitle="Kehadiran Anda per mata pelajaran." />
 
         {error && (
           <div className="glass p-4 mt-4 text-red-500" style={{ borderRadius: '12px' }}>

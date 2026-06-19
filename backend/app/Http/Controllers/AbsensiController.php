@@ -20,10 +20,16 @@ use App\Models\Kelas;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use App\Services\AbsensiSiswaService;
 
 class AbsensiController extends Controller
 {
-    
+    protected AbsensiSiswaService $absensiService;
+
+    public function __construct(AbsensiSiswaService $absensiService)
+    {
+        $this->absensiService = $absensiService;
+    }
 
     public function adminGuruIndex(\Illuminate\Http\Request $request)
     {
@@ -66,8 +72,8 @@ class AbsensiController extends Controller
         ]);
 
         try {
-            $data = $this->getFormData(
-                (int) $request->user()->id_user,
+            $data = $this->absensiService->getFormData(
+                (int) auth()->id(),
                 $validated
             );
 
@@ -96,8 +102,8 @@ class AbsensiController extends Controller
         ]);
 
         try {
-            $saved = $this->bulkSave(
-                (int) $request->user()->id_user,
+            $saved = $this->absensiService->bulkSave(
+                (int) auth()->id(),
                 $validated
             );
 
@@ -126,7 +132,7 @@ class AbsensiController extends Controller
         try {
             $rekap = $this->rekapSiswa(
                 $validated,
-                (int) $request->user()->id_user
+                (int) auth()->id()
             );
 
             return ApiResponse::success($rekap, 'Berhasil mengambil rekap absensi siswa');
@@ -143,7 +149,7 @@ class AbsensiController extends Controller
 
         try {
             $data = $this->checkIn(
-                (int) $request->user()->id_user,
+                (int) auth()->id(),
                 $request->input('keterangan')
             );
 
@@ -161,7 +167,7 @@ class AbsensiController extends Controller
 
         try {
             $data = $this->checkOut(
-                (int) $request->user()->id_user,
+                (int) auth()->id(),
                 $request->input('keterangan')
             );
 
@@ -181,9 +187,9 @@ class AbsensiController extends Controller
         ]);
 
         $items = $this->listForGuru(
-            (int) $request->user()->id_user,
-            $validated
-        );
+                (int) auth()->id(),
+                $validated
+            );
 
         return ApiResponse::success($items, 'Berhasil mengambil riwayat absensi guru');
     }
@@ -199,7 +205,7 @@ class AbsensiController extends Controller
         ]);
 
         $items = $this->listForSiswa(
-            (int) $request->user()->id_user,
+            (int) auth()->id(),
             $validated
         );
 

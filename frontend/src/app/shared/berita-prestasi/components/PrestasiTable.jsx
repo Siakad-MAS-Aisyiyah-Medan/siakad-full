@@ -1,5 +1,7 @@
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function PrestasiTable({
   filteredData,
   searchQuery,
@@ -12,28 +14,22 @@ export default function PrestasiTable({
 }) {
   return (
     <div className="data-panel view-list">
-      <div className="panel-header glass">
-        <div className="header-text">
-          <h2>Berita & Prestasi Sekolah</h2>
-          <p>Publikasikan kabar terbaru dan pencapaian siswa ke landing page.</p>
+      <PageHeader title="Berita & Prestasi Sekolah" subtitle="Publikasikan kabar terbaru dan pencapaian siswa ke landing page.">
+        <div className="search-box">
+          <Search size={18} />
+          <input
+            type="text"
+            placeholder="Cari artikel..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
         </div>
-        <div className="header-actions">
-          <div className="search-box">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Cari artikel..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-          {!readOnly && (
-            <button type="button" onClick={onAdd} className="btn-primary">
-              <Plus size={18} /> Tambah Artikel
-            </button>
-          )}
-        </div>
-      </div>
+        {!readOnly && (
+          <button type="button" onClick={onAdd} className="btn-primary">
+            <Plus size={18} /> Tambah Artikel
+          </button>
+        )}
+      </PageHeader>
 
       <div className="table-container glass mt-6">
         <table className="data-table">

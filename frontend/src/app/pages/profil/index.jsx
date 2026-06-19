@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
 import { Edit3, Loader2, UserCircle2, MapPin, Phone, CalendarDays, IdCard, ShieldCheck } from 'lucide-react';
 import { fetchMe } from '@app/shared/services/auth.service';
-import { toastError } from '@app/shared/hooks/useConfirm';
+import { updateBiodataProfile } from '@app/shared/services/akun.service';
+import { toastError, toastSuccess } from '@app/shared/hooks/useConfirm';
+import PageHeader from '@app/shared/components/PageHeader';
+import { ArrowLeft, Save, X } from 'lucide-react';
 
 function InfoCard({ label, value, icon: Icon }) {
   return (
@@ -23,15 +27,60 @@ export default function ProfilBiodataPage() {
   const [role, setRole] = useState('');
   const [profile, setProfile] = useState({});
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({});
+
   useEffect(() => {
     fetchMe()
       .then((data) => {
         setRole(data?.user?.role || '');
         setProfile(data?.profile || {});
+        
+        // Initialize form
+        setForm({
+          nama_lengkap: data?.profile?.nama_lengkap || data?.profile?.nama_kepala_sekolah || data?.profile?.nama_guru || data?.profile?.nama_siswa || '',
+          nip: data?.profile?.nip || data?.profile?.nip_nuptk || data?.profile?.nisn || '',
+          no_hp: data?.profile?.no_hp || data?.profile?.no_hp_wali || '',
+          alamat: data?.profile?.alamat || '',
+          jenis_kelamin: data?.profile?.jenis_kelamin || '',
+          tgl_lahir: data?.profile?.tgl_lahir || data?.profile?.tanggal_lahir || '',
+        });
       })
       .catch(() => toastError('Gagal', 'Gagal memuat data profil'))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      let payload = {};
+      if (role === 'kepsek') {
+        payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin };
+      } else if (role === 'guru') {
+        payload = { nama_guru: form.nama_lengkap, nip_nuptk: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin };
+      } else if (role === 'admin') {
+        payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp };
+      } else if (role === 'siswa') {
+        payload = { nama_siswa: form.nama_lengkap, nisn: form.nip, no_hp_wali: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin, tgl_lahir: form.tgl_lahir };
+      }
+
+      const res = await updateBiodataProfile(payload);
+      toastSuccess('Berhasil', 'Profil berhasil diperbarui');
+      setProfile(res.data);
+      setIsEditing(false);
+    } catch (err) {
+      toastError('Gagal', 'Gagal menyimpan profil');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const display = useMemo(() => {
     if (role === 'siswa') {
@@ -75,17 +124,25 @@ export default function ProfilBiodataPage() {
 
   return (
     <AdminPageShell>
-      <div className="admin-page-wrapper animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-          <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>Profil Saya</h1>
-            <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.5rem' }}>Informasi detail biodata dan peran Anda di sistem.</p>
-          </div>
-          <button type="button" className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '50px' }}>
-            <Edit3 size={18} />
-            <span style={{ fontWeight: 600 }}>Edit Profil</span>
-          </button>
-        </div>
+      <PageHeader 
+        title={isEditing ? 'Edit Biodata Diri' : 'Profil Saya'}
+        subtitle={isEditing ? 'Perbarui informasi biodata diri Anda' : 'Informasi detail biodata dan peran Anda di sistem.'}
+        backTo=""
+        actions={
+          isEditing ? (
+            <button type="button" onClick={() => setIsEditing(false)} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '50px', background: '#fff' }}>
+              <ArrowLeft size={18} />
+              <span style={{ fontWeight: 600 }}>Batal Edit</span>
+            </button>
+          ) : (
+            <button type="button" onClick={() => setIsEditing(true)} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '50px' }}>
+              <Edit3 size={18} />
+              <span style={{ fontWeight: 600 }}>Edit Profil</span>
+            </button>
+          )
+        }
+      />
+      <div className="admin-page-wrapper animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '1rem' }}>
 
         {loading ? (
           <div style={{ display: 'flex', height: '300px', alignItems: 'center', justifyContent: 'center' }}>
@@ -93,43 +150,91 @@ export default function ProfilBiodataPage() {
           </div>
         ) : (
           <div className="form-panel" style={{ padding: 0, overflow: 'hidden' }}>
-            <div style={{ height: '140px', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative' }}>
+            <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'radial-gradient(#fff 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
-            </div>
-            
-            <div style={{ padding: '0 2.5rem 2.5rem', position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1.5rem', zIndex: 1 }}>
                 <div style={{
-                  width: '110px', height: '110px', borderRadius: '24px',
+                  width: '90px', height: '90px', borderRadius: '50%',
                   background: '#fff',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
-                  marginTop: '-55px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px',
+                  flexShrink: 0
                 }}>
                   <div style={{
-                    width: '94px', height: '94px', borderRadius: '18px',
+                    width: '100%', height: '100%', borderRadius: '50%',
                     background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
                     color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '2.5rem', fontWeight: 800, letterSpacing: '0.05em'
+                    fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em'
                   }}>
                     {initials}
                   </div>
                 </div>
-                <div style={{ marginTop: '-1rem' }}>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0 }}>{display.nama}</h1>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 700, marginTop: '0.5rem' }}>
-                    <ShieldCheck size={14} /> {display.kelas}
+                <div>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>{display.nama}</h1>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '0.35rem 0.85rem', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 600, marginTop: '0.6rem', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <ShieldCheck size={15} /> {display.kelas}
                   </div>
                 </div>
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                <InfoCard label="Nama Lengkap" value={display.nama} icon={UserCircle2} />
-                <InfoCard label={display.nomorLabel} value={display.nomor} icon={IdCard} />
-                <InfoCard label="Nomor Handphone" value={display.noHp} icon={Phone} />
-                <InfoCard label="Tanggal Lahir" value={display.tanggalLahir} icon={CalendarDays} />
-                <InfoCard label="Alamat Tempat Tinggal" value={display.alamat} icon={MapPin} />
-              </div>
+            </div>
+            
+            <div style={{ padding: '2.5rem', position: 'relative' }}>
+              {isEditing ? (
+                <form onSubmit={handleSave}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+                    <div>
+                      <label className="form-label">Nama Lengkap</label>
+                      <input name="nama_lengkap" value={form.nama_lengkap} onChange={handleChange} className="form-control" required />
+                    </div>
+                    <div>
+                      <label className="form-label">{display.nomorLabel}</label>
+                      <input name="nip" value={form.nip} onChange={handleChange} className="form-control" />
+                    </div>
+                    <div>
+                      <label className="form-label">Nomor Handphone</label>
+                      <input name="no_hp" value={form.no_hp} onChange={handleChange} className="form-control" />
+                    </div>
+                    {role !== 'admin' && (
+                      <div>
+                        <label className="form-label">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" value={form.jenis_kelamin} onChange={handleChange} className="form-control">
+                          <option value="">Pilih...</option>
+                          <option value="L">Laki-Laki</option>
+                          <option value="P">Perempuan</option>
+                        </select>
+                      </div>
+                    )}
+                    {(role === 'siswa' || role === 'guru') && (
+                      <div>
+                        <label className="form-label">Tanggal Lahir</label>
+                        <input type="date" name="tgl_lahir" value={form.tgl_lahir} onChange={handleChange} className="form-control" />
+                      </div>
+                    )}
+                    {role !== 'admin' && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <label className="form-label">Alamat Lengkap</label>
+                        <textarea name="alamat" value={form.alamat} onChange={handleChange} className="form-control" rows="3"></textarea>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--color-border)', paddingTop: '1.5rem' }}>
+                    <button type="button" onClick={() => setIsEditing(false)} className="btn-outline">
+                      <X size={18} style={{ marginRight: '0.5rem' }} /> Batal
+                    </button>
+                    <button type="submit" disabled={saving} className="btn-primary" style={{ opacity: saving ? 0.7 : 1 }}>
+                      <Save size={18} style={{ marginRight: '0.5rem' }} /> {saving ? 'Menyimpan...' : 'Simpan Profil'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                  <InfoCard label="Nama Lengkap" value={display.nama} icon={UserCircle2} />
+                  <InfoCard label={display.nomorLabel} value={display.nomor} icon={IdCard} />
+                  <InfoCard label="Nomor Handphone" value={display.noHp} icon={Phone} />
+                  <InfoCard label="Tanggal Lahir" value={display.tanggalLahir} icon={CalendarDays} />
+                  <InfoCard label="Alamat Tempat Tinggal" value={display.alamat} icon={MapPin} />
+                </div>
+              )}
             </div>
           </div>
         )}

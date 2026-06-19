@@ -1,12 +1,23 @@
-import { Save, X } from 'lucide-react';
+import { Save, X, ArrowLeft } from 'lucide-react';
 import { guruLabel } from '@app/shared/utils/guruLabel';
+import PageHeader from '@app/shared/components/PageHeader';
 
 export default function EkskulForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   return (
-    <div className="form-panel glass">
-      <div className="panel-header border-b">
-        <h2>{readOnly ? 'Detail Ekstrakurikuler' : (view === 'add' ? 'Tambah Ekstrakurikuler' : 'Edit Ekstrakurikuler')}</h2>
-      </div>
+    <div className="form-panel glass" style={{ paddingTop: '1rem', border: 'none' }}>
+      <PageHeader 
+        title={readOnly ? 'Detail Ekstrakurikuler' : (view === 'add' ? 'Tambah Ekstrakurikuler' : 'Edit Ekstrakurikuler')}
+        subtitle={readOnly ? 'Informasi detail ekstrakurikuler' : 'Lengkapi formulir di bawah ini'}
+      >
+        <button
+          type="button"
+          onClick={onCancel}
+          className="btn-outline"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '38px', background: '#fff' }}
+        >
+          <ArrowLeft size={16} /> Kembali
+        </button>
+      </PageHeader>
 
       <form onSubmit={onSubmit} className="custom-form p-6 mt-4">
         <div className="input-group full">

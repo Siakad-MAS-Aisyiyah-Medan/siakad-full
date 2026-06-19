@@ -90,6 +90,8 @@ function StatusBadge({ status }) {
   );
 }
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function AdminDetailPendaftar({ readOnly = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -177,57 +179,44 @@ export default function AdminDetailPendaftar({ readOnly = false }) {
 
   return (
     <AdminPageShell>
-      <div className="admin-page-wrapper animate-fade-in">
-        <div className="panel-header mb-4">
-          <div className="header-text" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Link
-              to={readOnly ? '/kepala-sekolah/data-ppdb' : '/admin/ppdb'}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: '40px', height: '40px',
-                borderRadius: '10px', border: '1px solid var(--color-border)',
-                background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
-              }}
-            >
-              <ArrowLeft size={20} />
-            </Link>
-            <div>
-              <h2>Detail Pendaftar PPDB</h2>
-              <p>Informasi lengkap calon peserta didik baru</p>
-            </div>
-          </div>
-        </div>
+      <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+        <PageHeader 
+          title="Detail Pendaftar PPDB" 
+          subtitle="Informasi lengkap calon peserta didik baru"
+          backTo={readOnly ? '/kepala-sekolah/data-ppdb' : '/admin/ppdb'}
+        />
 
         <div className="form-panel" style={{ padding: 0, overflow: 'hidden', marginBottom: '1.5rem' }}>
-          <div style={{ height: '140px', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative' }}>
+          <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'radial-gradient(#fff 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
-          </div>
-          
-          <div style={{ padding: '0 2.5rem 2.5rem', position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5rem', marginTop: '-50px', marginBottom: '2.5rem' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1.5rem', zIndex: 1 }}>
               <div style={{
-                width: '100px', height: '100px', borderRadius: '24px',
-                background: '#fff', padding: '0.5rem',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.08)'
+                width: '90px', height: '90px', borderRadius: '50%',
+                background: '#fff',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px',
+                flexShrink: 0
               }}>
                 <div style={{
-                  width: '100%', height: '100%', borderRadius: '18px',
+                  width: '100%', height: '100%', borderRadius: '50%',
                   background: 'var(--color-background)',
                   color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <CircleUserRound size={48} strokeWidth={1.5} />
+                  <CircleUserRound size={42} strokeWidth={1.5} />
                 </div>
               </div>
-              <div style={{ paddingBottom: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>
                   {data.nama_lengkap || 'Nama Tidak Tersedia'}
                 </h1>
-                <div>
+                <div style={{ display: 'flex' }}>
                   <StatusBadge status={status} />
                 </div>
               </div>
             </div>
-
+          </div>
+          
+          <div style={{ padding: '2.5rem', position: 'relative' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
               <InfoField label="ID Pendaftaran" value={data.no_registrasi || data.id_pendaftaran} icon={FileText} />
               <InfoField label="Sekolah Asal" value={heroSchool} icon={School} />

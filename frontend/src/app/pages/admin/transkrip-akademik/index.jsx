@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Download, Eye, Search } from 'lucide-react';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
+import PageHeader from '@app/shared/components/PageHeader';
 import { fetchMuridList } from '@app/shared/akademik/murid/services/murid.service';
 import { fetchAdminStudentRaport } from '@app/shared/nilai/admin/services/transkrip.service';
+import { fetchTahunAjaran } from '@app/shared/services/tahunAjaran.service';
 
 const DEFAULT_FILTERS = {
   semester: 'Ganjil',
@@ -11,12 +13,23 @@ const DEFAULT_FILTERS = {
 
 export default function AdminTranskripAkademikPage() {
   const [muridList, setMuridList] = useState([]);
+  const [tahunAjaranList, setTahunAjaranList] = useState([]);
   const [selectedMurid, setSelectedMurid] = useState(null);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [raport, setRaport] = useState(null);
   const [loadingMurid, setLoadingMurid] = useState(true);
   const [loadingRaport, setLoadingRaport] = useState(false);
+
+  useEffect(() => {
+    fetchTahunAjaran().then(data => {
+      setTahunAjaranList(data || []);
+      const active = data?.find(t => t.is_active);
+      if (active) {
+        setFilters(p => ({ ...p, tahun_ajaran: active.tahun_ajaran }));
+      }
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     const loadMurid = async () => {
@@ -67,36 +80,28 @@ export default function AdminTranskripAkademikPage() {
   if (selectedMurid) {
     return (
       <AdminPageShell>
-        <div className="admin-page-wrapper animate-fade-in">
-          {/* Page Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <button
-              type="button"
-              onClick={() => setSelectedMurid(null)}
-              className="btn-outline"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '40px' }}
-            >
-              <ArrowLeft size={16} />
-              Kembali ke Daftar
-            </button>
-            <div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>Transkrip Akademik</h2>
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                {selectedMurid.siswa?.nama_siswa || '-'}
-              </p>
-            </div>
-          </div>
+        <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+          <PageHeader 
+            title="Transkrip Akademik" 
+            subtitle={selectedMurid.siswa?.nama_siswa || '-'} 
+            onBack={() => setSelectedMurid(null)} 
+          />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Filter Row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Tahun Ajaran</label>
-                <input
+                <select
                   value={filters.tahun_ajaran}
                   onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
-                  className="form-control"
-                />
+                  className="form-control no-print"
+                >
+                  {tahunAjaranList.map(ta => (
+                    <option key={ta.id_tahun_ajaran} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
+                  ))}
+                  {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
+                </select>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Semester</label>
@@ -115,7 +120,7 @@ export default function AdminTranskripAkademikPage() {
             <div className="form-panel">
               <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>Informasi Murid</h3>
-                <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
+                <button type="button" onClick={() => window.print()} className="btn-primary no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
                   <Download size={14} />
                   Unduh Transkrip
                 </button>
@@ -213,35 +218,29 @@ export default function AdminTranskripAkademikPage() {
 
   return (
     <AdminPageShell>
-      <div className="animate-fade-in">
-        {/* Panel Header */}
-        <div className="panel-header mb-4">
-          <div className="header-text">
-            <h2>Transkrip Akademik</h2>
-            <p>Lihat dan unduh transkrip nilai murid</p>
+      <div className="animate-fade-in" style={{ paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
+        <PageHeader title="Transkrip Akademik" subtitle="Lihat dan unduh transkrip nilai murid">
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <select
+              value={filters.tahun_ajaran}
+              onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
+              style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
+            >
+              {tahunAjaranList.map(ta => (
+                <option key={ta.id_tahun_ajaran} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
+              ))}
+              {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
+            </select>
+            <select
+              value={filters.semester}
+              onChange={(e) => setFilters(p => ({ ...p, semester: e.target.value }))}
+              style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
+            >
+              <option value="Ganjil">Ganjil</option>
+              <option value="Genap">Genap</option>
+            </select>
           </div>
-          <div className="header-actions">
-            {/* Filter Chips */}
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <select
-                value={filters.tahun_ajaran}
-                onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
-                style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
-              >
-                <option value="2025/2026">2025/2026</option>
-                <option value="2026/2027">2026/2027</option>
-              </select>
-              <select
-                value={filters.semester}
-                onChange={(e) => setFilters(p => ({ ...p, semester: e.target.value }))}
-                style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
-              >
-                <option value="Ganjil">Ganjil</option>
-                <option value="Genap">Genap</option>
-              </select>
-            </div>
-          </div>
-        </div>
+        </PageHeader>
 
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: '1rem' }}>

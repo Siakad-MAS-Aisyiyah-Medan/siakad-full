@@ -8,6 +8,8 @@ import NilaiFilterForm from '@app/shared/nilai/guru/components/NilaiFilterForm';
 import NilaiSiswaTable from '@app/shared/nilai/guru/components/NilaiSiswaTable';
 import Swal from 'sweetalert2';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function GuruNilaiPage() {
   const user = getStoredUser();
   const profile = getStoredProfile();
@@ -91,20 +93,14 @@ export default function GuruNilaiPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="data-panel view-list">
-        <div className="panel-header glass">
-          <div className="header-text">
-            <h2>Kelola Nilai Akademik</h2>
-            <p>Manajemen daftar nilai siswa sesuai tahun ajaran dan kelas.</p>
-          </div>
+      <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Kelola Nilai Akademik" subtitle="Manajemen daftar nilai siswa sesuai tahun ajaran dan kelas.">
           {step === 'filter' && (
-            <div className="header-actions">
-              <button onClick={() => setShowAddModal(true)} className="btn-primary">
-                <Plus size={18} /> Tambah Daftar Nilai
-              </button>
-            </div>
+            <button onClick={() => setShowAddModal(true)} className="btn-primary">
+              <Plus size={18} /> Tambah Daftar Nilai
+            </button>
           )}
-        </div>
+        </PageHeader>
 
         {step === 'filter' && !showAddModal && (
           <div className="mt-6 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

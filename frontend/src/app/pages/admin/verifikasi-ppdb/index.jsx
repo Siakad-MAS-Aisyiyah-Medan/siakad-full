@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
 import StatusBadge from '@app/shared/ppdb/components/StatusBadge';
 import { useAdminPpdb } from '@app/shared/ppdb/hooks/useAdminPpdb';
+import PageHeader from '@app/shared/components/PageHeader';
 import { fetchAdminPendaftarDetail } from "@app/shared/services/ppdb.service";
 
 export default function AdminVerifikasiPendaftar() {
@@ -18,11 +19,10 @@ export default function AdminVerifikasiPendaftar() {
 
   return (
     <AdminPageShell>
-      <div className="data-panel">
-        <div className="panel-header glass">
-          <h2>Verifikasi Pendaftar</h2>
-          <Link to={`/admin/ppdb/${id}`}>← Detail</Link>
-        </div>
+      <PageHeader title="Verifikasi Pendaftar" subtitle="Verifikasi dan tindak lanjut pendaftar PPDB">
+        <Link to={`/admin/ppdb/${id}`} className="btn-outline">← Detail</Link>
+      </PageHeader>
+      <div className="data-panel" style={{ paddingTop: '1rem' }}>
         {data && (
           <>
             <div className="glass p-4 mb-4">

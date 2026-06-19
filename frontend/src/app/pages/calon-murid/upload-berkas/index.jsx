@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { UploadCloud, CheckCircle2, AlertCircle, FileText, Trash2, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
+import PageHeader from '@app/shared/components/PageHeader';
 import { fetchBerkasList, uploadBerkas, deleteBerkas, BERKAS_LABELS } from '@app/shared/services/ppdb.service';
 import { UPLOAD_BERKAS_ITEMS } from '@app/shared/ppdb/config/calonMuridNav';
 import './upload-berkas.css';
@@ -93,17 +94,10 @@ export default function UploadBerkas() {
 
   return (
     <CalonMuridLayout>
-      <div className="ub-header animate-stagger-1">
-        <div className="ub-header__icon">
-          <UploadCloud size={28} />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-emerald-900">Upload Berkas Pendukung</h1>
-          <p className="text-emerald-700/80">
-            Silakan unggah dokumen persyaratan dalam format JPG, PNG, atau PDF (Maksimal 2MB per file).
-          </p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Upload Berkas Pendukung"
+        subtitle="Silakan unggah dokumen persyaratan dalam format JPG, PNG, atau PDF (Maksimal 2MB per file)."
+      />
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12 text-slate-400">

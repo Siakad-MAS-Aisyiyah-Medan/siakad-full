@@ -51,6 +51,8 @@ function resolveStorageUrl(path) {
   return `${origin}${path.startsWith('/storage/') ? path : `/storage/${path}`}`;
 }
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function InfoProfilPage({ readOnly = false }) {
   const [formData, setFormData] = useState({
     nama_sekolah: '',
@@ -178,55 +180,45 @@ export default function InfoProfilPage({ readOnly = false }) {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--color-text-muted)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
-          <p>Memuat profil sekolah...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="admin-page-wrapper animate-fade-in">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {isEditing && (
-              <button
-                type="button"
-                onClick={handleCancelEdit}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: '40px', height: '40px',
-                  borderRadius: '10px', border: '1px solid var(--color-border)',
-                  background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
-                }}
+    <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+      <PageHeader 
+        title={isEditing ? 'Edit Profil Sekolah' : 'Kelola Profil Sekolah'}
+        subtitle={isEditing ? 'Ubah informasi, foto, dan deskripsi sekolah.' : 'Kelola informasi profil sekolah, kontak, dan sambutan.'}
+      >
+        {!loading && (
+          isEditing ? (
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              className="btn-outline"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}
+            >
+              <ArrowLeft size={16} /> Kembali
+            </button>
+          ) : (
+            !readOnly && (
+              <button 
+                type="button" 
+                onClick={() => setIsEditing(true)} 
+                className="btn-primary" 
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                <ArrowLeft size={20} />
-              </button>
-            )}
-            <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>
-                {isEditing ? 'Edit Profil Sekolah' : 'Kelola Profil Sekolah'}
-              </h1>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
-                Dashboard <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>›</span> Profil Sekolah {isEditing && <><span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>›</span> Edit Data</>}
-              </p>
-            </div>
-          </div>
-          <div>
-            {!isEditing && !readOnly && (
-              <button type="button" onClick={() => setIsEditing(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, background: '#64748b', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
                 <Edit size={16} /> Edit Data
               </button>
-            )}
+            )
+          )
+        )}
+      </PageHeader>
+
+      {loading ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--color-text-muted)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+            <p>Memuat profil sekolah...</p>
           </div>
         </div>
-
-        {isEditing ? (
+      ) : isEditing ? (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Edit Box 1: School Name & Description */}
             <div className="form-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'row', gap: '2.5rem', alignItems: 'flex-start' }}>

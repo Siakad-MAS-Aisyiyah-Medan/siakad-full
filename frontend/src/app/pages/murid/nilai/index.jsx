@@ -24,6 +24,8 @@ function InfoLine({ label, value }) {
   );
 }
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function SiswaNilaiPage() {
   const user = getStoredUser();
   const profile = getStoredProfile();
@@ -59,8 +61,8 @@ export default function SiswaNilaiPage() {
 
   return (
     <MainLayout role="siswa" name={name}>
-      <div className="mx-auto max-w-[1160px] px-2 py-2">
-        <h1 className="text-5xl font-semibold tracking-tight text-slate-950">Transkrip Akademik Murid</h1>
+      <PageHeader title="Transkrip Akademik" subtitle="Lihat nilai akademik dan transkrip Anda" />
+      <div className="mx-auto max-w-[1160px] px-2 py-2" style={{ paddingTop: '1rem' }}>
 
         <section className="mt-10 rounded-md border border-slate-300 bg-white px-8 py-9">
           <h2 className="text-3xl font-semibold text-slate-950">Informasi Murid</h2>

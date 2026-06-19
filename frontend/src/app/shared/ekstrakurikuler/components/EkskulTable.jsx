@@ -1,4 +1,5 @@
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
+import PageHeader from '@app/shared/components/PageHeader';
 
 export default function EkskulTable({
   filteredData,
@@ -11,29 +12,24 @@ export default function EkskulTable({
   readOnly = false,
 }) {
   return (
-    <div className="data-panel view-list">
-      <div className="panel-header glass">
-        <div className="header-text">
-          <h2>Ekstrakurikuler</h2>
-          <p>Kelola daftar kegiatan ekstrakurikuler dan pembina di sekolah.</p>
+    <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
+      <PageHeader title="Ekstrakurikuler" subtitle="Kelola daftar kegiatan ekstrakurikuler dan pembina di sekolah.">
+        <div className="search-box" style={{ background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '0.25rem 0.5rem', display: 'flex', alignItems: 'center' }}>
+          <Search size={18} style={{ color: 'var(--color-text-muted)', marginRight: '0.5rem' }} />
+          <input
+            type="text"
+            placeholder="Cari ekskul..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{ border: 'none', outline: 'none', background: 'transparent' }}
+          />
         </div>
-        <div className="header-actions">
-          <div className="search-box">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Cari ekskul..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-          {!readOnly && (
-            <button type="button" onClick={onAdd} className="btn-primary">
-              <Plus size={18} /> Tambah Ekskul
-            </button>
-          )}
-        </div>
-      </div>
+        {!readOnly && (
+          <button type="button" onClick={onAdd} className="btn-primary">
+            <Plus size={18} /> Tambah Ekskul
+          </button>
+        )}
+      </PageHeader>
 
       <div className="table-container glass mt-6">
         <table className="data-table">

@@ -113,16 +113,7 @@ export default function LoginPage() {
             Kelola data akademik dengan mudah, cepat, dan transparan dalam satu platform
             terintegrasi.
           </p>
-          <div className="stats-grid">
-            <div className="stat-card glass">
-              <span className="stat-value">1k+</span>
-              <span className="stat-label">Siswa</span>
-            </div>
-            <div className="stat-card glass">
-              <span className="stat-value">50+</span>
-              <span className="stat-label">Guru</span>
-            </div>
-          </div>
+
         </div>
         <div className="blob-1"></div>
         <div className="blob-2"></div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import PageHeader from '@app/shared/components/PageHeader';
 import RekapAbsensiCard from '@app/shared/components/RekapAbsensiCard';
 import { useAbsensiGuru } from '@app/shared/absensi/admin-guru/hooks/useAbsensiGuru';
 
@@ -7,13 +8,8 @@ export default function AbsensiGuruView() {
 
   return (
     <div className="space-y-6">
-      <div className="data-panel view-list mb-6">
-        <div className="panel-header glass">
-          <div className="header-text">
-            <h2>Absensi Guru</h2>
-            <p>Pantau kehadiran guru dan pegawai sekolah per hari.</p>
-          </div>
-        </div>
+      <div className="data-panel view-list mb-6" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Absensi Guru" subtitle="Pantau kehadiran guru dan pegawai sekolah per hari." />
       </div>
       
       <RekapAbsensiCard rekap={rekap} title="Rekap Absensi Guru" />

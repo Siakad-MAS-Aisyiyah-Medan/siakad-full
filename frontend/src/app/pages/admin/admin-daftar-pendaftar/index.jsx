@@ -79,6 +79,8 @@ function CustomSelect({ value, onChange, options }) {
   );
 }
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function AdminDaftarPendaftar({ readOnly = false }) {
   const ppdb = useAdminPpdb() || {};
   const stats = ppdb.stats || {};
@@ -89,29 +91,22 @@ export default function AdminDaftarPendaftar({ readOnly = false }) {
 
   return (
     <AdminPageShell>
-      <div className="admin-page-wrapper animate-fade-in">
-        {/* Page Header */}
-        <div className="panel-header mb-4">
-          <div className="header-text">
-            <h2>Data PPDB</h2>
-            <p>Kelola data pendaftaran peserta didik baru</p>
+      <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Data PPDB" subtitle="Kelola data pendaftaran peserta didik baru">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Status:</label>
+            <CustomSelect
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { value: '', label: 'Semua Status' },
+                { value: 'submitted', label: 'Menunggu' },
+                { value: 'diterima', label: 'Diterima' },
+                { value: 'ditolak', label: 'Ditolak' }
+              ]}
+            />
           </div>
-          <div className="header-actions">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Status:</label>
-              <CustomSelect
-                value={statusFilter}
-                onChange={setStatusFilter}
-                options={[
-                  { value: '', label: 'Semua Status' },
-                  { value: 'submitted', label: 'Menunggu' },
-                  { value: 'diterima', label: 'Diterima' },
-                  { value: 'ditolak', label: 'Ditolak' }
-                ]}
-              />
-            </div>
-          </div>
-        </div>
+        </PageHeader>
 
         {/* Stats Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>

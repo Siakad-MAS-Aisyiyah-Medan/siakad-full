@@ -29,6 +29,8 @@ const EMPTY_FORM = {
   status: 'aktif',
 };
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function HakAksesPage() {
   const [akunData, setAkunData] = useState([]);
   const [stats, setStats] = useState({ total_akun: 0, role_aktif: 0 });
@@ -167,29 +169,22 @@ export default function HakAksesPage() {
 
   return (
     <AdminPageShell>
-      <div className="animate-fade-in">
-        {/* Panel Header */}
-        <div className="panel-header mb-4">
-          <div className="header-text">
-            <h2>Manajemen Pengguna</h2>
-            <p>Kelola akun dan hak akses pengguna sistem</p>
+      <div className="animate-fade-in" style={{ paddingTop: '1rem' }}>
+        <PageHeader title="Manajemen Pengguna" subtitle="Kelola akun dan hak akses pengguna sistem">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+            <input
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              placeholder="Cari akun..."
+              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+            />
           </div>
-          <div className="header-actions">
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-              <input
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                placeholder="Cari akun..."
-                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-              />
-            </div>
-            <button type="button" onClick={openCreateModal} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Akun
-            </button>
-          </div>
-        </div>
+          <button type="button" onClick={openCreateModal} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Akun
+          </button>
+        </PageHeader>
 
         {/* Stat Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>

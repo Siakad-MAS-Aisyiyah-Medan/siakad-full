@@ -1,11 +1,11 @@
 import { Save, X } from 'lucide-react';
+import PageHeader from '@app/shared/components/PageHeader';
 
 export default function PrestasiForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
+  const title = readOnly ? 'Detail Artikel' : (view === 'add' ? 'Tambah Artikel' : 'Edit Artikel');
   return (
-    <div className="form-panel glass">
-      <div className="panel-header border-b">
-        <h2>{readOnly ? 'Detail Artikel' : (view === 'add' ? 'Tambah Artikel' : 'Edit Artikel')}</h2>
-      </div>
+    <div className="form-panel glass" style={{ paddingTop: '1rem' }}>
+      <PageHeader title={title} subtitle="Kelola data artikel berita dan prestasi" />
 
       <form onSubmit={onSubmit} className="custom-form p-6 mt-4">
         <div className="input-group full">

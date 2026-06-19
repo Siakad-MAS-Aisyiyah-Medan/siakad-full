@@ -1,5 +1,7 @@
 import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 function statusLabel(kelas) {
   const status = String(kelas.status || '').toLowerCase();
   if (status === 'aktif') return 'Aktif';
@@ -19,36 +21,29 @@ export default function KelasTable({
 }) {
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Panel Header */}
-      <div className="panel-header mb-4">
-        <div className="header-text">
-          <h2>Data Kelas</h2>
-          <p>Kelola data kelas MAS Aisyiyah Medan</p>
+      <PageHeader title="Data Kelas" subtitle="Kelola data kelas MAS Aisyiyah Medan">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            placeholder="Cari data kelas..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+          />
         </div>
-        <div className="header-actions">
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-            <input
-              type="text"
-              placeholder="Cari data kelas..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-            />
-          </div>
-          {readOnly ? (
-            <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Download size={16} />
-              Unduh Data
-            </button>
-          ) : (
-            <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Plus size={16} />
-              Tambah Kelas
-            </button>
-          )}
-        </div>
-      </div>
+        {readOnly ? (
+          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Download size={16} />
+            Unduh Data
+          </button>
+        ) : (
+          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={16} />
+            Tambah Kelas
+          </button>
+        )}
+      </PageHeader>
 
       {/* Table */}
       <div className="table-container">
