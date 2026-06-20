@@ -15,10 +15,7 @@ export default function HeroPPDBSection() {
 
       <div className="pp-container pp-hero__layout">
         <div className={`pp-hero__content pp-reveal is-visible ${loading ? 'pp-hero--loading' : ''}`}>
-          <span className="pp-badge pp-badge--accent">
-            <Sparkles size={14} aria-hidden="true" />
-            PPDB Online {academicYear}
-          </span>
+
           <h1 className="pp-hero__title">{title}</h1>
           <p className="pp-hero__subtitle">{description}</p>
           <div className="pp-hero__actions">

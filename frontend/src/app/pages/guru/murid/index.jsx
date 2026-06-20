@@ -1,109 +1,131 @@
-import React, { useState } from 'react';
-import { Users, Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import MainLayout from '@app/shared/layouts/MainLayout';
-import PageHeader from '@app/shared/components/PageHeader';
-import { getStoredUser, getStoredProfile } from '@app/shared/services/auth.service';
+import apiClient from '@app/shared/services/apiClient';
+import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
-import AbsensiFilterForm from '../absensi/components/AbsensiFilterForm';
-import { useGuruAbsensi } from '../absensi/hooks/useGuruAbsensi';
 
 export default function GuruMuridPage() {
   const user = getStoredUser();
   const profile = getStoredProfile();
   const name = getDisplayName(profile, user?.role, user?.username);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const {
-    step,
-    meta,
-    kelasList,
-    mapelList,
-    siswaRows,
-    loading,
-    handleMetaChange,
-    loadSiswa,
-    reset,
-  } = useGuruAbsensi();
+  const idKelas = searchParams.get('id_kelas') || '';
+  const idMapel = searchParams.get('id_mapel') || '';
+  const namaKelas = searchParams.get('nama_kelas') || 'Kelas';
+  const tahunAjaran = searchParams.get('tahun_ajaran') || '2025/2026';
+  const semester = searchParams.get('semester') || 'Ganjil';
 
-  const [search, setSearch] = useState('');
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredSiswa = siswaRows.filter(s => 
-    s.nama_siswa?.toLowerCase().includes(search.toLowerCase()) || 
-    s.nisn?.includes(search)
-  );
+  useEffect(() => {
+    let active = true;
+
+    async function loadData() {
+      if (!idKelas || !idMapel) {
+        setRows([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await apiClient.get('/guru/murid-diajar', {
+          params: {
+          id_kelas: Number(idKelas),
+          id_mapel: Number(idMapel),
+          tahun_ajaran: tahunAjaran,
+          semester,
+          },
+        });
+
+        if (active) {
+          setRows(response?.data?.data?.siswa || []);
+        }
+      } catch (error) {
+        console.error('Gagal memuat data murid kelas yang diajar', error);
+        if (active) {
+          setRows([]);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadData();
+    return () => {
+      active = false;
+    };
+  }, [idKelas, idMapel, semester, tahunAjaran]);
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="data-panel view-list" style={{ paddingTop: '1rem' }}>
-        <PageHeader title="Data Murid" subtitle="Daftar murid pada kelas dan mata pelajaran yang Anda ampu." />
+      <div className="admin-page-wrapper animate-fade-in">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+            <div>
+              <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-text-dark)', marginBottom: '0.75rem' }}>
+                Murid - {namaKelas}
+              </h1>
+              <p style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-muted)' }}>
+                Berikut adalah daftar murid pada kelas {namaKelas} yang Anda ajar.
+              </p>
+            </div>
 
-        {step === 'filter' && (
-          <div className="mt-4">
-            <AbsensiFilterForm
-              meta={meta}
-              kelasList={kelasList}
-              mapelList={mapelList}
-              loading={loading}
-              onChange={handleMetaChange}
-              onSubmit={loadSiswa}
-            />
+            <button
+              type="button"
+              onClick={() => navigate('/guru/kelas')}
+              className="btn-outline"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', whiteSpace: 'nowrap' }}
+            >
+              <ArrowLeft size={16} />
+              Kembali
+            </button>
           </div>
-        )}
 
-        {step === 'input' && (
-          <div className="mt-4 form-panel glass p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-lg">
-                Daftar Murid - {kelasList.find(k => k.id_kelas == meta.id_kelas)?.nama_kelas}
-              </h3>
-              <button type="button" onClick={reset} className="btn-outline text-sm">
-                Ganti Kelas
-              </button>
-            </div>
-            
-            <div className="mb-4">
-              <div className="search-bar relative max-w-sm">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Cari nama / NISN..."
-                  className="input-field pl-10"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="table-responsive">
-              <table className="data-table">
-                <thead>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama Murid</th>
+                  <th>NISN</th>
+                  <th>Jenis Kelamin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
                   <tr>
-                    <th width="50">No</th>
-                    <th>NISN</th>
-                    <th>Nama Siswa</th>
-                    <th>L/P</th>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                      Memuat data murid...
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filteredSiswa.map((s, idx) => (
-                    <tr key={s.id_siswa}>
-                      <td>{idx + 1}</td>
-                      <td>{s.nisn || '-'}</td>
-                      <td>{s.nama_siswa}</td>
-                      <td>{s.jenis_kelamin}</td>
+                ) : rows.length > 0 ? (
+                  rows.map((row, index) => (
+                    <tr key={row.id_user_siswa}>
+                      <td>{index + 1}</td>
+                      <td style={{ fontWeight: 600 }}>{row.nama_siswa || '-'}</td>
+                      <td>{row.nisn || '-'}</td>
+                      <td>{row.jenis_kelamin || '-'}</td>
                     </tr>
-                  ))}
-                  {filteredSiswa.length === 0 && (
-                    <tr>
-                      <td colSpan="4" className="text-center text-slate-500 py-4">
-                        Tidak ada data murid.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                      Tidak ada data murid untuk kelas ini.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
       </div>
     </MainLayout>
   );

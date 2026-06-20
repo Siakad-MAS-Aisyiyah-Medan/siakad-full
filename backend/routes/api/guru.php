@@ -6,7 +6,8 @@ use App\Http\Controllers\NilaiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'permission:view_dashboard_guru,view_murid_diajar,view_kelas_diajar,view_mapel_diampu'])->group(function () {
-    Route::get('/guru/jadwal', [JadwalController::class, 'adminIndex']);
+    Route::get('/guru/jadwal', [JadwalController::class, 'guruIndex']);
+    Route::get('/guru/murid-diajar', [JadwalController::class, 'guruMuridDiajar']);
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa'])->group(function () {

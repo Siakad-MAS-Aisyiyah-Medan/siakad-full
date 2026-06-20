@@ -8,6 +8,7 @@ use App\Models\Siswa;
 use App\Models\JadwalPelajaran;
 use App\Http\Resources\JadwalResource;
 use App\Utils\AuditsAdminActions;
+use App\Utils\GuruPengampuUser;
 
 use App\Http\Controllers\Controller;
 use App\Exceptions\JadwalConflictException;
@@ -130,8 +131,19 @@ class JadwalController extends Controller
         }
     }
 
-    public function adminUpdate(UpdateJadwalRequest $request, $id)
+    public function adminUpdate(Request $request, $id)
     {
+        $validated = $request->validate([
+            'id_kelas' => 'required|exists:kelas,id_kelas',
+            'id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
+            'id_guru' => ['required', 'integer', 'exists:users,id_user', new GuruPengampuUser()],
+            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
+            'id_waktu' => 'required|exists:waktu_pelajaran,id_waktu',
+            'ruangan' => 'nullable|string|max:50',
+            'tahun_ajaran' => 'required|string|max:20',
+            'semester' => 'required|in:Ganjil,Genap',
+        ]);
+
         try {
             $jadwal = $this->processUpdate((int) $id, $validated);
 
@@ -158,7 +170,7 @@ class JadwalController extends Controller
         }
     }
 
-    private function adminConflictResponse(JadwalConflictException $e)
+    private function conflictResponse(JadwalConflictException $e)
     {
         return ApiResponse::error($e->getMessage(), 422, [
             'conflict_type' => $e->conflictType,
@@ -180,6 +192,60 @@ class JadwalController extends Controller
         );
 
         return ApiResponse::success($items, 'Berhasil mengambil jadwal mengajar');
+    }
+
+    public function guruMuridDiajar(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'guru') {
+            return ApiResponse::error('Akses data murid diajar hanya untuk guru.', 403);
+        }
+
+        $validated = $request->validate([
+            'id_kelas' => 'required|exists:kelas,id_kelas',
+            'id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
+            'tahun_ajaran' => 'required|string|max:20',
+            'semester' => 'required|in:Ganjil,Genap',
+        ]);
+
+        $jadwal = JadwalPelajaran::query()
+            ->where('id_guru', $user->id_user)
+            ->where('id_kelas', $validated['id_kelas'])
+            ->where('id_mapel', $validated['id_mapel'])
+            ->where('tahun_ajaran', $validated['tahun_ajaran'])
+            ->where('semester', $validated['semester'])
+            ->exists();
+
+        if (!$jadwal) {
+            return ApiResponse::error('Anda tidak mengampu kelas atau mata pelajaran ini.', 422);
+        }
+
+        $murid = Siswa::with('user')
+            ->where('id_kelas', $validated['id_kelas'])
+            ->orderBy('nama_siswa')
+            ->get()
+            ->map(function (Siswa $siswa) {
+                return [
+                    'id_user_siswa' => $siswa->id_user,
+                    'nama_siswa' => $siswa->nama_siswa,
+                    'nisn' => $siswa->user?->username,
+                    'jenis_kelamin' => $siswa->jenis_kelamin === 'L'
+                        ? 'Laki-laki'
+                        : ($siswa->jenis_kelamin === 'P' ? 'Perempuan' : null),
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success([
+            'meta' => [
+                'id_kelas' => (int) $validated['id_kelas'],
+                'id_mapel' => (int) $validated['id_mapel'],
+                'tahun_ajaran' => $validated['tahun_ajaran'],
+                'semester' => $validated['semester'],
+            ],
+            'siswa' => $murid,
+        ], 'Berhasil mengambil data murid yang diajar');
     }
 
     public function siswaIndex(Request $request)

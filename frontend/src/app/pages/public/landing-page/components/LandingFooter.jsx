@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, Facebook, Instagram, Youtube } from 'lucide-react';
 import AppLogo from '@app/shared/components/AppLogo';
 import { FOOTER_LINKS } from '../data/landingData';
 
@@ -15,10 +15,12 @@ export default function LandingFooter({ onScrollToSection = () => {} }) {
                 <p>Sistem Informasi Akademik</p>
               </div>
             </div>
-            <p className="lp-footer__desc">
-              Membentuk generasi islami yang unggul dalam IPTEK dan berakhlakul karimah
-              melalui pendidikan bermutu dan lingkungan yang religius.
-            </p>
+  
+            <div className="lp-footer__social">
+              <a href="#" aria-label="Facebook"><Facebook size={18} /></a>
+              <a href="#" aria-label="Instagram"><Instagram size={18} /></a>
+              <a href="#" aria-label="Youtube"><Youtube size={18} /></a>
+            </div>
           </div>
 
           <div>
