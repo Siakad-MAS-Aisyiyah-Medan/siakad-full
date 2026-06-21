@@ -2,30 +2,29 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Models\User;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class EnrollmentService
 {
     use AuditsAdminActions;
-    public function __construct(private PendaftaranStateService $pendaftaranState)
-    {
-    }
+
+    public function __construct(private PendaftaranStateService $pendaftaranState) {}
 
     public function enrollCalonSiswa(int $userId, ?int $idKelas = null): array
     {
         return DB::transaction(function () use ($userId, $idKelas) {
             $user = User::lockForUpdate()->find($userId);
-            if (!$user) {
+            if (! $user) {
                 throw new InvalidArgumentException('User tidak ditemukan.');
             }
 
             $pendaftaran = Pendaftaran::where('id_user', $user->id_user)->lockForUpdate()->first();
-            if (!$pendaftaran) {
+            if (! $pendaftaran) {
                 throw new InvalidArgumentException('Data pendaftaran tidak ditemukan.');
             }
 
@@ -92,7 +91,7 @@ class EnrollmentService
 
             $nis = $year.str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
 
-            if (!Siswa::where('nis', $nis)->exists()) {
+            if (! Siswa::where('nis', $nis)->exists()) {
                 return $nis;
             }
         }

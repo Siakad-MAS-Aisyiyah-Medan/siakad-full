@@ -9,7 +9,6 @@ use App\Http\Resources\NilaiResource;
 use App\Models\Absensi;
 use App\Models\AbsensiGuru;
 use App\Models\JadwalPelajaran;
-use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\Nilai;
 use App\Models\Pendaftaran;
@@ -24,8 +23,7 @@ class LaporanService
     public function __construct(
         private AbsensiSiswaService $absensiSiswa,
         private AbsensiGuruService $absensiGuru
-    ) {
-    }
+    ) {}
 
     public function generate(User $actor, string $jenis, array $filters): array
     {
@@ -61,10 +59,10 @@ class LaporanService
         $query = User::with(['siswa.kelas'])
             ->where('role', 'siswa');
 
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $query->whereHas('siswa', fn ($q) => $q->where('id_kelas', $filters['id_kelas']));
         }
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $s = $filters['search'];
             $query->where(function ($q) use ($s) {
                 $q->where('username', 'like', "%{$s}%")
@@ -87,7 +85,7 @@ class LaporanService
         ])->values()->all();
 
         $summaryQuery = Siswa::query();
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $summaryQuery->where('id_kelas', $filters['id_kelas']);
         }
         $perKelas = (clone $summaryQuery)
@@ -115,7 +113,7 @@ class LaporanService
     {
         $query = User::with('guru')->where('role', 'guru');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $s = $filters['search'];
             $query->where(function ($q) use ($s) {
                 $q->where('username', 'like', "%{$s}%")
@@ -150,12 +148,12 @@ class LaporanService
     {
         $query = Pendaftaran::with('user')->orderByDesc('updated_at');
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('ppdb_status', $filters['status']);
         }
         $this->applyDateRangeOnColumn($query, 'created_at', $filters);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $s = $filters['search'];
             $query->where(function ($q) use ($s) {
                 $q->where('nama_lengkap', 'like', "%{$s}%")
@@ -174,7 +172,7 @@ class LaporanService
         ])->values()->all();
 
         $statusCounts = Pendaftaran::query()
-            ->when(!empty($filters['status']), fn ($q) => $q->where('ppdb_status', $filters['status']))
+            ->when(! empty($filters['status']), fn ($q) => $q->where('ppdb_status', $filters['status']))
             ->selectRaw('ppdb_status, COUNT(*) as total')
             ->groupBy('ppdb_status')
             ->pluck('total', 'ppdb_status');
@@ -297,14 +295,14 @@ class LaporanService
         if ($actor->role === 'admin') {
             return;
         }
-        if (!in_array($jenis, $allowed, true)) {
+        if (! in_array($jenis, $allowed, true)) {
             throw new InvalidArgumentException('Anda tidak memiliki akses ke jenis laporan ini.');
         }
     }
 
     private function normalizeFilters(array $filters): array
     {
-        if (!empty($filters['bulan'])) {
+        if (! empty($filters['bulan'])) {
             $start = Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
             $filters['tanggal_dari'] = $start->toDateString();
             $filters['tanggal_sampai'] = $start->copy()->endOfMonth()->toDateString();
@@ -323,13 +321,13 @@ class LaporanService
             if (in_array($jenis, ['absensi_siswa', 'nilai', 'jadwal'], true)) {
                 $mapelIds = Mapel::where('id_guru', $actor->id_user)->pluck('id_mapel')->all();
                 $kelasIds = JadwalPelajaran::where('id_guru', $actor->id_user)
-                    ->when(!empty($filters['tahun_ajaran']), fn ($q) => $q->where('tahun_ajaran', $filters['tahun_ajaran']))
-                    ->when(!empty($filters['semester']), fn ($q) => $q->where('semester', $filters['semester']))
+                    ->when(! empty($filters['tahun_ajaran']), fn ($q) => $q->where('tahun_ajaran', $filters['tahun_ajaran']))
+                    ->when(! empty($filters['semester']), fn ($q) => $q->where('semester', $filters['semester']))
                     ->distinct()
                     ->pluck('id_kelas')
                     ->all();
 
-                if (!empty($filters['id_mapel']) && !in_array((int) $filters['id_mapel'], $mapelIds, true)) {
+                if (! empty($filters['id_mapel']) && ! in_array((int) $filters['id_mapel'], $mapelIds, true)) {
                     throw new InvalidArgumentException('Mapel di luar kelas ajar Anda.');
                 }
 
@@ -363,31 +361,31 @@ class LaporanService
 
     private function applyAbsensiSiswaFilters($query, array $filters): void
     {
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $query->where('id_kelas', $filters['id_kelas']);
         }
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $query->where('id_mapel', $filters['id_mapel']);
         }
-        if (!empty($filters['id_user_siswa'])) {
+        if (! empty($filters['id_user_siswa'])) {
             $query->where('id_user_siswa', $filters['id_user_siswa']);
         }
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        if (!empty($filters['id_guru'])) {
+        if (! empty($filters['id_guru'])) {
             $mapelIds = Mapel::where('id_guru', $filters['id_guru'])->pluck('id_mapel');
             $query->whereIn('id_mapel', $mapelIds);
         }
@@ -395,49 +393,49 @@ class LaporanService
 
     private function applyAbsensiGuruFilters($query, array $filters): void
     {
-        if (!empty($filters['id_user_guru'])) {
+        if (! empty($filters['id_user_guru'])) {
             $query->where('id_user_guru', $filters['id_user_guru']);
         }
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
     }
 
     private function applyNilaiFilters($query, array $filters): void
     {
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $query->whereIn('id_user_siswa', function ($q) use ($filters) {
                 $q->select('id_user')->from('siswa')->where('id_kelas', $filters['id_kelas']);
             });
         }
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $query->where('id_mapel', $filters['id_mapel']);
         }
-        if (!empty($filters['id_user_siswa'])) {
+        if (! empty($filters['id_user_siswa'])) {
             $query->where('id_user_siswa', $filters['id_user_siswa']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
         if (isset($filters['validated_by_wali'])) {
             $query->where('validated_by_wali', (bool) $filters['validated_by_wali']);
         }
-        if (!empty($filters['id_guru'])) {
+        if (! empty($filters['id_guru'])) {
             $mapelIds = Mapel::where('id_guru', $filters['id_guru'])->pluck('id_mapel');
             $query->whereIn('id_mapel', $mapelIds);
         }
@@ -445,29 +443,29 @@ class LaporanService
 
     private function applyJadwalFilters($query, array $filters): void
     {
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $query->where('id_kelas', $filters['id_kelas']);
         }
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $query->where('id_mapel', $filters['id_mapel']);
         }
-        if (!empty($filters['id_guru'])) {
+        if (! empty($filters['id_guru'])) {
             $query->where('id_guru', $filters['id_guru']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
     }
 
     private function applyDateRangeOnColumn($query, string $column, array $filters): void
     {
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate($column, '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate($column, '<=', $filters['tanggal_sampai']);
         }
     }

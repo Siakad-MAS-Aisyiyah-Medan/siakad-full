@@ -12,7 +12,7 @@ class GuruPengampuUser implements ValidationRule
     {
         $user = User::query()->find($value);
 
-        if (!$user) {
+        if (! $user) {
             $fail('Guru pengampu tidak ditemukan.');
 
             return;

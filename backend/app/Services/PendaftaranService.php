@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class PendaftaranService
 {
-    public function __construct(private PpdbService $ppdb)
-    {
-    }
+    public function __construct(private PpdbService $ppdb) {}
 
     public function getByUser(User $user): ?Pendaftaran
     {

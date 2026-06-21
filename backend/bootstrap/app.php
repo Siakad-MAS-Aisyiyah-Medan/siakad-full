@@ -1,8 +1,16 @@
 <?php
 
+use App\Http\Middleware\CheckPermission;
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\SecurityHeaders;
+use App\Utils\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 $builder = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,18 +21,18 @@ $builder = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'permission' => \App\Http\Middleware\CheckPermission::class,
+            'role' => CheckRole::class,
+            'permission' => CheckPermission::class,
         ]);
 
         $middleware->api(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
+            SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
+        $exceptions->render(function (ValidationException $e, $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
-                return \App\Utils\ApiResponse::error(
+                return ApiResponse::error(
                     'Validasi gagal',
                     422,
                     $e->errors()
@@ -32,24 +40,24 @@ $builder = Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function (\Throwable $e, $request) {
+        $exceptions->render(function (Throwable $e, $request) {
             if (! ($request->expectsJson() || $request->is('api/*'))) {
                 return null;
             }
 
-            if ($e instanceof \Illuminate\Validation\ValidationException) {
+            if ($e instanceof ValidationException) {
                 return null;
             }
 
-            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
-                return \App\Utils\ApiResponse::error('Unauthenticated', 401);
+            if ($e instanceof AuthenticationException) {
+                return ApiResponse::error('Unauthenticated', 401);
             }
 
-            if ($e instanceof \Symfony\Component\Routing\Exception\RouteNotFoundException && str_contains($e->getMessage(), '[login]')) {
-                return \App\Utils\ApiResponse::error('Unauthenticated', 401);
+            if ($e instanceof RouteNotFoundException && str_contains($e->getMessage(), '[login]')) {
+                return ApiResponse::error('Unauthenticated', 401);
             }
 
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+            if ($e instanceof HttpExceptionInterface) {
                 $status = $e->getStatusCode();
                 $message = config('app.debug') ? $e->getMessage() : match ($status) {
                     403 => 'Akses ditolak.',
@@ -58,7 +66,7 @@ $builder = Application::configure(basePath: dirname(__DIR__))
                     default => 'Permintaan tidak dapat diproses.',
                 };
 
-                return \App\Utils\ApiResponse::error($message, $status);
+                return ApiResponse::error($message, $status);
             }
 
             report($e);
@@ -67,13 +75,13 @@ $builder = Application::configure(basePath: dirname(__DIR__))
                 ? $e->getMessage()
                 : 'Terjadi kesalahan pada server.';
 
-            return \App\Utils\ApiResponse::error($message, 500);
+            return ApiResponse::error($message, 500);
         });
     });
 
 $app = $builder->create();
 
 // PENGATURAN EKSTREM: Memindahkan storage ke folder Temp bawaan Windows
-$app->useStoragePath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'siakad_storage');
+$app->useStoragePath(sys_get_temp_dir().DIRECTORY_SEPARATOR.'siakad_storage');
 
 return $app;

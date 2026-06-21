@@ -1,20 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Utils\SearchInput;
-use App\Models\Mapel;
-use App\Http\Resources\MapelResource;
-use App\Utils\AuditsAdminActions;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\MapelResource;
+use App\Models\Mapel;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
+use App\Utils\SearchInput;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class MapelController extends Controller
 {
-    
-
     public function index(Request $request)
     {
         $paginator = $this->list(
@@ -25,7 +22,7 @@ class MapelController extends Controller
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data mata pelajaran');
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:100',
@@ -39,7 +36,7 @@ class MapelController extends Controller
         return ApiResponse::success($mapel, 'Mata pelajaran berhasil ditambahkan', 201);
     }
 
-    public function update(\Illuminate\Http\Request $request, $id)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:100',
@@ -63,6 +60,7 @@ class MapelController extends Controller
     // --- Inlined from MapelService ---
 
     use AuditsAdminActions;
+
     private function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Mapel::with(['guru.guru']);
@@ -105,5 +103,4 @@ class MapelController extends Controller
         $this->auditAdmin('mapel.delete', $mapel, ['nama_mapel' => $mapel->nama_mapel]);
         $mapel->delete();
     }
-
 }

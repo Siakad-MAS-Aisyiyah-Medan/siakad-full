@@ -1,19 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\AuditLog;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\AuditLogResource;
+use App\Models\AuditLog;
+use App\Models\User;
 use App\Utils\ApiResponse;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Request;
 
 class AuditLogController extends Controller
 {
-    
-
     public function index(\Illuminate\Http\Request $request)
     {
         $validated = $request->validate([
@@ -36,12 +33,10 @@ class AuditLogController extends Controller
 
     // --- Inlined from AuditLogService ---
 
-    
-
     private function logAdminAction(string $action, ?Model $subject = null, array $meta = []): void
     {
         $user = auth()->user();
-        if (!$user instanceof User || !$this->shouldAudit($user)) {
+        if (! $user instanceof User || ! $this->shouldAudit($user)) {
             return;
         }
 
@@ -83,5 +78,4 @@ class AuditLogController extends Controller
 
         return in_array('manage_all', $this->permissions->permissionsForUser($user), true);
     }
-
 }

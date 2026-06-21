@@ -23,22 +23,34 @@ class UseCaseIntegrationTest extends TestCase
     public function test_all_seeded_roles_can_login_with_expected_redirect_and_use_case_menus(): void
     {
         $expectations = [
-            'admin' => ['/admin/dashboard', '/admin/hak-akses', '/admin/pengaturan'],
-            'kepsek' => ['/kepala-sekolah/dashboard', '/kepala-sekolah/profil-saya', '/kepala-sekolah/data-ppdb'],
-            'guru' => ['/guru/dashboard', '/guru/murid', '/guru/absensi'],
-            'siswa' => ['/siswa/dashboard', '/siswa/profil-saya', '/siswa/nilai'],
+            'admin' => [
+                'redirect' => '/admin/dashboard',
+                'menus' => ['/admin/dashboard', '/admin/profil-sekolah', '/admin/tahun-ajaran', '/admin/pengumuman', '/admin/guru', '/admin/murid', '/admin/kelas', '/admin/mapel', '/admin/transkrip-akademik', '/admin/ppdb', '/admin/hak-akses', '/admin/pengaturan'],
+            ],
+            'kepsek' => [
+                'redirect' => '/kepala-sekolah/dashboard',
+                'menus' => ['/kepala-sekolah/dashboard', '/kepala-sekolah/profil-saya', '/kepala-sekolah/pengumuman', '/kepala-sekolah/data-guru', '/kepala-sekolah/data-murid', '/kepala-sekolah/data-kelas', '/kepala-sekolah/data-mapel', '/kepala-sekolah/transkrip-akademik', '/kepala-sekolah/data-ppdb', '/kepala-sekolah/pengaturan'],
+            ],
+            'guru' => [
+                'redirect' => '/guru/dashboard',
+                'menus' => ['/guru/dashboard', '/guru/profil-saya', '/guru/pengumuman', '/guru/murid', '/guru/kelas', '/guru/mapel', '/guru/nilai', '/guru/absensi', '/guru/pengaturan'],
+            ],
+            'siswa' => [
+                'redirect' => '/siswa/dashboard',
+                'menus' => ['/siswa/dashboard', '/siswa/profil-saya', '/siswa/pengumuman', '/siswa/kelas', '/siswa/mapel', '/siswa/nilai', '/siswa/absensi', '/siswa/pengaturan'],
+            ],
         ];
 
-        foreach ($expectations as $username => $expectedPaths) {
+        foreach ($expectations as $username => $expected) {
             $response = $this->postJson('/api/login', [
                 'login' => $username,
                 'password' => 'password',
-            ])->assertOk()->assertJsonPath('success', true);
+            ])->assertOk()
+                ->assertJsonPath('success', true)
+                ->assertJsonPath('data.redirect_path', $expected['redirect']);
 
             $paths = collect($response->json('data.menus'))->pluck('path')->all();
-            foreach ($expectedPaths as $path) {
-                $this->assertContains($path, $paths, "Menu {$path} tidak tersedia untuk {$username}");
-            }
+            $this->assertSame($expected['menus'], $paths, "Daftar menu {$username} tidak sesuai");
         }
     }
 

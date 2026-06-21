@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Siswa;
-use App\Models\Mapel;
 use App\Models\Nilai;
-use App\Models\Kelas;
+use App\Services\NilaiService;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
-use App\Services\NilaiService;
 use InvalidArgumentException;
 
 class NilaiController extends Controller
@@ -29,6 +25,7 @@ class NilaiController extends Controller
 
         try {
             $data = $this->nilaiService->getFormData((int) $request->user()->id_user, $validated);
+
             return ApiResponse::success($data, 'Berhasil mengambil daftar nilai siswa');
         } catch (InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);
@@ -54,11 +51,13 @@ class NilaiController extends Controller
 
         try {
             $saved = $this->nilaiService->bulkSave((int) $request->user()->id_user, $validated);
+
             return ApiResponse::success($saved, 'Nilai siswa berhasil disimpan');
         } catch (InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);
         } catch (\Throwable $e) {
             report($e);
+
             return ApiResponse::error('Gagal menyimpan nilai siswa', 500);
         }
     }
@@ -74,6 +73,7 @@ class NilaiController extends Controller
         ]);
 
         $items = $this->nilaiService->listForSiswa((int) $request->user()->id_user, $validated);
+
         return ApiResponse::success($items, 'Berhasil mengambil nilai');
     }
 
@@ -121,10 +121,11 @@ class NilaiController extends Controller
                 'summary' => [
                     'total_nilai' => $summaryQuery->count(),
                     'per_kelas' => $perKelas,
-                ]
+                ],
             ], 'Berhasil mengambil rekap nilai');
         } catch (\Throwable $e) {
             report($e);
+
             return ApiResponse::error('Gagal mengambil data', 500);
         }
     }

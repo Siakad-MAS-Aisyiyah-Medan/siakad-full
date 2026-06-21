@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Http\Resources\NilaiResource;
-use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\Nilai;
 use App\Models\Siswa;
@@ -14,9 +13,7 @@ use InvalidArgumentException;
 
 class NilaiService
 {
-    public function __construct(private NilaiCalculationService $calculator)
-    {
-    }
+    public function __construct(private NilaiCalculationService $calculator) {}
 
     public function getFormData(int $guruId, array $params): array
     {
@@ -165,13 +162,13 @@ class NilaiService
 
     private function applyFilters($query, array $filters): void
     {
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $query->where('id_mapel', $filters['id_mapel']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
         if (isset($filters['validated_by_wali'])) {
@@ -182,7 +179,7 @@ class NilaiService
     private function assertGuruCanInput(int $guruId, int $mapelId): void
     {
         $user = User::findOrFail($guruId);
-        
+
         if ($user->role === 'admin') {
             return;
         }
@@ -219,7 +216,7 @@ class NilaiService
 
     private function perKelasBreakdown(Collection $rows, array $filters): array
     {
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             return [];
         }
 

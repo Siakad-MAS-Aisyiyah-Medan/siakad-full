@@ -18,7 +18,7 @@ class SecurityHeaders
         $response->headers->set('X-XSS-Protection', '1; mode=block');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-        if ($request->is('api/*') && !config('app.debug')) {
+        if ($request->is('api/*') && ! config('app.debug')) {
             $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
         }
 

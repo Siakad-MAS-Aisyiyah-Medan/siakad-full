@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Http\Resources\MapelResource;
 use App\Models\Mapel;
 use App\Support\SearchInput;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class MapelService
 {
     use AuditsAdminActions;
+
     public function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Mapel::with(['guru.guru']);

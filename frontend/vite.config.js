@@ -10,15 +10,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@app': path.resolve(__dirname, './src/app'),
     },
   },
   server: {
-    port: 1001,
+    port: 5173,
     strictPort: true,
   },
   build: {
-    // flatpickr still ships an obsolete IE media-query hack rejected by Lightning CSS.
     cssMinify: false,
   },
 })

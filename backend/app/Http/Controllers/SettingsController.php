@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
@@ -16,7 +15,7 @@ class SettingsController extends Controller
     public function index()
     {
         $settings = SystemSetting::all();
-        
+
         $grouped = $settings->groupBy('group')->map(function ($items, $group) {
             return [
                 'group' => $group,
@@ -43,8 +42,8 @@ class SettingsController extends Controller
     public function update(Request $request, $key)
     {
         $setting = SystemSetting::where('key', $key)->first();
-        
-        if (!$setting) {
+
+        if (! $setting) {
             return ApiResponse::error('Setting tidak ditemukan', 404);
         }
 
@@ -101,6 +100,7 @@ class SettingsController extends Controller
             'ppdb' => 'PPDB',
             'general' => 'Umum',
         ];
+
         return $labels[$group] ?? ucfirst($group);
     }
 
@@ -111,6 +111,7 @@ class SettingsController extends Controller
             'ppdb' => 'FileText',
             'general' => 'Settings',
         ];
+
         return $icons[$group] ?? 'Settings';
     }
 }

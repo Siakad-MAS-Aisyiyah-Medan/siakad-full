@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Http\Resources\EkskulResource;
 use App\Models\Ekskul;
 use App\Support\SearchInput;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EkskulService
 {
     use AuditsAdminActions;
+
     public function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Ekskul::with(['pembina.guru'])->orderBy('nama_ekskul');

@@ -25,6 +25,6 @@ class ProfilSekolah extends Model
         'email',
         'instagram',
         'facebook',
-        'youtube'
+        'youtube',
     ];
 }

@@ -152,9 +152,9 @@ class PpdbSettingController extends Controller
             $val = SystemSetting::getValue($key);
             // Decode JSON if it's an array field
             if (in_array($key, [
-                'ppdb_hero_highlights', 'ppdb_gelombang', 'ppdb_promo', 
-                'ppdb_persyaratan', 'ppdb_fasilitas', 'ppdb_ekstrakurikuler', 
-                'ppdb_alur', 'ppdb_kontak'
+                'ppdb_hero_highlights', 'ppdb_gelombang', 'ppdb_promo',
+                'ppdb_persyaratan', 'ppdb_fasilitas', 'ppdb_ekstrakurikuler',
+                'ppdb_alur', 'ppdb_kontak',
             ])) {
                 $decoded = $val ? json_decode($val, true) : null;
                 $settings[$key] = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : ($defaults[$key] ?? null);
@@ -174,9 +174,9 @@ class PpdbSettingController extends Controller
         $data = $request->except('ppdb_brosur_file');
 
         $jsonKeys = [
-            'ppdb_hero_highlights', 'ppdb_gelombang', 'ppdb_promo', 
-            'ppdb_persyaratan', 'ppdb_fasilitas', 'ppdb_ekstrakurikuler', 
-            'ppdb_alur', 'ppdb_kontak'
+            'ppdb_hero_highlights', 'ppdb_gelombang', 'ppdb_promo',
+            'ppdb_persyaratan', 'ppdb_fasilitas', 'ppdb_ekstrakurikuler',
+            'ppdb_alur', 'ppdb_kontak',
         ];
 
         foreach ($data as $key => $value) {

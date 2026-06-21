@@ -1,20 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Utils\SearchInput;
-use App\Http\Resources\BeritaResource;
-use App\Utils\AuditsAdminActions;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\BeritaResource;
 use App\Models\Berita;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
+use App\Utils\SearchInput;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class BeritaController extends Controller
 {
-    
-
     public function adminIndex(Request $request)
     {
         $paginator = $this->list(
@@ -34,7 +31,7 @@ class BeritaController extends Controller
         );
     }
 
-    public function adminStore(\Illuminate\Http\Request $request)
+    public function adminStore(Request $request)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
@@ -98,6 +95,7 @@ class BeritaController extends Controller
     // --- Inlined from BeritaService ---
 
     use AuditsAdminActions;
+
     private function list(?string $search = null, ?string $kategori = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Berita::query()->orderByDesc('tanggal_publikasi')->orderByDesc('id');
@@ -150,5 +148,4 @@ class BeritaController extends Controller
         $this->auditAdmin('berita.delete', $item, ['judul' => $item->judul]);
         $item->delete();
     }
-
 }

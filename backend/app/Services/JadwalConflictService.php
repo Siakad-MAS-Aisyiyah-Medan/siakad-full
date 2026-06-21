@@ -30,7 +30,7 @@ class JadwalConflictService
             );
         }
 
-        if (!empty($data['ruangan'])) {
+        if (! empty($data['ruangan'])) {
             $ruangan = mb_strtolower(trim($data['ruangan']));
             if ((clone $base)->whereRaw('LOWER(TRIM(ruangan)) = ?', [$ruangan])->exists()) {
                 throw new JadwalConflictException(

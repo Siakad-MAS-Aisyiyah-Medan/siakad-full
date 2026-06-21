@@ -31,6 +31,7 @@ class RbacSeeder extends Seeder
 
         MenuItem::where('path', 'like', '/wali%')->delete();
         MenuItem::where('path', 'like', '/kepsek%')->delete();
+        MenuItem::where('path', '/admin/pengaturan/tahun-ajaran')->delete();
         MenuItem::whereIn('label', ['Riwayat Absensi', 'Nilai Pribadi', 'Data PPDB Baru', 'Data Diri'])->delete();
 
         $permissions = [
@@ -66,8 +67,8 @@ class RbacSeeder extends Seeder
             ['key' => 'manage_absensi_siswa', 'name' => 'Kelola Absensi Murid', 'group' => 'guru'],
             ['key' => 'view_kelas_pribadi', 'name' => 'Lihat Data Kelas yang Dimasuki', 'group' => 'siswa'],
             ['key' => 'view_transkrip_pribadi', 'name' => 'Lihat Transkrip Akademik Pribadi', 'group' => 'siswa'],
-            ['key' => 'view_absensi_pribadi', 'name' => 'Lihat Absensi Pribadi', 'group' => 'legacy'],
-            ['key' => 'view_nilai_pribadi', 'name' => 'Lihat Nilai Pribadi', 'group' => 'legacy'],
+            ['key' => 'view_absensi_pribadi', 'name' => 'Lihat Absensi Pribadi', 'group' => 'siswa'],
+            ['key' => 'view_nilai_pribadi', 'name' => 'Lihat Nilai Pribadi', 'group' => 'siswa'],
             ['key' => 'manage_pendaftaran_pribadi', 'name' => 'Kelola Pendaftaran Pribadi', 'group' => 'calon_siswa'],
             ['key' => 'manage_formulir_pendaftaran', 'name' => 'Kelola Formulir Pendaftaran', 'group' => 'calon_siswa'],
             ['key' => 'manage_berkas_pendaftaran', 'name' => 'Kelola Berkas Pendaftaran', 'group' => 'calon_siswa'],
@@ -95,7 +96,8 @@ class RbacSeeder extends Seeder
             ]],
             ['key' => 'siswa', 'name' => 'Murid', 'redirect_path' => '/siswa/dashboard', 'permissions' => [
                 'view_dashboard_siswa', 'manage_profil_pribadi', 'manage_pengaturan_akun', 'view_pengumuman',
-                'view_kelas_pribadi', 'view_mapel', 'view_transkrip_pribadi', 'view_nilai_pribadi',
+                'view_kelas_pribadi', 'view_mapel', 'view_transkrip_pribadi', 'view_absensi_pribadi',
+                'view_nilai_pribadi',
             ]],
             ['key' => 'calon_siswa', 'name' => 'Calon Murid', 'redirect_path' => '/calon-murid/dashboard', 'permissions' => [
                 'view_dashboard_calon_siswa', 'manage_pengaturan_akun', 'manage_pendaftaran_pribadi',
@@ -128,7 +130,7 @@ class RbacSeeder extends Seeder
         $menus = [
             ['permission_key' => 'manage_all', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/admin/dashboard', 'sort_order' => 10],
             ['permission_key' => 'manage_profil_sekolah', 'icon_key' => 'School', 'label' => 'Profil Sekolah', 'path' => '/admin/profil-sekolah', 'sort_order' => 20],
-            ['permission_key' => 'manage_tahun_ajaran', 'icon_key' => 'CalendarDays', 'label' => 'Tahun Ajaran', 'path' => '/admin/pengaturan/tahun-ajaran', 'sort_order' => 30],
+            ['permission_key' => 'manage_tahun_ajaran', 'icon_key' => 'CalendarDays', 'label' => 'Tahun Ajaran', 'path' => '/admin/tahun-ajaran', 'sort_order' => 30],
             ['permission_key' => 'manage_pengumuman', 'icon_key' => 'Bell', 'label' => 'Pengumuman Sekolah', 'path' => '/admin/pengumuman', 'sort_order' => 40],
             ['permission_key' => 'manage_guru', 'icon_key' => 'Users', 'label' => 'Data Guru', 'path' => '/admin/guru', 'sort_order' => 50],
             ['permission_key' => 'manage_murid', 'icon_key' => 'GraduationCap', 'label' => 'Data Murid', 'path' => '/admin/murid', 'sort_order' => 60],
@@ -166,7 +168,8 @@ class RbacSeeder extends Seeder
             ['permission_key' => 'view_kelas_pribadi', 'icon_key' => 'BookOpen', 'label' => 'Data Kelas yang Dimasuki', 'path' => '/siswa/kelas', 'sort_order' => 640],
             ['permission_key' => 'view_mapel', 'icon_key' => 'ClipboardList', 'label' => 'Mata Pelajaran', 'path' => '/siswa/mapel', 'sort_order' => 650],
             ['permission_key' => 'view_transkrip_pribadi', 'icon_key' => 'FileText', 'label' => 'Transkrip Akademik Pribadi', 'path' => '/siswa/nilai', 'sort_order' => 660],
-            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/siswa/pengaturan', 'sort_order' => 670],
+            ['permission_key' => 'view_absensi_pribadi', 'icon_key' => 'ClipboardList', 'label' => 'Absensi Pribadi', 'path' => '/siswa/absensi', 'sort_order' => 670],
+            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/siswa/pengaturan', 'sort_order' => 680],
 
             ['permission_key' => 'view_dashboard_calon_siswa', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/calon-murid/dashboard', 'sort_order' => 810],
             ['permission_key' => 'manage_formulir_pendaftaran', 'icon_key' => 'FileText', 'label' => 'Formulir Pendaftaran', 'path' => '/ppdb/registrasi', 'sort_order' => 820],

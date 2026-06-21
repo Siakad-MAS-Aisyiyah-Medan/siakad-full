@@ -1,25 +1,25 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Models\User;
-use App\Models\Mapel;
-use App\Models\Kelas;
-use App\Models\JadwalPelajaran;
-use App\Models\Guru;
-use App\Models\Ekskul;
-use App\Utils\AuditsAdminActions;
 
-use App\Http\Controllers\Controller;
+use App\Models\Ekskul;
+use App\Models\Guru;
+use App\Models\JadwalPelajaran;
+use App\Models\Kelas;
+use App\Models\Mapel;
+use App\Models\User;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class GuruController extends Controller
 {
-    
-
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
         $validated = $request->validate([
             'search' => 'nullable|string',
@@ -36,7 +36,7 @@ class GuruController extends Controller
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data guru');
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'username' => 'required|unique:users,username',
@@ -64,14 +64,14 @@ class GuruController extends Controller
         }
     }
 
-    public function update(\Illuminate\Http\Request $request, $id)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'username' => 'required|unique:users,username,' . $id . ',id_user',
-            'email' => 'required|email|unique:users,email,' . $id . ',id_user',
+            'username' => 'required|unique:users,username,'.$id.',id_user',
+            'email' => 'required|email|unique:users,email,'.$id.',id_user',
             'password' => 'nullable|min:8',
             'nama_guru' => 'required|string|max:255',
-            'nip_nuptk' => 'required|string|max:50|unique:guru,nip_nuptk,' . $id . ',id_user',
+            'nip_nuptk' => 'required|string|max:50|unique:guru,nip_nuptk,'.$id.',id_user',
             'jenis_kelamin' => 'required|in:L,P',
             'agama' => 'required|string|max:50',
             'alamat' => 'required|string',
@@ -113,6 +113,7 @@ class GuruController extends Controller
     // --- Inlined from GuruService ---
 
     use AuditsAdminActions;
+
     private function listGuru(?string $search = null, int $perPage = 15, ?string $role = null): LengthAwarePaginator
     {
         $query = User::with('guru')->where('role', 'guru');
@@ -141,8 +142,8 @@ class GuruController extends Controller
             $user->save();
 
             $fotoPath = null;
-            if (isset($data['foto']) && $data['foto'] instanceof \Illuminate\Http\UploadedFile) {
-                $fotoPath = '/storage/' . $data['foto']->store('guru', 'public');
+            if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {
+                $fotoPath = '/storage/'.$data['foto']->store('guru', 'public');
             }
 
             Guru::create([
@@ -181,19 +182,19 @@ class GuruController extends Controller
             $user->role = $data['role'];
             $user->save();
 
-            if (!empty($data['password'])) {
+            if (! empty($data['password'])) {
                 $user->update(['password' => $data['password']]);
             }
 
             $guru = Guru::where('id_user', $id)->first();
             $fotoPath = $guru ? $guru->foto : null;
 
-            if (isset($data['foto']) && $data['foto'] instanceof \Illuminate\Http\UploadedFile) {
+            if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {
                 if ($fotoPath) {
                     $oldPath = str_replace('/storage/', '', $fotoPath);
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                    Storage::disk('public')->delete($oldPath);
                 }
-                $fotoPath = '/storage/' . $data['foto']->store('guru', 'public');
+                $fotoPath = '/storage/'.$data['foto']->store('guru', 'public');
             }
 
             $profilePayload = [
@@ -262,5 +263,4 @@ class GuruController extends Controller
             );
         }
     }
-
 }

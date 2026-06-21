@@ -1,21 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+use App\Http\Resources\KelasResource;
+use App\Models\Kelas;
+use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use App\Utils\SearchInput;
 use App\Utils\WaliKelasUser;
-use App\Models\Kelas;
-use App\Http\Resources\KelasResource;
-use App\Utils\AuditsAdminActions;
-
-use App\Http\Controllers\Controller;
-use App\Utils\ApiResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class KelasController extends Controller
 {
-    
-
     public function index(Request $request)
     {
         $paginator = $this->list(
@@ -29,16 +26,17 @@ class KelasController extends Controller
     public function stats()
     {
         $stats = $this->getStats();
+
         return ApiResponse::success($stats, 'Berhasil mengambil statistik kelas');
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_kelas' => 'required|string|max:50',
             'tingkat' => 'required|in:X,XI,XII',
             'jurusan' => 'required|in:IPA,IPS',
-            'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser()],
+            'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser],
             'tahun_ajaran' => 'nullable|string|max:20',
             'status' => 'nullable|in:aktif,nonaktif,Aktif,Nonaktif',
             'kapasitas_maksimal' => 'required|integer|min:1|max:100',
@@ -51,13 +49,13 @@ class KelasController extends Controller
         return ApiResponse::success($kelas, 'Kelas berhasil ditambahkan', 201);
     }
 
-    public function update(\Illuminate\Http\Request $request, $id)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'nama_kelas' => 'required|string|max:50',
             'tingkat' => 'required|in:X,XI,XII',
             'jurusan' => 'required|in:IPA,IPS',
-            'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser()],
+            'id_wali_kelas' => ['nullable', 'integer', 'exists:users,id_user', new WaliKelasUser],
             'tahun_ajaran' => 'nullable|string|max:20',
             'status' => 'nullable|in:aktif,nonaktif,Aktif,Nonaktif',
             'kapasitas_maksimal' => 'required|integer|min:1|max:100',
@@ -82,20 +80,21 @@ class KelasController extends Controller
     // --- Inlined from KelasService ---
 
     use AuditsAdminActions;
+
     private function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Kelas::with(['waliKelas.guru'])->withCount(['jadwal', 'siswa']);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $term = SearchInput::escape($filters['search']);
             $query->where('nama_kelas', 'like', "%{$term}%");
         }
 
-        if (!empty($filters['tingkat']) && $filters['tingkat'] !== 'Semua') {
+        if (! empty($filters['tingkat']) && $filters['tingkat'] !== 'Semua') {
             $query->where('tingkat', $filters['tingkat']);
         }
 
-        if (!empty($filters['jurusan']) && $filters['jurusan'] !== 'Semua') {
+        if (! empty($filters['jurusan']) && $filters['jurusan'] !== 'Semua') {
             $query->where('jurusan', $filters['jurusan']);
         }
 
@@ -140,5 +139,4 @@ class KelasController extends Controller
         $this->auditAdmin('kelas.delete', $kelas, ['nama_kelas' => $kelas->nama_kelas]);
         $kelas->delete();
     }
-
 }

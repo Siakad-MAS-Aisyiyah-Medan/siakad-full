@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\BerkasPendaftaran;
 use App\Models\Pendaftaran;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -144,7 +143,7 @@ class PendaftaranStateService
         $pendaftaran = $this->getOwnedOrFail($user);
         $this->assertEditableByCalon($pendaftaran);
 
-        if (!in_array($pendaftaran->ppdb_status, ['draft', 'revisi'], true)) {
+        if (! in_array($pendaftaran->ppdb_status, ['draft', 'revisi'], true)) {
             throw new InvalidArgumentException('Pendaftaran sudah dikirim atau sedang diproses.');
         }
 
@@ -162,7 +161,7 @@ class PendaftaranStateService
 
     public function transitionByAdmin(Pendaftaran $pendaftaran, string $status, ?string $catatan = null): Pendaftaran
     {
-        if (!in_array($status, ['terverifikasi', 'revisi', 'diterima', 'ditolak'], true)) {
+        if (! in_array($status, ['terverifikasi', 'revisi', 'diterima', 'ditolak'], true)) {
             throw new InvalidArgumentException('Status admin tidak valid.');
         }
 
@@ -171,7 +170,7 @@ class PendaftaranStateService
         }
 
         $allowedFrom = self::ADMIN_TRANSITIONS[$status] ?? [];
-        if (!in_array($pendaftaran->ppdb_status, $allowedFrom, true)) {
+        if (! in_array($pendaftaran->ppdb_status, $allowedFrom, true)) {
             throw new InvalidArgumentException(
                 "Tidak dapat mengubah status ke {$status} dari status {$pendaftaran->ppdb_status}."
             );
@@ -222,7 +221,7 @@ class PendaftaranStateService
             throw new InvalidArgumentException('Calon murid sudah menjadi siswa aktif.');
         }
 
-        if (!in_array($pendaftaran->ppdb_status, ['diterima', 'daftar_ulang'], true)) {
+        if (! in_array($pendaftaran->ppdb_status, ['diterima', 'daftar_ulang'], true)) {
             throw new InvalidArgumentException('PPDB harus berstatus diterima sebelum promosi.');
         }
 
@@ -247,7 +246,7 @@ class PendaftaranStateService
     public function getOwnedOrFail(User $user): Pendaftaran
     {
         $pendaftaran = Pendaftaran::where('id_user', $user->id_user)->first();
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             throw new InvalidArgumentException('Data pendaftaran tidak ditemukan.');
         }
 
@@ -276,7 +275,7 @@ class PendaftaranStateService
         foreach (PpdbBerkasService::allJenisKeys() as $jenis) {
             $normalized = PpdbBerkasService::normalizeJenis($jenis);
             $found = in_array($jenis, $uploaded, true) || in_array($normalized, $uploaded, true);
-            if (!$found) {
+            if (! $found) {
                 $label = PpdbBerkasService::JENIS[$jenis] ?? $jenis;
                 throw new InvalidArgumentException("Berkas {$label} wajib diunggah sebelum submit.");
             }

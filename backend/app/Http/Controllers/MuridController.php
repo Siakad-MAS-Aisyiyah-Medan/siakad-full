@@ -1,25 +1,22 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use App\Models\Siswa;
-use App\Models\User;
-use App\Utils\AuditsAdminActions;
-use App\Services\EnrollmentService;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\EnrollmentService;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use InvalidArgumentException;
 
 class MuridController extends Controller
 {
-    public function __construct(private EnrollmentService $enrollment)
-    {
-    }
+    public function __construct(private EnrollmentService $enrollment) {}
 
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
         $validated = $request->validate([
             'search' => 'nullable|string',
@@ -37,10 +34,11 @@ class MuridController extends Controller
     public function stats()
     {
         $stats = $this->getStats();
+
         return ApiResponse::success($stats, 'Berhasil mengambil statistik murid');
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'username' => 'required|string|unique:users,username',
@@ -62,13 +60,14 @@ class MuridController extends Controller
 
         try {
             $user = $this->createMurid($validated);
+
             return ApiResponse::success($user, 'Murid berhasil ditambahkan', 201);
         } catch (\Exception $e) {
-            return ApiResponse::error('Gagal menambahkan murid: ' . $e->getMessage(), 500);
+            return ApiResponse::error('Gagal menambahkan murid: '.$e->getMessage(), 500);
         }
     }
 
-    public function update(\Illuminate\Http\Request $request, $id)
+    public function update(Request $request, $id)
     {
         try {
             $validated = $request->validate([
@@ -77,7 +76,7 @@ class MuridController extends Controller
                 'password' => 'nullable|string|min:6',
                 'role' => 'nullable|in:siswa,calon_siswa',
                 'nama_siswa' => 'required|string',
-                'nisn' => 'nullable|string|unique:siswa,nisn,' . $id . ',id_user',
+                'nisn' => 'nullable|string|unique:siswa,nisn,'.$id.',id_user',
                 'nis' => 'nullable|string',
                 'jenis_kelamin' => 'required|in:L,P',
                 'tempat_lahir' => 'nullable|string',
@@ -97,7 +96,7 @@ class MuridController extends Controller
         }
     }
 
-    public function enroll(\Illuminate\Http\Request $request, $id)
+    public function enroll(Request $request, $id)
     {
         try {
             $validated = $request->validate([
@@ -125,7 +124,6 @@ class MuridController extends Controller
     // --- Inlined from MuridService ---
 
     use AuditsAdminActions;
-    
 
     private function listMurid(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
@@ -186,6 +184,7 @@ class MuridController extends Controller
 
             $fresh = $user->fresh(['siswa']);
             $this->auditAdmin('murid.create', $fresh, ['username' => $fresh->username]);
+
             return $fresh;
         });
     }
@@ -193,7 +192,7 @@ class MuridController extends Controller
     private function updateMurid(int $id, array $data): User
     {
         $user = User::findOrFail($id);
-        if (!in_array($user->role, ['siswa', 'calon_siswa'], true)) {
+        if (! in_array($user->role, ['siswa', 'calon_siswa'], true)) {
             throw new InvalidArgumentException('User bukan murid/calon siswa.');
         }
 
@@ -219,8 +218,8 @@ class MuridController extends Controller
                         $siswaData[$field === 'tanggal_lahir' ? 'tgl_lahir' : $field] = $data[$field];
                     }
                 }
-                
-                if (!empty($siswaData)) {
+
+                if (! empty($siswaData)) {
                     $user->siswa->update($siswaData);
                 }
             }
@@ -235,7 +234,7 @@ class MuridController extends Controller
     private function deleteMurid(int $id): void
     {
         $user = User::findOrFail($id);
-        if (!in_array($user->role, ['siswa', 'calon_siswa'], true)) {
+        if (! in_array($user->role, ['siswa', 'calon_siswa'], true)) {
             throw new InvalidArgumentException('User bukan murid/calon siswa.');
         }
         $this->auditAdmin('murid.delete', $user, ['username' => $user->username]);
@@ -246,5 +245,4 @@ class MuridController extends Controller
     {
         return $this->enrollment->enrollCalonSiswa($id, $idKelas);
     }
-
 }

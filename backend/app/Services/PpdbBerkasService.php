@@ -6,6 +6,7 @@ use App\Models\BerkasPendaftaran;
 use App\Models\Pendaftaran;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -41,9 +42,7 @@ class PpdbBerkasService
         'ktp_orang_tua' => 'file_ktp_ortu',
     ];
 
-    public function __construct(private PendaftaranStateService $state)
-    {
-    }
+    public function __construct(private PendaftaranStateService $state) {}
 
     public static function normalizeJenis(string $jenis): string
     {
@@ -61,7 +60,7 @@ class PpdbBerkasService
     public function listForUser(User $user): array
     {
         $pendaftaran = $this->getPendaftaranByUser($user);
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             return [
                 'items' => $this->buildPlaceholderItems(),
                 'can_edit' => true,
@@ -90,7 +89,7 @@ class PpdbBerkasService
     public function upload(User $user, string $jenis, UploadedFile $file): array
     {
         $jenis = self::normalizeJenis($jenis);
-        if (!array_key_exists($jenis, self::JENIS)) {
+        if (! array_key_exists($jenis, self::JENIS)) {
             throw new InvalidArgumentException('Jenis berkas tidak valid.');
         }
 
@@ -141,7 +140,7 @@ class PpdbBerkasService
             ->where('jenis_berkas', $jenis)
             ->first();
 
-        if (!$berkas) {
+        if (! $berkas) {
             throw new InvalidArgumentException('Berkas tidak ditemukan.');
         }
 
@@ -163,7 +162,7 @@ class PpdbBerkasService
             ->all();
 
         foreach (array_keys(self::JENIS) as $jenis) {
-            if (!in_array($jenis, $uploaded, true)) {
+            if (! in_array($jenis, $uploaded, true)) {
                 throw new InvalidArgumentException('Berkas '.self::JENIS[$jenis].' wajib diunggah sebelum submit.');
             }
         }
@@ -172,11 +171,11 @@ class PpdbBerkasService
     protected function resolveEditablePendaftaran(User $user): Pendaftaran
     {
         $pendaftaran = $this->getPendaftaranByUser($user);
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             throw new InvalidArgumentException('Mulai pendaftaran PPDB terlebih dahulu.');
         }
 
-        if (!$this->canEditPendaftaran($pendaftaran)) {
+        if (! $this->canEditPendaftaran($pendaftaran)) {
             throw new InvalidArgumentException('Berkas tidak dapat diubah pada status pendaftaran saat ini.');
         }
 
@@ -193,7 +192,7 @@ class PpdbBerkasService
         $ext = strtolower($file->getClientOriginalExtension() ?: '');
         $allowedExt = config('ppdb.berkas.allowed_extensions', ['pdf', 'jpg', 'jpeg', 'png']);
 
-        if (!in_array($ext, $allowedExt, true)) {
+        if (! in_array($ext, $allowedExt, true)) {
             throw new InvalidArgumentException(
                 'Format '.self::JENIS[$jenis].' harus: '.implode(', ', $allowedExt).'.'
             );
@@ -201,7 +200,7 @@ class PpdbBerkasService
 
         $mime = $file->getMimeType();
         $allowedMimes = config('ppdb.berkas.allowed_mimes', []);
-        if ($mime && !in_array($mime, $allowedMimes, true)) {
+        if ($mime && ! in_array($mime, $allowedMimes, true)) {
             throw new InvalidArgumentException('Tipe file tidak valid atau tidak aman.');
         }
 
@@ -214,7 +213,7 @@ class PpdbBerkasService
 
     protected function formatBerkasItem(string $jenis, string $label, ?BerkasPendaftaran $row): array
     {
-        if (!$row || !$row->file_path) {
+        if (! $row || ! $row->file_path) {
             return [
                 'jenis_berkas' => $jenis,
                 'label' => $label,
@@ -284,11 +283,11 @@ class PpdbBerkasService
 
     protected function syncLegacyColumn(Pendaftaran $pendaftaran, string $jenis, string $path): void
     {
-        if (!isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
+        if (! isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
             return;
         }
         $col = self::LEGACY_FILE_COLUMNS[$jenis];
-        if (\Illuminate\Support\Facades\Schema::hasColumn('pendaftaran', $col)) {
+        if (Schema::hasColumn('pendaftaran', $col)) {
             $pendaftaran->{$col} = $path;
             $pendaftaran->save();
         }
@@ -296,11 +295,11 @@ class PpdbBerkasService
 
     protected function clearLegacyColumn(Pendaftaran $pendaftaran, string $jenis): void
     {
-        if (!isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
+        if (! isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
             return;
         }
         $col = self::LEGACY_FILE_COLUMNS[$jenis];
-        if (\Illuminate\Support\Facades\Schema::hasColumn('pendaftaran', $col)) {
+        if (Schema::hasColumn('pendaftaran', $col)) {
             $pendaftaran->{$col} = null;
             $pendaftaran->save();
         }
@@ -314,7 +313,7 @@ class PpdbBerkasService
     protected function removeLegacyDuplicateRows(int $pendaftaranId, string $canonicalJenis): void
     {
         $legacyKeys = array_keys(array_filter(self::LEGACY_JENIS_MAP, fn ($v) => $v === $canonicalJenis));
-        if (!$legacyKeys) {
+        if (! $legacyKeys) {
             return;
         }
 

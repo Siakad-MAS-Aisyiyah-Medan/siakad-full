@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Http\Resources\JadwalResource;
 use App\Models\JadwalPelajaran;
 use App\Models\Siswa;
 use App\Support\SearchInput;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -14,9 +14,8 @@ use InvalidArgumentException;
 class JadwalService
 {
     use AuditsAdminActions;
-    public function __construct(private JadwalConflictService $conflicts)
-    {
-    }
+
+    public function __construct(private JadwalConflictService $conflicts) {}
 
     public function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
@@ -60,15 +59,15 @@ class JadwalService
             ->orderBy('hari')
             ->orderBy('waktu_pelajaran.jam_mulai')
             ->get()->map(
-            fn ($item) => (new JadwalResource($item))->resolve()
-        );
+                fn ($item) => (new JadwalResource($item))->resolve()
+            );
     }
 
     public function listForSiswa(int $userId, ?string $tahunAjaran = null, ?string $semester = null): Collection
     {
         $siswa = Siswa::where('id_user', $userId)->first();
 
-        if (!$siswa?->id_kelas) {
+        if (! $siswa?->id_kelas) {
             throw new InvalidArgumentException('Anda belum terdaftar di kelas. Hubungi admin sekolah.');
         }
 
@@ -87,8 +86,8 @@ class JadwalService
             ->orderBy('hari')
             ->orderBy('waktu_pelajaran.jam_mulai')
             ->get()->map(
-            fn ($item) => (new JadwalResource($item))->resolve()
-        );
+                fn ($item) => (new JadwalResource($item))->resolve()
+            );
     }
 
     public function create(array $data): array

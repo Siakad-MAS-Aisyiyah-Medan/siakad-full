@@ -1,0 +1,159 @@
+import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+
+import PageHeader from '@/shared/components/PageHeader';
+
+import { exportToCsv } from '@/shared/utils/exportCsv';
+
+function statusLabel(kelas) {
+  const status = String(kelas.status || '').toLowerCase();
+  if (status === 'aktif') return 'Aktif';
+  if (status === 'nonaktif') return 'Nonaktif';
+  return Number(kelas.jumlah_siswa || 0) > 0 ? 'Aktif' : 'Nonaktif';
+}
+
+export default function KelasTable({
+  filteredData,
+  searchQuery,
+  onSearchChange,
+  onAdd,
+  onEdit,
+  onDelete,
+  isFetching = false,
+  readOnly = false,
+}) {
+  const handleDownload = () => {
+    const dataToExport = filteredData.map(item => ({
+      'Tahun Ajaran': item.tahun_ajaran?.tahun_ajaran || item.tahun_ajaran_id || '-',
+      'Nama Kelas': item.nama_kelas || '-',
+      'Tingkatan': item.tingkatan || '-',
+      'Jurusan': item.jurusan || '-',
+      'Wali Kelas': item.wali_kelas?.nama_guru || item.wali_kelas_nama || '-',
+      'Status': statusLabel(item),
+    }));
+    exportToCsv('Data_Kelas.csv', dataToExport);
+  };
+
+  return (
+    <div className="animate-fade-in" style={{ margin: '-1.5rem', background: 'var(--color-white)', minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
+      <PageHeader title="Data Kelas" subtitle="Kelola data kelas MAS Aisyiyah Medan">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            placeholder="Cari data kelas..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {readOnly ? (
+            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
+                <Download size={16} />
+                Unduh Data
+              </button>
+              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={16} />
+                Tambah Kelas
+              </button>
+            </>
+          )}
+        </div>
+      </PageHeader>
+
+      {/* Table */}
+      <div style={{ flex: 1, overflowX: 'auto' }}>
+        <table className="data-table" style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th style={{ paddingLeft: '2rem' }}>No</th>
+              <th>Tahun Ajaran</th>
+              <th>Nama Kelas</th>
+              <th>Tingkatan</th>
+              <th>Jurusan</th>
+              <th>Wali Kelas</th>
+              <th>Status</th>
+              {!readOnly ? <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Aksi</th> : null}
+            </tr>
+          </thead>
+          <tbody>
+            {isFetching ? (
+              <tr>
+                <td colSpan={readOnly ? 7 : 8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
+                    Memuat data kelas...
+                  </div>
+                </td>
+              </tr>
+            ) : filteredData.length > 0 ? (
+              filteredData.map((kelas, idx) => {
+                const isAktif = statusLabel(kelas) === 'Aktif';
+                return (
+                  <tr key={kelas.id_kelas}>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
+                    <td>{kelas.tahun_ajaran || '2025/2026'}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{kelas.nama_kelas}</td>
+                    <td>
+                      <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)' }}>
+                        {kelas.tingkat || '-'}
+                      </span>
+                    </td>
+                    <td>{kelas.jurusan || '-'}</td>
+                    <td>{kelas.wali_kelas?.nama_guru || 'Belum ditentukan'}</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '50px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: isAktif ? 'var(--color-primary-soft)' : '#fef2f2',
+                        color: isAktif ? 'var(--color-primary-dark)' : '#991b1b',
+                        border: `1px solid ${isAktif ? 'var(--color-primary-light)' : '#fecaca'}`,
+                      }}>
+                        {statusLabel(kelas)}
+                      </span>
+                    </td>
+                    {!readOnly ? (
+                      <td style={{ paddingRight: '2rem' }}>
+                        <div className="actions-cell">
+                          <button type="button" onClick={() => onEdit && onEdit(kelas)} className="btn-icon edit" title="Edit">
+                            <Pencil size={15} />
+                          </button>
+                          <button type="button" onClick={() => onDelete && onDelete(kelas.id_kelas)} className="btn-icon delete" title="Hapus">
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    ) : null}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={readOnly ? 7 : 8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '2rem' }}>🏫</div>
+                    <p style={{ fontWeight: 600 }}>Tidak ada data kelas</p>
+                    <p style={{ fontSize: '0.875rem' }}>Tambah kelas baru untuk memulai</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ padding: '1rem 2rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border)', background: '#f8fafc' }}>
+        Menampilkan {filteredData.length} data kelas
+      </div>
+    </div>
+  );
+}

@@ -1,26 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Siswa;
-use App\Models\Mapel;
-use App\Models\JadwalPelajaran;
-use App\Http\Resources\AbsensiResource;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Validation\Rule;
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\AbsensiGuru;
-use App\Models\Absensi;
-use App\Http\Resources\AbsensiGuruResource;
 
-use App\Http\Controllers\Controller;
-use App\Models\Kelas;
-use App\Utils\ApiResponse;
-use Illuminate\Http\Request;
-use InvalidArgumentException;
+use App\Http\Resources\AbsensiGuruResource;
+use App\Http\Resources\AbsensiResource;
+use App\Models\Absensi;
+use App\Models\AbsensiGuru;
+use App\Models\JadwalPelajaran;
+use App\Models\Mapel;
+use App\Models\User;
 use App\Services\AbsensiSiswaService;
+use App\Utils\ApiResponse;
+use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use InvalidArgumentException;
 
 class AbsensiController extends Controller
 {
@@ -31,7 +28,7 @@ class AbsensiController extends Controller
         $this->absensiService = $absensiService;
     }
 
-    public function adminGuruIndex(\Illuminate\Http\Request $request)
+    public function adminGuruIndex(Request $request)
     {
         $validated = $request->validate([
             'search' => 'nullable|string',
@@ -46,7 +43,7 @@ class AbsensiController extends Controller
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data absensi guru');
     }
 
-    public function adminGuruRekap(\Illuminate\Http\Request $request)
+    public function adminGuruRekap(Request $request)
     {
         $validated = $request->validate([
             'search' => 'nullable|string',
@@ -58,7 +55,7 @@ class AbsensiController extends Controller
         return ApiResponse::success($rekap, 'Berhasil mengambil rekap absensi guru');
     }
 
-    public function guruFormData(\Illuminate\Http\Request $request)
+    public function guruFormData(Request $request)
     {
         $validated = $request->validate([
             'id_kelas' => 'required|exists:kelas,id_kelas',
@@ -83,7 +80,7 @@ class AbsensiController extends Controller
         }
     }
 
-    public function guruBulkStore(\Illuminate\Http\Request $request)
+    public function guruBulkStore(Request $request)
     {
         $validated = $request->validate([
             'meta' => 'required|array',
@@ -117,7 +114,7 @@ class AbsensiController extends Controller
         }
     }
 
-    public function guruRekapSiswa(\Illuminate\Http\Request $request)
+    public function guruRekapSiswa(Request $request)
     {
         $validated = $request->validate([
             'id_kelas' => 'nullable|exists:kelas,id_kelas',
@@ -141,7 +138,7 @@ class AbsensiController extends Controller
         }
     }
 
-    public function guruCheckIn(\Illuminate\Http\Request $request)
+    public function guruCheckIn(Request $request)
     {
         $validated = $request->validate([
             'keterangan' => 'nullable|string|max:500',
@@ -159,7 +156,7 @@ class AbsensiController extends Controller
         }
     }
 
-    public function guruCheckOut(\Illuminate\Http\Request $request)
+    public function guruCheckOut(Request $request)
     {
         $validated = $request->validate([
             'keterangan' => 'nullable|string|max:500',
@@ -177,7 +174,7 @@ class AbsensiController extends Controller
         }
     }
 
-    public function guruRiwayatGuru(\Illuminate\Http\Request $request)
+    public function guruRiwayatGuru(Request $request)
     {
         $validated = $request->validate([
             'tanggal_dari' => 'nullable|date',
@@ -187,14 +184,14 @@ class AbsensiController extends Controller
         ]);
 
         $items = $this->listForGuru(
-                (int) auth()->id(),
-                $validated
-            );
+            (int) auth()->id(),
+            $validated
+        );
 
         return ApiResponse::success($items, 'Berhasil mengambil riwayat absensi guru');
     }
 
-    public function siswaIndex(\Illuminate\Http\Request $request)
+    public function siswaIndex(Request $request)
     {
         $validated = $request->validate([
             'tahun_ajaran' => 'nullable|string|max:20',
@@ -292,7 +289,7 @@ class AbsensiController extends Controller
             if ($keterangan) {
                 $row->keterangan = $keterangan;
             }
-            if (!$row->jam_masuk) {
+            if (! $row->jam_masuk) {
                 $row->status = Absensi::STATUS_ALPA;
             }
         });
@@ -358,7 +355,7 @@ class AbsensiController extends Controller
                 'tanggal' => $today,
             ]);
 
-            if (!$row->exists) {
+            if (! $row->exists) {
                 $row->tahun_ajaran = $this->currentTahunAjaran();
                 $row->semester = $this->currentSemester();
                 $row->status = Absensi::STATUS_HADIR;
@@ -395,59 +392,58 @@ class AbsensiController extends Controller
 
     private function applyFilters($query, array $filters): void
     {
-        if (!empty($filters['bulan'])) {
+        if (! empty($filters['bulan'])) {
             $start = Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
             $filters['tanggal_dari'] = $start->toDateString();
             $filters['tanggal_sampai'] = $start->copy()->endOfMonth()->toDateString();
         }
 
-        if (!empty($filters['id_user_guru'])) {
+        if (! empty($filters['id_user_guru'])) {
             $query->where('id_user_guru', $filters['id_user_guru']);
         }
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
     }
-
 
     // --- Inlined from AbsensiSiswaService ---
 
     private function applyFiltersSiswa($query, array $filters): void
     {
-        if (!empty($filters['bulan'])) {
-            $start = \Carbon\Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
+        if (! empty($filters['bulan'])) {
+            $start = Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
             $filters['tanggal_dari'] = $start->toDateString();
             $filters['tanggal_sampai'] = $start->copy()->endOfMonth()->toDateString();
         }
 
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $query->where('id_kelas', $filters['id_kelas']);
         }
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $query->where('id_mapel', $filters['id_mapel']);
         }
-        if (!empty($filters['id_user_siswa'])) {
+        if (! empty($filters['id_user_siswa'])) {
             $query->where('id_user_siswa', $filters['id_user_siswa']);
         }
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
     }
@@ -455,7 +451,7 @@ class AbsensiController extends Controller
     private function assertGuruCanRecord(int $guruId, int $mapelId): void
     {
         $user = User::findOrFail($guruId);
-        
+
         if ($user->role === 'admin') {
             return;
         }
@@ -473,14 +469,15 @@ class AbsensiController extends Controller
     private function applyGuruRekapScope($query, int $guruId, array $filters): void
     {
         $user = User::findOrFail($guruId);
-        
+
         if ($user->role === 'admin') {
-            if (!empty($filters['id_mapel'])) {
+            if (! empty($filters['id_mapel'])) {
                 $query->where('id_mapel', $filters['id_mapel']);
             }
-            if (!empty($filters['id_kelas'])) {
+            if (! empty($filters['id_kelas'])) {
                 $query->where('id_kelas', $filters['id_kelas']);
             }
+
             return;
         }
 
@@ -490,9 +487,9 @@ class AbsensiController extends Controller
             throw new InvalidArgumentException('Anda belum ditugaskan mengampu mata pelajaran.');
         }
 
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $mapelId = (int) $filters['id_mapel'];
-            if (!$mapelIds->contains($mapelId)) {
+            if (! $mapelIds->contains($mapelId)) {
                 throw new InvalidArgumentException('Anda bukan pengampu mata pelajaran ini.');
             }
             $query->where('id_mapel', $mapelId);
@@ -500,19 +497,18 @@ class AbsensiController extends Controller
             $query->whereIn('id_mapel', $mapelIds);
         }
 
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $kelasId = (int) $filters['id_kelas'];
             $teachesKelas = JadwalPelajaran::where('id_guru', $guruId)
                 ->where('id_kelas', $kelasId)
                 ->exists();
 
-            if (!$teachesKelas) {
+            if (! $teachesKelas) {
                 throw new InvalidArgumentException('Anda tidak mengampu kelas ini.');
             }
-            
+
             // Apply filter only after validation passes
             $query->where('id_kelas', $kelasId);
         }
     }
-
 }

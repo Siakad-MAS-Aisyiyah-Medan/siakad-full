@@ -1,25 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Utils\SearchInput;
-use App\Models\Siswa;
-use App\Models\JadwalPelajaran;
+
+use App\Exceptions\JadwalConflictException;
 use App\Http\Resources\JadwalResource;
+use App\Models\JadwalPelajaran;
+use App\Models\Siswa;
+use App\Models\WaktuPelajaran;
+use App\Utils\ApiResponse;
 use App\Utils\AuditsAdminActions;
 use App\Utils\GuruPengampuUser;
-
-use App\Http\Controllers\Controller;
-use App\Exceptions\JadwalConflictException;
-use App\Utils\ApiResponse;
+use App\Utils\SearchInput;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class JadwalController extends Controller
 {
-    
-
     public function adminMatrix(Request $request, $id_kelas)
     {
         $request->validate([
@@ -27,8 +26,8 @@ class JadwalController extends Controller
             'semester' => 'required|in:Ganjil,Genap',
         ]);
 
-        $waktuList = \App\Models\WaktuPelajaran::orderBy('jam_mulai')->get();
-        $jadwalList = \App\Models\JadwalPelajaran::with(['mapel', 'guru.guru'])
+        $waktuList = WaktuPelajaran::orderBy('jam_mulai')->get();
+        $jadwalList = JadwalPelajaran::with(['mapel', 'guru.guru'])
             ->where('id_kelas', $id_kelas)
             ->where('tahun_ajaran', $request->query('tahun_ajaran'))
             ->where('semester', $request->query('semester'))
@@ -40,18 +39,18 @@ class JadwalController extends Controller
         foreach ($waktuList as $waktu) {
             $row = [
                 'waktu' => $waktu,
-                'jadwal' => []
+                'jadwal' => [],
             ];
             foreach ($hariList as $hari) {
-                $j = $jadwalList->first(fn($item) => $item->hari === $hari && $item->id_waktu === $waktu->id_waktu);
-                $row['jadwal'][$hari] = $j ? (new \App\Http\Resources\JadwalResource($j))->resolve() : null;
+                $j = $jadwalList->first(fn ($item) => $item->hari === $hari && $item->id_waktu === $waktu->id_waktu);
+                $row['jadwal'][$hari] = $j ? (new JadwalResource($j))->resolve() : null;
             }
             $matrix[] = $row;
         }
 
         return ApiResponse::success([
             'waktu' => $waktuList,
-            'matrix' => $matrix
+            'matrix' => $matrix,
         ], 'Berhasil mengambil matrix jadwal');
     }
 
@@ -65,12 +64,12 @@ class JadwalController extends Controller
             'jadwal.*.id_waktu' => 'required|exists:waktu_pelajaran,id_waktu',
             'jadwal.*.id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
             'jadwal.*.id_guru' => 'required|exists:users,id_user',
-            'jadwal.*.ruangan' => 'nullable|string'
+            'jadwal.*.ruangan' => 'nullable|string',
         ]);
 
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        DB::beginTransaction();
         try {
-            \App\Models\JadwalPelajaran::where('id_kelas', $id_kelas)
+            JadwalPelajaran::where('id_kelas', $id_kelas)
                 ->where('tahun_ajaran', $request->tahun_ajaran)
                 ->where('semester', $request->semester)
                 ->delete();
@@ -79,15 +78,16 @@ class JadwalController extends Controller
                 $data = array_merge($j, [
                     'id_kelas' => $id_kelas,
                     'tahun_ajaran' => $request->tahun_ajaran,
-                    'semester' => $request->semester
+                    'semester' => $request->semester,
                 ]);
                 $this->create($data);
             }
-            
-            \Illuminate\Support\Facades\DB::commit();
+
+            DB::commit();
+
             return ApiResponse::success(null, 'Jadwal matrix berhasil disimpan');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            DB::rollBack();
             if ($e instanceof JadwalConflictException) {
                 return $this->conflictResponse($e);
             }
@@ -105,12 +105,12 @@ class JadwalController extends Controller
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data jadwal');
     }
 
-    public function adminStore(\Illuminate\Http\Request $request)
+    public function adminStore(Request $request)
     {
         $validated = $request->validate([
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
-            'id_guru' => ['required', 'integer', 'exists:users,id_user', new GuruPengampuUser()],
+            'id_guru' => ['required', 'integer', 'exists:users,id_user', new GuruPengampuUser],
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
             'id_waktu' => 'required|exists:waktu_pelajaran,id_waktu',
             'ruangan' => 'nullable|string|max:50',
@@ -136,7 +136,7 @@ class JadwalController extends Controller
         $validated = $request->validate([
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
-            'id_guru' => ['required', 'integer', 'exists:users,id_user', new GuruPengampuUser()],
+            'id_guru' => ['required', 'integer', 'exists:users,id_user', new GuruPengampuUser],
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
             'id_waktu' => 'required|exists:waktu_pelajaran,id_waktu',
             'ruangan' => 'nullable|string|max:50',
@@ -217,7 +217,7 @@ class JadwalController extends Controller
             ->where('semester', $validated['semester'])
             ->exists();
 
-        if (!$jadwal) {
+        if (! $jadwal) {
             return ApiResponse::error('Anda tidak mengampu kelas atau mata pelajaran ini.', 422);
         }
 
@@ -272,7 +272,6 @@ class JadwalController extends Controller
     // --- Inlined from JadwalService ---
 
     use AuditsAdminActions;
-    
 
     private function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
@@ -316,15 +315,15 @@ class JadwalController extends Controller
             ->orderBy('hari')
             ->orderBy('waktu_pelajaran.jam_mulai')
             ->get()->map(
-            fn ($item) => (new JadwalResource($item))->resolve()
-        );
+                fn ($item) => (new JadwalResource($item))->resolve()
+            );
     }
 
     private function listForSiswa(int $userId, ?string $tahunAjaran = null, ?string $semester = null): Collection
     {
         $siswa = Siswa::where('id_user', $userId)->first();
 
-        if (!$siswa?->id_kelas) {
+        if (! $siswa?->id_kelas) {
             throw new InvalidArgumentException('Anda belum terdaftar di kelas. Hubungi admin sekolah.');
         }
 
@@ -343,8 +342,8 @@ class JadwalController extends Controller
             ->orderBy('hari')
             ->orderBy('waktu_pelajaran.jam_mulai')
             ->get()->map(
-            fn ($item) => (new JadwalResource($item))->resolve()
-        );
+                fn ($item) => (new JadwalResource($item))->resolve()
+            );
     }
 
     private function create(array $data): array
@@ -385,5 +384,4 @@ class JadwalController extends Controller
 
         return $data;
     }
-
 }

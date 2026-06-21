@@ -2,20 +2,23 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Models\Ekskul;
 use App\Models\Guru;
 use App\Models\JadwalPelajaran;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\User;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class GuruService
 {
     use AuditsAdminActions;
+
     public function listGuru(?string $search = null, int $perPage = 15, ?string $role = null): LengthAwarePaginator
     {
         $query = User::with('guru')->where('role', 'guru');
@@ -44,8 +47,8 @@ class GuruService
             $user->save();
 
             $fotoPath = null;
-            if (isset($data['foto']) && $data['foto'] instanceof \Illuminate\Http\UploadedFile) {
-                $fotoPath = '/storage/' . $data['foto']->store('guru', 'public');
+            if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {
+                $fotoPath = '/storage/'.$data['foto']->store('guru', 'public');
             }
 
             Guru::create([
@@ -84,19 +87,19 @@ class GuruService
             $user->role = $data['role'];
             $user->save();
 
-            if (!empty($data['password'])) {
+            if (! empty($data['password'])) {
                 $user->update(['password' => $data['password']]);
             }
 
             $guru = Guru::where('id_user', $id)->first();
             $fotoPath = $guru ? $guru->foto : null;
 
-            if (isset($data['foto']) && $data['foto'] instanceof \Illuminate\Http\UploadedFile) {
+            if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {
                 if ($fotoPath) {
                     $oldPath = str_replace('/storage/', '', $fotoPath);
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                    Storage::disk('public')->delete($oldPath);
                 }
-                $fotoPath = '/storage/' . $data['foto']->store('guru', 'public');
+                $fotoPath = '/storage/'.$data['foto']->store('guru', 'public');
             }
 
             $profilePayload = [

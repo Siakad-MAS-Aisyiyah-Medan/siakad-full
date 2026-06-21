@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Guru;
 use App\Models\Kelas;
@@ -43,7 +42,7 @@ class DashboardController extends Controller
                     'total_kelas' => $totalKelas,
                 ],
                 'audit_logs' => $auditLogs,
-            ]
+            ],
         ]);
     }
 }

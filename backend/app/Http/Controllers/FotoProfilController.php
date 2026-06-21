@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Utils\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class FotoProfilController extends Controller
@@ -19,7 +19,7 @@ class FotoProfilController extends Controller
         $role = $user->role;
         $profile = $this->getProfile($user, $role);
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan.'], 404);
         }
 
@@ -29,7 +29,7 @@ class FotoProfilController extends Controller
         }
 
         $path = $request->file('foto')->store('profil', 'public');
-        $profile->foto = '/storage/' . $path;
+        $profile->foto = '/storage/'.$path;
         $profile->save();
 
         return ApiResponse::success(
@@ -44,7 +44,7 @@ class FotoProfilController extends Controller
         $role = $user->role;
         $profile = $this->getProfile($user, $role);
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan.'], 404);
         }
 
@@ -60,10 +60,19 @@ class FotoProfilController extends Controller
 
     private function getProfile($user, $role)
     {
-        if ($role === 'guru') return $user->guru;
-        if ($role === 'siswa') return $user->siswa;
-        if ($role === 'kepsek') return $user->kepalaSekolah;
-        if ($role === 'admin') return $user->admin;
+        if ($role === 'guru') {
+            return $user->guru;
+        }
+        if ($role === 'siswa') {
+            return $user->siswa;
+        }
+        if ($role === 'kepsek') {
+            return $user->kepalaSekolah;
+        }
+        if ($role === 'admin') {
+            return $user->admin;
+        }
+
         return null;
     }
 }

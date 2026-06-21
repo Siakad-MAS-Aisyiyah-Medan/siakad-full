@@ -12,8 +12,7 @@ class AuthService
     public function __construct(
         private PermissionService $permissions,
         private AccountRegistrationService $accountRegistration,
-    ) {
-    }
+    ) {}
 
     /**
      * Registrasi akun calon siswa — delegasi ke layer Account (tanpa pendaftaran PPDB).
@@ -52,11 +51,11 @@ class AuthService
             })
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return ['error' => 'Akun tidak ditemukan', 'code' => 401];
         }
 
-        if (!Hash::check($password, $user->password)) {
+        if (! Hash::check($password, $user->password)) {
             return ['error' => 'Password salah', 'code' => 401];
         }
 

@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use App\Utils\AuditsAdminActions;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AkunController extends Controller
 {
     use AuditsAdminActions;
 
-    public function index(\Illuminate\Http\Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $query = User::with(['admin', 'guru', 'siswa', 'kepalaSekolah'])
             ->orderBy('created_at', 'desc');
@@ -20,8 +21,8 @@ class AkunController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -42,15 +43,25 @@ class AkunController extends Controller
         $users = collect($paginator->items())->map(function ($user) {
             $nipNisn = $user->username ?: '-';
             $noHp = '-';
-            if ($user->role === 'admin' && $user->admin) $nipNisn = $user->admin->nip ?? '-';
-            elseif ($user->role === 'guru' && $user->guru) $nipNisn = $user->guru->nip_nuptk ?? '-';
-            elseif ($user->role === 'kepsek' && $user->kepalaSekolah) $nipNisn = $user->kepalaSekolah->nip ?? '-';
-            elseif ($user->role === 'siswa' && $user->siswa) $nipNisn = $user->siswa->nisn ?? '-';
+            if ($user->role === 'admin' && $user->admin) {
+                $nipNisn = $user->admin->nip ?? '-';
+            } elseif ($user->role === 'guru' && $user->guru) {
+                $nipNisn = $user->guru->nip_nuptk ?? '-';
+            } elseif ($user->role === 'kepsek' && $user->kepalaSekolah) {
+                $nipNisn = $user->kepalaSekolah->nip ?? '-';
+            } elseif ($user->role === 'siswa' && $user->siswa) {
+                $nipNisn = $user->siswa->nisn ?? '-';
+            }
 
-            if ($user->role === 'admin' && $user->admin) $noHp = $user->admin->no_hp ?? '-';
-            elseif ($user->role === 'guru' && $user->guru) $noHp = $user->guru->no_hp ?? '-';
-            elseif ($user->role === 'kepsek' && $user->kepalaSekolah) $noHp = $user->kepalaSekolah->no_hp ?? '-';
-            elseif ($user->role === 'siswa' && $user->siswa) $noHp = $user->siswa->no_hp_wali ?? '-';
+            if ($user->role === 'admin' && $user->admin) {
+                $noHp = $user->admin->no_hp ?? '-';
+            } elseif ($user->role === 'guru' && $user->guru) {
+                $noHp = $user->guru->no_hp ?? '-';
+            } elseif ($user->role === 'kepsek' && $user->kepalaSekolah) {
+                $noHp = $user->kepalaSekolah->no_hp ?? '-';
+            } elseif ($user->role === 'siswa' && $user->siswa) {
+                $noHp = $user->siswa->no_hp_wali ?? '-';
+            }
 
             return [
                 'id' => $user->id_user,
@@ -78,19 +89,19 @@ class AkunController extends Controller
                     'last_page' => $paginator->lastPage(),
                     'per_page' => $paginator->perPage(),
                     'total' => $paginator->total(),
-                ]
+                ],
             ],
         ]);
     }
 
-    public function store(\Illuminate\Http\Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'role' => 'required|string|in:' . implode(',', User::ROLES),
+            'role' => 'required|string|in:'.implode(',', User::ROLES),
             'status' => 'nullable|string|in:aktif,nonaktif',
         ]);
 
@@ -98,7 +109,7 @@ class AkunController extends Controller
             'name' => $validated['name'],
             'username' => $validated['username'],
             'email' => $validated['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+            'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'status_aktif' => ($validated['status'] ?? 'aktif') === 'aktif',
             'status_akun' => $validated['status'] ?? 'aktif',
@@ -109,7 +120,7 @@ class AkunController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Akun berhasil ditambahkan',
-            'data' => $user
+            'data' => $user,
         ], 201);
     }
 
@@ -124,7 +135,7 @@ class AkunController extends Controller
             ], 403);
         }
 
-        // We can optionally delete related profile data here if needed, 
+        // We can optionally delete related profile data here if needed,
         // or rely on database cascading/soft deletes.
         $this->auditAdmin('akun.delete', $user, ['username' => $user->username]);
         $user->delete();
@@ -135,14 +146,14 @@ class AkunController extends Controller
         ]);
     }
 
-    public function update(\Illuminate\Http\Request $request, $id): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
-            'role' => 'required|string|in:' . implode(',', User::ROLES),
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
+            'role' => 'required|string|in:'.implode(',', User::ROLES),
             'status' => 'nullable|string|in:aktif,nonaktif',
             'no_hp' => 'nullable|string|max:20',
         ]);
@@ -157,7 +168,7 @@ class AkunController extends Controller
 
         if ($request->filled('password')) {
             $request->validate(['password' => 'string|min:6']);
-            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         }
 
         $user->save();
@@ -181,33 +192,33 @@ class AkunController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Akun berhasil diperbarui',
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
-    public function updateProfile(\Illuminate\Http\Request $request): JsonResponse
+    public function updateProfile(Request $request): JsonResponse
     {
         $user = auth()->user();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id_user . ',id_user',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
+            'username' => 'required|string|max:255|unique:users,username,'.$user->id_user.',id_user',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
             'current_password' => 'nullable|string',
             'new_password' => 'nullable|string|min:6|confirmed',
             'password' => 'nullable|string|min:6',
         ]);
 
         if ($request->filled('password')) {
-            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         } elseif ($request->filled('new_password')) {
-            if (!$request->filled('current_password') || !\Illuminate\Support\Facades\Hash::check($request->current_password, $user->password)) {
+            if (! $request->filled('current_password') || ! Hash::check($request->current_password, $user->password)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Password saat ini salah.'
+                    'message' => 'Password saat ini salah.',
                 ], 422);
             }
-            $user->password = \Illuminate\Support\Facades\Hash::make($request->new_password);
+            $user->password = Hash::make($request->new_password);
         }
 
         $user->name = $validated['name'];
@@ -220,7 +231,7 @@ class AkunController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Profil berhasil diperbarui.',
-            'data' => $user
+            'data' => $user,
         ]);
     }
 }

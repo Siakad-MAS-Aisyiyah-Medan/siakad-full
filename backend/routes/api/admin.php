@@ -1,18 +1,23 @@
 <?php
 
-use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AkunController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\MuridController;
 use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfilSekolahController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TahunAjaranController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index']);
-    Route::get('/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
 
     Route::get('/murid/stats', [MuridController::class, 'stats'])->middleware('permission:manage_murid,view_data_siswa');
     Route::get('/murid', [MuridController::class, 'index'])->middleware('permission:manage_murid,view_data_siswa');
@@ -25,8 +30,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Legacy PPDB routes (redirect ke modul baru - tetap untuk kompatibilitas)
     Route::middleware('permission:manage_ppdb')->group(function () {
-        Route::get('/ppdb-legacy', [\App\Http\Controllers\PendaftaranController::class, 'adminPpdbIndex']);
-        Route::patch('/ppdb/{id}/status', [\App\Http\Controllers\PendaftaranController::class, 'updateStatus']);
+        Route::get('/ppdb-legacy', [PendaftaranController::class, 'adminPpdbIndex']);
+        Route::patch('/ppdb/{id}/status', [PendaftaranController::class, 'updateStatus']);
     });
 
     Route::get('/guru', [GuruController::class, 'index'])->middleware('permission:manage_guru,view_data_guru');
@@ -60,20 +65,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware('permission:manage_users')->group(function () {
-        Route::get('/akun', [\App\Http\Controllers\AkunController::class, 'index']);
-        Route::post('/akun', [\App\Http\Controllers\AkunController::class, 'store']);
-        Route::put('/akun/{id}', [\App\Http\Controllers\AkunController::class, 'update']);
-        Route::delete('/akun/{id}', [\App\Http\Controllers\AkunController::class, 'destroy']);
+        Route::get('/akun', [AkunController::class, 'index']);
+        Route::post('/akun', [AkunController::class, 'store']);
+        Route::put('/akun/{id}', [AkunController::class, 'update']);
+        Route::delete('/akun/{id}', [AkunController::class, 'destroy']);
     });
 
     Route::middleware('permission:view_transkrip_murid')->group(function () {
         Route::get('/admin/transkrip-akademik/{idUserSiswa}/raport', [NilaiController::class, 'adminStudentRaport']);
     });
 
-    Route::get('/tahun-ajaran', [\App\Http\Controllers\TahunAjaranController::class, 'index']);
+    Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index']);
     Route::middleware('permission:manage_tahun_ajaran')->group(function () {
-        Route::apiResource('/tahun-ajaran', \App\Http\Controllers\TahunAjaranController::class)->except(['index']);
-        Route::put('/tahun-ajaran/{id}/activate', [\App\Http\Controllers\TahunAjaranController::class, 'activate']);
+        Route::apiResource('/tahun-ajaran', TahunAjaranController::class)->except(['index']);
+        Route::put('/tahun-ajaran/{id}/activate', [TahunAjaranController::class, 'activate']);
     });
 
     Route::get('/profil-sekolah', [ProfilSekolahController::class, 'show'])->middleware('permission:manage_profil_sekolah,view_dashboard_kepsek');
@@ -83,8 +88,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware('permission:manage_pengaturan_akun')->group(function () {
-        Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index']);
-        Route::put('/settings/{key}', [\App\Http\Controllers\SettingsController::class, 'update']);
-        Route::post('/settings/bulk', [\App\Http\Controllers\SettingsController::class, 'bulkUpdate']);
+        Route::get('/settings', [SettingsController::class, 'index']);
+        Route::put('/settings/{key}', [SettingsController::class, 'update']);
+        Route::post('/settings/bulk', [SettingsController::class, 'bulkUpdate']);
     });
 });

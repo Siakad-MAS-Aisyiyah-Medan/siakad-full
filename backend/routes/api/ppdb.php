@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\BerkasController;
-use App\Http\Controllers\PpdbController;
+use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\PpdbSettingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,8 +47,8 @@ Route::middleware([
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_ppdb'])->prefix('admin/ppdb')->group(function () {
-    Route::get('/settings', [\App\Http\Controllers\PpdbSettingController::class, 'getSettings']);
-    Route::post('/settings', [\App\Http\Controllers\PpdbSettingController::class, 'updateSettings']);
+    Route::get('/settings', [PpdbSettingController::class, 'getSettings']);
+    Route::post('/settings', [PpdbSettingController::class, 'updateSettings']);
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_ppdb,view_data_ppdb'])->prefix('admin/ppdb')->group(function () {

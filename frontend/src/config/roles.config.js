@@ -1,4 +1,3 @@
-/** Semua role yang tersedia di sistem */
 export const ROLES = {
   ADMIN: 'admin',
   KEPSEK: 'kepsek',
@@ -7,7 +6,6 @@ export const ROLES = {
   CALON_SISWA: 'calon_siswa',
 };
 
-/** Admin dapat mengakses semua fitur role lain */
 export const ADMIN_INHERITS = [
   ROLES.KEPSEK,
   ROLES.GURU,

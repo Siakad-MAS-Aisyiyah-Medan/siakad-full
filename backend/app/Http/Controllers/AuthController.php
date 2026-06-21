@@ -1,23 +1,21 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Hash;
-use App\Services\Account\AccountRegistrationService;
-use App\Models\User;
 
-use App\Utils\ApiResponse;
-use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\User;
+use App\Services\Account\AccountRegistrationService;
+use App\Services\PermissionService;
+use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
-    
-
     /** @deprecated Gunakan registerCalonSiswa — alias kompatibilitas */
-    public function register(\Illuminate\Http\Request $request)
+    public function register(Request $request)
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
@@ -44,7 +42,7 @@ class AuthController extends Controller
     /**
      * Registrasi akun saja (tabel users). Tidak membuat draft pendaftaran PPDB.
      */
-    public function registerCalonSiswa(\Illuminate\Http\Request $request)
+    public function registerCalonSiswa(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -74,7 +72,7 @@ class AuthController extends Controller
         );
     }
 
-    public function login(\Illuminate\Http\Request $request)
+    public function login(Request $request)
     {
         $validated = $request->validate([
             'login' => 'required|string|max:255',
@@ -109,21 +107,19 @@ class AuthController extends Controller
         return ApiResponse::success([
             'user' => (new UserResource($user))->resolve(),
             'profile' => $user->resolveProfile(),
-            'permissions' => app(\App\Services\PermissionService::class)->permissionsForUser($user),
-            'menus' => app(\App\Services\PermissionService::class)->menusForUser($user),
+            'permissions' => app(PermissionService::class)->permissionsForUser($user),
+            'menus' => app(PermissionService::class)->menusForUser($user),
         ]);
     }
 
     // --- Inlined from AuthService ---
-
-    
 
     /**
      * Registrasi akun calon siswa — delegasi ke layer Account (tanpa pendaftaran PPDB).
      */
     private function registerCalonSiswaData(array $data): User
     {
-        return app(\App\Services\Account\AccountRegistrationService::class)->registerCalonSiswa($data);
+        return app(AccountRegistrationService::class)->registerCalonSiswa($data);
     }
 
     /**
@@ -155,11 +151,11 @@ class AuthController extends Controller
             })
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return ['error' => 'Akun tidak ditemukan', 'code' => 401];
         }
 
-        if (!Hash::check($password, $user->password)) {
+        if (! Hash::check($password, $user->password)) {
             return ['error' => 'Password salah', 'code' => 401];
         }
 
@@ -173,7 +169,7 @@ class AuthController extends Controller
         $user->loadProfileRelations();
         $profile = $user->resolveProfile();
         $token = $user->createToken('auth_token')->plainTextToken;
-        $permissionService = app(\App\Services\PermissionService::class);
+        $permissionService = app(PermissionService::class);
         $permissions = $permissionService->permissionsForUser($user);
         $menus = $permissionService->menusForUser($user);
 
@@ -215,5 +211,4 @@ class AuthController extends Controller
                 : ['error' => 'Akun dinonaktifkan', 'code' => 403],
         };
     }
-
 }

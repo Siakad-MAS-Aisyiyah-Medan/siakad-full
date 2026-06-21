@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Admin;
+use App\Models\Guru;
+use App\Models\KepalaSekolah;
+use App\Models\Siswa;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class BiodataController extends Controller
 {
@@ -23,8 +27,8 @@ class BiodataController extends Controller
                 'no_hp' => 'nullable|string|max:20',
             ]);
             $profile = $user->guru;
-            if (!$profile) {
-                $profile = new \App\Models\Guru(['id_user' => $user->id_user]);
+            if (! $profile) {
+                $profile = new Guru(['id_user' => $user->id_user]);
             }
             $profile->fill($validated);
             $profile->save();
@@ -42,8 +46,8 @@ class BiodataController extends Controller
                 'no_hp_wali' => 'nullable|string|max:20',
             ]);
             $profile = $user->siswa;
-            if (!$profile) {
-                $profile = new \App\Models\Siswa(['id_user' => $user->id_user]);
+            if (! $profile) {
+                $profile = new Siswa(['id_user' => $user->id_user]);
             }
             $profile->fill($validated);
             $profile->save();
@@ -59,8 +63,8 @@ class BiodataController extends Controller
             $validated['nama_kepsek'] = $validated['nama_lengkap'];
             unset($validated['nama_lengkap']);
             $profile = $user->kepalaSekolah;
-            if (!$profile) {
-                $profile = new \App\Models\KepalaSekolah(['id_user' => $user->id_user]);
+            if (! $profile) {
+                $profile = new KepalaSekolah(['id_user' => $user->id_user]);
             }
             $profile->fill($validated);
             $profile->save();
@@ -73,22 +77,22 @@ class BiodataController extends Controller
             $validated['nama_admin'] = $validated['nama_lengkap'];
             unset($validated['nama_lengkap']);
             $profile = $user->admin;
-            if (!$profile) {
-                $profile = new \App\Models\Admin(['id_user' => $user->id_user]);
+            if (! $profile) {
+                $profile = new Admin(['id_user' => $user->id_user]);
             }
             $profile->fill($validated);
             $profile->save();
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Role tidak memiliki biodata.'
+                'message' => 'Role tidak memiliki biodata.',
             ], 400);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Biodata berhasil diperbarui.',
-            'data' => $profile
+            'data' => $profile,
         ]);
     }
 }

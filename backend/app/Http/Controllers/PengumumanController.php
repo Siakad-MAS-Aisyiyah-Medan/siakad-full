@@ -1,20 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Utils\SearchInput;
-use App\Utils\AuditsAdminActions;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\PengumumanResource;
 use App\Models\Pengumuman;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
+use App\Utils\SearchInput;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class PengumumanController extends Controller
 {
-    
-
     public function adminIndex(Request $request)
     {
         $paginator = $this->list(
@@ -33,7 +32,7 @@ class PengumumanController extends Controller
         );
     }
 
-    public function adminStore(\Illuminate\Http\Request $request)
+    public function adminStore(Request $request)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
@@ -49,7 +48,7 @@ class PengumumanController extends Controller
         return ApiResponse::success($item, 'Pengumuman berhasil ditambahkan', 201);
     }
 
-    public function adminUpdate(\Illuminate\Http\Request $request, $id)
+    public function adminUpdate(Request $request, $id)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
@@ -108,6 +107,7 @@ class PengumumanController extends Controller
     // --- Inlined from PengumumanService ---
 
     use AuditsAdminActions;
+
     private function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Pengumuman::query()->with('penulis')->orderByDesc('tanggal_publikasi')->orderByDesc('id');
@@ -134,9 +134,9 @@ class PengumumanController extends Controller
 
     private function create(array $data): array
     {
-        if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
+        if (isset($data['thumbnail']) && $data['thumbnail'] instanceof UploadedFile) {
             $path = $data['thumbnail']->store('pengumuman', 'public');
-            $data['thumbnail'] = '/storage/' . $path;
+            $data['thumbnail'] = '/storage/'.$path;
         }
 
         $data['tanggal_publikasi'] = $data['tanggal_publikasi'] ?? now()->toDateString();
@@ -151,13 +151,13 @@ class PengumumanController extends Controller
     {
         $item = Pengumuman::findOrFail($id);
 
-        if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
+        if (isset($data['thumbnail']) && $data['thumbnail'] instanceof UploadedFile) {
             if ($item->thumbnail) {
                 $oldPath = str_replace('/storage/', '', $item->thumbnail);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                Storage::disk('public')->delete($oldPath);
             }
             $path = $data['thumbnail']->store('pengumuman', 'public');
-            $data['thumbnail'] = '/storage/' . $path;
+            $data['thumbnail'] = '/storage/'.$path;
         }
 
         $item->update($data);
@@ -172,5 +172,4 @@ class PengumumanController extends Controller
         $this->auditAdmin('pengumuman.delete', $item, ['judul' => $item->judul]);
         $item->delete();
     }
-
 }

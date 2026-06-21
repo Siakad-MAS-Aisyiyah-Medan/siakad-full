@@ -7,7 +7,7 @@
 return [
     ['permission' => 'manage_all', 'iconKey' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/admin/dashboard'],
     ['permission' => 'manage_profil_sekolah', 'iconKey' => 'School', 'label' => 'Profil Sekolah', 'path' => '/admin/profil-sekolah'],
-    ['permission' => 'manage_tahun_ajaran', 'iconKey' => 'CalendarDays', 'label' => 'Tahun Ajaran', 'path' => '/admin/pengaturan/tahun-ajaran'],
+    ['permission' => 'manage_tahun_ajaran', 'iconKey' => 'CalendarDays', 'label' => 'Tahun Ajaran', 'path' => '/admin/tahun-ajaran'],
     ['permission' => 'manage_pengumuman', 'iconKey' => 'Bell', 'label' => 'Pengumuman Sekolah', 'path' => '/admin/pengumuman'],
     ['permission' => 'manage_guru', 'iconKey' => 'Users', 'label' => 'Data Guru', 'path' => '/admin/guru'],
     ['permission' => 'manage_murid', 'iconKey' => 'GraduationCap', 'label' => 'Data Murid', 'path' => '/admin/murid'],
@@ -45,6 +45,7 @@ return [
     ['permission' => 'view_kelas_pribadi', 'iconKey' => 'BookOpen', 'label' => 'Data Kelas yang Dimasuki', 'path' => '/siswa/kelas'],
     ['permission' => 'view_mapel', 'iconKey' => 'ClipboardList', 'label' => 'Mata Pelajaran', 'path' => '/siswa/mapel'],
     ['permission' => 'view_transkrip_pribadi', 'iconKey' => 'FileText', 'label' => 'Transkrip Akademik Pribadi', 'path' => '/siswa/nilai'],
+    ['permission' => 'view_absensi_pribadi', 'iconKey' => 'ClipboardList', 'label' => 'Absensi Pribadi', 'path' => '/siswa/absensi'],
     ['permission' => 'manage_pengaturan_akun', 'iconKey' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/siswa/pengaturan'],
 
     ['permission' => 'view_dashboard_calon_siswa', 'iconKey' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/calon-murid/dashboard'],

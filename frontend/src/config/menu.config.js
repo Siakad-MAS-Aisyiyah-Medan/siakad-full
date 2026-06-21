@@ -1,7 +1,3 @@
-/**
- * FALLBACK menu per role, dipakai hanya jika API login tidak mengembalikan menus.
- * Urutan dan label mengikuti UC01-UC31.
- */
 export const menuByRole = {
   admin: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/admin/dashboard', permission: 'manage_all' },
@@ -45,6 +41,7 @@ export const menuByRole = {
     { iconKey: 'BookOpen', label: 'Data Kelas yang Dimasuki', path: '/siswa/kelas', permission: 'view_kelas_pribadi' },
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/siswa/mapel', permission: 'view_mapel' },
     { iconKey: 'ClipboardList', label: 'Transkrip Akademik', path: '/siswa/nilai', permission: 'view_transkrip_pribadi' },
+    { iconKey: 'ClipboardList', label: 'Absensi Pribadi', path: '/siswa/absensi', permission: 'view_absensi_pribadi' },
   ],
   calon_siswa: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/calon-murid/dashboard', permission: 'view_dashboard_calon_siswa' },

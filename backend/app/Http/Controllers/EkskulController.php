@@ -1,20 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Utils\SearchInput;
-use App\Http\Resources\EkskulResource;
-use App\Utils\AuditsAdminActions;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\EkskulResource;
 use App\Models\Ekskul;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
+use App\Utils\SearchInput;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class EkskulController extends Controller
 {
-    
-
     public function adminIndex(Request $request)
     {
         $paginator = $this->list(
@@ -33,7 +30,7 @@ class EkskulController extends Controller
         );
     }
 
-    public function adminStore(\Illuminate\Http\Request $request)
+    public function adminStore(Request $request)
     {
         $validated = $request->validate([
             'nama_ekskul' => 'required|string|max:100',
@@ -79,6 +76,7 @@ class EkskulController extends Controller
     // --- Inlined from EkskulService ---
 
     use AuditsAdminActions;
+
     private function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Ekskul::with(['pembina.guru'])->orderBy('nama_ekskul');
@@ -127,5 +125,4 @@ class EkskulController extends Controller
         $this->auditAdmin('ekskul.delete', $item, ['nama_ekskul' => $item->nama_ekskul]);
         $item->delete();
     }
-
 }

@@ -9,14 +9,12 @@ use Illuminate\Support\Facades\Request;
 
 class AuditLogService
 {
-    public function __construct(private PermissionService $permissions)
-    {
-    }
+    public function __construct(private PermissionService $permissions) {}
 
     public function logAdminAction(string $action, ?Model $subject = null, array $meta = []): void
     {
         $user = auth()->user();
-        if (!$user instanceof User || !$this->shouldAudit($user)) {
+        if (! $user instanceof User || ! $this->shouldAudit($user)) {
             return;
         }
 

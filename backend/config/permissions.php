@@ -78,6 +78,7 @@ return [
             'view_kelas_pribadi',
             'view_mapel',
             'view_transkrip_pribadi',
+            'view_absensi_pribadi',
             'view_nilai_pribadi',
         ],
         'calon_siswa' => [

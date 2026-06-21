@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class PpdbService
@@ -38,8 +37,7 @@ class PpdbService
         private AuthService $auth,
         private EnrollmentService $enrollment,
         private PpdbBerkasService $berkasService,
-    ) {
-    }
+    ) {}
 
     public function getPublicInfo(): array
     {
@@ -194,7 +192,7 @@ class PpdbService
         $mapped = $this->mapFormulirInput($data);
         $pendaftaran = $this->state->saveDraft($user, $mapped);
 
-        if (!empty($data['nisn'])) {
+        if (! empty($data['nisn'])) {
             $pendaftaran->nisn = $data['nisn'];
             $pendaftaran->save();
         }
@@ -215,7 +213,7 @@ class PpdbService
     public function submit(User $user): Pendaftaran
     {
         $pendaftaran = $this->state->submit($user);
-        if (!$pendaftaran->no_registrasi) {
+        if (! $pendaftaran->no_registrasi) {
             $pendaftaran->no_registrasi = $this->generateNoRegistrasi();
             $pendaftaran->submitted_at = now();
             $pendaftaran->save();
@@ -311,7 +309,7 @@ class PpdbService
         $year = date('Y');
         $prefix = "PPDB-{$year}-";
 
-        return DB::transaction(function () use ($prefix, $year) {
+        return DB::transaction(function () use ($prefix) {
             $last = Pendaftaran::where('no_registrasi', 'like', $prefix.'%')
                 ->lockForUpdate()
                 ->orderByDesc('no_registrasi')
@@ -345,11 +343,11 @@ class PpdbService
     {
         $ext = strtolower($file->getClientOriginalExtension());
         $allowedExt = ['pdf', 'jpg', 'jpeg', 'png'];
-        if (!in_array($ext, $allowedExt, true)) {
+        if (! in_array($ext, $allowedExt, true)) {
             throw new InvalidArgumentException("Format file {$jenis} harus PDF, JPG, JPEG, atau PNG.");
         }
 
-        if (!in_array($file->getMimeType(), self::ALLOWED_MIMES, true)) {
+        if (! in_array($file->getMimeType(), self::ALLOWED_MIMES, true)) {
             throw new InvalidArgumentException("Tipe file {$jenis} tidak valid.");
         }
 

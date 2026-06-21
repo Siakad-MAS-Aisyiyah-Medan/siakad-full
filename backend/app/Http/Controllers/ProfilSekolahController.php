@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\ProfilSekolah;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProfilSekolahController extends Controller
@@ -16,8 +16,8 @@ class ProfilSekolahController extends Controller
     public function show()
     {
         $profil = ProfilSekolah::first();
-        
-        if (!$profil) {
+
+        if (! $profil) {
             // Jika belum ada, buat record kosong dengan default
             $profil = ProfilSekolah::create([
                 'nama_sekolah' => 'MAS Aisyiyah Medan',
@@ -27,7 +27,7 @@ class ProfilSekolahController extends Controller
                 'kata_sambutan' => 'Selamat datang di MAS Aisyiyah Medan.',
                 'nama_kepsek' => 'Kepala Sekolah MAS Aisyiyah',
                 'visi' => 'Menjadi institusi pendidikan Islam terkemuka',
-                'misi' => 'Menyelenggarakan pendidikan yang memadukan IPTEK dan IMTAQ'
+                'misi' => 'Menyelenggarakan pendidikan yang memadukan IPTEK dan IMTAQ',
             ]);
         }
 
@@ -64,22 +64,22 @@ class ProfilSekolahController extends Controller
         }
 
         $profil = ProfilSekolah::first();
-        if (!$profil) {
-            $profil = new ProfilSekolah();
+        if (! $profil) {
+            $profil = new ProfilSekolah;
         }
 
         $data = $request->except(['foto_kepsek', 'hero_image']);
 
         if ($request->hasFile('foto_kepsek')) {
             if ($profil->foto_kepsek) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($profil->foto_kepsek);
+                Storage::disk('public')->delete($profil->foto_kepsek);
             }
             $data['foto_kepsek'] = $request->file('foto_kepsek')->store('profil_sekolah', 'public');
         }
 
         if ($request->hasFile('hero_image')) {
             if ($profil->hero_image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($profil->hero_image);
+                Storage::disk('public')->delete($profil->hero_image);
             }
             $data['hero_image'] = $request->file('hero_image')->store('profil_sekolah', 'public');
         }

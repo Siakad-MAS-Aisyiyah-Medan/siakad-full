@@ -36,7 +36,7 @@ class AbsensiGuruService
             if ($keterangan) {
                 $row->keterangan = $keterangan;
             }
-            if (!$row->jam_masuk) {
+            if (! $row->jam_masuk) {
                 $row->status = Absensi::STATUS_ALPA;
             }
         });
@@ -102,7 +102,7 @@ class AbsensiGuruService
                 'tanggal' => $today,
             ]);
 
-            if (!$row->exists) {
+            if (! $row->exists) {
                 $row->tahun_ajaran = $this->currentTahunAjaran();
                 $row->semester = $this->currentSemester();
                 $row->status = Absensi::STATUS_HADIR;
@@ -139,25 +139,25 @@ class AbsensiGuruService
 
     private function applyFilters($query, array $filters): void
     {
-        if (!empty($filters['bulan'])) {
+        if (! empty($filters['bulan'])) {
             $start = Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
             $filters['tanggal_dari'] = $start->toDateString();
             $filters['tanggal_sampai'] = $start->copy()->endOfMonth()->toDateString();
         }
 
-        if (!empty($filters['id_user_guru'])) {
+        if (! empty($filters['id_user_guru'])) {
             $query->where('id_user_guru', $filters['id_user_guru']);
         }
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
     }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
 use App\Models\TahunAjaran;
 use App\Utils\ApiResponse;
@@ -14,6 +13,7 @@ class TahunAjaranController extends Controller
     public function index()
     {
         $data = TahunAjaran::orderBy('tanggal_mulai', 'desc')->get();
+
         return ApiResponse::success($data, 'Data tahun ajaran berhasil diambil');
     }
 
@@ -44,7 +44,7 @@ class TahunAjaranController extends Controller
     public function show($id)
     {
         $tahunAjaran = TahunAjaran::find($id);
-        if (!$tahunAjaran) {
+        if (! $tahunAjaran) {
             return ApiResponse::error('Tahun ajaran tidak ditemukan', 404);
         }
 
@@ -66,7 +66,7 @@ class TahunAjaranController extends Controller
         }
 
         $tahunAjaran = TahunAjaran::find($id);
-        if (!$tahunAjaran) {
+        if (! $tahunAjaran) {
             return ApiResponse::error('Tahun ajaran tidak ditemukan', 404);
         }
 
@@ -83,22 +83,23 @@ class TahunAjaranController extends Controller
     public function destroy($id)
     {
         $tahunAjaran = TahunAjaran::find($id);
-        if (!$tahunAjaran) {
+        if (! $tahunAjaran) {
             return ApiResponse::error('Tahun ajaran tidak ditemukan', 404);
         }
-        
+
         if ($tahunAjaran->status === 'Aktif') {
             return ApiResponse::error('Tidak dapat menghapus tahun ajaran yang sedang aktif', 400);
         }
 
         $tahunAjaran->delete();
+
         return ApiResponse::success(null, 'Tahun ajaran berhasil dihapus');
     }
 
     public function activate($id)
     {
         $tahunAjaran = TahunAjaran::find($id);
-        if (!$tahunAjaran) {
+        if (! $tahunAjaran) {
             return ApiResponse::error('Tahun ajaran tidak ditemukan', 404);
         }
 

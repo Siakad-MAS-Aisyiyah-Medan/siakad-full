@@ -2,12 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Admin;
-use App\Models\KepalaSekolah;
 use App\Models\Guru;
+use App\Models\KepalaSekolah;
 use App\Models\Siswa;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+
 class SiakadSeeder extends Seeder
 {
     /**

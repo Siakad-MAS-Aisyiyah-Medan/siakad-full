@@ -6,7 +6,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:1001', 'http://localhost:1002', 'https://siakad-alpha.vercel.app', 'https://siakad-ruddy.vercel.app', env('FRONTEND_URL')],
+    'allowed_origins' => array_values(array_filter([
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'https://siakad-alpha.vercel.app',
+        'https://siakad-ruddy.vercel.app',
+        env('FRONTEND_URL'),
+    ])),
 
     'allowed_origins_patterns' => [],
 

@@ -9,11 +9,12 @@ require __DIR__.'/api/kepsek.php';
 require __DIR__.'/api/calon-siswa.php';
 
 // Route Publik (Tidak butuh login)
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\ProfilSekolahController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('public')->group(function () {
     Route::get('/pengumuman', [PengumumanController::class, 'publicIndex']);
     Route::get('/pengumuman/{id}', [PengumumanController::class, 'publicShow']);
-    Route::get('/profil-sekolah', [\App\Http\Controllers\ProfilSekolahController::class, 'show']);
+    Route::get('/profil-sekolah', [ProfilSekolahController::class, 'show']);
 });

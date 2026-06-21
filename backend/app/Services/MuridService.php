@@ -2,20 +2,18 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Models\User;
-use App\Models\Siswa;
+use App\Utils\AuditsAdminActions;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 
 class MuridService
 {
     use AuditsAdminActions;
-    public function __construct(private EnrollmentService $enrollment)
-    {
-    }
+
+    public function __construct(private EnrollmentService $enrollment) {}
 
     public function listMurid(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
@@ -73,6 +71,7 @@ class MuridService
 
             $fresh = $user->fresh(['siswa']);
             $this->auditAdmin('murid.create', $fresh, ['username' => $fresh->username]);
+
             return $fresh;
         });
     }
@@ -80,7 +79,7 @@ class MuridService
     public function updateMurid(int $id, array $data): User
     {
         $user = User::findOrFail($id);
-        if (!in_array($user->role, ['siswa', 'calon_siswa'], true)) {
+        if (! in_array($user->role, ['siswa', 'calon_siswa'], true)) {
             throw new InvalidArgumentException('User bukan murid/calon siswa.');
         }
 
@@ -106,8 +105,8 @@ class MuridService
                         $siswaData[$field] = $data[$field];
                     }
                 }
-                
-                if (!empty($siswaData)) {
+
+                if (! empty($siswaData)) {
                     $user->siswa->update($siswaData);
                 }
             }
@@ -122,7 +121,7 @@ class MuridService
     public function deleteMurid(int $id): void
     {
         $user = User::findOrFail($id);
-        if (!in_array($user->role, ['siswa', 'calon_siswa'], true)) {
+        if (! in_array($user->role, ['siswa', 'calon_siswa'], true)) {
             throw new InvalidArgumentException('User bukan murid/calon siswa.');
         }
         $this->auditAdmin('murid.delete', $user, ['username' => $user->username]);

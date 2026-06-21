@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Http\Resources\BeritaResource;
 use App\Models\Berita;
 use App\Support\SearchInput;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class BeritaService
 {
     use AuditsAdminActions;
+
     public function list(?string $search = null, ?string $kategori = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Berita::query()->orderByDesc('tanggal_publikasi')->orderByDesc('id');

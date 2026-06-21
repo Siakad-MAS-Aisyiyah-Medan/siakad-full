@@ -1,23 +1,21 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
-use App\Models\User;
-use App\Models\Pendaftaran;
-use App\Models\BerkasPendaftaran;
 
-use App\Http\Controllers\Controller;
+use App\Models\BerkasPendaftaran;
+use App\Models\Pendaftaran;
+use App\Models\User;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class BerkasController extends Controller
 {
-    
-
     public function index()
     {
         try {
@@ -27,7 +25,7 @@ class BerkasController extends Controller
         }
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $jenis = implode(',', self::allJenisKeys());
         $maxKb = 2048;
@@ -89,8 +87,6 @@ class BerkasController extends Controller
         'ktp_orang_tua' => 'file_ktp_ortu',
     ];
 
-    
-
     public static function normalizeJenis(string $jenis): string
     {
         return self::LEGACY_JENIS_MAP[$jenis] ?? $jenis;
@@ -107,7 +103,7 @@ class BerkasController extends Controller
     private function listForUser(User $user): array
     {
         $pendaftaran = $this->getPendaftaranByUser($user);
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             return [
                 'items' => $this->buildPlaceholderItems(),
                 'can_edit' => true,
@@ -136,7 +132,7 @@ class BerkasController extends Controller
     private function upload(User $user, string $jenis, UploadedFile $file): array
     {
         $jenis = self::normalizeJenis($jenis);
-        if (!array_key_exists($jenis, self::JENIS)) {
+        if (! array_key_exists($jenis, self::JENIS)) {
             throw new InvalidArgumentException('Jenis berkas tidak valid.');
         }
 
@@ -187,7 +183,7 @@ class BerkasController extends Controller
             ->where('jenis_berkas', $jenis)
             ->first();
 
-        if (!$berkas) {
+        if (! $berkas) {
             throw new InvalidArgumentException('Berkas tidak ditemukan.');
         }
 
@@ -209,7 +205,7 @@ class BerkasController extends Controller
             ->all();
 
         foreach (array_keys(self::JENIS) as $jenis) {
-            if (!in_array($jenis, $uploaded, true)) {
+            if (! in_array($jenis, $uploaded, true)) {
                 throw new InvalidArgumentException('Berkas '.self::JENIS[$jenis].' wajib diunggah sebelum submit.');
             }
         }
@@ -218,11 +214,11 @@ class BerkasController extends Controller
     private function resolveEditablePendaftaran(User $user): Pendaftaran
     {
         $pendaftaran = $this->getPendaftaranByUser($user);
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             throw new InvalidArgumentException('Mulai pendaftaran PPDB terlebih dahulu.');
         }
 
-        if (!$this->canEditPendaftaran($pendaftaran)) {
+        if (! $this->canEditPendaftaran($pendaftaran)) {
             throw new InvalidArgumentException('Berkas tidak dapat diubah pada status pendaftaran saat ini.');
         }
 
@@ -239,7 +235,7 @@ class BerkasController extends Controller
         $ext = strtolower($file->getClientOriginalExtension() ?: '');
         $allowedExt = config('ppdb.berkas.allowed_extensions', ['pdf', 'jpg', 'jpeg', 'png']);
 
-        if (!in_array($ext, $allowedExt, true)) {
+        if (! in_array($ext, $allowedExt, true)) {
             throw new InvalidArgumentException(
                 'Format '.self::JENIS[$jenis].' harus: '.implode(', ', $allowedExt).'.'
             );
@@ -247,7 +243,7 @@ class BerkasController extends Controller
 
         $mime = $file->getMimeType();
         $allowedMimes = config('ppdb.berkas.allowed_mimes', []);
-        if ($mime && !in_array($mime, $allowedMimes, true)) {
+        if ($mime && ! in_array($mime, $allowedMimes, true)) {
             throw new InvalidArgumentException('Tipe file tidak valid atau tidak aman.');
         }
 
@@ -260,7 +256,7 @@ class BerkasController extends Controller
 
     private function formatBerkasItem(string $jenis, string $label, ?BerkasPendaftaran $row): array
     {
-        if (!$row || !$row->file_path) {
+        if (! $row || ! $row->file_path) {
             return [
                 'jenis_berkas' => $jenis,
                 'label' => $label,
@@ -330,11 +326,11 @@ class BerkasController extends Controller
 
     private function syncLegacyColumn(Pendaftaran $pendaftaran, string $jenis, string $path): void
     {
-        if (!isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
+        if (! isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
             return;
         }
         $col = self::LEGACY_FILE_COLUMNS[$jenis];
-        if (\Illuminate\Support\Facades\Schema::hasColumn('pendaftaran', $col)) {
+        if (Schema::hasColumn('pendaftaran', $col)) {
             $pendaftaran->{$col} = $path;
             $pendaftaran->save();
         }
@@ -342,11 +338,11 @@ class BerkasController extends Controller
 
     private function clearLegacyColumn(Pendaftaran $pendaftaran, string $jenis): void
     {
-        if (!isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
+        if (! isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
             return;
         }
         $col = self::LEGACY_FILE_COLUMNS[$jenis];
-        if (\Illuminate\Support\Facades\Schema::hasColumn('pendaftaran', $col)) {
+        if (Schema::hasColumn('pendaftaran', $col)) {
             $pendaftaran->{$col} = null;
             $pendaftaran->save();
         }
@@ -360,7 +356,7 @@ class BerkasController extends Controller
     private function removeLegacyDuplicateRows(int $pendaftaranId, string $canonicalJenis): void
     {
         $legacyKeys = array_keys(array_filter(self::LEGACY_JENIS_MAP, fn ($v) => $v === $canonicalJenis));
-        if (!$legacyKeys) {
+        if (! $legacyKeys) {
             return;
         }
 
@@ -368,5 +364,4 @@ class BerkasController extends Controller
             ->whereIn('jenis_berkas', $legacyKeys)
             ->delete();
     }
-
 }

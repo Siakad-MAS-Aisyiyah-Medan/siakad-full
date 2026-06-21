@@ -1,7 +1,3 @@
-/**
- * Pemetaan route -> permission (sinkron dengan menu_items & API di backend).
- * Admin dengan manage_all otomatis lolos semua route (via hasPermission).
- */
 export const ROUTE_PERMISSIONS = {
   '/admin/dashboard': 'manage_all',
   '/admin/profil-sekolah': 'manage_profil_sekolah',

@@ -13,9 +13,7 @@ use InvalidArgumentException;
  */
 class PpdbRegistrationService
 {
-    public function __construct(private PpdbBerkasService $berkasService)
-    {
-    }
+    public function __construct(private PpdbBerkasService $berkasService) {}
 
     /** Indeks langkah formulir (1-based) — step 1 = keterangan pribadi */
     public const FIRST_STEP = 1;
@@ -88,7 +86,7 @@ class PpdbRegistrationService
         if ($existing) {
             $status = $this->normalizeStatus($existing);
 
-            if (!in_array($status, ['draft', 'revision'], true)) {
+            if (! in_array($status, ['draft', 'revision'], true)) {
                 throw new InvalidArgumentException(
                     'Pendaftaran sudah dikirim atau diproses. Pantau status di dashboard.'
                 );
@@ -283,7 +281,7 @@ class PpdbRegistrationService
 
     public function toArray(?Pendaftaran $pendaftaran): ?array
     {
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             return null;
         }
 
@@ -325,11 +323,11 @@ class PpdbRegistrationService
         $this->assertCalonSiswa($user);
         $pendaftaran = $this->getByUser($user);
 
-        if (!$pendaftaran) {
+        if (! $pendaftaran) {
             throw new InvalidArgumentException('Pendaftaran belum dimulai. Gunakan endpoint start terlebih dahulu.');
         }
 
-        if (!$this->isEditable($pendaftaran)) {
+        if (! $this->isEditable($pendaftaran)) {
             throw new InvalidArgumentException('Pendaftaran tidak dapat diubah pada status: '.$this->normalizeStatus($pendaftaran));
         }
 
@@ -358,17 +356,17 @@ class PpdbRegistrationService
     protected function assertCompleteForSubmit(Pendaftaran $pendaftaran): void
     {
         $pribadi = $pendaftaran->keteranganPribadi;
-        if (!$pribadi || empty(trim((string) $pribadi->nama_lengkap))) {
+        if (! $pribadi || empty(trim((string) $pribadi->nama_lengkap))) {
             throw new InvalidArgumentException('Keterangan pribadi belum lengkap (nama lengkap wajib).');
         }
 
         $pendidikan = $pendaftaran->pendidikanAsal;
-        if (!$pendidikan || empty(trim((string) $pendidikan->sekolah_asal))) {
+        if (! $pendidikan || empty(trim((string) $pendidikan->sekolah_asal))) {
             throw new InvalidArgumentException('Pendidikan asal belum lengkap (sekolah asal wajib).');
         }
 
         $ortu = $pendaftaran->orangTuaWali;
-        if (!$ortu || empty(trim((string) $ortu->nama_ayah)) || empty(trim((string) $ortu->nama_ibu))) {
+        if (! $ortu || empty(trim((string) $ortu->nama_ayah)) || empty(trim((string) $ortu->nama_ibu))) {
             throw new InvalidArgumentException('Data orang tua belum lengkap.');
         }
     }

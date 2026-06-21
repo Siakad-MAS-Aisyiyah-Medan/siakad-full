@@ -14,8 +14,7 @@ class PpdbAdminService
     public function __construct(
         private PendaftaranStateService $state,
         private PpdbService $ppdb,
-    ) {
-    }
+    ) {}
 
     public function list(?string $search = null, ?string $status = null, int $perPage = 15): LengthAwarePaginator
     {
@@ -25,7 +24,7 @@ class PpdbAdminService
     public function getStats(): array
     {
         $all = Pendaftaran::query()->get(['status_pendaftaran', 'ppdb_status']);
-        
+
         $menunggu = 0;
         $diterima = 0;
         $ditolak = 0;

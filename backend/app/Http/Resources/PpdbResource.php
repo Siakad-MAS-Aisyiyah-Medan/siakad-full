@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Services\PpdbBerkasService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Services\PpdbBerkasService;
 use Illuminate\Support\Facades\Storage;
 
 class PpdbResource extends JsonResource
@@ -79,7 +79,7 @@ class PpdbResource extends JsonResource
             'ppdb_status' => $this->ppdb_status,
             'status_pendaftaran' => $this->status_pendaftaran,
             'current_step' => $this->current_step,
-            'catatan_admin' => $this->when(!$this->adminView, $this->catatan_admin),
+            'catatan_admin' => $this->when(! $this->adminView, $this->catatan_admin),
             'submitted_at' => $this->submitted_at,
             'verified_at' => $this->verified_at,
             'accepted_at' => $this->accepted_at,
@@ -100,7 +100,7 @@ class PpdbResource extends JsonResource
 
     private function berkasUrls(): array
     {
-        if (!$this->relationLoaded('berkas')) {
+        if (! $this->relationLoaded('berkas')) {
             return [];
         }
 

@@ -9,14 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    /**
-     * @param  string  ...$roles
-     */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Unauthenticated', 401);
         }
 

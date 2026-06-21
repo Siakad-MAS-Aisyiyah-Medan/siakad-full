@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\MenuItem;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -17,7 +16,7 @@ class PermissionService
         return Cache::remember("rbac.permissions.role.{$roleKey}", self::CACHE_TTL, function () use ($roleKey) {
             $role = Role::where('key', $roleKey)->with('permissions')->first();
 
-            if (!$role) {
+            if (! $role) {
                 return $this->permissionsFromConfig($roleKey);
             }
 

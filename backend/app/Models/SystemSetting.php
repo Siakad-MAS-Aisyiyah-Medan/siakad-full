@@ -24,6 +24,7 @@ class SystemSetting extends Model
     public static function getValue(string $key, $default = null): ?string
     {
         $setting = self::where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 
@@ -44,6 +45,7 @@ class SystemSetting extends Model
     public static function getAllGrouped(): array
     {
         $settings = self::all()->groupBy('group');
+
         return $settings->toArray();
     }
 }

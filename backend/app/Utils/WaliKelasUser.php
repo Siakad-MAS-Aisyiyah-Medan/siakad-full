@@ -16,7 +16,7 @@ class WaliKelasUser implements ValidationRule
 
         $user = User::query()->find($value);
 
-        if (!$user) {
+        if (! $user) {
             $fail('User wali kelas tidak ditemukan.');
 
             return;

@@ -2,29 +2,30 @@
 
 namespace App\Services;
 
-use App\Utils\AuditsAdminActions;
 use App\Http\Resources\KelasResource;
 use App\Models\Kelas;
 use App\Support\SearchInput;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class KelasService
 {
     use AuditsAdminActions;
+
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Kelas::with(['waliKelas.guru'])->withCount(['jadwal', 'siswa']);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $term = SearchInput::escape($filters['search']);
             $query->where('nama_kelas', 'like', "%{$term}%");
         }
 
-        if (!empty($filters['tingkat']) && $filters['tingkat'] !== 'Semua') {
+        if (! empty($filters['tingkat']) && $filters['tingkat'] !== 'Semua') {
             $query->where('tingkat', $filters['tingkat']);
         }
 
-        if (!empty($filters['jurusan']) && $filters['jurusan'] !== 'Semua') {
+        if (! empty($filters['jurusan']) && $filters['jurusan'] !== 'Semua') {
             $query->where('jurusan', $filters['jurusan']);
         }
 

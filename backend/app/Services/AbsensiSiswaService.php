@@ -8,6 +8,7 @@ use App\Models\JadwalPelajaran;
 use App\Models\Mapel;
 use App\Models\Siswa;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -71,7 +72,7 @@ class AbsensiSiswaService
 
             foreach ($items as $row) {
                 $status = $row['status'] ?? Absensi::STATUS_HADIR;
-                if (!array_key_exists($status, Absensi::statusLabels())) {
+                if (! array_key_exists($status, Absensi::statusLabels())) {
                     throw new InvalidArgumentException('Status absensi tidak valid.');
                 }
 
@@ -141,31 +142,31 @@ class AbsensiSiswaService
 
     private function applyFilters($query, array $filters): void
     {
-        if (!empty($filters['bulan'])) {
-            $start = \Carbon\Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
+        if (! empty($filters['bulan'])) {
+            $start = Carbon::createFromFormat('Y-m', $filters['bulan'])->startOfMonth();
             $filters['tanggal_dari'] = $start->toDateString();
             $filters['tanggal_sampai'] = $start->copy()->endOfMonth()->toDateString();
         }
 
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $query->where('id_kelas', $filters['id_kelas']);
         }
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $query->where('id_mapel', $filters['id_mapel']);
         }
-        if (!empty($filters['id_user_siswa'])) {
+        if (! empty($filters['id_user_siswa'])) {
             $query->where('id_user_siswa', $filters['id_user_siswa']);
         }
-        if (!empty($filters['tanggal_dari'])) {
+        if (! empty($filters['tanggal_dari'])) {
             $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
         }
-        if (!empty($filters['tanggal_sampai'])) {
+        if (! empty($filters['tanggal_sampai'])) {
             $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
         }
-        if (!empty($filters['semester'])) {
+        if (! empty($filters['semester'])) {
             $query->where('semester', $filters['semester']);
         }
-        if (!empty($filters['tahun_ajaran'])) {
+        if (! empty($filters['tahun_ajaran'])) {
             $query->where('tahun_ajaran', $filters['tahun_ajaran']);
         }
     }
@@ -191,9 +192,9 @@ class AbsensiSiswaService
             throw new InvalidArgumentException('Anda belum ditugaskan mengampu mata pelajaran.');
         }
 
-        if (!empty($filters['id_mapel'])) {
+        if (! empty($filters['id_mapel'])) {
             $mapelId = (int) $filters['id_mapel'];
-            if (!$mapelIds->contains($mapelId)) {
+            if (! $mapelIds->contains($mapelId)) {
                 throw new InvalidArgumentException('Anda bukan pengampu mata pelajaran ini.');
             }
             $query->where('id_mapel', $mapelId);
@@ -201,13 +202,13 @@ class AbsensiSiswaService
             $query->whereIn('id_mapel', $mapelIds);
         }
 
-        if (!empty($filters['id_kelas'])) {
+        if (! empty($filters['id_kelas'])) {
             $kelasId = (int) $filters['id_kelas'];
             $teachesKelas = JadwalPelajaran::where('id_guru', $guruId)
                 ->where('id_kelas', $kelasId)
                 ->exists();
 
-            if (!$teachesKelas) {
+            if (! $teachesKelas) {
                 throw new InvalidArgumentException('Anda tidak mengampu kelas ini.');
             }
         }
