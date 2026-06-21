@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BookOpen, Layers, Search, User } from 'lucide-react';
 import MainLayout from '@app/shared/layouts/MainLayout';
+import PageHeader from '@app/shared/components/PageHeader';
 import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.service';
 import apiClient from '@app/shared/services/apiClient';
 import { getDisplayName } from '@app/shared/utils/profile';
@@ -54,53 +55,64 @@ export default function SiswaMapelPage() {
 
   return (
     <MainLayout role="siswa" name={name}>
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-4 md:px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-extrabold text-slate-800">Mata Pelajaran</h2>
-            <p className="text-sm font-medium text-slate-500 mt-1">
-              Daftar mata pelajaran yang tersedia dalam sistem akademik sekolah.
-            </p>
-          </div>
-          <div className="relative w-full md:w-72">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+        <PageHeader title="Mata Pelajaran" subtitle="Daftar mata pelajaran yang tersedia dalam sistem akademik sekolah.">
+          <div className="animate-fade-in" style={{ position: 'relative', width: '260px', animationDelay: '0.1s' }}>
+            <Search style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', width: '16px', height: '16px' }} />
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Cari mata pelajaran..."
-              className="w-full bg-white border border-slate-200 text-slate-800 text-sm font-semibold rounded-full pl-10 pr-4 h-10 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:font-medium placeholder:text-slate-400"
+              style={{
+                width: '100%', height: '38px', padding: '0 1rem 0 2.25rem',
+                borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff',
+                fontSize: '0.85rem', color: '#334155', outline: 'none', transition: 'all 0.2s',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+              }}
+              onFocus={e => { e.target.style.borderColor = '#3b82f6'; e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'; }}
+              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)'; }}
             />
           </div>
-        </div>
+        </PageHeader>
 
-        {error && (
-          <div className="m-6 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-600">
-            {error}
-          </div>
-        )}
+        <div style={{ padding: '1.5rem' }}>
+          {error && (
+            <div className="animate-fade-in-up" style={{ padding: '1rem 1.25rem', borderRadius: '10px', background: '#fef2f2', border: '1px solid #fee2e2', color: '#ef4444', fontSize: '0.875rem', fontWeight: 500, marginBottom: '1.5rem' }}>
+              {error}
+            </div>
+          )}
 
-        <div className="p-4 md:p-8">
           {loading ? (
-            <div className="py-16 text-center text-slate-400">Memuat mata pelajaran...</div>
+            <div style={{ padding: '4rem 0', textAlign: 'center', color: '#94a3b8', fontSize: '0.95rem' }}>Memuat mata pelajaran...</div>
           ) : filteredMapel.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filteredMapel.map((mapel) => {
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+              {filteredMapel.map((mapel, i) => {
                 const guru = mapel.guru?.guru?.nama_guru || mapel.guru?.profile?.nama_guru;
                 return (
-                  <div key={mapel.id_mapel} className="border border-slate-200 rounded-2xl p-5 bg-white hover:border-blue-300 transition-colors">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                        <BookOpen size={24} />
+                  <div key={mapel.id_mapel} className="animate-fade-in-up" style={{
+                    borderRadius: '16px', background: '#fff', border: '1px solid #e2e8f0',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)', padding: '1.5rem',
+                    transition: 'all 0.2s', animationDelay: `${i * 0.05}s`, opacity: 0,
+                    animationFillMode: 'forwards', cursor: 'default'
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
+                  onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <BookOpen size={22} strokeWidth={2} />
                       </div>
-                      <div className="min-w-0">
-                        <h3 className="text-lg font-bold text-slate-800">{mapel.nama_mapel}</h3>
-                        <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
-                          <Layers size={14} /> Kelas {mapel.tingkat || 'Semua'} - {mapel.kelompok_mapel || 'Umum'}
-                        </p>
-                        <p className="text-sm text-slate-500 mt-2 flex items-center gap-2">
-                          <User size={14} /> {guru || 'Guru belum ditentukan'}
-                        </p>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mapel.nama_mapel}</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.75rem' }}>
+                          <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+                            <Layers size={14} /> Kelas {mapel.tingkat || 'Semua'} - {mapel.kelompok_mapel || 'Umum'}
+                          </p>
+                          <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+                            <User size={14} /> <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{guru || 'Guru belum ditentukan'}</span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -108,9 +120,9 @@ export default function SiswaMapelPage() {
               })}
             </div>
           ) : (
-            <div className="py-16 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">
-              <BookOpen size={48} className="mx-auto mb-3 opacity-20" />
-              <p>Tidak ada mata pelajaran yang ditemukan.</p>
+            <div style={{ padding: '5rem 0', textAlign: 'center', color: '#94a3b8', background: '#f8fafb', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
+              <BookOpen size={48} style={{ margin: '0 auto 1rem', opacity: 0.2 }} />
+              <p style={{ fontSize: '0.95rem' }}>Tidak ada mata pelajaran yang ditemukan.</p>
             </div>
           )}
         </div>

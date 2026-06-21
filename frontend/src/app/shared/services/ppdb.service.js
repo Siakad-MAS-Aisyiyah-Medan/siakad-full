@@ -107,6 +107,19 @@ export async function fetchAdminPpdbStats() {
   return unwrapData(res);
 }
 
+export async function fetchAdminPpdbSettings() {
+  const res = await apiClient.get('/admin/ppdb/settings');
+  return unwrapData(res);
+}
+
+export async function updateAdminPpdbSettings(payload) {
+  // If payload is FormData (because of file upload)
+  const isFormData = payload instanceof FormData;
+  const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+  const res = await apiClient.post('/admin/ppdb/settings', payload, config);
+  return unwrapData(res);
+}
+
 export async function fetchAdminPendaftarDetail(id) {
   const res = await apiClient.get(`/admin/ppdb/${id}`);
   return unwrapData(res);
@@ -150,6 +163,7 @@ export const PPDB_STATUS_LABELS = {
   terverifikasi: 'Menunggu',
   diterima: 'Diterima',
   ditolak: 'Ditolak',
+  menjadi_murid: 'Siswa Aktif',
 };
 
 export const BERKAS_LABELS = {

@@ -14,7 +14,8 @@ import AdminMapel from '@app/pages/admin/kelola-mapel';
 import AdminTranskripAkademik from '@app/pages/admin/transkrip-akademik';
 import AdminHakAkses from '@app/pages/admin/hak-akses';
 import AdminPengaturan from '@app/pages/admin/pengaturan';
-import AdminTahunAjaran from '@app/pages/admin/pengaturan/tahun-ajaran';
+import AdminPengaturanPpdb from '@app/pages/admin/pengaturan-ppdb';
+import AdminTahunAjaran from '@app/pages/admin/tahun-ajaran';
 import AdminDaftarPendaftar from '@app/pages/admin/admin-daftar-pendaftar';
 import AdminDetailPendaftar from '@app/pages/admin/admin-detail-pendaftar';
 import ProfilBiodataPage from '@app/pages/profil';
@@ -51,6 +52,7 @@ export const roleRoutes = (
     <Route path="/admin/dashboard" element={wrapPerm('/admin/dashboard', <DashboardAdmin />)} />
     <Route path="/admin/profil-sekolah" element={wrapPerm('/admin/profil-sekolah', <AdminProfilSekolah />)} />
     <Route path="/admin/profil" element={<Navigate to="/admin/profil-sekolah" replace />} />
+    <Route path="/admin/pengaturan-ppdb" element={wrapPerm('/admin/pengaturan-ppdb', <AdminPengaturanPpdb />)} />
     <Route path="/admin/pengumuman" element={wrapPerm('/admin/pengumuman', <AdminPengumuman />)} />
     <Route path="/admin/murid" element={wrapPerm('/admin/murid', <AdminMurid />)} />
     <Route path="/admin/guru" element={wrapPerm('/admin/guru', <AdminGuru />)} />
@@ -62,7 +64,7 @@ export const roleRoutes = (
     <Route path="/admin/hak-akses" element={wrapPerm('/admin/hak-akses', <AdminHakAkses />)} />
     <Route path="/admin/roles" element={<Navigate to="/admin/hak-akses" replace />} />
     <Route path="/admin/pengaturan" element={wrapPerm('/admin/pengaturan', <AdminPengaturan />)} />
-    <Route path="/admin/pengaturan/tahun-ajaran" element={wrapPerm('/admin/pengaturan/tahun-ajaran', <AdminTahunAjaran />)} />
+    <Route path="/admin/tahun-ajaran" element={wrapPerm('/admin/tahun-ajaran', <AdminTahunAjaran />)} />
 
     {/* Kepala sekolah */}
     <Route path="/kepala-sekolah/dashboard" element={wrapPerm('/kepala-sekolah/dashboard', <DashboardKepalaSekolah />)} />

@@ -1,5 +1,10 @@
 import { Save, X } from 'lucide-react';
 import PageHeader from '@app/shared/components/PageHeader';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/themes/airbnb.css';
+import { Indonesian } from 'flatpickr/dist/l10n/id.js';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function PrestasiForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const title = readOnly ? 'Detail Artikel' : (view === 'add' ? 'Tambah Artikel' : 'Edit Artikel');
@@ -29,11 +34,28 @@ export default function PrestasiForm({ view, formData, loading, onChange, onSubm
           <label>
             Isi Artikel <span className="text-red-500">*</span>
           </label>
-          <textarea name="isi" value={formData.isi} onChange={onChange} rows={6} required disabled={readOnly} />
+          <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+            {readOnly ? (
+              <div style={{ padding: '1rem', background: '#f8fafc' }} dangerouslySetInnerHTML={{ __html: formData.isi }} />
+            ) : (
+              <ReactQuill
+                theme="snow"
+                value={formData.isi}
+                onChange={(val) => onChange({ target: { name: 'isi', value: val || '' } })}
+                readOnly={readOnly}
+                style={{ height: '300px', paddingBottom: '42px' }}
+              />
+            )}
+          </div>
         </div>
 
         <div className="input-group full mt-4">
           <label>URL Gambar (opsional)</label>
+          {formData.gambar && (
+            <div className="mb-3">
+              <img src={formData.gambar} alt="Preview" style={{ maxHeight: '180px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+            </div>
+          )}
           <input
             type="url"
             name="gambar"
@@ -46,12 +68,21 @@ export default function PrestasiForm({ view, formData, loading, onChange, onSubm
 
         <div className="input-group full mt-4">
           <label>Tanggal Publikasi</label>
-          <input
-            type="date"
-            name="tanggal_publikasi"
+          <Flatpickr
             value={formData.tanggal_publikasi}
-            onChange={onChange}
+            onChange={(selectedDates, dateStr) => {
+              onChange({ target: { name: 'tanggal_publikasi', value: dateStr } });
+            }}
+            options={{
+              locale: Indonesian,
+              dateFormat: 'Y-m-d',
+              altInput: true,
+              altFormat: 'j F Y',
+            }}
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             disabled={readOnly}
+            placeholder="Pilih tanggal..."
+            style={{ background: '#fff' }}
           />
         </div>
 

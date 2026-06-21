@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ArrowRight, CalendarDays, Search } from 'lucide-react';
 import { getPublicNews } from '@app/shared/services/publicNews.service';
 import LandingNavbar from '@app/pages/public/landing-page/components/LandingNavbar';
-import LandingFooter from '@app/pages/public/landing-page/components/LandingFooter';
+import { resolveStorageUrl } from '@app/shared/services/apiHelpers';
+import { apiConfig } from '@/config/api.config';
+import '@app/pages/public/landing-page/landing.css';
 
 export default function PublicNewsList() {
   const navigate = useNavigate();
@@ -26,82 +28,82 @@ export default function PublicNewsList() {
   }, []);
 
   const filteredNews = news.filter((item) =>
-    item.judul.toLowerCase().includes(search.toLowerCase()) ||
-    item.isi.toLowerCase().includes(search.toLowerCase())
+    item.judul?.toLowerCase().includes(search.toLowerCase()) ||
+    item.isi?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const formatDate = (isoString) => {
+    if (!isoString) return '-';
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch {
+      return isoString;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="landing-page" style={{ minHeight: '100vh', background: 'var(--color-surface)' }}>
       <LandingNavbar activeSection="berita" onScrollToSection={() => navigate('/home')} />
 
-      <main className="mx-auto max-w-7xl px-6 py-12">
-        <div className="text-center">
-          <h1 className="text-5xl font-semibold text-slate-900">Pengumuman</h1>
-          <p className="mt-4 text-2xl text-slate-500">Informasi terbaru dari MAS Aisyiyah Medan</p>
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '120px 24px 60px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: '3.5rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>Pengumuman</h1>
+          <p style={{ marginTop: '1rem', fontSize: '1.25rem', color: 'var(--color-text-muted)' }}>Informasi terbaru dari MAS Aisyiyah Medan</p>
         </div>
 
-        <div className="relative mx-auto mt-10 max-w-5xl rounded-2xl border border-slate-300 bg-white">
-          <Search className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 text-slate-400" />
+        <div style={{ position: 'relative', margin: '40px auto 0', maxWidth: '800px', borderRadius: '16px', border: '1px solid var(--color-border)', background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <Search style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', width: '24px', height: '24px' }} />
           <input
             type="text"
             placeholder="Cari pengumuman berdasarkan judul..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full rounded-2xl bg-transparent py-5 pl-16 pr-6 text-2xl text-slate-900 outline-none"
+            style={{ width: '100%', borderRadius: '16px', background: 'transparent', padding: '20px 24px 20px 64px', fontSize: '1.1rem', color: 'var(--color-text-dark)', outline: 'none', border: 'none' }}
           />
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-6">
-          <button type="button" className="rounded-xl border border-slate-300 p-4 text-slate-700">
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button type="button" className="rounded-xl border border-slate-300 bg-slate-300 px-5 py-4 text-xl text-slate-700">1</button>
-          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">2</button>
-          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">3</button>
-          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">4</button>
-          <button type="button" className="rounded-xl border border-slate-300 px-5 py-4 text-xl text-slate-700">5</button>
-          <span className="text-2xl text-slate-700">...</span>
-          <button type="button" className="rounded-xl border border-slate-300 p-4 text-slate-700">
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="mt-12 grid gap-6 lg:grid-cols-4">
+        <div style={{ marginTop: '60px', display: 'grid', gap: '24px', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
           {loading ? (
-            <div className="col-span-full py-12 text-center text-slate-500">Memuat pengumuman terbaru...</div>
+            <div style={{ gridColumn: '1/-1', padding: '48px 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>Memuat pengumuman terbaru...</div>
           ) : filteredNews.length > 0 ? (
             filteredNews.slice(0, 8).map((item) => (
-              <article key={item.id} className="rounded-[18px] border border-slate-300 bg-white p-5">
-                <div className="flex h-[220px] items-center justify-center border border-slate-300 bg-slate-50" />
-                <h2 className="mt-6 text-3xl font-semibold text-slate-900">{item.judul}</h2>
-                <div className="mt-4 space-y-3">
-                  <div className="h-2 rounded-full bg-slate-300" />
-                  <div className="h-2 w-5/6 rounded-full bg-slate-300" />
-                  <div className="h-2 w-2/3 rounded-full bg-slate-300" />
+              <article key={item.id} style={{ borderRadius: '18px', border: '1px solid var(--color-border)', background: '#fff', padding: '20px', transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column' }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.05)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
+                <div style={{ display: 'flex', height: '180px', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--color-border)', background: 'var(--color-surface)', borderRadius: '10px', overflow: 'hidden' }}>
+                  {item.thumbnail ? (
+                     <img src={resolveStorageUrl(item.thumbnail, apiConfig)} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                     <span style={{ fontSize: '3rem' }}>📢</span>
+                  )}
                 </div>
-                <div className="mt-5 flex items-center gap-3 text-lg text-slate-500">
-                  <CalendarDays className="h-4 w-4" />
-                  {item.tanggal_publikasi || '08 Mei 2024'}
+                <h2 style={{ marginTop: '24px', fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-dark)', lineHeight: '1.4', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.judul}</h2>
+                <div style={{ marginTop: '16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+                  <CalendarDays size={16} />
+                  {formatDate(item.tanggal_publikasi)}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/pengumuman/${item.id}`)}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 px-5 py-4 text-2xl text-slate-700"
-                >
-                  Baca Selengkapnya
-                  <ArrowRight className="h-5 w-5" />
-                </button>
+                <div style={{ marginTop: 'auto' }}>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/pengumuman/${item.id}`)}
+                    style={{ marginTop: '20px', display: 'inline-flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '12px', borderRadius: '12px', border: '1px solid var(--color-border)', padding: '12px 20px', fontSize: '1rem', color: 'var(--color-text-dark)', background: '#fff', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-soft)'; e.currentTarget.style.color = 'var(--color-primary-dark)'; e.currentTarget.style.borderColor = 'var(--color-primary-light)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = 'var(--color-text-dark)'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}
+                  >
+                    Baca Selengkapnya
+                    <ArrowRight size={20} />
+                  </button>
+                </div>
               </article>
             ))
           ) : (
-            <div className="col-span-full rounded-[18px] border border-slate-300 bg-white px-8 py-16 text-center text-slate-500">
+            <div style={{ gridColumn: '1/-1', borderRadius: '18px', border: '1px solid var(--color-border)', background: '#fff', padding: '64px 32px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
               Tidak ada pengumuman saat ini.
             </div>
           )}
         </div>
       </main>
-
-      <LandingFooter onScrollToSection={() => navigate('/home')} />
     </div>
   );
 }

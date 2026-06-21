@@ -3,7 +3,7 @@ import { CheckCircle2, Eye, XCircle } from 'lucide-react';
 
 function statusLabel(status) {
   const value = status || 'submitted';
-  if (['diterima', 'accepted'].includes(value)) return 'Diterima';
+  if (['diterima', 'accepted', 'menjadi_murid'].includes(value)) return 'Diterima';
   if (['ditolak', 'rejected'].includes(value)) return 'Ditolak';
   return 'Menunggu';
 }

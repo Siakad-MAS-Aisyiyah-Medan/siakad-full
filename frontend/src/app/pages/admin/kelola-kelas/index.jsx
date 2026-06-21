@@ -13,6 +13,7 @@ export default function KelasPage({ readOnly = false }) {
     openEdit,
     cancelForm,
     guruData,
+    tahunAjaranData,
     formData,
     loading,
     handleChange,
@@ -39,6 +40,7 @@ export default function KelasPage({ readOnly = false }) {
           view={view}
           formData={formData}
           guruData={guruData}
+          tahunAjaranData={tahunAjaranData}
           loading={loading}
           onChange={handleChange}
           onSubmit={submitForm}

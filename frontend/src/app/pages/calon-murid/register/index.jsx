@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, AlertCircle, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, UserPlus, AlertCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AppLogo from '@app/shared/components/AppLogo';
 import { registerCalonSiswa } from '@app/shared/services/auth.service';
@@ -101,6 +101,7 @@ export default function RegisterCalonMurid() {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
+  const [visiblePasswords, setVisiblePasswords] = useState({});
 
   const onChange = (e) => {
     const { id, value } = e.target;
@@ -183,10 +184,6 @@ export default function RegisterCalonMurid() {
               </li>
             ))}
           </ol>
-          <Link to="/home" className="register-page__back-link">
-            <ArrowLeft size={18} aria-hidden="true" />
-            Kembali ke Profil Sekolah
-          </Link>
         </div>
       </aside>
 
@@ -219,19 +216,44 @@ export default function RegisterCalonMurid() {
                 className={`register-page__field${fieldErrors[field.id] ? ' register-page__field--error' : ''}`}
               >
                 <label htmlFor={field.id}>{field.label}</label>
-                <input
-                  type={field.type}
-                  id={field.id}
-                  name={field.id}
-                  value={form[field.id]}
-                  onChange={onChange}
-                  placeholder={field.placeholder}
-                  autoComplete={field.autoComplete}
-                  required
-                  disabled={loading}
-                  aria-invalid={fieldErrors[field.id] ? 'true' : undefined}
-                  aria-describedby={fieldErrors[field.id] ? `${field.id}-error` : undefined}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={field.type === 'password' && visiblePasswords[field.id] ? 'text' : field.type}
+                    id={field.id}
+                    name={field.id}
+                    value={form[field.id]}
+                    onChange={onChange}
+                    placeholder={field.placeholder}
+                    autoComplete={field.autoComplete}
+                    required
+                    disabled={loading}
+                    aria-invalid={fieldErrors[field.id] ? 'true' : undefined}
+                    aria-describedby={fieldErrors[field.id] ? `${field.id}-error` : undefined}
+                    style={{ paddingRight: field.type === 'password' ? '50px' : '1rem' }}
+                  />
+                  {field.type === 'password' ? (
+                    <button
+                      type="button"
+                      onClick={() => setVisiblePasswords((prev) => ({ ...prev, [field.id]: !prev[field.id] }))}
+                      aria-label="Tampilkan atau sembunyikan password"
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#6b7280',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: 0
+                      }}
+                    >
+                      {visiblePasswords[field.id] ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  ) : null}
+                </div>
                 {field.hint && !fieldErrors[field.id] ? (
                   <span className="register-page__field-hint">{field.hint}</span>
                 ) : null}
@@ -258,6 +280,9 @@ export default function RegisterCalonMurid() {
           <footer className="register-page__footer">
             <p>
               Sudah punya akun? <Link to={LOGIN_CALON_MURID}>Login Calon Siswa</Link>
+            </p>
+            <p style={{ marginTop: '10px' }}>
+              <Link to="/home">Kembali ke Profil Sekolah</Link>
             </p>
           </footer>
         </div>

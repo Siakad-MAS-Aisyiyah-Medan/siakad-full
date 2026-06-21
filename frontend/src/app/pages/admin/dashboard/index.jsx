@@ -157,20 +157,31 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ) : audit.items.length ? (
-                  audit.items.slice(0, 5).map((item, index) => (
-                    <tr key={item.id || index} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s' }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                      <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{item.created_at || item.waktu || '-'}</td>
-                      <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.actor_name || item.aktor || '-'}</td>
-                      <td style={{ padding: '0.85rem 1.5rem' }}>
-                        <span style={{ padding: '0.25rem 0.65rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, background: '#ecfdf5', color: '#059669' }}>
-                          {item.action || item.aksi || '-'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{item.subject || item.subjek || '-'}</td>
-                    </tr>
-                  ))
+                  audit.items.slice(0, 5).map((item, index) => {
+                    const dateObj = new Date(item.created_at || item.waktu);
+                    const formattedDate = isNaN(dateObj.getTime()) ? '-' : dateObj.toLocaleString('id-ID', {
+                      year: 'numeric', month: 'short', day: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    const actorName = item.actor?.username || item.actor?.name || item.aktor || '-';
+                    const subjectDisplay = item.subject_type ? `${item.subject_type} #${item.subject_id}` : (item.subject || item.subjek || '-');
+
+                    return (
+                      <tr key={item.id || index} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s' }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                        <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{formattedDate}</td>
+                        <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{actorName}</td>
+                        <td style={{ padding: '0.85rem 1.5rem' }}>
+                          <span style={{ padding: '0.25rem 0.65rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, background: '#ecfdf5', color: '#059669' }}>
+                            {item.action || item.aksi || '-'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{subjectDisplay}</td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="4" style={{ padding: '2.5rem 1.5rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.875rem' }}>

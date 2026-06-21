@@ -4,7 +4,6 @@ import {
   FileEdit, User, Heart, School, Users, Star, FileText, ClipboardCheck,
 } from 'lucide-react';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
-import PageHeader from '@app/shared/components/PageHeader';
 import FormActions from '@app/shared/ppdb/components/form/FormActions';
 import {
   StepKepribadian,
@@ -78,7 +77,6 @@ export default function FormulirPpdbWizard() {
   const disabled = w.saving || w.isLocked;
   const totalSteps = w.STEPS.length;
   const err = w.fieldErrors;
-  const completedSet = new Set(w.completedSteps);
 
   const StepIcon = STEP_ICONS[stepKey] || FileEdit;
   const accentClass = STEP_ACCENTS[stepKey] || 'wizard-accent--green';
@@ -96,14 +94,10 @@ export default function FormulirPpdbWizard() {
     }
   };
 
-  /* ── Loading ── */
+  /* ΓöÇΓöÇ Loading ΓöÇΓöÇ */
   if (w.loading) {
     return (
       <CalonMuridLayout>
-        <PageHeader 
-          title="Formulir Pendaftaran PPDB"
-          subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
-        />
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-slate-400">
           <div className="wizard-loading-ring" />
           <p className="text-sm font-medium">Memuat formulir pendaftaran...</p>
@@ -112,14 +106,10 @@ export default function FormulirPpdbWizard() {
     );
   }
 
-  /* ── Init Error ── */
+  /* ΓöÇΓöÇ Init Error ΓöÇΓöÇ */
   if (w.initError) {
     return (
       <CalonMuridLayout>
-        <PageHeader 
-          title="Formulir Pendaftaran PPDB"
-          subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
-        />
         <div className="mx-auto max-w-lg mt-16 text-center">
           <div className="wizard-error-card">
             <AlertCircle size={40} className="text-red-400 mx-auto mb-4" />
@@ -135,25 +125,21 @@ export default function FormulirPpdbWizard() {
   if (!w.ready) return null;
 
   return (
-    <CalonMuridLayout>
-      <div className="wizard-root animate-stagger-1">
-        {/* ── Wizard Page Header ── */}
-        {/* ── Wizard Page Header ── */}
-        <PageHeader 
-          title="Formulir Pendaftaran PPDB"
-          subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
+    <CalonMuridLayout
+      title="Formulir Pendaftaran PPDB"
+      subtitle="Lengkapi semua tahap dengan data yang akurat sesuai dokumen resmi."
+      headerActions={
+        <button
+          type="button"
+          className="wizard-btn-outline"
+          onClick={() => navigate('/calon-murid/status')}
         >
-          <button
-            type="button"
-            className="wizard-btn-outline"
-            style={{ padding: '0.45rem 1rem' }}
-            onClick={() => navigate('/calon-murid/status')}
-          >
-            Lihat Status
-          </button>
-        </PageHeader>
-
-        {/* ── Step Progress Bar ── */}
+          Lihat Status
+        </button>
+      }
+    >
+      <div className="wizard-root animate-stagger-1">
+        {/* ΓöÇΓöÇ Step Progress Bar ΓöÇΓöÇ */}
         <div className="wizard-progress-wrap animate-stagger-2">
           {/* Mini progress pill */}
           <div className="wizard-progress-topbar">
@@ -175,7 +161,7 @@ export default function FormulirPpdbWizard() {
           <div className="wizard-steps-scroll">
             <div className="wizard-steps-row">
               {PPDB_STEPS.map((s, idx) => {
-                const done = completedSet.has(idx);
+                const done = idx < w.activeStep;
                 const active = idx === w.activeStep;
                 const reachable = idx <= w.maxReachableStep;
                 const state = active ? 'active' : done ? 'done' : reachable ? 'reachable' : 'pending';
@@ -191,7 +177,7 @@ export default function FormulirPpdbWizard() {
                     {/* connector line */}
                     {idx > 0 && (
                       <div className="wizard-step-line">
-                        <div className={`wizard-step-line__fill${completedSet.has(idx - 1) ? ' wizard-step-line__fill--done' : ''}`} />
+                        <div className={`wizard-step-line__fill${done || active ? ' wizard-step-line__fill--done' : ''}`} />
                       </div>
                     )}
                     <span className="wizard-step-circle">
@@ -208,7 +194,7 @@ export default function FormulirPpdbWizard() {
           </div>
         </div>
 
-        {/* ── Form Card ── */}
+        {/* ΓöÇΓöÇ Form Card ΓöÇΓöÇ */}
         <div className="wizard-form-card animate-stagger-3">
           {/* Step header */}
           <div className={`wizard-step-header ${accentClass}`}>
@@ -226,7 +212,7 @@ export default function FormulirPpdbWizard() {
               <AutoSaveHint status={w.autoSaveStatus || 'idle'} />
               <span className="wizard-meta-pill">
                 TP {w.forms.meta?.tahun || '2026/2027'}
-                {w.forms.meta?.nomor ? ` · #${w.forms.meta.nomor}` : ''}
+                {w.forms.meta?.nomor ? ` ┬╖ #${w.forms.meta.nomor}` : ''}
               </span>
             </div>
           </div>
@@ -235,7 +221,7 @@ export default function FormulirPpdbWizard() {
           {w.isLocked && (
             <div className="wizard-locked-banner">
               <AlertCircle size={16} className="shrink-0" />
-              <span>Formulir terkunci — pendaftaran sudah diajukan dan menunggu verifikasi admin.</span>
+              <span>Formulir terkunci ΓÇö pendaftaran sudah diajukan dan menunggu verifikasi admin.</span>
             </div>
           )}
 
@@ -254,10 +240,10 @@ export default function FormulirPpdbWizard() {
               onBack={w.goBack}
               onSaveDraft={stepKey === 'review' ? undefined : w.saveDraft}
               draftLoading={w.saving}
-              onPrimary={stepKey === 'review' ? () => navigate('/calon-murid/upload-berkas') : w.saveAndNext}
-              primaryLabel={stepKey === 'review' ? 'Selesai & Lanjut ke Berkas' : 'Simpan Data'}
+              onPrimary={stepKey === 'review' ? w.submit : w.saveAndNext}
+              primaryLabel={stepKey === 'review' ? 'Submit Pendaftaran' : 'Simpan & Lanjut'}
               primaryLoading={w.saving}
-              primaryLoadingLabel={stepKey === 'review' ? 'Menyimpan...' : 'Menyimpan...'}
+              primaryLoadingLabel={stepKey === 'review' ? 'Mengirim...' : 'Menyimpan...'}
               disabled={disabled}
               isReview={stepKey === 'review'}
               showSaveDraft={stepKey !== 'review'}

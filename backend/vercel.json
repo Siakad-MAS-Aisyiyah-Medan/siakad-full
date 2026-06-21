@@ -22,8 +22,10 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
-    "CACHE_DRIVER": "array",
+    "APP_DEBUG": "false",
+    "APP_URL": "https://siakadbackend-pi.vercel.app",
+    "FRONTEND_URL": "https://siakad-ruddy.vercel.app",
+    "CACHE_STORE": "array",
     "SESSION_DRIVER": "cookie",
     "QUEUE_CONNECTION": "sync",
     "LOG_CHANNEL": "stderr",

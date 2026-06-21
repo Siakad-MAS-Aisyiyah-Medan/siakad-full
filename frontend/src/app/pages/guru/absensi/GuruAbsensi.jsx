@@ -8,6 +8,7 @@ import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.servi
 import { getDisplayName } from '@app/shared/utils/profile';
 import { fetchAbsensiForm, saveAbsensiBulk } from '@app/shared/absensi/guru/services/absensi.service';
 import { toastError, toastSuccess } from '@app/shared/hooks/useConfirm';
+import PageHeader from '@app/shared/components/PageHeader';
 
 import {
   buildDefaultAbsensiContexts,
@@ -28,7 +29,7 @@ function readStoredContexts() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -66,21 +67,10 @@ function AbsensiContextForm({
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <button type="button" onClick={onCancel} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', alignSelf: 'flex-start' }}>
-        <ArrowLeft size={16} />
-        Kembali
-      </button>
-
-      <div>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text-dark)' }}>
-          {mode === 'create' ? 'Tambah Absensi' : 'Edit Absensi'}
-        </h1>
-        <p style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-muted)' }}>
-          {mode === 'create'
-            ? 'Lengkapi data berikut untuk menambahkan absensi murid.'
-            : 'Ubah data absensi yang telah dibuat.'}
-        </p>
-      </div>
+      <PageHeader 
+        title={mode === 'create' ? 'Tambah Absensi' : 'Edit Absensi'}
+        subtitle={mode === 'create' ? 'Lengkapi data berikut untuk menambahkan absensi murid.' : 'Ubah data absensi yang telah dibuat.'}
+      />
 
       <div className="form-panel glass" style={{ padding: '1.75rem' }}>
         <div style={{ display: 'grid', gap: '1.5rem' }}>
@@ -163,19 +153,10 @@ function AbsensiInputView({ context, rows, loading, saving, onBack, onChange, on
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <button type="button" onClick={onBack} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', alignSelf: 'flex-start' }}>
-        <ArrowLeft size={16} />
-        Kembali
-      </button>
-
-      <div>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text-dark)' }}>
-          Isi Absensi Murid
-        </h1>
-        <p style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-muted)' }}>
-          Isi kehadiran murid untuk setiap pertemuan pada bulan yang dipilih.
-        </p>
-      </div>
+      <PageHeader 
+        title="Isi Absensi Murid"
+        subtitle="Isi kehadiran murid untuk setiap pertemuan pada bulan yang dipilih."
+      />
 
       <div className="glass" style={{ borderRadius: '16px', padding: '1.25rem 1.5rem', border: '1px solid var(--color-border)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1rem 2rem' }}>
@@ -576,18 +557,15 @@ export default function GuruAbsensiPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in">
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
         {view === 'list' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div>
-              <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-text-dark)', marginBottom: '1rem' }}>
-                Absensi Murid
-              </h1>
+            <PageHeader title="Absensi Murid" subtitle="Kelola data absensi murid.">
               <button type="button" onClick={openCreate} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: '#111827', borderColor: '#111827' }}>
                 <Plus size={18} />
                 Tambah Absensi
               </button>
-            </div>
+            </PageHeader>
 
             <div className="table-container">
               <table className="data-table">

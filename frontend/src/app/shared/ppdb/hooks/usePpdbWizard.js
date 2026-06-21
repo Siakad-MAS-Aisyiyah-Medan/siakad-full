@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
+  buildInitialCompletedSteps,
   computeMaxReachableStep,
   computeWizardPercent,
   EDITABLE_STATUSES,
@@ -10,6 +11,7 @@ import {
 } from '../config/ppdbWizardConfig';
 import {
   fetchMyRegistration,
+  saveStepDokumen,
   saveStepKepribadian,
   saveStepKesehatan,
   saveStepKeteranganPribadi,
@@ -19,8 +21,8 @@ import {
 } from '@app/shared/services/ppdb.service';
 import { startOrResumePpdb } from '../utils/startOrResumePpdb';
 import {
+  calculateFormulirProgress,
   getStepPayload,
-  parseRequiredFieldMessage,
   validateAllFormSteps,
   validateStep,
 } from '../utils/ppdbWizardValidation';
@@ -42,6 +44,8 @@ const EMPTY_FORMS = {
   meta: {},
 };
 
+const AUTO_SAVE_MS = 2500;
+
 export function extractApiError(err) {
   const res = err?.response;
   const errors = res?.data?.errors;
@@ -61,12 +65,6 @@ export function extractApiError(err) {
     message: res?.data?.message || err?.message || 'Terjadi kesalahan pada proses PPDB.',
     fieldErrors: {},
   };
-}
-
-function parseMissingBerkasMessage(message) {
-  const match = String(message || '').match(/Berkas\s+(.+?)\s+wajib diunggah/i);
-  if (!match) return null;
-  return match[1];
 }
 
 function mapRegistrationToForms(p) {
@@ -158,6 +156,7 @@ export function usePpdbWizard() {
 
   const formsRef = useRef(forms);
   const activeStepRef = useRef(activeStep);
+  const autoSaveTimer = useRef(null);
   const skipAutoSave = useRef(false);
 
   formsRef.current = forms;
@@ -170,6 +169,8 @@ export function usePpdbWizard() {
     const locked = FINAL_STATUSES.includes(status);
     setIsLocked(locked);
 
+    const safeStep = 0; // Default ke step 0, hitung maxReachable nanti
+    
     const computedCompleted = recalculateCompletedSteps(formsData);
     setCompletedSteps(computedCompleted);
     
@@ -239,7 +240,7 @@ export function usePpdbWizard() {
         if (!silent) setSaving(false);
       }
     },
-    [syncFromServer],
+    [applyRegistration],
   );
 
   const initialize = useCallback(async () => {
@@ -251,10 +252,11 @@ export function usePpdbWizard() {
       let data = await fetchMyRegistration();
       let pendaftaran = data?.pendaftaran;
 
-      if (pendaftaran && FINAL_STATUSES.includes(pendaftaran.status_pendaftaran)) {
-        navigate('/calon-murid/status', { replace: true });
-        return;
-      }
+      // Removed redirect to allow read-only view
+      // if (pendaftaran && FINAL_STATUSES.includes(pendaftaran.status_pendaftaran)) {
+      //   navigate('/calon-murid/status', { replace: true });
+      //   return;
+      // }
 
       if (!data?.has_registration || !pendaftaran) {
         const started = await startOrResumePpdb();
@@ -332,15 +334,6 @@ export function usePpdbWizard() {
 
     skipAutoSave.current = true;
     const result = await persistStep(step.key, { advance: true, silent: false });
-    if (result.ok) {
-      await Swal.fire({
-        icon: 'success',
-        title: 'Berhasil',
-        text: 'Data berhasil disimpan',
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    }
     skipAutoSave.current = false;
     return result.ok;
   };
@@ -392,39 +385,23 @@ export function usePpdbWizard() {
       setIsLocked(true);
       await Swal.fire({
         icon: 'success',
-        title: 'Pendaftaran berhasil dikirim',
+        title: 'Pendaftaran Diajukan',
         text: 'Formulir terkunci. Menunggu verifikasi admin.',
       });
       navigate('/calon-murid/status', { replace: true });
       return true;
     } catch (err) {
-      const parsed = extractApiError(err);
-      const missingField = parseRequiredFieldMessage(parsed.message);
-      const missingBerkas = parseMissingBerkasMessage(parsed.message);
-
-      if (missingField && missingField.stepIndex >= 0) {
-        setActiveStep(missingField.stepIndex);
-        setFieldErrors({
-          [missingField.field]: `${missingField.label} wajib diisi`,
-        });
-      }
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal submit',
-        text: missingField
-          ? `${missingField.label} wajib diisi sebelum submit.`
-          : missingBerkas
-            ? `Berkas ${missingBerkas} belum diunggah. Lengkapi dulu di menu Upload Berkas.`
-            : parsed.message,
-      });
+      Swal.fire({ icon: 'error', title: 'Gagal submit', text: extractApiError(err).message });
       return false;
     } finally {
       setSaving(false);
     }
   };
 
-  const percent = computeWizardPercent(activeStep, completedSteps);
+  const percent = calculateFormulirProgress({
+    current_step: forms.meta?.currentStep,
+    ppdb_status: forms.meta?.status,
+  });
   const maxReachableStep = computeMaxReachableStep(completedSteps, serverStepIndex);
 
   return {

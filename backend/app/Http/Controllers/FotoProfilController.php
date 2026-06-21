@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -31,11 +32,10 @@ class FotoProfilController extends Controller
         $profile->foto = '/storage/' . $path;
         $profile->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Foto profil berhasil diperbarui.',
-            'foto_url' => $profile->foto
-        ]);
+        return ApiResponse::success(
+            ['foto_url' => $profile->foto],
+            'Foto profil berhasil diperbarui.'
+        );
     }
 
     public function delete(): JsonResponse
@@ -55,10 +55,7 @@ class FotoProfilController extends Controller
             $profile->save();
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Foto profil berhasil dihapus.'
-        ]);
+        return ApiResponse::success(null, 'Foto profil berhasil dihapus.');
     }
 
     private function getProfile($user, $role)

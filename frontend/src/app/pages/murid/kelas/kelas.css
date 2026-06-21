@@ -1,0 +1,18 @@
+.wf-student-info { min-height: 315px; }
+.wf-student-info dl { margin: 0; display: grid; gap: 30px; }
+.wf-student-info dl div { display: grid; grid-template-columns: 240px 30px 1fr; font-size: 1.05rem; }
+.wf-student-info dl div::after { content: ':'; grid-column: 2; grid-row: 1; }
+.wf-student-info dt { grid-column: 1; }
+.wf-student-info dd { grid-column: 3; margin: 0; }
+.wf-class-panel { min-height: 390px; }
+.wf-class-table-wrap { overflow-x: auto; border: 1px solid #d2d5d9; border-radius: 10px; }
+.wf-class-table { width: 100%; min-width: 930px; border-collapse: collapse; table-layout: fixed; }
+.wf-class-table th, .wf-class-table td { padding: 28px 20px; border-right: 1px solid #d2d5d9; text-align: left; vertical-align: middle; }
+.wf-class-table th:last-child, .wf-class-table td:last-child { border-right: 0; }
+.wf-class-table th { background: #f7f7f8; border-bottom: 1px solid #d2d5d9; font-size: .95rem; font-weight: 700; }
+.wf-class-table td { height: 140px; font-size: 1rem; }
+.wf-class-table th:nth-child(1) { width: 16%; }.wf-class-table th:nth-child(2) { width: 14%; }.wf-class-table th:nth-child(3) { width: 17%; }.wf-class-table th:nth-child(4) { width: 29%; }.wf-class-table th:nth-child(5) { width: 24%; }
+@media (max-width: 700px) {
+  .wf-student-info { min-height: 0; }
+  .wf-student-info dl div { grid-template-columns: 130px 18px 1fr; font-size: .95rem; }
+}

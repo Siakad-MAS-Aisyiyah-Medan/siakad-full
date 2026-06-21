@@ -17,6 +17,7 @@ class BiodataController extends Controller
                 'nip_nuptk' => 'nullable|string|max:50',
                 'nama_guru' => 'required|string|max:255',
                 'jenis_kelamin' => 'nullable|string|in:L,P',
+                'tgl_lahir' => 'nullable|date',
                 'agama' => 'nullable|string|max:50',
                 'alamat' => 'nullable|string',
                 'no_hp' => 'nullable|string|max:20',
@@ -51,9 +52,12 @@ class BiodataController extends Controller
                 'nip' => 'nullable|string|max:50',
                 'nama_lengkap' => 'required|string|max:255',
                 'jenis_kelamin' => 'nullable|string|in:L,P',
+                'tgl_lahir' => 'nullable|date',
                 'no_hp' => 'nullable|string|max:20',
                 'alamat' => 'nullable|string',
             ]);
+            $validated['nama_kepsek'] = $validated['nama_lengkap'];
+            unset($validated['nama_lengkap']);
             $profile = $user->kepalaSekolah;
             if (!$profile) {
                 $profile = new \App\Models\KepalaSekolah(['id_user' => $user->id_user]);
@@ -66,6 +70,8 @@ class BiodataController extends Controller
                 'nama_lengkap' => 'required|string|max:255',
                 'no_hp' => 'nullable|string|max:20',
             ]);
+            $validated['nama_admin'] = $validated['nama_lengkap'];
+            unset($validated['nama_lengkap']);
             $profile = $user->admin;
             if (!$profile) {
                 $profile = new \App\Models\Admin(['id_user' => $user->id_user]);

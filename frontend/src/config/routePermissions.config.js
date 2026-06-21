@@ -5,7 +5,7 @@
 export const ROUTE_PERMISSIONS = {
   '/admin/dashboard': 'manage_all',
   '/admin/profil-sekolah': 'manage_profil_sekolah',
-  '/admin/pengaturan/tahun-ajaran': 'manage_tahun_ajaran',
+  '/admin/tahun-ajaran': 'manage_tahun_ajaran',
   '/admin/pengumuman': 'manage_pengumuman',
   '/admin/murid': 'manage_murid',
   '/admin/guru': 'manage_guru',

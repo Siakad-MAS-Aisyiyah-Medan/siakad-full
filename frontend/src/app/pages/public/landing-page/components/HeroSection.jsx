@@ -1,8 +1,12 @@
 import { Sparkles } from 'lucide-react';
 import AppLogo from '@app/shared/components/AppLogo';
 import { SCHOOL_NAME } from '../data/landingData';
+import { resolveStorageUrl } from '@app/shared/services/apiHelpers';
+import { apiConfig } from '@/config/api.config';
 
-export default function HeroSection({ onPendaftaranClick }) {
+export default function HeroSection({ profil, onPendaftaranClick }) {
+  const logoUrl = profil?.hero_image ? resolveStorageUrl(profil.hero_image, apiConfig) : undefined;
+  
   return (
     <section className="lp-hero" id="home">
       <div className="lp-hero__bg"></div>
@@ -11,12 +15,11 @@ export default function HeroSection({ onPendaftaranClick }) {
       <div className="lp-container lp-hero__grid-layout">
         <div>
           <h1 className="lp-hero__title" style={{ marginTop: '2rem' }}>
-            {SCHOOL_NAME}
+            {profil?.nama_sekolah || SCHOOL_NAME}
           </h1>
 
           <p className="lp-hero__subtitle">
-            Membentuk generasi islami yang unggul dalam IPTEK dan berakhlakul karimah
-            melalui pendidikan bermutu dan lingkungan yang religius.
+            {profil?.hero_subtitle || 'Membentuk generasi islami yang unggul dalam IPTEK dan berakhlakul karimah melalui pendidikan bermutu dan lingkungan yang religius.'}
           </p>
 
           <div className="lp-hero__actions">
@@ -32,7 +35,7 @@ export default function HeroSection({ onPendaftaranClick }) {
 
         <div className="lp-hero-logo-presentation">
           <div className="lp-hero-logo-circle">
-            <AppLogo size={280} />
+            <AppLogo size={340} srcUrl={logoUrl} />
           </div>
         </div>
       </div>

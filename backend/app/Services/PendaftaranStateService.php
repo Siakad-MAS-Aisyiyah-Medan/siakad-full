@@ -66,7 +66,7 @@ class PendaftaranStateService
     protected const ADMIN_TRANSITIONS = [
         'terverifikasi' => ['diajukan'],
         'revisi' => ['diajukan', 'terverifikasi'],
-        'diterima' => ['terverifikasi', 'daftar_ulang'],
+        'diterima' => ['diajukan', 'terverifikasi', 'daftar_ulang'],
         'ditolak' => ['diajukan', 'terverifikasi', 'revisi'],
     ];
 

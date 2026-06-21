@@ -127,6 +127,7 @@ export const PPDB_DEFAULTS = {
     },
   ],
   address: 'Jl. Demak No. 3, Medan',
+  email: 'info@masaisyiyahmedan.sch.id',
 };
 
 export const FOOTER_LINKS = [

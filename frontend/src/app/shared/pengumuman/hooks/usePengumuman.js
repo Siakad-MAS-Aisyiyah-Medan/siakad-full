@@ -7,7 +7,7 @@ import {
 } from '../services/pengumuman.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
-const today = new Date().toISOString().slice(0, 16);
+const today = new Date().toISOString().slice(0, 10);
 
 const emptyForm = {
   judul: '',
@@ -71,12 +71,25 @@ export function usePengumuman() {
     setFormData({
       judul: item.judul || '',
       isi: item.isi || '',
-      tanggal_publikasi: item.tanggal_publikasi?.slice?.(0, 16) || item.tanggal_publikasi || today,
+      tanggal_publikasi: item.tanggal_publikasi?.slice?.(0, 10) || item.tanggal_publikasi || today,
       akses: item.akses || 'umum',
       kategori: item.kategori || '',
-      thumbnail: null, // Keep it null so it doesn't upload a string
+      thumbnail: null,
     });
     setView('edit');
+  };
+
+  const openView = (item) => {
+    setCurrentId(item.id);
+    setFormData({
+      judul: item.judul || '',
+      isi: item.isi || '',
+      tanggal_publikasi: item.tanggal_publikasi?.slice?.(0, 10) || item.tanggal_publikasi || today,
+      akses: item.akses || 'umum',
+      kategori: item.kategori || '',
+      thumbnail: item.thumbnail || null,
+    });
+    setView('view');
   };
 
   const cancelForm = () => {
@@ -130,7 +143,7 @@ export function usePengumuman() {
     }
   };
 
-    return {
+  return {
     view,
     items,
     searchQuery,
@@ -143,6 +156,7 @@ export function usePengumuman() {
     isFetching,
     openAdd,
     openEdit,
+    openView,
     cancelForm,
     handleChange,
     submitForm,

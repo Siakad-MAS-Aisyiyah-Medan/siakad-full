@@ -1,4 +1,5 @@
-.status-header {
+/* status-pendaftaran.css */
+.sp-header {
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -9,9 +10,10 @@
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  animation: lc-slide-up 0.4s ease-out forwards;
 }
 
-.status-header__icon {
+.sp-header__icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,216 +25,213 @@
   flex-shrink: 0;
 }
 
-.status-refresh-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.status-refresh-btn:hover:not(:disabled) {
-  background: #f8fafc;
-  color: var(--color-primary, #0f7a5c);
-  border-color: var(--color-primary, #0f7a5c);
-}
-
-.status-content {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 1024px) {
-  .status-content {
-    grid-template-columns: 3fr 2fr;
-  }
-}
-
-.status-card-main {
+.sp-status-hero { 
+  margin-bottom: 1.5rem; 
+  min-height: 215px; 
+  padding: 2.5rem; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
-  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px; 
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
+  text-align: center; 
+  animation: lc-slide-up 0.5s ease-out forwards;
 }
 
-.status-card-main__badge-wrap {
-  margin-bottom: 2rem;
-  display: flex;
-}
-
-.status-badge-lg {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 999px;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.status-badge-lg--belum, .status-badge-lg--draft {
-  background: #f1f5f9;
+.sp-status-hero > p { 
+  margin: 0 0 18px; 
+  font-size: 1.1rem; 
+  font-weight: 600; 
   color: #64748b;
-  border: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.status-badge-lg--submitted {
-  background: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+.sp-status-hero__title { 
+  display: flex; 
+  align-items: center; 
+  gap: 20px; 
 }
 
-.status-badge-lg--verified {
-  background: #f3e8ff;
-  color: #7e22ce;
-  border: 1px solid #e9d5ff;
-}
-
-.status-badge-lg--accepted {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-
-.status-badge-lg--rejected, .status-badge-lg--revision {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
-
-.status-card-main__info h2 {
-  font-size: 1.5rem;
+.sp-status-hero__title h2 { 
+  margin: 0; 
+  font-size: clamp(2rem, 4vw, 2.8rem); 
   font-weight: 800;
-  color: #1e293b;
-  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
 }
 
-.status-card-main__info p {
-  font-size: 1rem;
-  color: #475569;
-  margin-bottom: 0.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.sp-status-hero > span { 
+  margin-top: 20px; 
+  color: #475569; 
+  font-size: 1.1rem; 
+  max-width: 600px;
 }
 
-.status-alert {
-  margin-top: 1.5rem;
-  padding: 1.25rem;
-  border-radius: 12px;
-  font-size: 0.95rem;
-}
-
-.status-alert--warning {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  color: #92400e;
-}
-
-.status-timeline-card {
+.sp-panel { 
+  margin-bottom: 1.5rem;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
-  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+  border-radius: 20px; 
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   padding: 2rem;
+  animation: lc-slide-up 0.6s ease-out forwards;
 }
 
-.status-timeline-card__title {
-  font-size: 1.15rem;
+.sp-panel h2 {
+  font-size: 1.3rem;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(15, 122, 92, 0.1);
 }
 
-.status-timeline {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
+.sp-status-info dl { 
+  display: grid; 
+  gap: 16px; 
+  margin: 0; 
 }
 
-.status-timeline::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 20px;
-  width: 2px;
-  background: #e2e8f0;
-  z-index: 0;
-}
-
-.status-timeline__item {
-  position: relative;
-  display: flex;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-  z-index: 1;
-}
-
-.status-timeline__item:last-child {
-  margin-bottom: 0;
-}
-
-.status-timeline__dot {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #f1f5f9;
-  border: 2px solid #cbd5e1;
-  color: #94a3b8;
-  display: flex;
+.sp-status-info dl div { 
+  display: grid; 
+  grid-template-columns: 200px 20px 1fr; 
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  z-index: 2;
+  font-size: 1.05rem;
+}
+
+.sp-status-info dl div::after { 
+  content: ':'; 
+  grid-column: 2; 
+  grid-row: 1; 
+  color: #94a3b8;
+}
+
+.sp-status-info dt { 
+  grid-column: 1; 
+  color: #64748b;
+  font-weight: 500;
+}
+
+.sp-status-info dd { 
+  grid-column: 3; 
+  margin: 0; 
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.sp-progress-grid { 
+  display: grid; 
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 2rem;
+}
+
+.sp-progress-item { 
+  padding: 1rem; 
+  background: rgba(248, 250, 252, 0.6);
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.sp-progress-label { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  margin-bottom: 16px; 
+}
+
+.sp-progress-label > span { 
+  width: 32px; 
+  height: 32px; 
+  display: grid; 
+  place-items: center; 
+  border: 2px solid #cbd5e1; 
+  border-radius: 50%; 
+  color: transparent;
   transition: all 0.3s ease;
 }
 
-.status-timeline__item--active .status-timeline__dot {
-  background: white;
-  border-color: var(--color-primary, #0f7a5c);
-  color: var(--color-primary, #0f7a5c);
-  box-shadow: 0 0 0 6px rgba(15, 122, 92, 0.15);
-  animation: cm-pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
+.sp-progress-label > span.is-complete { 
+  background: var(--color-primary, #0f7a5c); 
+  color: #fff; 
+  border-color: var(--color-primary, #0f7a5c); 
+  box-shadow: 0 4px 10px rgba(15, 122, 92, 0.2);
 }
 
-.status-timeline__item--done .status-timeline__dot {
-  background: var(--color-primary, #0f7a5c);
-  border-color: var(--color-primary, #0f7a5c);
-  color: white;
-}
-
-.status-timeline__content {
-  padding-top: 0.5rem;
-}
-
-.status-timeline__content strong {
-  display: block;
-  font-size: 1.05rem;
+.sp-progress-label strong { 
+  font-size: 1.05rem; 
   color: #1e293b;
-  margin-bottom: 0.25rem;
+  flex: 1;
 }
 
-.status-timeline__content span {
-  display: block;
-  font-size: 0.85rem;
-  color: #64748b;
-  line-height: 1.4;
+.sp-progress-label b { 
+  font-size: 1.1rem; 
+  color: var(--color-primary, #0f7a5c);
 }
 
-.status-timeline__item--active .status-timeline__content strong {
-  color: var(--color-primary-dark, #0a5c46);
+.sp-progress-track { 
+  height: 12px; 
+  overflow: hidden; 
+  border-radius: 20px; 
+  background: #e2e8f0; 
+}
+
+.sp-progress-track i { 
+  display: block; 
+  height: 100%; 
+  border-radius: inherit; 
+  background: linear-gradient(90deg, var(--color-primary-light, #34d399), var(--color-primary, #0f7a5c)); 
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-status-note { 
+  display: flex; 
+  gap: 20px; 
+  align-items: flex-start; 
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.sp-status-note svg {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sp-status-note h2 { 
+  margin-bottom: 8px; 
+  border-bottom: none;
+  padding-bottom: 0;
+  color: #1e293b;
+}
+
+.sp-status-note p { 
+  margin: 0; 
+  color: #475569; 
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+.sp-status-page--accepted .sp-status-hero__title { color: #166534; }
+.sp-status-page--rejected .sp-status-hero__title { color: #991b1b; }
+.sp-status-page--revision .sp-status-hero__title { color: #92400e; }
+.sp-status-page--submitted .sp-status-hero__title { color: #1e40af; }
+.sp-status-page--verified .sp-status-hero__title { color: #6b21a8; }
+.sp-status-page--draft .sp-status-hero__title, .sp-status-page--none .sp-status-hero__title { color: #334155; }
+
+.sp-spin { display: inline-block; animation: sp-spin .75s linear infinite; } 
+@keyframes sp-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 850px) {
+  .sp-progress-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .sp-status-hero__title { flex-direction: column; gap: 12px; }
+  .sp-status-info dl div { grid-template-columns: 120px 16px 1fr; font-size: 0.95rem; }
+  .sp-panel { padding: 1.5rem; }
 }

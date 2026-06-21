@@ -47,7 +47,7 @@ export default function PpdbFooter() {
             </li>
             <li>
               <Mail size={16} aria-hidden="true" />
-              info@masaisyiyahmedan.sch.id
+              {content.email}
             </li>
           </ul>
         </div>

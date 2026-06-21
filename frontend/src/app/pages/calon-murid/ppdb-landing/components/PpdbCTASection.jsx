@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import DaftarSekarangButton from '@app/shared/ppdb/components/DaftarSekarangButton';
+import { usePpdbContent } from '../context/PpdbContentContext';
 
 export default function PpdbCTASection() {
+  const { content } = usePpdbContent();
+
   return (
     <section className="pp-section pp-cta-section">
       <div className="pp-container pp-reveal">
@@ -15,7 +18,24 @@ export default function PpdbCTASection() {
           </div>
           <div className="pp-cta-card__actions">
             <DaftarSekarangButton className="pp-btn pp-btn--white pp-btn--lg" />
-
+            {content.brosur && (
+              <a
+                href={content.brosur}
+                target="_blank"
+                rel="noreferrer"
+                className="pp-btn pp-btn--outline pp-btn--lg"
+                style={{ 
+                  textDecoration: 'none', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.5rem',
+                  borderColor: 'rgba(255,255,255,0.4)',
+                  color: '#fff'
+                }}
+              >
+                Unduh Brosur
+              </a>
+            )}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { PPDB_STEPS, STEP_REQUIRED, STEP_SECTION } from '../config/ppdbWizardConfig';
+import { PPDB_STEPS, STEP_REQUIRED, STEP_SECTION, stepIndexFromCurrentStep } from '../config/ppdbWizardConfig';
 
 export const FIELD_LABELS = {
   nama_lengkap: 'Nama Lengkap',
@@ -51,8 +51,21 @@ const NUMERIC_FIELDS = new Set([
   'tinggi_badan',
 ]);
 
-function isEmpty(value) {
-  return value === undefined || value === null || String(value).trim() === '';
+function isEmpty(value, field) {
+  if (value === undefined || value === null) return true;
+  const str = String(value).trim();
+  if (str === '') return true;
+
+  // Khusus untuk tinggi, berat, dan anak_ke, angka 0 tidak masuk akal
+  if (str === '0' && ['berat_badan', 'tinggi_badan', 'anak_ke'].includes(field)) {
+    return true;
+  }
+  // Khusus untuk gol_darah, tanda '-' berarti belum diisi
+  if (str === '-' && field === 'gol_darah') {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -69,7 +82,7 @@ export function validateStep(stepKey, forms) {
   const fieldErrors = {};
 
   (STEP_REQUIRED[stepKey] || []).forEach((field) => {
-    if (isEmpty(data[field])) {
+    if (isEmpty(data[field], field)) {
       fieldErrors[field] = `${FIELD_LABELS[field] || field} wajib diisi`;
     }
   });
@@ -154,5 +167,36 @@ export function getStepPayload(stepKey, forms) {
     payload.tgl_lahir = payload.tgl_lahir.slice(0, 10);
   }
 
+  const nextStepMap = {
+    'keterangan-pribadi': 'kesehatan',
+    'kesehatan': 'pendidikan-asal',
+    'pendidikan-asal': 'orang-tua-wali',
+    'orang-tua-wali': 'kepribadian',
+    'kepribadian': 'review',
+  };
+  
+  if (nextStepMap[stepKey]) {
+    payload.current_step = nextStepMap[stepKey];
+  }
+
   return payload;
+}
+
+
+/** 
+ * Menghitung progres persentase formulir pendaftaran 
+ * murni berdasarkan 'current_step' (Langkah terakhir yang di-Save & Next)
+ */
+export function calculateFormulirProgress(registration) {
+  if (!registration) return 0;
+  if (['diajukan', 'terverifikasi', 'diterima', 'ditolak', 'menjadi_murid'].includes(registration.ppdb_status || registration.status_pendaftaran)) return 100;
+
+  const currentStepIndex = stepIndexFromCurrentStep(registration.current_step);
+  const formSteps = PPDB_STEPS.length - 1; // 5 steps formulir, excluding review
+  
+  // Jika index melebihi formSteps (misal di halaman review atau sudah submit), cap 100%
+  const completed = Math.min(formSteps, currentStepIndex);
+  
+  if (formSteps === 0) return 0;
+  return Math.min(100, Math.round((completed / formSteps) * 100));
 }

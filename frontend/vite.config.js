@@ -17,4 +17,8 @@ export default defineConfig({
     port: 1001,
     strictPort: true,
   },
+  build: {
+    // flatpickr still ships an obsolete IE media-query hack rejected by Lightning CSS.
+    cssMinify: false,
+  },
 })

@@ -114,7 +114,7 @@ class User extends Authenticatable
             'admin' => ['admin'],
             'kepsek' => ['kepalaSekolah'],
             'guru' => ['guru'],
-            'siswa' => ['siswa.kelas'],
+            'siswa' => ['siswa.kelas.waliKelas'],
             'calon_siswa' => ['pendaftaran'],
             default => [],
         };

@@ -231,9 +231,7 @@ class BerkasController extends Controller
 
     private function canEditPendaftaran(Pendaftaran $pendaftaran): bool
     {
-        $status = $pendaftaran->status_pendaftaran ?? $pendaftaran->ppdb_status ?? 'draft';
-
-        return in_array($status, ['draft', 'revision', 'revisi', 'submitted', 'diajukan'], true);
+        return $pendaftaran->isEditable();
     }
 
     private function assertAllowedFile(UploadedFile $file, string $jenis): void

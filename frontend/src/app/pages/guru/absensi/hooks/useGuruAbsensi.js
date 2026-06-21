@@ -71,7 +71,7 @@ export function useGuruAbsensi() {
       id_tahun_ajaran: filter.id_tahun_ajaran,
     })
       .then((res) => setDaftarList(res.data ?? []))
-      .catch((err) => {
+      .catch(() => {
         setError('Gagal memuat riwayat absensi.');
         setDaftarList([]);
       })

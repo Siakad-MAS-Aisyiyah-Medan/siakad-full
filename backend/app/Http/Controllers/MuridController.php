@@ -131,7 +131,7 @@ class MuridController extends Controller
     {
         $query = User::query()
             ->with(['siswa.kelas', 'pendaftaran'])
-            ->whereIn('role', ['siswa', 'calon_siswa']);
+            ->where('role', 'siswa');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -148,7 +148,7 @@ class MuridController extends Controller
     private function getStats(): array
     {
         return [
-            'total_murid' => User::whereIn('role', ['siswa', 'calon_siswa'])->count(),
+            'total_murid' => User::where('role', 'siswa')->count(),
             'siswa_aktif' => User::where('role', 'siswa')->count(),
             'calon_siswa' => User::where('role', 'calon_siswa')->count(),
             'alumni' => User::where('role', 'alumni')->count(),

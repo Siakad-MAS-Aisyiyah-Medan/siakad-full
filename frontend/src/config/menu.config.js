@@ -6,7 +6,8 @@ export const menuByRole = {
   admin: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/admin/dashboard', permission: 'manage_all' },
     { iconKey: 'School', label: 'Profil Sekolah', path: '/admin/profil-sekolah', permission: 'manage_profil_sekolah' },
-    { iconKey: 'CalendarDays', label: 'Tahun Ajaran', path: '/admin/pengaturan/tahun-ajaran', permission: 'manage_tahun_ajaran' },
+    { iconKey: 'Settings', label: 'Pengaturan PPDB', path: '/admin/pengaturan-ppdb', permission: 'manage_ppdb' },
+    { iconKey: 'CalendarDays', label: 'Tahun Ajaran', path: '/admin/tahun-ajaran', permission: 'manage_tahun_ajaran' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/admin/pengumuman', permission: 'manage_pengumuman' },
     { iconKey: 'Users', label: 'Data Guru', path: '/admin/guru', permission: 'manage_guru' },
     { iconKey: 'GraduationCap', label: 'Data Murid', path: '/admin/murid', permission: 'manage_murid' },
@@ -18,6 +19,7 @@ export const menuByRole = {
   ],
   kepsek: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/kepala-sekolah/dashboard', permission: 'view_dashboard_kepsek' },
+    { iconKey: 'User', label: 'Profil Pribadi', path: '/kepala-sekolah/profil-saya', permission: 'manage_profil_pribadi' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/kepala-sekolah/pengumuman', permission: 'view_pengumuman' },
     { iconKey: 'Users', label: 'Data Guru', path: '/kepala-sekolah/data-guru', permission: 'view_data_guru' },
     { iconKey: 'GraduationCap', label: 'Data Murid', path: '/kepala-sekolah/data-murid', permission: 'view_data_siswa' },
@@ -28,7 +30,9 @@ export const menuByRole = {
   ],
   guru: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/guru/dashboard', permission: 'view_dashboard_guru' },
+    { iconKey: 'User', label: 'Profil Pribadi', path: '/guru/profil-saya', permission: 'manage_profil_pribadi' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/guru/pengumuman', permission: 'view_pengumuman' },
+    { iconKey: 'Users', label: 'Data Murid yang Diajar', path: '/guru/murid', permission: 'view_murid_diajar' },
     { iconKey: 'BookOpen', label: 'Data Kelas yang Diajar', path: '/guru/kelas', permission: 'view_kelas_diajar' },
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran yang Diampu', path: '/guru/mapel', permission: 'view_mapel_diampu' },
     { iconKey: 'FileText', label: 'Daftar Nilai Murid', path: '/guru/nilai', permission: 'manage_nilai_siswa' },
@@ -36,6 +40,7 @@ export const menuByRole = {
   ],
   siswa: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/siswa/dashboard', permission: 'view_dashboard_siswa' },
+    { iconKey: 'User', label: 'Profil Pribadi', path: '/siswa/profil-saya', permission: 'manage_profil_pribadi' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/siswa/pengumuman', permission: 'view_pengumuman' },
     { iconKey: 'BookOpen', label: 'Data Kelas yang Dimasuki', path: '/siswa/kelas', permission: 'view_kelas_pribadi' },
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/siswa/mapel', permission: 'view_mapel' },

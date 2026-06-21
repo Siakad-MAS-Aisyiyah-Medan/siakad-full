@@ -1,3 +1,5 @@
+import { normalizePpdbStatus } from './dashboardState';
+
 /** Langkah progress di dashboard (7 langkah tampilan) */
 export const DASHBOARD_PROGRESS_STEPS = [
   { key: 'biodata', label: 'Biodata' },
@@ -33,7 +35,7 @@ export function computePpdbProgress(pendaftaran) {
     return { activeIndex: 0, percent: 0, steps };
   }
 
-  const status = pendaftaran.status_pendaftaran;
+  const status = normalizePpdbStatus(pendaftaran);
 
   if (FINAL_STATUSES.includes(status)) {
     return { activeIndex: steps.length, percent: 100, steps };

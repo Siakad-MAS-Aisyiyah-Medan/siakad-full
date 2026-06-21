@@ -9,7 +9,7 @@ import { confirmAction, showLoadingAlert, closeAlert } from '@app/shared/hooks/u
 import { getJsonItem } from '@app/shared/utils/storage';
 import { CALON_MURID_NAV } from '../config/calonMuridNav';
 
-export default function CalonMuridLayout({ children }) {
+export default function CalonMuridLayout({ children, title, subtitle, icon: Icon, headerActions }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -92,7 +92,26 @@ export default function CalonMuridLayout({ children }) {
             >
               <Menu size={22} />
             </button>
-            {isDashboard ? (
+            
+            {title ? (
+              <div className="content-header__greeting" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {Icon && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '42px', height: '42px', background: 'var(--color-primary-soft, #e8f6f1)', color: 'var(--color-primary, #0f7a5c)', borderRadius: '12px', flexShrink: 0 }}>
+                    <Icon size={22} />
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>
+                    {title}
+                  </h2>
+                  {subtitle && (
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem' }}>
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : isDashboard ? (
               <div className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>
                   Halo, {displayName.split(' ')[0]} 👋
@@ -106,24 +125,12 @@ export default function CalonMuridLayout({ children }) {
             )}
           </div>
           <div className="content-header__right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {headerActions && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>{headerActions}</div>}
             <div id="global-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}></div>
-            {isDashboard && (
-              <>
-                <span className="content-header__bell">
-                  <Bell size={20} />
-                </span>
-                <div className="user-info">
-                  <span className="user-info__avatar">
-                    <CircleUserRound size={22} />
-                  </span>
-                  <span className="user-info__name">{displayName}</span>
-                </div>
-                {accountStatus !== 'aktif' && (
-                  <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20 ml-2">
-                    Nonaktif
-                  </span>
-                )}
-              </>
+            {accountStatus !== 'aktif' && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-600/20 ml-2">
+                Nonaktif
+              </span>
             )}
           </div>
         </header>

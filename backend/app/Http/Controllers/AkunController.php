@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use App\Utils\AuditsAdminActions;
 
 class AkunController extends Controller
 {
+    use AuditsAdminActions;
+
     public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         $query = User::with(['admin', 'guru', 'siswa', 'kepalaSekolah'])
@@ -101,6 +104,8 @@ class AkunController extends Controller
             'status_akun' => $validated['status'] ?? 'aktif',
         ]);
 
+        $this->auditAdmin('akun.create', $user, ['username' => $user->username]);
+
         return response()->json([
             'success' => true,
             'message' => 'Akun berhasil ditambahkan',
@@ -121,6 +126,7 @@ class AkunController extends Controller
 
         // We can optionally delete related profile data here if needed, 
         // or rely on database cascading/soft deletes.
+        $this->auditAdmin('akun.delete', $user, ['username' => $user->username]);
         $user->delete();
 
         return response()->json([
@@ -170,6 +176,8 @@ class AkunController extends Controller
             }
         }
 
+        $this->auditAdmin('akun.update', $user, ['username' => $user->username]);
+
         return response()->json([
             'success' => true,
             'message' => 'Akun berhasil diperbarui',
@@ -206,6 +214,8 @@ class AkunController extends Controller
         $user->username = $validated['username'];
         $user->email = $validated['email'];
         $user->save();
+
+        $this->auditAdmin('profile.update', $user, ['username' => $user->username]);
 
         return response()->json([
             'success' => true,

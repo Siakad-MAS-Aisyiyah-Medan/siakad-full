@@ -3,16 +3,20 @@ import { Menu, X } from 'lucide-react';
 import AppLogo from '@app/shared/components/AppLogo';
 import DaftarSekarangButton from '@app/shared/ppdb/components/DaftarSekarangButton';
 import { NAV_ITEMS } from '../data/landingData';
+import { resolveStorageUrl } from '@app/shared/services/apiHelpers';
+import { apiConfig } from '@/config/api.config';
 
-export default function LandingNavbar({ activeSection, menuOpen, scrolled, onToggleMenu, onScrollToSection, onCloseMenu }) {
+export default function LandingNavbar({ profil, activeSection, menuOpen, scrolled, onToggleMenu, onScrollToSection, onCloseMenu }) {
+  const logoUrl = profil?.hero_image ? resolveStorageUrl(profil.hero_image, apiConfig) : undefined;
+  
   return (
     <>
       <header className={`lp-navbar ${scrolled ? 'lp-navbar--scrolled' : ''}`}>
         <div className="lp-container lp-navbar__inner">
           <Link to="/home" className="lp-navbar__brand">
-            <AppLogo size={42} />
+            <AppLogo size={52} srcUrl={logoUrl} />
             <div className="lp-navbar__brand-text">
-              <span className="lp-navbar__brand-title">MAS Aisyiyah Medan</span>
+              <span className="lp-navbar__brand-title">{profil?.nama_sekolah || 'MAS Aisyiyah Medan'}</span>
               <span className="lp-navbar__brand-sub">Sistem Informasi Akademik</span>
             </div>
           </Link>

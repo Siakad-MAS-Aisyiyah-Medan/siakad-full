@@ -2,6 +2,8 @@ import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 import PageHeader from '@app/shared/components/PageHeader';
 
+import { exportToCsv } from '@app/shared/utils/exportCsv';
+
 export default function MapelTable({
   filteredData,
   searchQuery,
@@ -12,6 +14,16 @@ export default function MapelTable({
   isFetching = false,
   readOnly = false,
 }) {
+  const handleDownload = () => {
+    const dataToExport = filteredData.map(item => ({
+      'Nama Mata Pelajaran': item.nama_mapel || '-',
+      'Guru Pengampu': item.guru?.nama_guru || 'Belum ditentukan',
+      'Tingkatan': item.tingkat || '-',
+      'Status': 'Aktif',
+    }));
+    exportToCsv('Data_Mata_Pelajaran.csv', dataToExport);
+  };
+
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader title="Mata Pelajaran" subtitle="Kelola data mata pelajaran MAS Aisyiyah Medan">
@@ -27,17 +39,25 @@ export default function MapelTable({
             />
           </div>
         )}
-        {readOnly ? (
-          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Download size={16} />
-            Unduh Data
-          </button>
-        ) : (
-          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plus size={16} />
-            Tambah Mapel
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {readOnly ? (
+            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
+                <Download size={16} />
+                Unduh Data
+              </button>
+              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={16} />
+                Tambah Mapel
+              </button>
+            </>
+          )}
+        </div>
       </PageHeader>
 
       {/* Table */}

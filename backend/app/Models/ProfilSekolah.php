@@ -21,6 +21,10 @@ class ProfilSekolah extends Model
         'foto_kepsek',
         'no_hp',
         'visi',
-        'misi'
+        'misi',
+        'email',
+        'instagram',
+        'facebook',
+        'youtube'
     ];
 }

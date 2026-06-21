@@ -1,34 +1,17 @@
 import { ArrowLeft, Plus, Save, X } from 'lucide-react';
 import { guruLabel } from '@app/shared/utils/guruLabel';
+import PageHeader from '@app/shared/components/PageHeader';
 
 export default function MapelForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const isEdit = view === 'edit' && !readOnly;
 
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Page Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <button
-          type="button"
-          onClick={onCancel}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '40px', height: '40px',
-            borderRadius: '10px', border: '1px solid var(--color-border)',
-            background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
-          }}
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>
-            {readOnly ? 'Detail Mata Pelajaran' : view === 'add' ? 'Tambah Mata Pelajaran' : 'Edit Mata Pelajaran'}
-          </h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0 }}>
-            {readOnly ? 'Informasi lengkap mata pelajaran' : view === 'add' ? 'Isi data untuk menambah mata pelajaran baru' : 'Perbarui informasi mata pelajaran'}
-          </p>
-        </div>
-      </div>
+      <PageHeader 
+        title={readOnly ? 'Detail Mata Pelajaran' : view === 'add' ? 'Tambah Mata Pelajaran' : 'Edit Mata Pelajaran'}
+        subtitle={readOnly ? 'Informasi lengkap mata pelajaran' : view === 'add' ? 'Isi data untuk menambah mata pelajaran baru' : 'Perbarui informasi mata pelajaran'}
+        onBack={onCancel}
+      />
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>

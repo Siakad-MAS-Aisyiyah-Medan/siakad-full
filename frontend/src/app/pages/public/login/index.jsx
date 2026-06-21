@@ -1,90 +1,81 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { login, saveSession, getRedirectPathForRole } from '@app/shared/services/auth.service';
-import { getDisplayName } from '@app/shared/utils/profile';
 import AppLogo from '@app/shared/components/AppLogo';
-import { Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
+import { getRedirectPathForRole, login, saveSession } from '@app/shared/services/auth.service';
+import { getDisplayName } from '@app/shared/utils/profile';
+
+const ACCESS_OPTIONS = [
+  { value: 'admin', label: 'Administrator', roles: ['admin', 'superadmin'] },
+  { value: 'kepsek', label: 'Kepala Sekolah', roles: ['kepsek'] },
+  { value: 'guru', label: 'Guru', roles: ['guru'] },
+  { value: 'siswa', label: 'Murid', roles: ['siswa'] },
+  { value: 'calon_siswa', label: 'Calon Murid', roles: ['calon_siswa'] },
+];
 
 export default function LoginPage() {
+  const [access, setAccess] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [roleType, setRoleType] = useState('Murid & Calon Murid');
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
-    if (searchParams.get('expired') === '1') {
-      const msg =
-        searchParams.get('message') ||
-        'Sesi Anda telah berakhir. Silakan login kembali.';
-      Swal.fire({ icon: 'warning', title: 'Sesi Berakhir', text: decodeURIComponent(msg) });
-    }
+    if (searchParams.get('expired') !== '1') return;
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sesi Berakhir',
+      text: decodeURIComponent(searchParams.get('message') || 'Sesi Anda telah berakhir. Silakan login kembali.'),
+    });
   }, [searchParams]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    if (!access) {
+      await Swal.fire({ icon: 'warning', title: 'Pilih Akses', text: 'Pilih akses akun sebelum login.' });
+      return;
+    }
 
+    setLoading(true);
     try {
       const result = await login({ login: username.trim(), password });
+      const selected = ACCESS_OPTIONS.find((item) => item.value === access);
+      if (!selected?.roles.includes(result.user.role)) {
+        throw new Error(`Akun ini tidak memiliki akses sebagai ${selected?.label}.`);
+      }
+
       const { user, profile, token, permissions, menus, redirect_path } = result;
-
-      const allowedRolesForAdmin = ['admin', 'superadmin'];
-      const allowedRolesForPegawai = ['pegawai', 'guru', 'kepsek', 'staff'];
-      const allowedRolesForMurid = ['siswa', 'calon_siswa'];
-
-      let isRoleValid = false;
-      if (roleType === 'Administrator' && allowedRolesForAdmin.includes(user.role)) {
-        isRoleValid = true;
-      } else if (roleType === 'Pegawai' && allowedRolesForPegawai.includes(user.role)) {
-        isRoleValid = true;
-      } else if (roleType === 'Murid & Calon Murid' && allowedRolesForMurid.includes(user.role)) {
-        isRoleValid = true;
-      }
-
-      if (!isRoleValid) {
-        throw { response: { data: { message: `Akses ditolak: Akun Anda tidak memiliki hak akses sebagai ${roleType}.` } } };
-      }
-
       saveSession({ user, profile, token, permissions, menus, redirect_path });
-
-      const displayName = getDisplayName(profile, user.role, user.name ?? user.username);
-
-      const redirectParam = searchParams.get('redirect');
-      let target = redirectParam || redirect_path || getRedirectPathForRole(user.role);
-      if (user.role === 'calon_siswa' && !redirectParam) {
-        target = '/calon-murid/dashboard';
-      }
-
-      Swal.fire({
+      await Swal.fire({
         icon: 'success',
         title: 'Berhasil Login',
-        text: `Selamat datang kembali, ${displayName}!`,
-        timer: 1500,
+        text: `Selamat datang, ${getDisplayName(profile, user.role, user.name ?? user.username)}!`,
+        timer: 1100,
         showConfirmButton: false,
       });
-
-      setTimeout(() => navigate(target), 1500);
-    } catch (err) {
+      navigate(searchParams.get('redirect') || redirect_path || getRedirectPathForRole(user.role), { replace: true });
+    } catch (error) {
       Swal.fire({
         icon: 'error',
         title: 'Gagal Login',
-        text: err.response?.data?.message || 'Username, NIP, NISN, Email, atau Password salah!',
+        text: error.response?.data?.message || error.message || 'Username atau password salah.',
       });
     } finally {
       setLoading(false);
@@ -92,16 +83,18 @@ export default function LoginPage() {
   };
 
   const getLoginLabel = () => {
-    if (roleType === 'Administrator') return 'Username';
-    if (roleType === 'Pegawai') return 'NIP / Email';
+    if (access === 'admin') return 'Username';
+    if (access === 'kepsek' || access === 'guru') return 'NIP / Email';
     return 'NISN / Email';
   };
 
   const getLoginPlaceholder = () => {
-    if (roleType === 'Administrator') return 'Masukkan Username';
-    if (roleType === 'Pegawai') return 'Masukkan NIP atau email';
+    if (access === 'admin') return 'Masukkan Username';
+    if (access === 'kepsek' || access === 'guru') return 'Masukkan NIP atau email';
     return 'Masukkan NISN atau email';
   };
+
+  const selectedLabel = ACCESS_OPTIONS.find(o => o.value === access)?.label || '-- Pilih akses --';
 
   return (
     <div className="login-container">
@@ -113,7 +106,6 @@ export default function LoginPage() {
             Kelola data akademik dengan mudah, cepat, dan transparan dalam satu platform
             terintegrasi.
           </p>
-
         </div>
         <div className="blob-1"></div>
         <div className="blob-2"></div>
@@ -138,17 +130,16 @@ export default function LoginPage() {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 borderRadius: '0.5rem',
-                border: isDropdownOpen ? '1px solid #059669' : '1px solid #e2e8f0',
-                backgroundColor: isDropdownOpen ? '#ffffff' : '#f8fafb',
-                color: '#0f172a',
+                border: isDropdownOpen ? '1px solid var(--primary, #0ea5e9)' : '1px solid #e5e7eb',
+                backgroundColor: isDropdownOpen ? '#ffffff' : '#f9fafb',
+                color: '#111827',
                 cursor: 'pointer',
-                boxShadow: isDropdownOpen ? '0 0 0 4px rgba(5, 150, 105, 0.12)' : 'none',
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                fontSize: '0.9rem',
-                borderRadius: '12px',
+                boxShadow: isDropdownOpen ? '0 0 0 3px rgba(14, 165, 233, 0.1)' : 'none',
+                transition: 'all 0.2s ease',
+                fontSize: '0.95rem'
               }}
             >
-              <span style={{ fontWeight: '500' }}>{roleType}</span>
+              <span style={{ fontWeight: '500', color: access ? 'inherit' : '#6b7280' }}>{selectedLabel}</span>
               <ChevronDown size={18} style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease', color: '#6b7280' }} />
             </div>
 
@@ -160,39 +151,38 @@ export default function LoginPage() {
                 right: 0,
                 marginTop: '0.5rem',
                 backgroundColor: 'white',
-                borderRadius: '12px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+                borderRadius: '0.5rem',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
                 zIndex: 50,
                 overflow: 'hidden',
                 animation: 'fadeIn 0.2s ease-out'
               }}>
-                {['Administrator', 'Pegawai', 'Murid & Calon Murid'].map((role) => (
+                {ACCESS_OPTIONS.map((item) => (
                   <div
-                    key={role}
-                    onClick={() => { setRoleType(role); setIsDropdownOpen(false); }}
+                    key={item.value}
+                    onClick={() => { setAccess(item.value); setIsDropdownOpen(false); }}
                     style={{
                       padding: '0.875rem 1rem',
                       cursor: 'pointer',
-                      backgroundColor: roleType === role ? '#ecfdf5' : 'transparent',
-                      color: roleType === role ? '#059669' : '#4b5563',
-                      fontWeight: roleType === role ? '600' : '400',
+                      backgroundColor: access === item.value ? '#f0f9ff' : 'transparent',
+                      color: access === item.value ? 'var(--primary, #0ea5e9)' : '#4b5563',
+                      fontWeight: access === item.value ? '600' : '400',
                       transition: 'all 0.15s ease',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      borderLeft: roleType === role ? '3px solid #059669' : '3px solid transparent',
-                      borderRadius: '4px',
+                      borderLeft: access === item.value ? '3px solid var(--primary, #0ea5e9)' : '3px solid transparent'
                     }}
                     onMouseEnter={(e) => {
-                      if (roleType !== role) e.currentTarget.style.backgroundColor = '#f3f4f6';
+                      if (access !== item.value) e.currentTarget.style.backgroundColor = '#f3f4f6';
                     }}
                     onMouseLeave={(e) => {
-                      if (roleType !== role) e.currentTarget.style.backgroundColor = 'transparent';
+                      if (access !== item.value) e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >
-                    {role}
-                    {roleType === role && <Check size={18} />}
+                    {item.label}
+                    {access === item.value && <Check size={18} />}
                   </div>
                 ))}
               </div>

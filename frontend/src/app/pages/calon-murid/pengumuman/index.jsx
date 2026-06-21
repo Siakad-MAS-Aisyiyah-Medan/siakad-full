@@ -4,6 +4,12 @@ import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
 import { fetchPpdbInfo } from '@app/shared/services/ppdb.service';
 import './pengumuman-ppdb.css';
 
+const stripHtml = (html) => {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
+};
+
 export default function PengumumanPpdb() {
   const [pengumumanData, setPengumumanData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,8 +77,8 @@ export default function PengumumanPpdb() {
                   )}
                 </div>
                 <h3 className="pengumuman-card__title">{item.judul || 'Pengumuman Penting'}</h3>
-                <p className="pengumuman-card__excerpt">
-                  {item.konten || item.deskripsi || item.isi || 'Tidak ada konten deskripsi untuk pengumuman ini.'}
+                <p className="pengumuman-card__excerpt" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  {stripHtml(item.konten || item.deskripsi || item.isi) || 'Tidak ada konten deskripsi untuk pengumuman ini.'}
                 </p>
                 <div className="pengumuman-card__footer">
                   <button className="pengumuman-btn">

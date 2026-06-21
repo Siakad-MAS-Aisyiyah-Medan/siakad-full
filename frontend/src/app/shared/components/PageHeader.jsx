@@ -8,8 +8,8 @@ export default function PageHeader({ title, subtitle, actions, backTo, onBack, c
   const navigate = useNavigate();
 
   useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
+    const frame = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   if (!mounted) return null;

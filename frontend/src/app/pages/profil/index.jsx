@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminPageShell from '@app/shared/components/AdminPageShell';
-import { Edit3, Loader2, UserCircle2, MapPin, Phone, CalendarDays, IdCard, ShieldCheck } from 'lucide-react';
+import { Edit3, Loader2, UserCircle2, MapPin, Phone, CalendarDays, IdCard, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import { fetchMe } from '@app/shared/services/auth.service';
-import { updateBiodataProfile } from '@app/shared/services/akun.service';
-import { toastError, toastSuccess } from '@app/shared/hooks/useConfirm';
+import { deleteFotoProfil, updateBiodataProfile, uploadFotoProfil } from '@app/shared/services/akun.service';
+import { confirmAction, toastError, toastSuccess, toastValidation } from '@app/shared/hooks/useConfirm';
+import { apiConfig } from '@/config/api.config';
 import PageHeader from '@app/shared/components/PageHeader';
 import { ArrowLeft, Save, X } from 'lucide-react';
 
@@ -29,6 +30,7 @@ export default function ProfilBiodataPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [form, setForm] = useState({});
 
   useEffect(() => {
@@ -39,12 +41,12 @@ export default function ProfilBiodataPage() {
         
         // Initialize form
         setForm({
-          nama_lengkap: data?.profile?.nama_lengkap || data?.profile?.nama_kepala_sekolah || data?.profile?.nama_guru || data?.profile?.nama_siswa || '',
+          nama_lengkap: data?.profile?.nama_admin || data?.profile?.nama_kepsek || data?.profile?.nama_guru || data?.profile?.nama_siswa || '',
           nip: data?.profile?.nip || data?.profile?.nip_nuptk || data?.profile?.nisn || '',
           no_hp: data?.profile?.no_hp || data?.profile?.no_hp_wali || '',
           alamat: data?.profile?.alamat || '',
           jenis_kelamin: data?.profile?.jenis_kelamin || '',
-          tgl_lahir: data?.profile?.tgl_lahir || data?.profile?.tanggal_lahir || '',
+          tgl_lahir: String(data?.profile?.tgl_lahir || data?.profile?.tanggal_lahir || '').slice(0, 10),
         });
       })
       .catch(() => toastError('Gagal', 'Gagal memuat data profil'))
@@ -62,9 +64,9 @@ export default function ProfilBiodataPage() {
     try {
       let payload = {};
       if (role === 'kepsek') {
-        payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin };
+        payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin, tgl_lahir: form.tgl_lahir || null };
       } else if (role === 'guru') {
-        payload = { nama_guru: form.nama_lengkap, nip_nuptk: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin };
+        payload = { nama_guru: form.nama_lengkap, nip_nuptk: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin, tgl_lahir: form.tgl_lahir || null };
       } else if (role === 'admin') {
         payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp };
       } else if (role === 'siswa') {
@@ -73,12 +75,53 @@ export default function ProfilBiodataPage() {
 
       const res = await updateBiodataProfile(payload);
       toastSuccess('Berhasil', 'Profil berhasil diperbarui');
-      setProfile(res.data);
+      setProfile(prev => ({ ...prev, ...res }));
       setIsEditing(false);
-    } catch (err) {
-      toastError('Gagal', 'Gagal menyimpan profil');
+    } catch (error) {
+      toastError('Gagal', error.response?.data?.message || 'Gagal menyimpan profil');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+      await toastValidation('Berkas Tidak Valid', 'Gunakan gambar JPG atau PNG dengan ukuran maksimal 2 MB.');
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const result = await uploadFotoProfil(file);
+      setProfile((current) => ({ ...current, foto: result.foto_url }));
+      await toastSuccess('Berhasil', 'Foto profil berhasil diperbarui');
+    } catch (error) {
+      await toastError('Gagal', error.response?.data?.message || 'Gagal mengunggah foto profil');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handlePhotoDelete = async () => {
+    const confirmed = await confirmAction({
+      title: 'Hapus Foto Profil?',
+      text: 'Foto profil akan dihapus dari akun Anda.',
+      confirmText: 'Hapus',
+    });
+    if (!confirmed) return;
+
+    setUploadingPhoto(true);
+    try {
+      await deleteFotoProfil();
+      setProfile((current) => ({ ...current, foto: null }));
+      await toastSuccess('Berhasil', 'Foto profil berhasil dihapus');
+    } catch (error) {
+      await toastError('Gagal', error.response?.data?.message || 'Gagal menghapus foto profil');
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -108,7 +151,7 @@ export default function ProfilBiodataPage() {
     }
 
     return {
-      nama: profile.nama_lengkap || profile.nama_kepala_sekolah || 'Kepala Sekolah',
+      nama: profile.nama_kepsek || profile.nama_admin || (role === 'kepsek' ? 'Kepala Sekolah' : 'Administrator'),
       nomor: profile.nip || profile.nip_nuptk,
       nomorLabel: 'NIP',
       alamat: profile.alamat,
@@ -121,6 +164,9 @@ export default function ProfilBiodataPage() {
   const initials = display.nama
     ? display.nama.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
     : 'U';
+  const photoUrl = profile.foto
+    ? `${apiConfig.baseURL.replace(/\/api\/?$/, '')}${profile.foto}`
+    : null;
 
   return (
     <AdminPageShell>
@@ -130,12 +176,12 @@ export default function ProfilBiodataPage() {
         backTo=""
         actions={
           isEditing ? (
-            <button type="button" onClick={() => setIsEditing(false)} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '50px', background: '#fff' }}>
+            <button type="button" onClick={() => setIsEditing(false)} className="btn-outline">
               <ArrowLeft size={18} />
               <span style={{ fontWeight: 600 }}>Batal Edit</span>
             </button>
           ) : (
-            <button type="button" onClick={() => setIsEditing(true)} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '50px' }}>
+            <button type="button" onClick={() => setIsEditing(true)} className="btn-outline">
               <Edit3 size={18} />
               <span style={{ fontWeight: 600 }}>Edit Profil</span>
             </button>
@@ -164,15 +210,28 @@ export default function ProfilBiodataPage() {
                     width: '100%', height: '100%', borderRadius: '50%',
                     background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
                     color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em'
+                    fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em', overflow: 'hidden'
                   }}>
-                    {initials}
+                    {photoUrl ? (
+                      <img src={photoUrl} alt={`Foto profil ${display.nama}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : initials}
                   </div>
                 </div>
                 <div>
                   <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>{display.nama}</h1>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '0.35rem 0.85rem', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 600, marginTop: '0.6rem', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     <ShieldCheck size={15} /> {display.kelas}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.8rem' }}>
+                    <label className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: uploadingPhoto ? 'wait' : 'pointer', background: '#fff' }}>
+                      <Upload size={16} /> {uploadingPhoto ? 'Memproses...' : 'Ganti Foto'}
+                      <input type="file" accept="image/png,image/jpeg" onChange={handlePhotoUpload} disabled={uploadingPhoto} hidden />
+                    </label>
+                    {photoUrl && (
+                      <button type="button" className="btn-outline" onClick={handlePhotoDelete} disabled={uploadingPhoto} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#dc2626', background: '#fff' }}>
+                        <Trash2 size={16} /> Hapus
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -204,7 +263,7 @@ export default function ProfilBiodataPage() {
                         </select>
                       </div>
                     )}
-                    {(role === 'siswa' || role === 'guru') && (
+                    {(role === 'siswa' || role === 'guru' || role === 'kepsek') && (
                       <div>
                         <label className="form-label">Tanggal Lahir</label>
                         <input type="date" name="tgl_lahir" value={form.tgl_lahir} onChange={handleChange} className="form-control" />

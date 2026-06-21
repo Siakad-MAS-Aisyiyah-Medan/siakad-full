@@ -1,7 +1,7 @@
 import apiClient from './apiClient';
 
 export async function getProfilSekolah() {
-  const response = await apiClient.get('/profil-sekolah');
+  const response = await apiClient.get('/public/profil-sekolah');
   return response.data;
 }
 
@@ -11,11 +11,10 @@ export async function updateProfilSekolah(data) {
   
   for (const key in data) {
     if (data[key] !== null && data[key] !== undefined) {
-      if (key === 'foto_kepsek' && data[key] instanceof File) {
-        formData.append(key, data[key]);
-      } else if (key !== 'foto_kepsek') {
-        formData.append(key, data[key]);
+      if ((key === 'foto_kepsek' || key === 'hero_image') && !(data[key] instanceof File)) {
+        continue;
       }
+      formData.append(key, data[key]);
     }
   }
 

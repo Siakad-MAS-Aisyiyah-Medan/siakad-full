@@ -55,7 +55,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.7rem 1.35rem;
-  border-radius: 999px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 0.9375rem;
   line-height: 1;
@@ -183,7 +183,7 @@
 .ppdb-page .pp-navbar__menu a,
 .ppdb-page .pp-navbar__menu .pp-navbar__menu-route {
   padding: 0.5rem 0.75rem;
-  border-radius: 999px;
+  border-radius: 8px;
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--pp-text-muted);

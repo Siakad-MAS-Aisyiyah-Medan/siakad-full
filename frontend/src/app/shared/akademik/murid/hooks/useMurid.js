@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { fetchMuridList, fetchMuridStats, enrollMurid, deleteMurid } from '../services/murid.service';
+import {
+  createMurid,
+  deleteMurid,
+  enrollMurid,
+  fetchMuridList,
+  fetchMuridStats,
+  updateMurid,
+} from '../services/murid.service';
 import { fetchKelasList } from '@app/shared/akademik/kelas/services/kelas.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 import Swal from 'sweetalert2';
@@ -194,17 +201,20 @@ export function useMurid() {
     setLoading(true);
     try {
       if (view === 'add') {
-        const generatedUsername = formData.username || formData.nisn || formData.no_hp;
+        const fallbackId = 'siswa_' + Date.now().toString().slice(-6);
+        const generatedUsername = formData.username || formData.nisn || formData.no_hp || fallbackId;
+        const defaultPassword = 'admin123';
+        
         const payload = {
           ...formData,
           username: generatedUsername,
-          email: formData.email || (generatedUsername ? `${generatedUsername}@mas.sch.id` : ''),
-          password: formData.password || String(formData.nisn || formData.no_hp || '123456'),
+          email: formData.email || `${generatedUsername}@mas.sch.id`,
+          password: formData.password || defaultPassword,
         };
-        await import('../services/murid.service').then(m => m.createMurid(payload));
+        await createMurid(payload);
         toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
-        await import('../services/murid.service').then(m => m.updateMurid(editId, formData));
+        await updateMurid(editId, formData);
         toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       loadMurid();

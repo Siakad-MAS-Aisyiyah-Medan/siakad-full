@@ -7,12 +7,18 @@ const MISI_ITEMS = [
   'Menjalin kemitraan dengan orang tua dan masyarakat.',
 ];
 
-export default function VisionMissionSection() {
+export default function VisionMissionSection({ profil }) {
+  const visiText = profil?.visi || 'Menjadi lembaga pendidikan Islam yang unggul.\nBerkarakter mulia dan kompetitif.\nSiap menghadapi tantangan masa depan.';
+  const visiItems = visiText.split('\n').filter(Boolean);
+
+  const misiItems = profil?.misi 
+    ? profil.misi.split('\n').filter(Boolean) 
+    : MISI_ITEMS;
+
   return (
     <section className="lp-section">
       <div className="lp-container">
         <div className="lp-section-header">
-          <span className="lp-eyebrow">Arah & Tujuan</span>
           <h2 className="lp-section-title">Visi & Misi</h2>
         </div>
 
@@ -23,18 +29,12 @@ export default function VisionMissionSection() {
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: '#064e3b' }}>Visi</h3>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#5f736c', lineHeight: 1.6 }}>
-                <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0, marginTop: '0.2rem' }} />
-                Menjadi lembaga pendidikan Islam yang unggul.
-              </li>
-              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#5f736c', lineHeight: 1.6 }}>
-                <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0, marginTop: '0.2rem' }} />
-                Berkarakter mulia dan kompetitif.
-              </li>
-              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#5f736c', lineHeight: 1.6 }}>
-                <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0, marginTop: '0.2rem' }} />
-                Siap menghadapi tantangan masa depan.
-              </li>
+              {visiItems.map((item, index) => (
+                <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#5f736c', lineHeight: 1.6 }}>
+                  <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0, marginTop: '0.2rem' }} />
+                  {item}
+                </li>
+              ))}
             </ul>
           </article>
 
@@ -44,8 +44,8 @@ export default function VisionMissionSection() {
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: '#064e3b' }}>Misi</h3>
             <ul className="lp-misi-list">
-              {MISI_ITEMS.map((item) => (
-                <li key={item}>
+              {misiItems.map((item, index) => (
+                <li key={index}>
                   <CheckCircle2 size={16} />
                   {item}
                 </li>

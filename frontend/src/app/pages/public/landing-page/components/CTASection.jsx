@@ -6,7 +6,6 @@ export default function CTASection({ onPendaftaranClick }) {
       <div className="lp-container lp-reveal">
         <div className="lp-cta-card">
           <div className="lp-cta-card__content">
-            <span className="lp-eyebrow lp-eyebrow--light">Penerimaan Siswa Baru</span>
             <h2>Bergabunglah Bersama MAS Aisyiyah Medan</h2>
             <p>
               Daftarkan putra-putri Anda sekarang dan wujudkan masa depan cerah dengan pendidikan

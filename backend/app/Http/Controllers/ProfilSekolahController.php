@@ -20,14 +20,14 @@ class ProfilSekolahController extends Controller
         if (!$profil) {
             // Jika belum ada, buat record kosong dengan default
             $profil = ProfilSekolah::create([
-                'nama_sekolah' => 'Sistem Informasi Akademik',
-                'hero_subtitle' => 'Sistem Informasi Akademik Terpadu',
-                'tentang_kami' => 'Sistem informasi akademik berbasis web.',
-                'alamat' => '-',
-                'kata_sambutan' => 'Selamat datang di Sistem Informasi Akademik.',
-                'nama_kepsek' => '-',
-                'visi' => '-',
-                'misi' => '-'
+                'nama_sekolah' => 'MAS Aisyiyah Medan',
+                'hero_subtitle' => 'Pendidikan Berkualitas Berlandaskan Nilai Islami',
+                'tentang_kami' => 'MAS Aisyiyah Medan adalah sekolah berprestasi yang berfokus pada pendidikan akhlak dan ilmu pengetahuan.',
+                'alamat' => 'Jl. Demak No. 3, Medan',
+                'kata_sambutan' => 'Selamat datang di MAS Aisyiyah Medan.',
+                'nama_kepsek' => 'Kepala Sekolah MAS Aisyiyah',
+                'visi' => 'Menjadi institusi pendidikan Islam terkemuka',
+                'misi' => 'Menyelenggarakan pendidikan yang memadukan IPTEK dan IMTAQ'
             ]);
         }
 
@@ -50,9 +50,13 @@ class ProfilSekolahController extends Controller
             'kata_sambutan' => 'nullable|string',
             'nama_kepsek' => 'nullable|string|max:255',
             'no_hp' => 'nullable|string|max:25',
+            'email' => 'nullable|email|max:255',
             'foto_kepsek' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'visi' => 'nullable|string',
             'misi' => 'nullable|string',
+            'instagram' => 'nullable|string',
+            'facebook' => 'nullable|string',
+            'youtube' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {

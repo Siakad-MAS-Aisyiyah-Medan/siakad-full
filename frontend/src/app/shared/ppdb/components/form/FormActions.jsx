@@ -34,20 +34,7 @@ export default function FormActions({
 
       {/* Right side */}
       <div className="wizard-form-actions__right">
-        {showSaveDraft && onSaveDraft && !isReview && (
-          <button
-            type="button"
-            onClick={onSaveDraft}
-            disabled={disabled || draftLoading}
-            className="wizard-action-btn wizard-action-btn--draft"
-          >
-            {draftLoading
-              ? <Loader2 size={15} className="animate-spin" />
-              : <Save size={15} />
-            }
-            Simpan Draft
-          </button>
-        )}
+
 
         <button
           type="button"

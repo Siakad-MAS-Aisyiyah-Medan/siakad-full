@@ -102,14 +102,15 @@ export function useGuru() {
     try {
       if (view === 'add') {
         const payload = new FormData();
-        const generatedUsername = formData.username || formData.nip_nuptk || formData.no_hp;
+        const fallbackId = 'guru_' + Date.now().toString().slice(-6);
+        const generatedUsername = formData.username || formData.nip_nuptk || formData.no_hp || fallbackId;
         const generatedEmail = formData.email || `${generatedUsername}@mas.sch.id`;
-        const generatedPassword = formData.password || String(formData.nip_nuptk || formData.no_hp || 'password123');
+        const defaultPassword = `admin123`;
         const normalized = {
           ...formData,
           username: generatedUsername,
           email: generatedEmail,
-          password: generatedPassword.length >= 8 ? generatedPassword : `${generatedPassword}12345678`.slice(0, 8),
+          password: formData.password || defaultPassword,
         };
         Object.keys(normalized).forEach(key => {
           if (normalized[key] !== null && normalized[key] !== '') {

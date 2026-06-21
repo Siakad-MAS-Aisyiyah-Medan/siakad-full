@@ -101,6 +101,7 @@ class PendaftaranController extends Controller
             'hobi' => '',
             'cita_cita' => '',
             'ppdb_status' => 'draft',
+            'status_pendaftaran' => 'draft',
             'status_kelulusan' => 'Pending',
         ]);
 
@@ -136,6 +137,7 @@ class PendaftaranController extends Controller
             'alamat' => 'sometimes|string',
             'no_telp' => 'sometimes|string|max:20',
             'status_yatim' => 'sometimes|in:Yatim,Piatu,Yatim Piatu,Tidak',
+            'current_step' => 'sometimes|string|max:50',
         ]);
 
         return $this->savePendaftaranStep(Auth::user(), $validated, 'Keterangan pribadi disimpan');
@@ -157,6 +159,7 @@ class PendaftaranController extends Controller
             'gol_darah' => 'sometimes|string|max:5',
             'penyakit_diderita' => 'nullable|string|max:255',
             'cacat_badan' => 'nullable|string|max:255',
+            'current_step' => 'sometimes|string|max:50',
         ]);
 
         return $this->savePendaftaranStep(Auth::user(), $validated, 'Data kesehatan disimpan');
@@ -173,6 +176,7 @@ class PendaftaranController extends Controller
             'no_sttb' => 'sometimes|string|max:100',
             'pindahan_dari' => 'nullable|string|max:255',
             'no_surat_pindah' => 'nullable|string|max:100',
+            'current_step' => 'sometimes|string|max:50',
         ]);
 
         return $this->savePendaftaranStep(Auth::user(), $validated, 'Data pendidikan asal disimpan');
@@ -193,11 +197,14 @@ class PendaftaranController extends Controller
             'agama_ortu' => 'sometimes|string|max:50',
             'alamat_ortu' => 'sometimes|string',
             'no_hp_ortu' => 'sometimes|string|max:20',
+            'no_hp_ayah' => 'nullable|string|max:20',
+            'no_hp_ibu' => 'nullable|string|max:20',
             'nama_wali' => 'nullable|string|max:255',
             'pendidikan_wali' => 'nullable|string|max:100',
             'pekerjaan_wali' => 'nullable|string|max:100',
             'agama_wali' => 'nullable|string|max:50',
             'alamat_wali' => 'nullable|string',
+            'current_step' => 'sometimes|string|max:50',
         ]);
 
         return $this->savePendaftaranStep(Auth::user(), $validated, 'Data orang tua/wali disimpan');
@@ -211,6 +218,7 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'hobi' => 'sometimes|string|max:255',
             'cita_cita' => 'sometimes|string|max:255',
+            'current_step' => 'sometimes|string|max:50',
         ]);
 
         return $this->savePendaftaranStep(Auth::user(), $validated, 'Data kepribadian disimpan');
@@ -265,6 +273,7 @@ class PendaftaranController extends Controller
         }
 
         $pendaftaran->ppdb_status = 'diajukan';
+        $pendaftaran->status_pendaftaran = 'submitted';
         $pendaftaran->status_kelulusan = 'Pending';
         $pendaftaran->submitted_at = now();
         if (!$pendaftaran->no_registrasi) {
@@ -628,18 +637,27 @@ class PendaftaranController extends Controller
 
     private function getPublicInfo(): array
     {
+        $getJson = function ($key, $default) {
+            $val = \App\Models\SystemSetting::getValue($key);
+            if (!$val) return $default;
+            $decoded = json_decode($val, true);
+            return (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : $default;
+        };
+
+        $profil = \App\Models\ProfilSekolah::first();
+
         return [
-            'nama_sekolah' => 'MAS Aisyiyah Medan',
-            'judul' => 'Penerimaan Peserta Didik Baru',
-            'tahun_ajaran' => '2026/2027',
-            'deskripsi' => 'MAS Aisyiyah Medan membuka pendaftaran peserta didik baru Tahun Pelajaran 2026/2027. Buat akun calon murid, lengkapi formulir dan berkas, lalu pantau status pendaftaran secara online.',
-            'hero_highlights' => [
+            'nama_sekolah' => $profil?->nama_sekolah ?: 'MAS Aisyiyah Medan',
+            'judul' => \App\Models\SystemSetting::getValue('ppdb_judul') ?: 'Penerimaan Peserta Didik Baru',
+            'tahun_ajaran' => \App\Models\SystemSetting::getValue('ppdb_tahun_ajaran') ?: '2026/2027',
+            'deskripsi' => \App\Models\SystemSetting::getValue('ppdb_deskripsi') ?: 'MAS Aisyiyah Medan membuka pendaftaran peserta didik baru Tahun Pelajaran 2026/2027. Buat akun calon murid, lengkapi formulir dan berkas, lalu pantau status pendaftaran secara online.',
+            'hero_highlights' => $getJson('ppdb_hero_highlights', [
                 ['teks' => 'Gratis uang pembangunan', 'ikon' => 'gift'],
                 ['teks' => 'Gratis pendaftaran 20 pendaftar pertama', 'ikon' => 'award'],
                 ['teks' => 'Diskon alumni Muhammadiyah/Aisyiyah', 'ikon' => 'percent'],
                 ['teks' => 'Gratis SPP bagi anak yatim (syarat berlaku)', 'ikon' => 'heart'],
-            ],
-            'gelombang' => [
+            ]),
+            'gelombang' => $getJson('ppdb_gelombang', [
                 [
                     'id' => 'gelombang-1',
                     'judul' => 'Gelombang 1',
@@ -660,8 +678,8 @@ class PendaftaranController extends Controller
                         'Gratis uang ekskul 3 bulan untuk juara 1, 2, 3',
                     ],
                 ],
-            ],
-            'promo' => [
+            ]),
+            'promo' => $getJson('ppdb_promo', [
                 [
                     'judul' => 'Gratis Biaya Pendaftaran',
                     'deskripsi' => 'Untuk 20 pendaftar pertama pada periode yang ditentukan.',
@@ -692,8 +710,8 @@ class PendaftaranController extends Controller
                     'deskripsi' => 'Kurikulum nasional dengan penguatan IPTEK dan literasi digital.',
                     'ikon' => 'monitor',
                 ],
-            ],
-            'persyaratan' => [
+            ]),
+            'persyaratan' => $getJson('ppdb_persyaratan', [
                 'Mengisi formulir pendaftaran online',
                 'Fotokopi akta kelahiran',
                 'Fotokopi kartu keluarga',
@@ -702,23 +720,23 @@ class PendaftaranController extends Controller
                 'Fotokopi ijazah/SKL legalisir',
                 'Fotokopi KIP (jika ada)',
                 'NISN',
-            ],
-            'fasilitas' => [
+            ]),
+            'fasilitas' => $getJson('ppdb_fasilitas', [
                 ['nama' => 'Ruang Kelas Luas', 'ikon' => 'building'],
                 ['nama' => 'Ruang Perpustakaan', 'ikon' => 'library'],
                 ['nama' => 'Mushola', 'ikon' => 'church'],
                 ['nama' => 'Lapangan Olahraga', 'ikon' => 'volleyball'],
                 ['nama' => 'Ruang Komputer', 'ikon' => 'monitor'],
                 ['nama' => 'Ruang Keterampilan', 'ikon' => 'utensils'],
-            ],
-            'ekstrakurikuler' => [
+            ]),
+            'ekstrakurikuler' => $getJson('ppdb_ekstrakurikuler', [
                 ['nama' => 'Pramuka', 'ikon' => 'shield'],
                 ['nama' => 'Futsal', 'ikon' => 'dumbbell'],
                 ['nama' => 'Tapak Suci', 'ikon' => 'users'],
                 ['nama' => 'Tahfidz', 'ikon' => 'book'],
                 ['nama' => 'Tata Boga', 'ikon' => 'utensils'],
-            ],
-            'alur' => [
+            ]),
+            'alur' => $getJson('ppdb_alur', [
                 'Lihat informasi PPDB',
                 'Buat akun calon murid',
                 'Login calon murid',
@@ -727,8 +745,8 @@ class PendaftaranController extends Controller
                 'Submit pendaftaran',
                 'Verifikasi admin',
                 'Pengumuman hasil',
-            ],
-            'kontak' => [
+            ]),
+            'kontak' => $getJson('ppdb_kontak', [
                 [
                     'nama' => 'Muharleny Br Damanik, S.Ag',
                     'telepon' => ['+62 813 9686 5480'],
@@ -741,8 +759,9 @@ class PendaftaranController extends Controller
                     'nama' => 'Anggi Mira, S.Pd',
                     'telepon' => ['+62 813 9686 5480', '+62 813 7444 5100'],
                 ],
-            ],
-            'alamat' => 'Jl. Demak No. 3, Medan',
+            ]),
+            'alamat' => $profil?->alamat ?: 'Jl. Demak No. 3, Medan',
+            'brosur' => \App\Models\SystemSetting::getValue('ppdb_brosur'),
             'diperbarui_pada' => now()->toIso8601String(),
         ];
     }
@@ -813,7 +832,7 @@ class PendaftaranController extends Controller
     {
         $total = Pendaftaran::count();
         $verified = Pendaftaran::where('ppdb_status', 'terverifikasi')->count();
-        $accepted = Pendaftaran::whereIn('ppdb_status', ['diterima', 'accepted'])->count();
+        $accepted = Pendaftaran::whereIn('ppdb_status', ['diterima', 'accepted', 'menjadi_murid'])->count();
         $rejected = Pendaftaran::whereIn('ppdb_status', ['ditolak', 'rejected'])->count();
         $waiting = Pendaftaran::whereIn('ppdb_status', ['draft', 'submitted', 'diajukan', 'terverifikasi', 'verified'])->count();
         
@@ -842,7 +861,7 @@ class PendaftaranController extends Controller
         if ($status === 'submitted') {
             $query->whereIn('ppdb_status', ['submitted', 'diajukan', 'terverifikasi', 'verified']);
         } elseif ($status === 'diterima') {
-            $query->whereIn('ppdb_status', ['diterima', 'accepted']);
+            $query->whereIn('ppdb_status', ['diterima', 'accepted', 'menjadi_murid']);
         } elseif ($status === 'ditolak') {
             $query->whereIn('ppdb_status', ['ditolak', 'rejected']);
         } elseif ($status) {
@@ -906,11 +925,16 @@ class PendaftaranController extends Controller
 
     private function adminTerima(int $id, ?string $catatan = null): Pendaftaran
     {
-        return $this->state->transitionByAdmin(
+        $pendaftaran = $this->state->transitionByAdmin(
             Pendaftaran::findOrFail($id),
             'diterima',
             $catatan
         );
+
+        // Auto enroll menjadi siswa
+        $this->enrollment->enrollCalonSiswa($pendaftaran->id_user);
+
+        return $pendaftaran->fresh(['user', 'berkas']);
     }
 
     public function adminPpdbTolak(\Illuminate\Http\Request $request, $id)

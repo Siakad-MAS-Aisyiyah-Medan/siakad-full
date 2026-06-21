@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -69,10 +69,11 @@ function StatusBadge({ status }) {
     accepted: 'Diterima', diterima: 'Diterima',
     rejected: 'Ditolak', ditolak: 'Ditolak',
     revision: 'Revisi', revisi: 'Revisi',
+    menjadi_murid: 'Siswa Aktif',
   };
   
-  let bg = '#fef3c7', color = '#d97706', icon = null; // warning (amber)
-  if (['accepted', 'diterima', 'verified', 'terverifikasi'].includes(normalized)) {
+  let bg = '#fef3c7', color = '#d97706'; // warning (amber)
+  if (['accepted', 'diterima', 'verified', 'terverifikasi', 'menjadi_murid'].includes(normalized)) {
     bg = '#d1fae5'; color = '#059669'; // success (emerald)
   } else if (['rejected', 'ditolak'].includes(normalized)) {
     bg = '#fee2e2'; color = '#dc2626'; // danger (red)
@@ -117,24 +118,6 @@ export default function AdminDetailPendaftar({ readOnly = false }) {
 
   const status = data?.status || data?.ppdb_status;
   const isPending = ['submitted', 'diajukan', 'verified', 'terverifikasi'].includes(String(status || '').toLowerCase());
-  const parentRows = useMemo(
-    () => ({
-      father: [
-        ['Nama Ayah', data?.nama_ayah],
-        ['Pekerjaan', data?.pekerjaan_ayah],
-        ['No. HP', data?.no_hp_ayah || data?.telepon_ayah || data?.hp_ayah],
-        ['Pendidikan Terakhir', data?.pendidikan_ayah],
-      ],
-      mother: [
-        ['Nama Ibu', data?.nama_ibu],
-        ['Pekerjaan', data?.pekerjaan_ibu],
-        ['No. HP', data?.no_hp_ibu || data?.telepon_ibu || data?.hp_ibu],
-        ['Pendidikan Terakhir', data?.pendidikan_ibu],
-      ],
-    }),
-    [data],
-  );
-
   const fullAddress = [data?.alamat, data?.kelurahan, data?.kecamatan, data?.kota]
     .filter(Boolean)
     .join(', ');
@@ -282,38 +265,95 @@ export default function AdminDetailPendaftar({ readOnly = false }) {
               </div>
             </SectionCard>
 
-            {isPending && !readOnly && (
+            {(!readOnly && (isPending || ['diterima', 'accepted'].includes(String(status || '').toLowerCase()))) && (
               <div className="form-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(255,255,255,0.8)' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}>Aksi Pendaftaran</h3>
-                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0, marginBottom: '0.5rem' }}>Tentukan apakah calon siswa ini diterima atau ditolak berdasarkan data di atas.</p>
+                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0, marginBottom: '0.5rem' }}>
+                  {['submitted', 'diajukan'].includes(String(status || '').toLowerCase()) 
+                    ? 'Verifikasi keabsahan data pendaftar atau minta revisi jika ada yang salah.'
+                    : ['diterima', 'accepted'].includes(String(status || '').toLowerCase())
+                    ? 'Calon siswa ini sudah diterima. Klik tombol di bawah untuk menjadikannya Murid Aktif.'
+                    : 'Tentukan apakah calon siswa ini diterima atau ditolak berdasarkan data di atas.'}
+                </p>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => handleAction(ppdb.tolak)}
-                    style={{
-                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                      height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
-                      background: '#fff', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', transition: 'all 0.2s'
-                    }}
-                    onMouseOver={(e) => { e.currentTarget.style.background = '#fef2f2'; }}
-                    onMouseOut={(e) => { e.currentTarget.style.background = '#fff'; }}
-                  >
-                    <XCircle size={18} /> Tolak Pendaftaran
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAction(ppdb.terima)}
-                    style={{
-                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                      height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
-                      background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
-                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
-                    }}
-                    onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.35)'; }}
-                    onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.25)'; }}
-                  >
-                    <CheckCircle2 size={18} /> Terima Pendaftaran
-                  </button>
+                  {['diterima', 'accepted'].includes(String(status || '').toLowerCase()) ? (
+                    <button
+                      type="button"
+                      onClick={() => handleAction(ppdb.jadikanMurid)}
+                      style={{
+                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                        height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                        background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.35)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.25)'; }}
+                    >
+                      <UserCircle2 size={18} /> Jadikan Murid Aktif
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleAction(ppdb.tolak)}
+                        style={{
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                          height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                          background: '#fff', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = '#fef2f2'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = '#fff'; }}
+                      >
+                        <XCircle size={18} /> Tolak
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAction(ppdb.revisi)}
+                        style={{
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                          height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                          background: '#fff', color: '#d97706', border: '1px solid #fde68a', cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = '#fffbeb'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = '#fff'; }}
+                      >
+                        <FileText size={18} /> Minta Revisi
+                      </button>
+
+                      {['submitted', 'diajukan'].includes(String(status || '').toLowerCase()) ? (
+                        <button
+                          type="button"
+                          onClick={() => handleAction(ppdb.verifikasi)}
+                          style={{
+                            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                            height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                            background: '#3b82f6', color: '#fff', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
+                          }}
+                          onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.35)'; }}
+                          onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.25)'; }}
+                        >
+                          <CheckCircle2 size={18} /> Verifikasi Data
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleAction(ppdb.terima)}
+                          style={{
+                            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                            height: '46px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                            background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
+                          }}
+                          onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.35)'; }}
+                          onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.25)'; }}
+                        >
+                          <CheckCircle2 size={18} /> Terima Pendaftar
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             )}

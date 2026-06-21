@@ -11,7 +11,9 @@ import {
   UserCircle2,
   BookOpen,
   Target,
-  Edit
+  Edit,
+  Share2,
+  Mail
 } from 'lucide-react';
 import { getProfilSekolah, updateProfilSekolah } from '@app/shared/services/profilSekolah.service';
 import { toastError, toastSuccess, toastValidation } from '@app/shared/hooks/useConfirm';
@@ -63,8 +65,12 @@ export default function InfoProfilPage({ readOnly = false }) {
     nama_kepsek: '',
     foto_kepsek: null,
     no_hp: '',
+    email: '',
     visi: '',
     misi: '',
+    instagram: '',
+    facebook: '',
+    youtube: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -337,15 +343,39 @@ export default function InfoProfilPage({ readOnly = false }) {
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <MapPin size={18} /> Informasi Kontak Sekolah
               </h3>
-              <div style={{ display: 'flex', gap: '2rem' }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem' }}>
+                <div>
                   <FormLabel required>Alamat Lengkap</FormLabel>
                   <textarea name="alamat" value={formData.alamat || ''} onChange={handleChange} className="form-control" rows={3} placeholder="Masukkan alamat lengkap sekolah..." required />
                 </div>
-                <div style={{ width: '1px', background: '#e2e8f0' }} />
-                <div style={{ flex: 1 }}>
+                <div>
                   <FormLabel required>Nomor Telepon / HP</FormLabel>
                   <input name="no_hp" value={formData.no_hp || ''} onChange={handleChange} className="form-control" placeholder="Contoh: 081234567890" required />
+                </div>
+                <div>
+                  <FormLabel required>Email Sekolah</FormLabel>
+                  <input name="email" type="email" value={formData.email || ''} onChange={handleChange} className="form-control" placeholder="Contoh: info@sekolah.sch.id" required />
+                </div>
+              </div>
+            </div>
+
+            {/* Edit Box 6: Social Media */}
+            <div className="form-panel" style={{ padding: '2rem' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Share2 size={18} /> Media Sosial
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem' }}>
+                <div>
+                  <FormLabel>Instagram</FormLabel>
+                  <input name="instagram" value={formData.instagram || ''} onChange={handleChange} className="form-control" placeholder="https://instagram.com/..." />
+                </div>
+                <div>
+                  <FormLabel>Facebook</FormLabel>
+                  <input name="facebook" value={formData.facebook || ''} onChange={handleChange} className="form-control" placeholder="https://facebook.com/..." />
+                </div>
+                <div>
+                  <FormLabel>YouTube</FormLabel>
+                  <input name="youtube" value={formData.youtube || ''} onChange={handleChange} className="form-control" placeholder="https://youtube.com/..." />
                 </div>
               </div>
             </div>
@@ -441,8 +471,8 @@ export default function InfoProfilPage({ readOnly = false }) {
             {/* Box 5: Kontak */}
             <div className="form-panel" style={{ padding: '2rem' }}>
               <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Informasi Kontak Sekolah</h3>
-              <div style={{ display: 'flex', gap: '3rem' }}>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
                   <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <MapPin size={20} />
                   </div>
@@ -451,14 +481,60 @@ export default function InfoProfilPage({ readOnly = false }) {
                     <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', lineHeight: 1.6, margin: 0 }}>{formData.alamat || 'Belum diatur'}</p>
                   </div>
                 </div>
-                <div style={{ width: '1px', background: '#e2e8f0' }} />
-                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
                   <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Phone size={20} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>No HP Sekolah</h4>
                     <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>{formData.no_hp || 'Belum diatur'}</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Mail size={20} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Email Sekolah</h4>
+                    <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>{formData.email || 'Belum diatur'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Box 6: Social Media */}
+            <div className="form-panel" style={{ padding: '2rem' }}>
+              <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Media Sosial</h3>
+              <div style={{ display: 'flex', gap: '3rem' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Share2 size={20} />
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <div>
+                      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Instagram</h4>
+                      {formData.instagram ? (
+                        <a href={formData.instagram} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none' }}>{formData.instagram}</a>
+                      ) : (
+                        <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
+                      )}
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Facebook</h4>
+                      {formData.facebook ? (
+                        <a href={formData.facebook} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none' }}>{formData.facebook}</a>
+                      ) : (
+                        <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
+                      )}
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>YouTube</h4>
+                      {formData.youtube ? (
+                        <a href={formData.youtube} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none' }}>{formData.youtube}</a>
+                      ) : (
+                        <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,7 @@
 import { PPDB_DEFAULTS } from '../data/ppdbDefaults';
 import { resolveIcon } from './iconMap';
+import { resolveStorageUrl } from '@app/shared/services/apiHelpers';
+import { apiConfig } from '@/config/api.config';
 
 function pickString(...values) {
   for (const v of values) {
@@ -105,12 +107,16 @@ function mapContacts(apiList, defaults) {
 export function mergePpdbContent(apiData) {
   const d = PPDB_DEFAULTS;
   const api = apiData && typeof apiData === 'object' ? apiData : {};
+  
+  const rawBrosur = pickString(api.brosur, api.ppdb_brosur, d.brosur);
+  const brosurUrl = rawBrosur ? resolveStorageUrl(rawBrosur, apiConfig) : '';
 
   return {
     schoolName: pickString(api.nama_sekolah, api.school_name, d.schoolName),
     title: pickString(api.judul, api.title, d.title),
     academicYear: pickString(api.tahun_ajaran, api.academic_year, d.academicYear),
     description: pickString(api.deskripsi, api.description, d.description),
+    brosur: brosurUrl,
     heroHighlights: mapHighlights(api.hero_highlights ?? api.heroHighlights, d.heroHighlights),
     waves: mapWaves(api.gelombang ?? api.waves, d.waves),
     promo: mapPromo(api.promo, d.promo),
@@ -123,6 +129,7 @@ export function mergePpdbContent(apiData) {
     flow: mapFlow(api.alur ?? api.flow, d.flow),
     contacts: mapContacts(api.kontak ?? api.contacts, d.contacts),
     address: pickString(api.alamat, api.address, d.address),
+    email: pickString(api.email, d.email),
     updatedAt: api.diperbarui_pada ?? api.updated_at ?? null,
     fromApi: Boolean(apiData),
   };

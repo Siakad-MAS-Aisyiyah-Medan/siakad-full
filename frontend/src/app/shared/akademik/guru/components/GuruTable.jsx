@@ -2,6 +2,8 @@ import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 import PageHeader from '@app/shared/components/PageHeader';
 
+import { exportToCsv } from '@app/shared/utils/exportCsv';
+
 export default function GuruTable({
   filteredData,
   searchQuery,
@@ -12,8 +14,20 @@ export default function GuruTable({
   isFetching = false,
   readOnly = false,
 }) {
+  const handleDownload = () => {
+    const dataToExport = filteredData.map(item => ({
+      'Nama Guru': item.nama_guru || '-',
+      'NIP/NUPTK': item.nip_nuptk || '-',
+      'Jenis Kelamin': item.jenis_kelamin === 'L' ? 'Laki-Laki' : item.jenis_kelamin === 'P' ? 'Perempuan' : '-',
+      'No. Handphone': item.no_hp || '-',
+      'Alamat': item.alamat || '-',
+      'Jabatan': item.role_label || 'Guru',
+    }));
+    exportToCsv('Data_Guru.csv', dataToExport);
+  };
+
   return (
-    <div className="admin-page-wrapper animate-fade-in">
+    <div className="animate-fade-in" style={{ margin: '-1.5rem', background: 'var(--color-white)', minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
       <PageHeader title="Data Guru" subtitle="Kelola data guru MAS Aisyiyah Medan">
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={16} style={{ position: 'absolute', left: '1rem', color: '#94a3b8', pointerEvents: 'none', transition: 'color 0.2s ease' }} className="search-icon" />
@@ -43,22 +57,30 @@ export default function GuruTable({
             }}
           />
         </div>
-        {readOnly ? (
-          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Download size={16} />
-            Unduh Data
-          </button>
-        ) : (
-          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plus size={16} />
-            Tambah Guru
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {readOnly ? (
+            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
+                <Download size={16} />
+                Unduh Data
+              </button>
+              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={16} />
+                Tambah Guru
+              </button>
+            </>
+          )}
+        </div>
       </PageHeader>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
+      <div style={{ flex: 1, overflowX: 'auto' }}>
+        <table className="data-table" style={{ width: '100%' }}>
           <thead>
             <tr>
               <th>No</th>
@@ -87,12 +109,12 @@ export default function GuruTable({
                 const isAktif = profile.status !== 'nonaktif';
                 return (
                   <tr key={user.id_user}>
-                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
-                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{profile.nama_guru || '-'}</td>
-                    <td>{profile.nip_nuptk || '-'}</td>
-                    <td>{profile.jenis_kelamin === 'L' ? 'Laki-laki' : profile.jenis_kelamin === 'P' ? 'Perempuan' : '-'}</td>
-                    <td>{profile.no_hp || '-'}</td>
-                    <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.alamat || '-'}</td>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)', whiteSpace: 'nowrap', minWidth: '180px' }}>{profile.nama_guru || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{profile.nip_nuptk || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{profile.jenis_kelamin === 'L' ? 'Laki-laki' : profile.jenis_kelamin === 'P' ? 'Perempuan' : '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{profile.no_hp || '-'}</td>
+                    <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.alamat || '-'}</td>
                     <td>
                       <span style={{
                         display: 'inline-block',
@@ -108,7 +130,7 @@ export default function GuruTable({
                       </span>
                     </td>
                     {!readOnly ? (
-                      <td>
+                      <td style={{ paddingRight: '2rem' }}>
                         <div className="actions-cell">
                           <button type="button" onClick={() => onEdit && onEdit(user)} className="btn-icon edit" title="Edit">
                             <Pencil size={15} />
@@ -138,7 +160,7 @@ export default function GuruTable({
       </div>
 
       {/* Footer info */}
-      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+      <div style={{ padding: '1rem 2rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border)', background: '#f8fafc' }}>
         Menampilkan {filteredData.length} data guru
       </div>
     </div>

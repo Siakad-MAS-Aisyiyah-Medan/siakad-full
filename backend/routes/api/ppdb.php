@@ -46,6 +46,11 @@ Route::middleware([
     Route::get('/bukti', [PendaftaranController::class, 'calonPpdbBukti']);
 });
 
+Route::middleware(['auth:sanctum', 'permission:manage_ppdb'])->prefix('admin/ppdb')->group(function () {
+    Route::get('/settings', [\App\Http\Controllers\PpdbSettingController::class, 'getSettings']);
+    Route::post('/settings', [\App\Http\Controllers\PpdbSettingController::class, 'updateSettings']);
+});
+
 Route::middleware(['auth:sanctum', 'permission:manage_ppdb,view_data_ppdb'])->prefix('admin/ppdb')->group(function () {
     Route::get('/stats', [PendaftaranController::class, 'adminPpdbStats']);
     Route::get('/', [PendaftaranController::class, 'adminPpdbIndex']);

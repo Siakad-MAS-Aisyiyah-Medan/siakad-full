@@ -17,12 +17,12 @@ class PpdbBerkasService
 {
     /** @var array<string, string> key => label */
     public const JENIS = [
-        'ijazah_atau_skl' => 'Ijazah / SKHUN',
-        'stk' => 'STK',
+        'ijazah_atau_skl' => 'Ijazah / STTB SMP',
+        'stk' => 'Rapor Semester 1-5',
         'pas_foto' => 'Pas Foto',
-        'nisn' => 'NISN',
-        'kartu_keluarga' => 'Kartu Keluarga (KK)',
-        'ktp_orang_tua' => 'KTP Orang Tua',
+        'nisn' => 'Akta Kelahiran',
+        'kartu_keluarga' => 'Kartu Keluarga',
+        'ktp_orang_tua' => 'Surat Keterangan Lulus',
     ];
 
     /** Alias jenis lama → baru (kompatibilitas data) */
@@ -185,9 +185,7 @@ class PpdbBerkasService
 
     protected function canEditPendaftaran(Pendaftaran $pendaftaran): bool
     {
-        $status = $pendaftaran->status_pendaftaran ?? $pendaftaran->ppdb_status ?? 'draft';
-
-        return in_array($status, ['draft', 'revision', 'revisi', 'submitted', 'diajukan'], true);
+        return $pendaftaran->isEditable();
     }
 
     protected function assertAllowedFile(UploadedFile $file, string $jenis): void

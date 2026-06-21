@@ -1,31 +1,13 @@
-import { createElement } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, CheckCircle2, ChevronRight, ClipboardList, Clock3, GraduationCap, Megaphone, Users, XCircle } from 'lucide-react';
 import { getJsonItem } from '@app/shared/utils/storage';
 import { getDisplayName } from '@app/shared/utils/profile';
 import MainLayout from '@app/shared/layouts/MainLayout';
+import { fetchAdminDashboardStats } from '@app/shared/services/dashboard.service';
+import { fetchAdminPpdbStats } from '@app/shared/services/ppdb.service';
+import { fetchPengumumanList } from '@app/shared/pengumuman/services/pengumuman.service';
 
-const topCards = [
-  { label: 'Total Murid', value: '125', icon: GraduationCap, gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.3)' },
-  { label: 'Total Guru', value: '18', icon: Users, gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', shadow: 'rgba(59, 130, 246, 0.3)' },
-  { label: 'Mata Pelajaran', value: '12', icon: ClipboardList, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'rgba(245, 158, 11, 0.3)' },
-  { label: 'Total Kelas', value: '24', icon: BookOpen, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', shadow: 'rgba(139, 92, 246, 0.3)' },
-];
-
-const ppdbRows = [
-  { label: 'Total Pendaftar', value: '125', icon: Users, color: '#3b82f6', bg: '#eff6ff' },
-  { label: 'Diterima', value: '80', icon: CheckCircle2, color: '#059669', bg: '#ecfdf5' },
-  { label: 'Ditolak', value: '25', icon: XCircle, color: '#ef4444', bg: '#fef2f2' },
-  { label: 'Menunggu', value: '20', icon: Clock3, color: '#f59e0b', bg: '#fffbeb' },
-];
-
-const announcements = [
-  { title: 'PPDB Tahun Ajaran 2026/2027 Telah Dibuka', date: '01/06/2026' },
-  { title: 'Libur Hari Raya Idul Adha 1447 H', date: '25/05/2026' },
-  { title: 'Rapat Guru dan Staf', date: '20/05/2026' },
-  { title: 'Pengumpulan Raport Semester Genap', date: '15/05/2026' },
-  { title: 'Ujian Akhir Semester Genap', date: '10/05/2026' },
-];
 
 function StatCard({ value, label, icon, gradient, shadow, delay }) {
   return (
@@ -48,6 +30,48 @@ export default function KepsekDashboard() {
   const user = getJsonItem('user');
   const profile = getJsonItem('profile');
   const name = getDisplayName(profile, user?.role ?? 'kepsek', user?.username);
+
+  const [stats, setStats] = useState({
+    total_murid: 0,
+    total_guru: 0,
+    total_mapel: 0,
+    total_kelas: 0,
+  });
+  const [ppdbStats, setPpdbStats] = useState({
+    total: 0,
+    diterima: 0,
+    ditolak: 0,
+    menunggu: 0,
+  });
+  const [newsList, setNewsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetchAdminDashboardStats().catch(() => ({ stats: {} })),
+      fetchAdminPpdbStats().catch(() => ({})),
+      fetchPengumumanList({ per_page: 5 }).catch(() => ([]))
+    ]).then(([dashboardRes, ppdbRes, newsRes]) => {
+      if (dashboardRes?.stats) setStats(dashboardRes.stats);
+      if (ppdbRes) setPpdbStats(ppdbRes);
+      if (newsRes && Array.isArray(newsRes)) setNewsList(newsRes);
+      setLoading(false);
+    });
+  }, []);
+
+  const topCards = [
+    { label: 'Total Murid', value: stats.total_murid || 0, icon: GraduationCap, gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.3)' },
+    { label: 'Total Guru', value: stats.total_guru || 0, icon: Users, gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', shadow: 'rgba(59, 130, 246, 0.3)' },
+    { label: 'Mata Pelajaran', value: stats.total_mapel || 0, icon: ClipboardList, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'rgba(245, 158, 11, 0.3)' },
+    { label: 'Total Kelas', value: stats.total_kelas || 0, icon: BookOpen, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', shadow: 'rgba(139, 92, 246, 0.3)' },
+  ];
+
+  const ppdbRows = [
+    { label: 'Total Pendaftar', value: ppdbStats.total || 0, icon: Users, color: '#3b82f6', bg: '#eff6ff' },
+    { label: 'Diterima', value: ppdbStats.diterima || 0, icon: CheckCircle2, color: '#059669', bg: '#ecfdf5' },
+    { label: 'Ditolak', value: ppdbStats.ditolak || 0, icon: XCircle, color: '#ef4444', bg: '#fef2f2' },
+    { label: 'Menunggu', value: ppdbStats.menunggu || 0, icon: Clock3, color: '#f59e0b', bg: '#fffbeb' },
+  ];
 
   return (
     <MainLayout role="kepsek" name={name}>
@@ -104,17 +128,25 @@ export default function KepsekDashboard() {
               <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#064e3b' }}>Pengumuman Terbaru</h2>
             </div>
             <div style={{ padding: '0.25rem 0.5rem' }}>
-              {announcements.map((item) => (
-                <div key={`${item.title}-${item.date}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '0.75rem 1rem', borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s', borderRadius: '8px' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.85rem', color: '#334155' }}>
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
-                    <span>{item.title}</span>
+              {loading ? (
+                <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>Memuat...</div>
+              ) : newsList.length > 0 ? (
+                newsList.map((item) => (
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '0.75rem 1rem', borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s', borderRadius: '8px' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.85rem', color: '#334155' }}>
+                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+                      <span>{item.judul}</span>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                      {new Date(item.tanggal_publikasi || item.created_at).toLocaleDateString('id-ID')}
+                    </span>
                   </div>
-                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>{item.date}</span>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>Belum ada pengumuman.</div>
+              )}
             </div>
             <Link to="/kepala-sekolah/pengumuman" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.5rem', borderTop: '1px solid #f1f5f9', fontSize: '0.85rem', fontWeight: 600, color: '#059669', textDecoration: 'none', transition: 'background 0.15s' }}
               onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}

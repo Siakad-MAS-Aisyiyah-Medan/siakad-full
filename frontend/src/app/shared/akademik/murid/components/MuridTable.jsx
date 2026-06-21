@@ -2,6 +2,8 @@ import { Download, Pencil, Plus, Search, ShieldCheck, Trash2 } from 'lucide-reac
 
 import PageHeader from '@app/shared/components/PageHeader';
 
+import { exportToCsv } from '@app/shared/utils/exportCsv';
+
 export default function MuridTable({
   data,
   searchQuery,
@@ -13,8 +15,22 @@ export default function MuridTable({
   readOnly = false,
   onAdd,
 }) {
+  const handleDownload = () => {
+    const dataToExport = data.map(item => ({
+      'Nama Murid': item.nama_siswa || '-',
+      'NISN': item.nisn || '-',
+      'Jenis Kelamin': item.jenis_kelamin === 'L' ? 'Laki-Laki' : item.jenis_kelamin === 'P' ? 'Perempuan' : '-',
+      'Tahun Masuk': item.tahun_masuk || '-',
+      'Tahun Keluar': item.tahun_keluar || '-',
+      'Status': item.status || '-',
+      'No. HP Wali': item.no_hp_wali || '-',
+      'Alamat': item.alamat || '-',
+    }));
+    exportToCsv('Data_Murid.csv', dataToExport);
+  };
+
   return (
-    <div className="admin-page-wrapper animate-fade-in">
+    <div className="animate-fade-in" style={{ margin: '-1.5rem', background: 'var(--color-white)', minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
       <PageHeader title="Data Murid" subtitle="Kelola data siswa MAS Aisyiyah Medan">
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
@@ -26,36 +42,45 @@ export default function MuridTable({
             style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
           />
         </div>
-        {readOnly ? (
-          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Download size={16} />
-            Unduh Data
-          </button>
-        ) : (
-          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plus size={16} />
-            Tambah Murid
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {readOnly ? (
+            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
+                <Download size={16} />
+                Unduh Data
+              </button>
+              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={16} />
+                Tambah Murid
+              </button>
+            </>
+          )}
+        </div>
       </PageHeader>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
+      <div style={{ flex: 1, overflowX: 'auto' }}>
+        <table className="data-table" style={{ width: '100%' }}>
           <thead>
             <tr>
-              <th>No</th>
+              <th style={{ paddingLeft: '2rem' }}>No</th>
+              <th>Nama Murid</th>
               <th>No HP</th>
               <th>Tahun Masuk</th>
               <th>Tahun Lulus</th>
               <th>Status</th>
-              {!readOnly ? <th style={{ textAlign: 'right' }}>Aksi</th> : null}
+              {!readOnly ? <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Aksi</th> : null}
             </tr>
           </thead>
           <tbody>
             {isFetching ? (
               <tr>
-                <td colSpan={readOnly ? 5 : 6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan={readOnly ? 6 : 7} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
                     <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
                     Memuat data murid...
@@ -65,13 +90,15 @@ export default function MuridTable({
             ) : data.length > 0 ? (
               data.map((murid, idx) => {
                 const isAktif = murid.status_aktif !== false;
+                const nama = murid.siswa?.nama_siswa || murid.pendaftaran?.nama_lengkap || '-';
                 return (
                   <tr key={murid.id_user}>
-                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
-                    <td>{murid.siswa?.no_hp || murid.pendaftaran?.no_hp || '-'}</td>
-                    <td>{murid.siswa?.tahun_masuk || murid.pendaftaran?.tahun_masuk || '-'}</td>
-                    <td>{murid.siswa?.tahun_lulus || '-'}</td>
-                    <td>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)', whiteSpace: 'nowrap', minWidth: '180px' }}>{nama}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.no_hp || murid.pendaftaran?.no_hp || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.tahun_masuk || murid.pendaftaran?.tahun_masuk || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.tahun_lulus || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>
                       <span style={{
                         display: 'inline-block',
                         padding: '0.25rem 0.75rem',
@@ -86,7 +113,7 @@ export default function MuridTable({
                       </span>
                     </td>
                     {!readOnly ? (
-                      <td>
+                      <td style={{ paddingRight: '2rem' }}>
                         <div className="actions-cell">
                           <button type="button" onClick={() => onEdit && onEdit(murid)} className="btn-icon edit" title="Edit">
                             <Pencil size={15} />
@@ -107,7 +134,7 @@ export default function MuridTable({
               })
             ) : (
               <tr>
-                <td colSpan={readOnly ? 5 : 6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan={readOnly ? 6 : 7} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ fontSize: '2rem' }}>🎓</div>
                     <p style={{ fontWeight: 600 }}>Data murid tidak ditemukan</p>
@@ -120,7 +147,7 @@ export default function MuridTable({
         </table>
       </div>
 
-      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+      <div style={{ padding: '1rem 2rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border)', background: '#f8fafc' }}>
         Menampilkan {data.length} data murid
       </div>
     </div>

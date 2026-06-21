@@ -8,6 +8,7 @@ import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.servi
 import { getDisplayName } from '@app/shared/utils/profile';
 import { fetchNilaiForm, saveNilaiBulk } from '@app/shared/nilai/guru/services/nilai.service';
 import { toastError, toastSuccess } from '@app/shared/hooks/useConfirm';
+import PageHeader from '@app/shared/components/PageHeader';
 
 import { buildDefaultNilaiContexts } from '../guruTeachingUtils';
 
@@ -18,7 +19,7 @@ function readStoredContexts() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -48,21 +49,10 @@ function NilaiContextForm({
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <button type="button" onClick={onCancel} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', alignSelf: 'flex-start' }}>
-        <ArrowLeft size={16} />
-        Kembali
-      </button>
-
-      <div>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text-dark)' }}>
-          {mode === 'create' ? 'Tambah Daftar Nilai' : 'Edit Daftar Nilai'}
-        </h1>
-        <p style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-muted)' }}>
-          {mode === 'create'
-            ? 'Isi data berikut untuk menambahkan daftar nilai murid.'
-            : 'Ubah data berikut untuk memperbarui daftar nilai murid.'}
-        </p>
-      </div>
+      <PageHeader 
+        title={mode === 'create' ? 'Tambah Daftar Nilai' : 'Edit Daftar Nilai'}
+        subtitle={mode === 'create' ? 'Isi data berikut untuk menambahkan daftar nilai murid.' : 'Ubah data berikut untuk memperbarui daftar nilai murid.'}
+      />
 
       <div className="form-panel glass" style={{ padding: '1.75rem' }}>
         <div style={{ display: 'grid', gap: '1.5rem' }}>
@@ -131,19 +121,10 @@ function NilaiContextForm({
 function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange, onSave }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <button type="button" onClick={onBack} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', alignSelf: 'flex-start' }}>
-        <ArrowLeft size={16} />
-        Kembali
-      </button>
-
-      <div>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text-dark)' }}>
-          Isi Daftar Nilai
-        </h1>
-        <p style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-muted)' }}>
-          Masukkan nilai untuk setiap murid pada mata pelajaran yang dipilih.
-        </p>
-      </div>
+      <PageHeader 
+        title="Isi Daftar Nilai"
+        subtitle="Masukkan nilai untuk setiap murid pada mata pelajaran yang dipilih."
+      />
 
       <div className="glass" style={{ borderRadius: '16px', padding: '1.25rem 1.5rem', border: '1px solid var(--color-border)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '1rem' }}>
@@ -486,18 +467,15 @@ export default function GuruNilaiPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in">
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
         {view === 'list' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div>
-              <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-text-dark)', marginBottom: '1rem' }}>
-                Daftar Nilai Murid
-              </h1>
+            <PageHeader title="Daftar Nilai Murid" subtitle="Kelola data nilai murid.">
               <button type="button" onClick={openCreate} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: '#111827', borderColor: '#111827' }}>
                 <Plus size={18} />
                 Tambah Daftar Nilai
               </button>
-            </div>
+            </PageHeader>
 
             <div className="table-container">
               <table className="data-table">

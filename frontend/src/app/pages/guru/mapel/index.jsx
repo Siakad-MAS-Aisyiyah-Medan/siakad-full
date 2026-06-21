@@ -4,6 +4,7 @@ import MainLayout from '@app/shared/layouts/MainLayout';
 import apiClient from '@app/shared/services/apiClient';
 import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
+import PageHeader from '@app/shared/components/PageHeader';
 
 import { dedupeMapelDiampu } from '../guruTeachingUtils';
 
@@ -45,16 +46,8 @@ export default function GuruMapelPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div>
-            <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-text-dark)', marginBottom: '0.35rem' }}>
-              Mata Pelajaran yang Diampu
-            </h1>
-            <p style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-muted)' }}>
-              Berikut adalah daftar mata pelajaran yang Anda ampu.
-            </p>
-          </div>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+        <PageHeader title="Mata Pelajaran yang Diampu" subtitle="Berikut adalah daftar mata pelajaran yang Anda ampu." />
 
           <div className="table-container">
             <table className="data-table">
@@ -96,7 +89,6 @@ export default function GuruMapelPage() {
           <div style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>
             Menampilkan 1 - {mapelList.length} dari {mapelList.length} data
           </div>
-        </div>
       </div>
     </MainLayout>
   );

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLandingNav } from '@app/pages/public/landing-page/hooks/useLandingNav';
 import { useReveal } from '@app/pages/public/landing-page/hooks/useReveal';
@@ -7,6 +8,7 @@ import AboutSection from '@app/pages/public/landing-page/components/AboutSection
 import VisionMissionSection from '@app/pages/public/landing-page/components/VisionMissionSection';
 import NewsPreview from '@app/pages/public/landing-page/components/NewsPreview';
 import LandingFooter from '@app/pages/public/landing-page/components/LandingFooter';
+import { getProfilSekolah } from '@app/shared/services/profilSekolah.service';
 import '@app/pages/public/landing-page/landing.css';
 
 const LandingPage = () => {
@@ -21,6 +23,22 @@ const LandingPage = () => {
 
   useReveal();
 
+  const [profil, setProfil] = useState(null);
+
+  useEffect(() => {
+    const fetchProfil = async () => {
+      try {
+        const response = await getProfilSekolah();
+        if (response?.data) {
+          setProfil(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profil sekolah:', error);
+      }
+    };
+    fetchProfil();
+  }, []);
+
   const handlePendaftaranClick = () => {
     navigate('/ppdb/informasi');
   };
@@ -28,6 +46,7 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
       <LandingNavbar
+        profil={profil}
         activeSection={activeSection}
         menuOpen={menuOpen}
         scrolled={scrolled}
@@ -38,15 +57,16 @@ const LandingPage = () => {
 
       <main>
         <HeroSection
+          profil={profil}
           onPendaftaranClick={handlePendaftaranClick}
           onLearnMore={() => scrollToSection('profil')}
         />
-        <AboutSection />
-        <VisionMissionSection />
+        <AboutSection profil={profil} />
+        <VisionMissionSection profil={profil} />
         <NewsPreview />
       </main>
 
-      <LandingFooter onScrollToSection={scrollToSection} />
+      <LandingFooter profil={profil} onScrollToSection={scrollToSection} />
     </div>
   );
 };

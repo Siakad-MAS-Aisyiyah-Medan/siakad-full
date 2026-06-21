@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, NavLink, useLocation } from 'react-router-dom';
-import { Bell, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { renderMenuIcon } from '@app/shared/constants/icons';
 import AppLogo from '@app/shared/components/AppLogo';
 import { ROLE_LABELS } from '@/config/roles.config';
@@ -90,9 +90,6 @@ export default function MainLayout({ children, role, name }) {
             <div id="global-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}></div>
             {isDashboard && (
               <>
-                <button type="button" className="content-header__bell" aria-label="Notifikasi">
-                  <Bell size={22} />
-                </button>
                 <MotionUserInfo name={name} roleLabel={roleLabel} role={role} onLogout={handleLogout} />
               </>
             )}

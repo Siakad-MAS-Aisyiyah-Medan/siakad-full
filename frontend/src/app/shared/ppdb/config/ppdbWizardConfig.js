@@ -21,14 +21,12 @@ export function computeWizardPercent(activeStepIndex, completedSteps = [], total
   const formSteps = totalSteps - 1;
   if (formSteps <= 0) return 0;
   const doneCount = completedSteps.filter((i) => i < formSteps).length;
-  const base = Math.max(doneCount, activeStepIndex);
+  const base = doneCount;
   return Math.min(100, Math.round((base / formSteps) * 100));
 }
 
-/** Indeks langkah terakhir yang boleh diklik (resume + 1 langkah ke depan) */
 export function computeMaxReachableStep(completedSteps, serverStepIndex = 0) {
-  const fromCompleted = completedSteps.length ? Math.max(...completedSteps) + 1 : 0;
-  return Math.min(PPDB_STEPS.length - 1, Math.max(fromCompleted, serverStepIndex));
+  return Math.min(PPDB_STEPS.length - 1, serverStepIndex);
 }
 
 export function buildInitialCompletedSteps(serverStepIndex) {
@@ -43,7 +41,8 @@ export function buildInitialCompletedSteps(serverStepIndex) {
 const WIZARD_STEP_INDEX = Object.fromEntries(PPDB_STEPS.map((s, i) => [s.key, i]));
 
 export function stepIndexFromCurrentStep(currentStep) {
-  if (!currentStep || currentStep === 'submitted') return PPDB_STEPS.length;
+  if (currentStep === 'submitted') return PPDB_STEPS.length;
+  if (!currentStep) return 0;
 
   const asNum = parseInt(String(currentStep), 10);
   if (!Number.isNaN(asNum) && asNum >= 1) {

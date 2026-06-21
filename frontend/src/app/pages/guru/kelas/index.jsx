@@ -7,6 +7,7 @@ import apiClient from '@app/shared/services/apiClient';
 import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
 import { fetchKelasList } from '@app/shared/akademik/kelas/services/kelas.service';
+import PageHeader from '@app/shared/components/PageHeader';
 
 import { dedupeKelasDiajar, normalizeText } from '../guruTeachingUtils';
 
@@ -96,35 +97,19 @@ export default function GuruKelasPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div>
-            <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-text-dark)', marginBottom: '0.35rem' }}>
-              Data Kelas yang Diajar
-            </h1>
-          </div>
-
-          <div style={{ position: 'relative', maxWidth: '100%' }}>
-            <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+        <PageHeader title="Data Kelas yang Diajar" subtitle="Berikut adalah daftar kelas yang Anda ajar.">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Cari Data Kelas..."
-              style={{
-                width: '100%',
-                height: '64px',
-                borderRadius: '14px',
-                border: '1px solid var(--color-border)',
-                paddingLeft: '3.25rem',
-                paddingRight: '1rem',
-                fontSize: '1rem',
-                outline: 'none',
-                background: '#fff',
-                color: 'var(--color-text-dark)',
-              }}
+              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '260px', background: '#fff', color: 'var(--color-text-dark)' }}
             />
           </div>
+        </PageHeader>
 
           <div className="table-container">
             <table className="data-table">
@@ -182,7 +167,6 @@ export default function GuruKelasPage() {
           <div style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>
             Menampilkan 1 - {displayRows.length} dari {displayRows.length} data
           </div>
-        </div>
       </div>
     </MainLayout>
   );

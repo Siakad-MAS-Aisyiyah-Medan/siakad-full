@@ -56,10 +56,12 @@ class PermissionService
 
     public function menusForUser(User $user): array
     {
-        // Bypass database menus and return empty.
-        // This forces the frontend to use its local `menu.config.js`,
-        // making it infinitely easier to add/remove menus without dealing with DB and Cache.
-        return [];
+        $prefixes = $this->menuPathPrefixesForRole($user->role);
+
+        return array_values(array_filter(
+            $this->menusFromConfig($user),
+            fn (array $item) => $this->pathMatchesPrefixes($item['path'], $prefixes)
+        ));
     }
 
     public function redirectPathForRole(string $roleKey): string

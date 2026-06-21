@@ -1,0 +1,26 @@
+.wf-registration-form { display: grid; gap: 10px; }
+.wf-form-section { padding: 22px 24px; border: 1px solid #d2d5d9; border-radius: 8px; background: #fff; }
+.wf-form-section h2 { margin: 0 0 18px; font-size: 1.15rem; font-weight: 700; }
+.wf-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 42px; }
+.wf-form-field { display: block; min-width: 0; }
+.wf-form-field > span { display: block; margin-bottom: 7px; font-size: .85rem; font-weight: 600; }
+.wf-form-field input, .wf-form-field select, .wf-form-field textarea { width: 100%; height: 42px; padding: 0 12px; border: 1px solid #cbd0d7; border-radius: 6px; background: #fff; color: #24272d; font: inherit; font-size: .88rem; outline: none; }
+.wf-form-field textarea { min-height: 62px; padding: 11px 12px; resize: vertical; }
+.wf-form-field input:focus, .wf-form-field select:focus, .wf-form-field textarea:focus { border-color: #6b7280; box-shadow: 0 0 0 3px rgba(107,114,128,.1); }
+.wf-form-span { grid-column: 1 / -1; }
+.wf-address-field textarea { min-height: 78px; }
+.wf-parent-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
+.wf-parent-grid > div { padding: 0 20px 0 8px; }
+.wf-parent-grid > div + div { padding: 0 8px 0 20px; border-left: 1px solid #d7d9dd; }
+.wf-parent-grid h3 { margin: 0 0 10px; font-size: .95rem; }
+.wf-parent-grid .wf-form-field { margin-bottom: 12px; }
+.wf-form-submit-row { padding: 16px; border: 1px solid #d2d5d9; border-radius: 8px; text-align: center; }
+.wf-form-submit-row button { width: min(360px, 100%); height: 48px; border: 0; border-radius: 6px; background: #dedede; color: #17191d; font: inherit; font-weight: 700; cursor: pointer; }
+.wf-form-submit-row button:hover:not(:disabled) { background: #d1d1d1; }
+.wf-form-submit-row button:disabled { opacity: .65; cursor: wait; }
+@media (max-width: 760px) {
+  .wf-form-grid, .wf-parent-grid { grid-template-columns: 1fr; }
+  .wf-form-span { grid-column: auto; }
+  .wf-parent-grid > div, .wf-parent-grid > div + div { padding: 0; border-left: 0; }
+  .wf-parent-grid > div + div { margin-top: 18px; padding-top: 18px; border-top: 1px solid #d7d9dd; }
+}

@@ -1,23 +1,22 @@
-import { createElement } from 'react';
+import React, { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, CalendarDays, ClipboardList, Megaphone, Users, ChevronRight } from 'lucide-react';
-import { getJsonItem } from '@app/shared/utils/storage';
+import { getStoredProfile, getStoredUser } from '@app/shared/services/auth.service';
 import { getDisplayName } from '@app/shared/utils/profile';
 import MainLayout from '@app/shared/layouts/MainLayout';
+import { fetchPengumumanList } from '@app/shared/pengumuman/services/pengumuman.service';
+import apiClient from '@app/shared/services/apiClient';
 
-const cards = [
-  { label: 'Total Mata Pelajaran', value: '12', icon: BookOpen, gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.3)' },
-  { label: 'Kelas Saat Ini', value: 'XI IPA 1', icon: Users, gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', shadow: 'rgba(59, 130, 246, 0.3)' },
-  { label: 'Tahun Ajaran Aktif', value: '2025/2026', icon: CalendarDays, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'rgba(245, 158, 11, 0.3)' },
-  { label: 'Semester Aktif', value: 'Ganjil', icon: ClipboardList, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', shadow: 'rgba(139, 92, 246, 0.3)' },
-];
-
-const announcements = [
-  { title: 'PPDB Tahun Ajaran 2026/2027 Telah Dibuka', date: '01/06/2026' },
-  { title: 'Libur Hari Raya Idul Adha 1447 H', date: '25/05/2026' },
-  { title: 'Rapat Guru dan Staf', date: '20/05/2026' },
-  { title: 'Pembagian Raport Semester Genap', date: '15/05/2026' },
-];
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return dateString;
+    return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+  } catch {
+    return dateString;
+  }
+};
 
 function StatCard({ value, label, icon, gradient, shadow, delay }) {
   return (
@@ -33,10 +32,11 @@ function StatCard({ value, label, icon, gradient, shadow, delay }) {
         overflow: 'hidden',
         animationDelay: `${delay}s`,
         opacity: 0,
+        animationFillMode: 'forwards'
       }}
     >
       <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 relative z-10">
         <div>
           <p style={{ fontSize: '1.35rem', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em' }}>{value}</p>
           <p style={{ marginTop: '0.5rem', fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.9, maxWidth: '140px' }}>{label}</p>
@@ -50,12 +50,57 @@ function StatCard({ value, label, icon, gradient, shadow, delay }) {
 }
 
 export default function SiswaDashboard() {
-  const user = getJsonItem('user');
-  const profile = getJsonItem('profile');
+  const user = getStoredUser();
+  const [profile, setProfile] = useState(getStoredProfile() || null);
   const name = getDisplayName(profile, user?.role ?? 'siswa', user?.username);
 
+  const [announcements, setAnnouncements] = useState([]);
+  const [totalMapel, setTotalMapel] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    
+    // Fetch pengumuman
+    fetchPengumumanList({ per_page: 4 })
+      .then(res => {
+        if (active && Array.isArray(res)) setAnnouncements(res);
+      })
+      .catch(console.error);
+      
+    // Fetch mata pelajaran count
+    apiClient.get('/mapel')
+      .then(response => {
+        if (active) {
+          const payload = response.data?.data;
+          const items = Array.isArray(payload?.data) ? payload.data : Array.isArray(payload) ? payload : [];
+          setTotalMapel(items.length);
+        }
+      })
+      .catch(console.error);
+
+    // Refresh profile data to get latest kelas
+    apiClient.get('/me')
+      .then((response) => {
+        if (active && response.data?.data?.profile) {
+          setProfile(response.data.data.profile);
+        }
+      })
+      .catch(console.error);
+
+    return () => { active = false; };
+  }, []);
+
+  const kelas = profile?.kelas;
+  
+  const cards = [
+    { label: 'Total Mata Pelajaran', value: totalMapel.toString(), icon: BookOpen, gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.3)' },
+    { label: 'Kelas Saat Ini', value: kelas?.nama_kelas || '-', icon: Users, gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)', shadow: 'rgba(59, 130, 246, 0.3)' },
+    { label: 'Tahun Ajaran Aktif', value: kelas?.tahun_ajaran || '-', icon: CalendarDays, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'rgba(245, 158, 11, 0.3)' },
+    { label: 'Semester Aktif', value: 'Ganjil', icon: ClipboardList, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', shadow: 'rgba(139, 92, 246, 0.3)' },
+  ];
+
   return (
-    <MainLayout role="siswa" name={name}>
+    <MainLayout role={user?.role || 'siswa'} name={name}>
       <div className="mx-auto flex max-w-[1160px] flex-col gap-6 px-5 py-6">
         <div className="animate-fade-in">
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#064e3b', letterSpacing: '-0.02em' }}>Dashboard</h1>
@@ -78,6 +123,7 @@ export default function SiswaDashboard() {
             overflow: 'hidden',
             animationDelay: '0.3s',
             opacity: 0,
+            animationFillMode: 'forwards'
           }}
         >
           <div style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
@@ -88,25 +134,31 @@ export default function SiswaDashboard() {
           </div>
 
           <div style={{ padding: '0.25rem 0.5rem' }}>
-            {announcements.map((item) => (
-              <div
-                key={`${item.title}-${item.date}`}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  gap: '1rem', padding: '0.85rem 1rem',
-                  borderBottom: '1px solid #f1f5f9',
-                  transition: 'background 0.15s', borderRadius: '8px', cursor: 'default',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', color: '#334155' }}>
-                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
-                  <span>{item.title}</span>
+            {announcements.length > 0 ? (
+              announcements.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    gap: '1rem', padding: '0.85rem 1rem',
+                    borderBottom: '1px solid #f1f5f9',
+                    transition: 'background 0.15s', borderRadius: '8px', cursor: 'default',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', color: '#334155' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+                    <span style={{ display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.judul}</span>
+                  </div>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>{formatDate(item.tanggal_publikasi)}</span>
                 </div>
-                <span style={{ fontSize: '0.78rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>{item.date}</span>
+              ))
+            ) : (
+              <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+                Belum ada pengumuman terbaru
               </div>
-            ))}
+            )}
           </div>
 
           <Link

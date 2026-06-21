@@ -98,7 +98,7 @@ export default function AdminTranskripAkademikPage() {
                   className="form-control no-print"
                 >
                   {tahunAjaranList.map(ta => (
-                    <option key={ta.id_tahun_ajaran} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
+                    <option key={ta.tahun_ajaran} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
                   ))}
                   {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
                 </select>

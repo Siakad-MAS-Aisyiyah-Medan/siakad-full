@@ -1,118 +1,108 @@
-import { useState, useEffect } from 'react';
-import { ClipboardList, CheckCircle2, Clock, AlertCircle, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, Clock3, Info, Loader2, TriangleAlert, XCircle } from 'lucide-react';
 import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
-import PageHeader from '@app/shared/components/PageHeader';
-import { fetchPpdbStatus, PPDB_STATUS_LABELS } from '@app/shared/services/ppdb.service';
+import { fetchMyRegistration, fetchPpdbStatus } from '@app/shared/services/ppdb.service';
 import { getJsonItem } from '@app/shared/utils/storage';
+import { normalizePpdbStatus } from '@app/shared/ppdb/utils/dashboardState';
+import { calculateFormulirProgress } from '@app/shared/ppdb/utils/ppdbWizardValidation';
 import './status-pendaftaran.css';
 
+const STATUS_COPY = {
+  none: ['Belum Mendaftar', 'Silakan lengkapi formulir dan berkas pendaftaran Anda.'],
+  draft: ['Belum Dikirim', 'Lengkapi formulir dan berkas, lalu kirim pendaftaran Anda.'],
+  revision: ['Perlu Perbaikan', 'Periksa catatan sekolah dan perbaiki data pendaftaran Anda.'],
+  submitted: ['Menunggu Verifikasi', 'Pendaftaran Anda sedang dalam proses verifikasi oleh pihak sekolah.'],
+  verified: ['Sudah Diverifikasi', 'Data Anda telah diverifikasi dan sedang menunggu keputusan sekolah.'],
+  accepted: ['Pendaftaran Diterima', 'Selamat, pendaftaran Anda telah diterima oleh pihak sekolah.'],
+  rejected: ['Pendaftaran Ditolak', 'Pendaftaran belum dapat diterima. Silakan lihat keterangan dari sekolah.'],
+};
+
 export default function StatusPendaftaran() {
-  const [statusData, setStatusData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const user = getJsonItem('user');
+  const [data, setData] = useState(null);
+  const [registration, setRegistration] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
+    Promise.all([fetchPpdbStatus(), fetchMyRegistration()])
+      .then(([status, current]) => { setData(status); setRegistration(current?.pendaftaran || null); })
+      .catch((error) => console.error('Gagal memuat status PPDB', error))
+      .finally(() => setLoading(false));
   }, []);
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchPpdbStatus();
-      setStatusData(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) {
+    return (
+      <CalonMuridLayout title="Status Pendaftaran" subtitle="Pantau proses dan status pendaftaran Anda.">
+        <div className="flex flex-col items-center justify-center p-12 text-slate-400">
+          <Loader2 size={40} className="sp-spin mb-4" />
+          <p>Memuat status...</p>
+        </div>
+      </CalonMuridLayout>
+    );
+  }
 
-  const status = statusData?.status || 'belum';
-  const label = PPDB_STATUS_LABELS[status] || status;
+  const status = normalizePpdbStatus(data ? { ppdb_status: data.status } : null);
+  const [title, description] = STATUS_COPY[status] || STATUS_COPY.none;
+  const StatusIcon = status === 'accepted' || status === 'verified' ? Check : status === 'rejected' ? XCircle : status === 'revision' ? TriangleAlert : Clock3;
+  const formPercent = calculateFormulirProgress(registration);
+  const files = Array.isArray(registration?.berkas) ? registration.berkas : [];
+  const filePercent = Math.min(100, Math.round(files.filter((item) => item.url).length / 6 * 100));
+  const sentDate = data?.submitted_at ? new Date(data.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
 
   return (
-    <CalonMuridLayout>
-      <PageHeader 
-        title="Status Pendaftaran"
-        subtitle="Pantau perkembangan dan hasil verifikasi pendaftaran Anda di sini."
-      >
-        <button onClick={loadData} disabled={loading} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 1rem' }} aria-label="Refresh status">
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
-        </button>
-      </PageHeader>
-
-      <div className="status-content animate-stagger-2">
-        {/* Kartu Status Utama */}
-        <div className="status-card-main">
-          <div className="status-card-main__badge-wrap">
-            <span className={`status-badge-lg status-badge-lg--${status}`}>
-              {status === 'accepted' ? <CheckCircle2 size={24} /> : 
-               status === 'rejected' ? <AlertCircle size={24} /> : <Clock size={24} />}
-              {label}
-            </span>
+    <CalonMuridLayout title="Status Pendaftaran" subtitle="Pantau proses dan status pendaftaran Anda.">
+      <div className={`sp-status-page sp-status-page--${status}`}>
+        <section className="sp-status-hero">
+          <p>Status Pendaftaran Anda</p>
+          <div className="sp-status-hero__title">
+            <StatusIcon size={64} strokeWidth={1.8} />
+            <h2>{title}</h2>
           </div>
-          
-          <div className="status-card-main__info">
-            <h2>{user?.name || user?.username || 'Calon Siswa'}</h2>
-            <p><strong>No. Pendaftaran:</strong> {statusData?.no_pendaftaran || '-'}</p>
-            <p><strong>Tanggal Submit:</strong> {statusData?.submitted_at ? new Date(statusData.submitted_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</p>
+          <span>{description}</span>
+        </section>
+
+        <section className="sp-panel sp-status-info">
+          <h2>Informasi Pendaftaran</h2>
+          <dl>
+            <div><dt>Nama Lengkap</dt><dd>{registration?.nama_lengkap || user?.name || '-'}</dd></div>
+            <div><dt>Tanggal Pengiriman</dt><dd>{sentDate}</dd></div>
+            <div><dt>Sekolah Tujuan</dt><dd>MAS Aisyiyah Medan</dd></div>
+          </dl>
+        </section>
+
+        <section className="sp-panel sp-status-progress">
+          <h2>Progres Pendaftaran</h2>
+          <div className="sp-progress-grid">
+            <Progress label="Formulir Pendaftaran" percent={formPercent} />
+            <Progress label="Berkas Pendaftaran" percent={filePercent} />
           </div>
+        </section>
 
-          {statusData?.catatan_admin && (
-            <div className="status-alert status-alert--warning mt-4">
-              <strong>Catatan dari Admin:</strong>
-              <p>{statusData.catatan_admin}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Timeline */}
-        <div className="status-timeline-card">
-          <h3 className="status-timeline-card__title">Perjalanan Pendaftaran</h3>
-          <ul className="status-timeline">
-            <li className="status-timeline__item status-timeline__item--done">
-              <div className="status-timeline__dot"><CheckCircle2 size={16} /></div>
-              <div className="status-timeline__content">
-                <strong>Pembuatan Akun</strong>
-                <span>Akun Anda telah berhasil dibuat.</span>
-              </div>
-            </li>
-            
-            <li className={`status-timeline__item ${statusData?.submitted_at ? 'status-timeline__item--done' : 'status-timeline__item--active'}`}>
-              <div className="status-timeline__dot">
-                {statusData?.submitted_at ? <CheckCircle2 size={16} /> : <Clock size={16} />}
-              </div>
-              <div className="status-timeline__content">
-                <strong>Pengisian Formulir</strong>
-                <span>{statusData?.submitted_at ? 'Formulir telah dikirim.' : 'Harap lengkapi dan submit formulir pendaftaran.'}</span>
-              </div>
-            </li>
-
-            <li className={`status-timeline__item ${['verified', 'accepted', 'rejected'].includes(status) ? 'status-timeline__item--done' : (status === 'submitted' ? 'status-timeline__item--active' : '')}`}>
-              <div className="status-timeline__dot">
-                {['verified', 'accepted', 'rejected'].includes(status) ? <CheckCircle2 size={16} /> : <Clock size={16} />}
-              </div>
-              <div className="status-timeline__content">
-                <strong>Verifikasi Berkas</strong>
-                <span>Admin sedang memeriksa kesesuaian data dan dokumen.</span>
-              </div>
-            </li>
-
-            <li className={`status-timeline__item ${['accepted', 'rejected'].includes(status) ? 'status-timeline__item--done' : (status === 'verified' ? 'status-timeline__item--active' : '')}`}>
-              <div className="status-timeline__dot">
-                {status === 'accepted' ? <CheckCircle2 size={16} /> : status === 'rejected' ? <AlertCircle size={16} /> : <Clock size={16} />}
-              </div>
-              <div className="status-timeline__content">
-                <strong>Hasil Akhir</strong>
-                <span>
-                  {status === 'accepted' ? 'Selamat! Anda diterima.' : 
-                   status === 'rejected' ? 'Mohon maaf, pendaftaran ditolak.' : 'Menunggu pengumuman akhir.'}
-                </span>
-              </div>
-            </li>
-          </ul>
-        </div>
+        <section className="sp-panel sp-status-note">
+          <Info size={30} />
+          <div>
+            <h2>Keterangan</h2>
+            <p>{data?.catatan_admin || 'Harap menunggu informasi lebih lanjut melalui email atau pengumuman resmi sekolah.'}</p>
+          </div>
+        </section>
       </div>
     </CalonMuridLayout>
+  );
+}
+
+function Progress({ label, percent }) {
+  return (
+    <div className="sp-progress-item">
+      <div className="sp-progress-label">
+        <span className={percent === 100 ? 'is-complete' : ''}>
+          {percent === 100 ? <Check size={18} strokeWidth={2.5} /> : null}
+        </span>
+        <strong>{label}</strong>
+        <b>{percent}%</b>
+      </div>
+      <div className="sp-progress-track">
+        <i style={{ width: `${percent}%` }} />
+      </div>
+    </div>
   );
 }

@@ -2,6 +2,8 @@ import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 import PageHeader from '@app/shared/components/PageHeader';
 
+import { exportToCsv } from '@app/shared/utils/exportCsv';
+
 function statusLabel(kelas) {
   const status = String(kelas.status || '').toLowerCase();
   if (status === 'aktif') return 'Aktif';
@@ -19,8 +21,20 @@ export default function KelasTable({
   isFetching = false,
   readOnly = false,
 }) {
+  const handleDownload = () => {
+    const dataToExport = filteredData.map(item => ({
+      'Tahun Ajaran': item.tahun_ajaran?.tahun_ajaran || item.tahun_ajaran_id || '-',
+      'Nama Kelas': item.nama_kelas || '-',
+      'Tingkatan': item.tingkatan || '-',
+      'Jurusan': item.jurusan || '-',
+      'Wali Kelas': item.wali_kelas?.nama_guru || item.wali_kelas_nama || '-',
+      'Status': statusLabel(item),
+    }));
+    exportToCsv('Data_Kelas.csv', dataToExport);
+  };
+
   return (
-    <div className="admin-page-wrapper animate-fade-in">
+    <div className="animate-fade-in" style={{ margin: '-1.5rem', background: 'var(--color-white)', minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
       <PageHeader title="Data Kelas" subtitle="Kelola data kelas MAS Aisyiyah Medan">
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
@@ -32,32 +46,40 @@ export default function KelasTable({
             style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
           />
         </div>
-        {readOnly ? (
-          <button type="button" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Download size={16} />
-            Unduh Data
-          </button>
-        ) : (
-          <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plus size={16} />
-            Tambah Kelas
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {readOnly ? (
+            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Unduh Data
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
+                <Download size={16} />
+                Unduh Data
+              </button>
+              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={16} />
+                Tambah Kelas
+              </button>
+            </>
+          )}
+        </div>
       </PageHeader>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
+      <div style={{ flex: 1, overflowX: 'auto' }}>
+        <table className="data-table" style={{ width: '100%' }}>
           <thead>
             <tr>
-              <th>No</th>
+              <th style={{ paddingLeft: '2rem' }}>No</th>
               <th>Tahun Ajaran</th>
               <th>Nama Kelas</th>
               <th>Tingkatan</th>
               <th>Jurusan</th>
               <th>Wali Kelas</th>
               <th>Status</th>
-              {!readOnly ? <th style={{ textAlign: 'right' }}>Aksi</th> : null}
+              {!readOnly ? <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Aksi</th> : null}
             </tr>
           </thead>
           <tbody>
@@ -75,7 +97,7 @@ export default function KelasTable({
                 const isAktif = statusLabel(kelas) === 'Aktif';
                 return (
                   <tr key={kelas.id_kelas}>
-                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                    <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
                     <td>{kelas.tahun_ajaran || '2025/2026'}</td>
                     <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{kelas.nama_kelas}</td>
                     <td>
@@ -100,7 +122,7 @@ export default function KelasTable({
                       </span>
                     </td>
                     {!readOnly ? (
-                      <td>
+                      <td style={{ paddingRight: '2rem' }}>
                         <div className="actions-cell">
                           <button type="button" onClick={() => onEdit && onEdit(kelas)} className="btn-icon edit" title="Edit">
                             <Pencil size={15} />
@@ -129,7 +151,7 @@ export default function KelasTable({
         </table>
       </div>
 
-      <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+      <div style={{ padding: '1rem 2rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border)', background: '#f8fafc' }}>
         Menampilkan {filteredData.length} data kelas
       </div>
     </div>

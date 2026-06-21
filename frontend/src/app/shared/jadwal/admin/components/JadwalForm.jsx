@@ -20,16 +20,8 @@ export default function JadwalForm({
       <PageHeader 
         title={view === 'add' ? 'Tambah Jadwal' : 'Edit Jadwal'}
         subtitle="Lengkapi informasi jadwal pelajaran di bawah ini"
-      >
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn-outline"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '38px', background: '#fff' }}
-        >
-          <ArrowLeft size={16} /> Kembali
-        </button>
-      </PageHeader>
+        onBack={onCancel}
+      />
 
       <form onSubmit={onSubmit} className="custom-form p-6 mt-4">
         <div className="input-group full">

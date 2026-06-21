@@ -13,6 +13,7 @@ export default function AppLogo({
   size = 'md',
   alt = 'Logo Aisyiyah',
   variant = 'default',
+  srcUrl,
 }) {
   const dimension = typeof size === 'number' ? size : SIZE_MAP[size] ?? SIZE_MAP.md;
   const wrapClass =
@@ -25,7 +26,7 @@ export default function AppLogo({
   return (
     <span className={wrapClass}>
       <img
-        src={LogoAisyiyah}
+        src={srcUrl || LogoAisyiyah}
         alt={alt}
         className={`app-logo-img ${className}`.trim()}
         style={{ width: dimension, height: dimension }}

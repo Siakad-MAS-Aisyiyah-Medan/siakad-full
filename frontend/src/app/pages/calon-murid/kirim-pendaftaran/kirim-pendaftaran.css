@@ -1,0 +1,252 @@
+/* kirim-pendaftaran.css */
+.kp-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.kp-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: lc-slide-up 0.5s ease-out forwards;
+}
+
+.kp-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(15, 122, 92, 0.08);
+}
+
+.kp-card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.kp-card-icon.is-complete {
+  background: var(--color-primary-soft, #e8f6f1);
+  color: var(--color-primary, #0f7a5c);
+}
+
+.kp-card-icon.is-pending {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.kp-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.kp-card-content h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+.kp-card-content p {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.kp-progress-wrap {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.kp-progress-bar {
+  flex: 1;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.kp-progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kp-progress-fill.is-complete {
+  background: linear-gradient(90deg, var(--color-primary-light, #34d399), var(--color-primary, #0f7a5c));
+}
+
+.kp-progress-fill.is-pending {
+  background: #3b82f6;
+}
+
+.kp-progress-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  min-width: 3.5rem;
+  text-align: right;
+}
+
+.kp-progress-text.is-complete { color: var(--color-primary-dark, #0a5c46); }
+.kp-progress-text.is-pending { color: #334155; }
+
+/* Submit Box */
+.kp-submit-box {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 3rem 2rem;
+  text-align: center;
+  animation: lc-slide-up 0.6s ease-out forwards;
+}
+
+.kp-submit-box h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 1.5rem;
+}
+
+.kp-submit-btn {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 400px;
+  padding: 0 2rem;
+  height: 56px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--color-primary-light, #34d399) 0%, var(--color-primary, #0f7a5c) 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(15, 122, 92, 0.2);
+}
+
+.kp-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(15, 122, 92, 0.35);
+  filter: brightness(1.05);
+}
+
+.kp-submit-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.kp-msg-error {
+  font-size: 0.95rem;
+  color: #dc2626;
+  margin: 1.25rem 0 0;
+  font-weight: 600;
+}
+
+.kp-msg-success {
+  font-size: 0.95rem;
+  color: var(--color-primary-dark, #0a5c46);
+  margin: 1.25rem 0 0;
+  font-weight: 600;
+}
+
+/* Success State Box */
+.kp-success-box {
+  background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+  border: 1px solid #bbf7d0;
+  border-radius: 24px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(22, 101, 52, 0.1);
+  animation: lc-slide-up 0.5s ease-out forwards;
+}
+
+.kp-success-icon {
+  width: 90px;
+  height: 90px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: #166534;
+  box-shadow: 0 10px 25px rgba(22, 101, 52, 0.15);
+  animation: lc-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.kp-success-box h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #166534;
+  margin: 0 0 1rem;
+}
+
+.kp-success-box p {
+  font-size: 1.1rem;
+  color: #15803d;
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.kp-success-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 2rem;
+  height: 52px;
+  border-radius: 14px;
+  background: #166534;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(22, 101, 52, 0.2);
+}
+
+.kp-success-link:hover {
+  background: #14532d;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(22, 101, 52, 0.3);
+  color: white;
+}
+
+@keyframes lc-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 620px) {
+  .kp-card { padding: 1.5rem; flex-direction: column; text-align: center; gap: 1rem; }
+  .kp-card-icon { margin: 0 auto; }
+  .kp-progress-wrap { flex-direction: column; gap: 0.75rem; }
+  .kp-progress-text { text-align: center; }
+  .kp-submit-box { padding: 2rem 1.5rem; }
+  .kp-success-box { padding: 3rem 1.5rem; }
+  .kp-success-box h2 { font-size: 1.5rem; }
+}

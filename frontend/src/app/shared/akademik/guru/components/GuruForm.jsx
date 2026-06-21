@@ -1,33 +1,17 @@
 import { ArrowLeft, Plus, Save, X } from 'lucide-react';
 
+import PageHeader from '@app/shared/components/PageHeader';
+
 export default function GuruForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const isEdit = view === 'edit' && !readOnly;
 
   return (
     <div className="admin-page-wrapper animate-fade-in">
-      {/* Page Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <button
-          type="button"
-          onClick={onCancel}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '40px', height: '40px',
-            borderRadius: '10px', border: '1px solid var(--color-border)',
-            background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer',
-          }}
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>
-            {readOnly ? 'Detail Data Guru' : view === 'add' ? 'Tambah Data Guru' : 'Edit Data Guru'}
-          </h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0 }}>
-            {readOnly ? 'Informasi lengkap data guru' : view === 'add' ? 'Isi data untuk menambah guru baru' : 'Perbarui informasi data guru'}
-          </p>
-        </div>
-      </div>
+      <PageHeader 
+        title={readOnly ? 'Detail Data Guru' : view === 'add' ? 'Tambah Data Guru' : 'Edit Data Guru'}
+        subtitle={readOnly ? 'Informasi lengkap data guru' : view === 'add' ? 'Isi data untuk menambah guru baru' : 'Perbarui informasi data guru'}
+        onBack={onCancel}
+      />
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>
@@ -94,6 +78,21 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
                   <option value="aktif">Aktif</option>
                   <option value="nonaktif">Nonaktif</option>
                 </select>
+              </div>
+
+              <div style={{ gridColumn: '1/-1', marginTop: '0.5rem' }}>
+                <div style={{ padding: '1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#166534', fontSize: '0.875rem' }}>
+                  <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.1rem' }}>🔐</span> Informasi Akun Otomatis
+                  </strong>
+                  <p style={{ margin: '0.5rem 0 0', lineHeight: 1.5 }}>
+                    Sistem akan secara otomatis membuatkan akun login untuk guru ini menggunakan data yang Anda masukkan:
+                  </p>
+                  <ul style={{ margin: '0.25rem 0 0', paddingLeft: '1.5rem', lineHeight: 1.6 }}>
+                    <li><strong>Username:</strong> {formData.username || formData.nip_nuptk || formData.no_hp || '(Menunggu input NIP/NUPTK/No HP)'}</li>
+                    <li><strong>Password:</strong> admin123</li>
+                  </ul>
+                </div>
               </div>
             </div>
           )}

@@ -16,6 +16,7 @@ export default function PengumumanPage({ readOnly = false }) {
     loading,
     openAdd,
     openEdit,
+    openView,
     cancelForm,
     handleChange,
     submitForm,
@@ -36,11 +37,12 @@ export default function PengumumanPage({ readOnly = false }) {
           onAdd={readOnly ? undefined : openAdd}
           onEdit={readOnly ? undefined : openEdit}
           onDelete={readOnly ? undefined : removeItem}
+          onView={openView}
           isFetching={isFetching}
           readOnly={readOnly}
         />
       )}
-      {(view === 'add' || view === 'edit') && (
+      {(view === 'add' || view === 'edit' || view === 'view') && (
         <PengumumanForm
           view={view}
           formData={formData}
@@ -48,7 +50,7 @@ export default function PengumumanPage({ readOnly = false }) {
           onChange={handleChange}
           onSubmit={submitForm}
           onCancel={cancelForm}
-          readOnly={readOnly}
+          readOnly={readOnly || view === 'view'}
         />
       )}
     </AdminPageShell>

@@ -15,4 +15,5 @@ use App\Http\Controllers\PengumumanController;
 Route::prefix('public')->group(function () {
     Route::get('/pengumuman', [PengumumanController::class, 'publicIndex']);
     Route::get('/pengumuman/{id}', [PengumumanController::class, 'publicShow']);
+    Route::get('/profil-sekolah', [\App\Http\Controllers\ProfilSekolahController::class, 'show']);
 });

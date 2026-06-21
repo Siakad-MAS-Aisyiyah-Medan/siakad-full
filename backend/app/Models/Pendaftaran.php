@@ -57,6 +57,8 @@ class Pendaftaran extends Model
         'agama_ortu',
         'alamat_ortu',
         'no_hp_ortu',
+        'no_hp_ayah',
+        'no_hp_ibu',
         'nama_wali',
         'pendidikan_wali',
         'pekerjaan_wali',
@@ -128,11 +130,9 @@ class Pendaftaran extends Model
 
     public function isEditable(): bool
     {
-        $status = $this->status_pendaftaran ?? $this->ppdb_status ?? 'draft';
-        if (in_array($status, ['draft', 'revision', 'revisi'], true)) {
-            return true;
-        }
+        $canonicalEditable = in_array($this->status_pendaftaran ?? 'draft', ['draft', 'revision'], true);
+        $legacyEditable = in_array($this->ppdb_status ?? 'draft', ['draft', 'revision', 'revisi'], true);
 
-        return false;
+        return $canonicalEditable && $legacyEditable;
     }
 }

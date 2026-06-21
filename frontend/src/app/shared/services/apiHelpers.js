@@ -31,3 +31,11 @@ export function unwrapPaginated(response) {
     meta: body.meta ?? null,
   };
 }
+
+export function resolveStorageUrl(path, apiConfig) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const baseUrl = new URL(apiConfig.baseURL);
+  const origin = `${baseUrl.protocol}//${baseUrl.host}`;
+  return `${origin}${path.startsWith('/storage/') ? path : `/storage/${path}`}`;
+}

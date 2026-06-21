@@ -1,8 +1,27 @@
 import { CalendarDays, Eye, Megaphone, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 import PageHeader from '@app/shared/components/PageHeader';
+import apiClient from '@app/shared/services/apiClient';
+import { resolveStorageUrl } from '@app/shared/services/apiHelpers';
 
-function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd, onEdit, onDelete, isFetching }) {
+const stripHtml = (html) => {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return dateString;
+    return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+  } catch {
+    return dateString;
+  }
+};
+
+function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd, onEdit, onDelete, onView, isFetching }) {
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader title="Pengumuman Sekolah" subtitle="Kelola pengumuman untuk civitas MAS Aisyiyah Medan">
@@ -69,7 +88,7 @@ function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd
                   </td>
                   <td>
                     <div className="actions-cell">
-                      <button type="button" className="btn-icon" title="Lihat Isi" style={{ background: 'var(--color-primary-soft)', borderColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                      <button type="button" onClick={() => onView?.(item)} className="btn-icon" title="Lihat Isi" style={{ background: 'var(--color-primary-soft)', borderColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
                         <Eye size={15} />
                       </button>
                       <button type="button" onClick={() => onEdit?.(item)} className="btn-icon edit" title="Edit">
@@ -104,7 +123,7 @@ function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd
   );
 }
 
-function ReadOnlyPengumumanCards({ filteredData, searchQuery, onSearchChange, isFetching }) {
+function ReadOnlyPengumumanCards({ filteredData, searchQuery, onSearchChange, isFetching, onView }) {
   return (
     <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
       <PageHeader title="Pengumuman Sekolah" subtitle="Informasi terbaru dari MAS Aisyiyah Medan">
@@ -140,20 +159,20 @@ function ReadOnlyPengumumanCards({ filteredData, searchQuery, onSearchChange, is
                 {/* Thumbnail */}
                 <div style={{ height: '160px', background: 'var(--color-primary-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                   {item.thumbnail ? (
-                    <img src={item.thumbnail} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={resolveStorageUrl(item.thumbnail, apiClient.defaults)} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <Megaphone size={40} style={{ color: 'var(--color-primary)', opacity: 0.5 }} />
                   )}
                 </div>
                 {/* Body */}
                 <div style={{ padding: '1rem' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '0.5rem', lineClamp: 2 }}>{item.judul}</h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.isi}</p>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: '0 0 0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.judul}</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '0 0 0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{stripHtml(item.isi)}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
                     <CalendarDays size={13} />
-                    {item.tanggal_publikasi || '-'}
+                    {formatDate(item.tanggal_publikasi)}
                   </div>
-                  <button type="button" className="btn-outline" style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
+                  <button type="button" onClick={() => onView?.(item)} className="btn-outline" style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
                     Baca Selengkapnya →
                   </button>
                 </div>

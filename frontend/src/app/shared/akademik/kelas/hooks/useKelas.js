@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchKelasList, fetchKelasStats, createKelas, updateKelas, deleteKelas } from '../services/kelas.service';
 import { fetchGuruList } from '@app/shared/akademik/guru/services/guru.service';
+import { fetchTahunAjaran } from '@app/shared/services/tahunAjaran.service';
 import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
 const emptyForm = {
@@ -19,6 +20,7 @@ export function useKelas() {
   const [kelasData, setKelasData] = useState([]);
   const [stats, setStats] = useState(null);
   const [guruData, setGuruData] = useState([]);
+  const [tahunAjaranData, setTahunAjaranData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTingkat, setFilterTingkat] = useState('Semua');
   const [filterJurusan, setFilterJurusan] = useState('Semua');
@@ -35,14 +37,16 @@ export function useKelas() {
       if (filterTingkat !== 'Semua') params.tingkat = filterTingkat;
       if (filterJurusan !== 'Semua') params.jurusan = filterJurusan;
 
-      const [kelas, statsData, guru] = await Promise.all([
+      const [kelas, statsData, guru, tahunAjaran] = await Promise.all([
         fetchKelasList(params),
         fetchKelasStats(),
         fetchGuruList({ role: 'guru', per_page: 100 }),
+        fetchTahunAjaran()
       ]);
       setKelasData(kelas);
       setStats(statsData);
       setGuruData(guru);
+      setTahunAjaranData(tahunAjaran);
     } catch (error) {
       console.error('Error fetching kelas:', error);
     } finally {
@@ -146,6 +150,7 @@ export function useKelas() {
     filteredData,
     stats,
     guruData,
+    tahunAjaranData,
     formData,
     loading,
     isFetching,

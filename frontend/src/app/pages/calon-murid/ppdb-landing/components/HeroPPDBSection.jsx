@@ -5,7 +5,7 @@ import { usePpdbContent } from '../context/PpdbContentContext';
 
 export default function HeroPPDBSection() {
   const { content, loading } = usePpdbContent();
-  const { title, academicYear, description, heroHighlights } = content;
+  const { title, description, heroHighlights } = content;
 
   return (
     <section className="pp-hero" id="beranda">
@@ -20,7 +20,17 @@ export default function HeroPPDBSection() {
           <p className="pp-hero__subtitle">{description}</p>
           <div className="pp-hero__actions">
             <DaftarSekarangButton className="pp-btn pp-btn--primary pp-btn--lg" />
-
+            {content.brosur && (
+              <a
+                href={content.brosur}
+                target="_blank"
+                rel="noreferrer"
+                className="pp-btn pp-btn--outline pp-btn--lg"
+                style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                Unduh Brosur
+              </a>
+            )}
           </div>
         </div>
 

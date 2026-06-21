@@ -5,6 +5,8 @@ import CalonMuridLayout from '@app/shared/ppdb/layouts/CalonMuridLayout';
 import { fetchMyRegistration, fetchPpdbInfo } from '@app/shared/services/ppdb.service';
 import { startOrResumePpdb } from '@app/shared/ppdb/utils/startOrResumePpdb';
 import { toastValidation } from '@app/shared/hooks/useConfirm';
+import { resolveStorageUrl } from '@app/shared/services/apiHelpers';
+import apiClient from '@app/shared/services/apiClient';
 
 function formatDateLabel(value) {
   if (!value) return '-';
@@ -119,42 +121,33 @@ export default function DashboardCalonMurid() {
           <div>
             <Section icon={<ClipboardList style={{ width: '22px', height: '22px' }} />} title="Syarat Pendaftaran" delay={0.15}>
               <ul style={{ listStyle: 'disc', paddingLeft: '1.25rem' }} className="space-y-2">
-                <li>Mengisi formulir pendaftaran secara lengkap.</li>
-                <li>Mengunggah seluruh berkas persyaratan yang ditentukan sekolah.</li>
-                <li>Memastikan data yang diinput sesuai dengan dokumen asli.</li>
-                <li>Mengirim pendaftaran sebelum batas waktu yang ditentukan.</li>
+                {(ppdbInfo?.persyaratan || []).map((syarat, idx) => (
+                  <li key={idx}>{syarat}</li>
+                ))}
               </ul>
             </Section>
 
             <Section icon={<ListChecks style={{ width: '22px', height: '22px' }} />} title="Alur Pendaftaran" delay={0.2}>
-              <ol className="space-y-2" style={{ paddingLeft: '1.25rem' }}>
-                <li>1. Lengkapi Formulir Pendaftaran.</li>
-                <li>2. Unggah Berkas Pendaftaran.</li>
-                <li>3. Kirim Pendaftaran.</li>
-                <li>4. Tunggu proses verifikasi dari sekolah.</li>
-                <li>5. Lihat hasil pada menu Status Pendaftaran.</li>
+              <ol className="space-y-2" style={{ paddingLeft: '1.25rem', listStyle: 'decimal' }}>
+                {(ppdbInfo?.alur || []).map((alur, idx) => (
+                  <li key={idx}>{alur}</li>
+                ))}
               </ol>
-            </Section>
-
-            <Section icon={<CircleAlert style={{ width: '22px', height: '22px' }} />} title="Informasi Penting" delay={0.25}>
-              <ul style={{ listStyle: 'disc', paddingLeft: '1.25rem' }} className="space-y-2">
-                <li>Pastikan seluruh data yang diinput sudah benar sebelum mengirim pendaftaran.</li>
-                <li>Pendaftaran yang sudah dikirim tidak dapat diubah kembali.</li>
-                <li>Hasil seleksi dapat dilihat melalui menu Status Pendaftaran.</li>
-              </ul>
             </Section>
 
             <Section icon={<Phone style={{ width: '22px', height: '22px' }} />} title="Kontak Sekolah" delay={0.3}>
               <div style={{ display: 'grid', gap: '0.65rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <Phone style={{ width: '16px', height: '16px', color: '#059669' }} />
-                  <span style={{ fontWeight: 600, color: '#64748b', width: '65px', fontSize: '0.82rem' }}>No. HP</span>
-                  <span>: 0812-3456-7890</span>
-                </div>
+                {(ppdbInfo?.kontak || []).map((kontak, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <Phone style={{ width: '16px', height: '16px', color: '#059669' }} />
+                    <span style={{ fontWeight: 600, color: '#64748b', width: '120px', fontSize: '0.82rem' }}>{kontak.nama}</span>
+                    <span>: {(kontak.telepon || []).join(', ')}</span>
+                  </div>
+                ))}
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
                   <MapPin style={{ width: '16px', height: '16px', marginTop: '0.1rem', color: '#059669' }} />
-                  <span style={{ fontWeight: 600, color: '#64748b', width: '65px', fontSize: '0.82rem' }}>Alamat</span>
-                  <span>: Jl. Demak No. 3, Medan, Sumatera Utara</span>
+                  <span style={{ fontWeight: 600, color: '#64748b', width: '120px', fontSize: '0.82rem' }}>Alamat</span>
+                  <span>: {ppdbInfo?.alamat || '-'}</span>
                 </div>
               </div>
             </Section>
@@ -162,6 +155,22 @@ export default function DashboardCalonMurid() {
 
           {/* Action buttons */}
           <div style={{ marginTop: '1.25rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '0.85rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
+            {ppdbInfo?.brosur && (
+              <a
+                href={resolveStorageUrl(ppdbInfo.brosur, apiClient.defaults)}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  borderRadius: '14px', border: '1.5px solid #e2e8f0', padding: '0.75rem 1.5rem',
+                  fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', background: '#f8fafc',
+                  cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  textDecoration: 'none'
+                }}
+              >
+                <ClipboardList style={{ width: '16px', height: '16px', color: '#0ea5e9' }} />
+                Unduh Brosur
+              </a>
+            )}
             <button
               type="button"
               onClick={() => navigate('/calon-murid/status')}

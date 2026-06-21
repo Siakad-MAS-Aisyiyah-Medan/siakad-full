@@ -4,6 +4,7 @@ import { ArrowLeft, Eye, EyeOff, Loader2, Save, X, UserCircle2, Mail, Lock, Shie
 import { fetchMe } from '@app/shared/services/auth.service';
 import { updateAdminProfile } from '@app/shared/services/akun.service';
 import { ROLE_LABELS } from '@/config/roles.config';
+import { confirmAction, toastSuccess, toastError } from '@app/shared/hooks/useConfirm';
 
 function InfoCard({ label, value, icon: Icon, isPassword = false }) {
   return (
@@ -87,13 +88,28 @@ export default function PengaturanSistemPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
+    const isChanged = JSON.stringify(form) !== JSON.stringify(initialForm);
+    if (isChanged) {
+      const confirmed = await confirmAction({
+        title: 'Batal Edit?',
+        text: 'Perubahan Anda tidak akan disimpan.',
+        confirmText: 'Yakin Keluar',
+        cancelText: 'Lanjut Edit',
+      });
+      if (!confirmed) return;
+    }
     if (initialForm) setForm(initialForm);
     setIsEditing(false);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (form.new_password && form.new_password !== form.new_password_confirmation) {
+      toastError('Gagal', 'Konfirmasi password tidak cocok.');
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
@@ -102,13 +118,19 @@ export default function PengaturanSistemPage() {
         email: form.email,
       };
       if (form.new_password) {
-        payload.password = form.new_password;
+        payload.current_password = form.current_password;
+        payload.new_password = form.new_password;
+        payload.new_password_confirmation = form.new_password_confirmation;
       }
       await updateAdminProfile(payload);
       const nextState = { ...form, current_password: '', new_password: '', new_password_confirmation: '' };
       setInitialForm(nextState);
       setForm(nextState);
       setIsEditing(false);
+      toastSuccess('Berhasil', 'Profil berhasil diperbarui.');
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Terjadi kesalahan saat menyimpan profil.';
+      toastError('Gagal', msg);
     } finally {
       setSaving(false);
     }
@@ -138,21 +160,10 @@ export default function PengaturanSistemPage() {
         <PageHeader 
           title={isEditing ? 'Edit Profil Akun' : 'Pengaturan Akun'} 
           subtitle={isEditing ? 'Perbarui informasi profil dan keamanan akun Anda' : 'Kelola informasi profil dan keamanan akun Anda'}
-          backTo=""
+          onBack={isEditing ? handleCancel : undefined}
+          backTo={!isEditing ? "" : undefined}
         >
-          {isEditing ? (
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="btn-outline"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                height: '38px', background: '#fff'
-              }}
-            >
-              <ArrowLeft size={16} /> Batal Edit
-            </button>
-          ) : (
+          {!isEditing && (
             <button type="button" onClick={() => setIsEditing(true)} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <PencilIcon /> Edit Profil
             </button>
@@ -215,6 +226,22 @@ export default function PengaturanSistemPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
                 <div>
+                  <FormLabel>Password Saat Ini</FormLabel>
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><Lock size={18} /></div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="current_password"
+                      value={form.current_password}
+                      onChange={handleChange}
+                      className="form-control"
+                      style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
+                      placeholder="Masukkan password saat ini"
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <FormLabel>Password Baru</FormLabel>
                   <div style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><Lock size={18} /></div>
@@ -230,6 +257,22 @@ export default function PengaturanSistemPage() {
                     <button type="button" onClick={() => setShowPassword((prev) => !prev)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
+                  </div>
+                </div>
+
+                <div>
+                  <FormLabel>Konfirmasi Password Baru</FormLabel>
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><Lock size={18} /></div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="new_password_confirmation"
+                      value={form.new_password_confirmation}
+                      onChange={handleChange}
+                      className="form-control"
+                      style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
+                      placeholder="Ulangi password baru"
+                    />
                   </div>
                 </div>
               </div>
