@@ -33,6 +33,7 @@ export default function HakAksesPage() {
   const [akunData, setAkunData] = useState([]);
   const [stats, setStats] = useState({ total_akun: 0, role_aktif: 0 });
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterRole, setFilterRole] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ last_page: 1, total: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -43,10 +44,10 @@ export default function HakAksesPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const loadAkun = useCallback(async (page = currentPage, search = searchQuery) => {
+  const loadAkun = useCallback(async (page = currentPage, search = searchQuery, role = filterRole) => {
     setIsLoading(true);
     try {
-      const data = await fetchAdminAkunList({ page, search });
+      const data = await fetchAdminAkunList({ page, search, role });
       const usersArray = Array.isArray(data?.users) ? data.users : [];
       setAkunData(usersArray);
       setStats({
@@ -59,12 +60,12 @@ export default function HakAksesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, filterRole]);
 
   useEffect(() => {
-    const timer = setTimeout(() => loadAkun(currentPage, searchQuery), 250);
+    const timer = setTimeout(() => loadAkun(currentPage, searchQuery, filterRole), 250);
     return () => clearTimeout(timer);
-  }, [currentPage, loadAkun, searchQuery]);
+  }, [currentPage, loadAkun, searchQuery, filterRole]);
 
   const closeForm = () => {
     setView('list');
@@ -172,14 +173,28 @@ export default function HakAksesPage() {
       {view === 'list' ? (
         <div className="animate-fade-in" style={{ paddingTop: '1rem' }}>
           <PageHeader title="Manajemen Pengguna" subtitle="Kelola akun dan hak akses pengguna sistem">
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-              <input
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                placeholder="Cari akun..."
-                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-              />
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+                <input
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                  placeholder="Cari akun..."
+                  style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
+                />
+              </div>
+              <select
+                value={filterRole}
+                onChange={(e) => { setFilterRole(e.target.value); setCurrentPage(1); }}
+                className="form-control"
+                style={{ height: '38px', cursor: 'pointer', minWidth: '160px', paddingRight: '2.5rem', paddingLeft: '1rem', backgroundPosition: 'right 0.75rem center' }}
+              >
+                <option value="">Semua Role</option>
+                <option value="admin">Administrator</option>
+                <option value="kepsek">Kepala Sekolah</option>
+                <option value="guru">Guru</option>
+                <option value="siswa">Murid</option>
+              </select>
             </div>
             <button type="button" onClick={handleAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <Plus size={16} />
