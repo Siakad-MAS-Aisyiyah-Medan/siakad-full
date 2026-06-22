@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, NavLink, useLocation } from 'react-router-dom';
-import { LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { LogOut, User, Settings, ChevronDown, Menu, X } from 'lucide-react';
 import { renderMenuIcon } from '@/shared/constants/icons';
 import AppLogo from '@/shared/components/AppLogo';
 import { ROLE_LABELS } from '@/config/roles.config';
@@ -8,6 +8,7 @@ import { logout, getMenuItems } from '@/shared/services/auth.service';
 import { confirmAction, showLoadingAlert, closeAlert } from '@/shared/hooks/useConfirm';
 
 export default function MainLayout({ children, role, name }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const menuItems = getMenuItems();
@@ -50,7 +51,12 @@ export default function MainLayout({ children, role, name }) {
 
   return (
     <div className="dashboard-layout">
-      <aside className="sidebar">
+      <div 
+        className={`sidebar-overlay ${isMobileMenuOpen ? 'open' : ''}`} 
+        onClick={() => setIsMobileMenuOpen(false)}
+      ></div>
+
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <div className="sidebar-brand__logo">
             <AppLogo size={54} variant="sidebar" />
@@ -67,6 +73,7 @@ export default function MainLayout({ children, role, name }) {
               key={`${item.path}-${index}`}
               to={item.path}
               className={() => `nav-item ${isMenuItemActive(item.path) ? 'active' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               {renderMenuIcon(item.iconKey)} {item.label}
             </NavLink>
@@ -77,14 +84,22 @@ export default function MainLayout({ children, role, name }) {
 
       <main className="dashboard-content">
         <header className="content-header">
-          {location.pathname.includes('/dashboard') ? (
-            <div className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>Halo, {name && name !== 'Pengguna' ? name : roleLabel} 👋</h2>
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem' }}>Selamat datang di Sistem Informasi Akademik.</p>
-            </div>
-          ) : (
-            <div id="global-header-title" className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}></div>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button 
+              className="mobile-menu-btn" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            {location.pathname.includes('/dashboard') ? (
+              <div className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>Halo, {name && name !== 'Pengguna' ? name : roleLabel} 👋</h2>
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.25rem' }}>Selamat datang di Sistem Informasi Akademik.</p>
+              </div>
+            ) : (
+              <div id="global-header-title" className="content-header__greeting" style={{ display: 'flex', flexDirection: 'column' }}></div>
+            )}
+          </div>
 
           <div className="content-header__right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div id="global-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}></div>

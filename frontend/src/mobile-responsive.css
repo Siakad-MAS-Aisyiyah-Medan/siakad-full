@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE CSS
+   Semua perbaikan layout untuk tampilan HP (max-width: 768px)
+   ═══════════════════════════════════════════════════════════════ */
+
+.mobile-menu-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* 
+   * 1. Layout & Sidebar (Off-Canvas)
+   */
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Overlay saat sidebar terbuka di mobile */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .dashboard-content {
+    width: 100%;
+  }
+
+  .content-header {
+    padding: 0 1rem;
+    height: 70px;
+  }
+
+  /* Sembunyikan pesan selamat datang panjang di header jika ada */
+  .content-header__greeting p {
+    display: none;
+  }
+
+  .content-header__greeting h2 {
+    font-size: 1rem !important;
+  }
+
+  /* Mobile Hamburger Menu Button */
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-dark);
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+
+  /* 
+   * 2. Login Page
+   */
+  .login-visual {
+    display: none !important;
+  }
+  
+  .login-form-side {
+    padding: 1.5rem !important;
+  }
+
+  .form-card {
+    padding: 1.5rem;
+  }
+
+  /* 
+   * 3. Dashboard, Cards & Grid
+   */
+  .admin-page-wrapper {
+    padding: 1rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .welcome-banner {
+    padding: 1.5rem !important;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem !important;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .panel-header .header-actions {
+    justify-content: stretch;
+    width: 100%;
+  }
+  
+  .panel-header .header-actions > * {
+    flex: 1;
+  }
+
+  /* 
+   * 4. Table Scroll
+   */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -1rem; /* Membiarkan tabel scroll hingga mentok tepi layar */
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .data-table {
+    min-width: 700px; /* Memaksa tabel mekar agar bisa horizontal scroll */
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* 
+   * 5. Typography, Inputs & Touch Targets
+   */
+  body, p, span, div {
+    font-size: 14px; /* Minimal font size */
+  }
+
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.1rem !important; }
+
+  /* Mencegah auto-zoom di iOS dengan mengatur font-size input ke 16px */
+  input, select, textarea {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+
+  /* Memastikan tombol minimal 44x44px untuk touch target */
+  button, .btn-icon, .nav-item {
+    min-height: 44px;
+  }
+  
+  .user-info {
+    min-height: 44px;
+    gap: 0.35rem !important;
+  }
+  
+  .user-info__name {
+    display: none; /* Sembunyikan nama user di top bar saat mobile */
+  }
+}
