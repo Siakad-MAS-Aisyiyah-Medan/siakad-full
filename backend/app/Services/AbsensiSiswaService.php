@@ -118,7 +118,21 @@ class AbsensiSiswaService
             ->groupBy('tanggal', 'jam_mulai', 'jam_selesai', 'tahun_ajaran', 'semester')
             ->orderByDesc('tanggal')
             ->orderByDesc('jam_mulai')
-            ->get();
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'tanggal' => \Carbon\Carbon::parse($row->tanggal)->format('Y-m-d'),
+                    'jam_mulai' => $row->jam_mulai,
+                    'jam_selesai' => $row->jam_selesai,
+                    'tahun_ajaran' => $row->tahun_ajaran,
+                    'semester' => $row->semester,
+                    'count_hadir' => (int) $row->count_hadir,
+                    'count_sakit' => (int) $row->count_sakit,
+                    'count_izin' => (int) $row->count_izin,
+                    'count_alpa' => (int) $row->count_alpa,
+                    'count_terlambat' => (int) $row->count_terlambat,
+                ];
+            });
     }
 
     public function listForSiswa(int $userId, array $filters = []): Collection
@@ -233,5 +247,20 @@ class AbsensiSiswaService
                 throw new InvalidArgumentException('Anda tidak mengampu kelas ini.');
             }
         }
+    }
+
+    public function deleteMeeting(int $guruId, array $params)
+    {
+        $this->assertGuruCanRecord($guruId, (int) $params['id_mapel']);
+
+        $jamMulai = $params['jam_mulai'] . ':00';
+        $jamSelesai = $params['jam_selesai'] . ':00';
+
+        Absensi::where('id_kelas', $params['id_kelas'])
+            ->where('id_mapel', $params['id_mapel'])
+            ->where('tanggal', $params['tanggal'])
+            ->where('jam_mulai', $jamMulai)
+            ->where('jam_selesai', $jamSelesai)
+            ->delete();
     }
 }

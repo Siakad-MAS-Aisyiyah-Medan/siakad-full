@@ -16,6 +16,11 @@ export async function fetchHistoryAbsensi(params) {
   return unwrapData(response);
 }
 
+export async function deleteAbsensiMeeting(params) {
+  const response = await apiClient.delete('/guru/absensi/siswa/meeting', { params });
+  return unwrapData(response);
+}
+
 export async function fetchRekapSiswa(params = {}) {
   const response = await apiClient.get('/guru/absensi/siswa/rekap', { params });
   return unwrapData(response);

@@ -151,9 +151,27 @@ class AbsensiController extends Controller
                 $validated
             );
 
-            return ApiResponse::success($history, 'Berhasil mengambil riwayat absensi');
+            return ApiResponse::success($history, 'Berhasil mengambil riwayat absensi pertemuan');
         } catch (InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);
+        }
+    }
+
+    public function guruDeleteMeeting(Request $request)
+    {
+        $validated = $request->validate([
+            'id_kelas' => 'required|exists:kelas,id_kelas',
+            'id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
+            'tanggal' => 'required|date',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
+        ]);
+
+        try {
+            $this->absensiService->deleteMeeting((int) auth()->id(), $validated);
+            return ApiResponse::success(null, 'Data absensi pertemuan berhasil dihapus');
+        } catch (\Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
