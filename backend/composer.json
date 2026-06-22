@@ -10,7 +10,7 @@
         "laravel/framework": "^12.61",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.9",
-        "maatwebsite/excel": "^3.1"
+        "rap2hpoutre/fast-excel": "^5.9"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

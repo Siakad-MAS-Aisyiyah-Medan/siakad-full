@@ -7,11 +7,9 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Exception;
 
-class SiswaImport implements ToCollection, WithHeadingRow
+class SiswaImport
 {
     protected $idKelas;
 
@@ -20,14 +18,16 @@ class SiswaImport implements ToCollection, WithHeadingRow
         $this->idKelas = $idKelas;
     }
 
-    public function collection(Collection $rows)
+    public function import($rows)
     {
         DB::beginTransaction();
 
         try {
-            foreach ($rows as $index => $row) {
+            $rowIndex = 2;
+            foreach ($rows as $row) {
                 // Lewati baris kosong
-                if (!isset($row['nis']) || !isset($row['nama'])) {
+                if (empty($row['nis']) || empty($row['nama'])) {
+                    $rowIndex++;
                     continue;
                 }
 
@@ -36,11 +36,11 @@ class SiswaImport implements ToCollection, WithHeadingRow
                 
                 // Cek apakah NIS atau NISN sudah ada
                 if (Siswa::where('nis', $nis)->orWhere('nisn', $nisn)->exists()) {
-                    throw new Exception("Baris " . ($index + 2) . ": NIS ($nis) atau NISN ($nisn) sudah terdaftar di sistem.");
+                    throw new Exception("Baris " . $rowIndex . ": NIS ($nis) atau NISN ($nisn) sudah terdaftar di sistem.");
                 }
 
                 if (User::where('username', $nis)->exists()) {
-                    throw new Exception("Baris " . ($index + 2) . ": Username/NIS ($nis) sudah terdaftar di tabel pengguna.");
+                    throw new Exception("Baris " . $rowIndex . ": Username/NIS ($nis) sudah terdaftar di tabel pengguna.");
                 }
 
                 // Buat User
@@ -54,6 +54,20 @@ class SiswaImport implements ToCollection, WithHeadingRow
                     'status_akun' => 'aktif',
                 ]);
 
+                // Format Tanggal Lahir (FastExcel / OpenSpout biasanya me-return string Y-m-d atau DateTime)
+                $tglLahir = '2000-01-01';
+                if (!empty($row['tgl_lahir'])) {
+                    if ($row['tgl_lahir'] instanceof \DateTimeInterface) {
+                        $tglLahir = $row['tgl_lahir']->format('Y-m-d');
+                    } else {
+                        // Jika formatnya string, kita asumsikan sudah valid dan coba parse
+                        $parsed = strtotime($row['tgl_lahir']);
+                        if ($parsed !== false) {
+                            $tglLahir = date('Y-m-d', $parsed);
+                        }
+                    }
+                }
+
                 // Buat Siswa
                 Siswa::create([
                     'id_user' => $user->id_user,
@@ -62,13 +76,14 @@ class SiswaImport implements ToCollection, WithHeadingRow
                     'nis' => $nis,
                     'nama_siswa' => $row['nama'],
                     'tempat_lahir' => $row['tempat_lahir'] ?? '-',
-                    'tgl_lahir' => isset($row['tgl_lahir']) ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['tgl_lahir'])->format('Y-m-d') : '2000-01-01',
+                    'tgl_lahir' => $tglLahir,
                     'jenis_kelamin' => isset($row['lp']) && strtoupper($row['lp']) == 'P' ? 'P' : 'L',
                     'agama' => $row['agama'] ?? 'Islam',
                     'alamat' => $row['alamat'] ?? '-',
                     'nama_wali' => $row['nama_wali'] ?? '-',
                     'no_hp_wali' => $row['no_hp_wali'] ?? '-',
                 ]);
+                $rowIndex++;
             }
             DB::commit();
         } catch (Exception $e) {

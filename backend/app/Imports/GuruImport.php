@@ -7,20 +7,21 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Exception;
 
-class GuruImport implements ToCollection, WithHeadingRow
+class GuruImport
 {
-    public function collection(Collection $rows)
+    public function import($rows)
     {
         DB::beginTransaction();
 
         try {
-            foreach ($rows as $index => $row) {
+            // Kita mengubah cara mendapatkan indeks karena index FastExcel mulai dari 0 untuk row pertama isi data (baris 2)
+            $rowIndex = 2; 
+            foreach ($rows as $row) {
                 // Lewati baris kosong
-                if (!isset($row['nip_nuptk']) || !isset($row['nama'])) {
+                if (empty($row['nip_nuptk']) || empty($row['nama'])) {
+                    $rowIndex++;
                     continue;
                 }
 
@@ -28,11 +29,11 @@ class GuruImport implements ToCollection, WithHeadingRow
                 
                 // Cek apakah NIP sudah ada
                 if (Guru::where('nip_nuptk', $nip)->exists()) {
-                    throw new Exception("Baris " . ($index + 2) . ": NIP/NUPTK ($nip) sudah terdaftar di sistem.");
+                    throw new Exception("Baris " . $rowIndex . ": NIP/NUPTK ($nip) sudah terdaftar di sistem.");
                 }
 
                 if (User::where('username', $nip)->exists()) {
-                    throw new Exception("Baris " . ($index + 2) . ": Username/NIP ($nip) sudah terdaftar di tabel pengguna.");
+                    throw new Exception("Baris " . $rowIndex . ": Username/NIP ($nip) sudah terdaftar di tabel pengguna.");
                 }
 
                 // Buat User
@@ -57,6 +58,8 @@ class GuruImport implements ToCollection, WithHeadingRow
                     'no_hp' => $row['no_hp'] ?? '-',
                     'status' => 'aktif',
                 ]);
+                
+                $rowIndex++;
             }
             DB::commit();
         } catch (Exception $e) {

@@ -5,11 +5,8 @@ namespace App\Http\Controllers;
 use App\Imports\GuruImport;
 use App\Imports\SiswaImport;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Exception;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Illuminate\Support\Facades\Response;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class ImportController extends Controller
 {
@@ -21,7 +18,10 @@ class ImportController extends Controller
         ]);
 
         try {
-            Excel::import(new SiswaImport($request->id_kelas), $request->file('file'));
+            $siswaImport = new SiswaImport($request->id_kelas);
+            $rows = (new FastExcel)->import($request->file('file'));
+            $siswaImport->import($rows);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Data Siswa berhasil diimport.',
@@ -41,7 +41,10 @@ class ImportController extends Controller
         ]);
 
         try {
-            Excel::import(new GuruImport(), $request->file('file'));
+            $guruImport = new GuruImport();
+            $rows = (new FastExcel)->import($request->file('file'));
+            $guruImport->import($rows);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Data Guru berhasil diimport.',
@@ -56,53 +59,39 @@ class ImportController extends Controller
 
     public function downloadTemplateSiswa()
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        
-        $headers = ['NISN', 'NIS', 'Nama', 'Tempat Lahir', 'Tgl Lahir (YYYY-MM-DD)', 'L/P', 'Agama', 'Alamat', 'Nama Wali', 'No HP Wali'];
-        
-        // Add headers
-        foreach ($headers as $index => $header) {
-            $column = chr(65 + $index);
-            $sheet->setCellValue($column . '1', $header);
-            $sheet->getColumnDimension($column)->setAutoSize(true);
-        }
-
-        $writer = new Xlsx($spreadsheet);
-        
-        ob_start();
-        $writer->save('php://output');
-        $content = ob_get_clean();
-
-        return Response::make($content, 200, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="template_siswa.xlsx"',
+        // Menyediakan satu baris kosong dengan key (header) yang benar
+        $data = collect([
+            [
+                'NISN' => '', 
+                'NIS' => '', 
+                'nama' => '', 
+                'tempat_lahir' => '', 
+                'tgl_lahir' => '', 
+                'lp' => '', 
+                'agama' => '', 
+                'alamat' => '', 
+                'nama_wali' => '', 
+                'no_hp_wali' => ''
+            ]
         ]);
+
+        return (new FastExcel($data))->download('template_siswa.xlsx');
     }
 
     public function downloadTemplateGuru()
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        
-        $headers = ['NIP/NUPTK', 'Nama', 'L/P', 'Agama', 'Alamat', 'No HP'];
-        
-        // Add headers
-        foreach ($headers as $index => $header) {
-            $column = chr(65 + $index);
-            $sheet->setCellValue($column . '1', $header);
-            $sheet->getColumnDimension($column)->setAutoSize(true);
-        }
-
-        $writer = new Xlsx($spreadsheet);
-        
-        ob_start();
-        $writer->save('php://output');
-        $content = ob_get_clean();
-
-        return Response::make($content, 200, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="template_guru.xlsx"',
+        // Menyediakan satu baris kosong dengan key (header) yang benar
+        $data = collect([
+            [
+                'nip_nuptk' => '', 
+                'nama' => '', 
+                'lp' => '', 
+                'agama' => '', 
+                'alamat' => '', 
+                'no_hp' => ''
+            ]
         ]);
+
+        return (new FastExcel($data))->download('template_guru.xlsx');
     }
 }
