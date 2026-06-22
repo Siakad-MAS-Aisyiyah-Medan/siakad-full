@@ -11,7 +11,7 @@ export const menuByRole = {
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/admin/mapel', permission: 'manage_mapel' },
     { iconKey: 'FileText', label: 'Transkrip Akademik Murid', path: '/admin/transkrip-akademik', permission: 'view_transkrip_murid' },
     { iconKey: 'UserCheck', label: 'Data PPDB', path: '/admin/ppdb', permission: 'manage_ppdb' },
-    { iconKey: 'ShieldCheck', label: 'Akun Pengguna & Hak Akses', path: '/admin/hak-akses', permission: 'manage_users' },
+    { iconKey: 'ShieldCheck', label: 'Manajemen Pengguna', path: '/admin/hak-akses', permission: 'manage_users' },
   ],
   kepsek: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/kepala-sekolah/dashboard', permission: 'view_dashboard_kepsek' },

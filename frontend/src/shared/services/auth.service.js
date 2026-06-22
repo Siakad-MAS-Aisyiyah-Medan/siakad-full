@@ -115,7 +115,7 @@ export function getMenuItems() {
   const normalizedItems = items.map((item) => {
     const labelOverrides = {
       '/admin/ppdb': 'Data PPDB',
-      '/admin/hak-akses': 'Akun Pengguna & Hak Akses',
+      '/admin/hak-akses': 'Manajemen Pengguna',
       '/admin/pengaturan': 'Pengaturan Akun',
       '/admin/transkrip-akademik': 'Transkrip Akademik Murid',
       '/kepala-sekolah/data-ppdb': 'Data PPDB',

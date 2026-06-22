@@ -11,19 +11,15 @@
   /* 
    * 1. Layout & Sidebar (Off-Canvas)
    */
-  .dashboard-layout {
-    flex-direction: column;
-  }
-
   .sidebar {
-    position: fixed;
+    position: fixed !important;
     top: 0;
     left: 0;
-    width: 260px;
-    height: 100vh;
-    z-index: 1000;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
     transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s ease;
     box-shadow: none;
   }
 
@@ -32,7 +28,6 @@
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
   }
 
-  /* Overlay saat sidebar terbuka di mobile */
   .sidebar-overlay {
     position: fixed;
     inset: 0;
@@ -49,26 +44,38 @@
   }
 
   .dashboard-content {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100%;
+    overflow-x: hidden !important;
   }
 
   .content-header {
-    padding: 0 1rem;
-    height: 70px;
+    padding: 0.75rem 1rem !important;
+    height: auto !important;
+    min-height: 70px !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
   }
 
-  /* Sembunyikan pesan selamat datang panjang di header jika ada */
-  .content-header__greeting p {
-    display: none;
+  /* Cegah tulisan "Halo Administrator" menendang elemen lain */
+  .content-header > div:first-child {
+    flex: 1;
+    min-width: 0;
   }
 
   .content-header__greeting h2 {
     font-size: 1rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* Mobile Hamburger Menu Button */
+  .content-header__greeting p {
+    display: none !important;
+  }
+
   .mobile-menu-btn {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     width: 44px;
@@ -79,6 +86,13 @@
     color: var(--color-text-dark);
     margin-right: 0.5rem;
     cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Pastikan elemen profil kanan bisa menyusut dengan baik */
+  .content-header__right {
+    flex-shrink: 0;
+    gap: 0.5rem !important;
   }
 
   /* 
@@ -89,18 +103,19 @@
   }
   
   .login-form-side {
-    padding: 1.5rem !important;
+    padding: 1rem !important;
+    width: 100% !important;
   }
 
   .form-card {
-    padding: 1.5rem;
+    padding: 1rem !important;
   }
 
   /* 
    * 3. Dashboard, Cards & Grid
    */
   .admin-page-wrapper {
-    padding: 1rem !important;
+    padding: 1rem 0.5rem !important; /* kurangi padding samping di HP */
   }
 
   .stats-grid {
@@ -110,40 +125,38 @@
 
   .welcome-banner {
     padding: 1.5rem !important;
-    flex-direction: column;
+    flex-direction: column !important;
     text-align: center;
     gap: 1rem !important;
   }
 
   .panel-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
   }
 
   .panel-header .header-actions {
-    justify-content: stretch;
-    width: 100%;
+    justify-content: stretch !important;
+    width: 100% !important;
   }
   
   .panel-header .header-actions > * {
-    flex: 1;
+    flex: 1 !important;
   }
 
   /* 
    * 4. Table Scroll
    */
   .table-container {
-    overflow-x: auto;
+    overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
-    margin: 0 -1rem; /* Membiarkan tabel scroll hingga mentok tepi layar */
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+    margin: 0 !important;
+    border-radius: 8px !important;
   }
 
   .data-table {
-    min-width: 700px; /* Memaksa tabel mekar agar bisa horizontal scroll */
+    min-width: 700px !important;
   }
 
   .data-table th,
@@ -154,31 +167,25 @@
   /* 
    * 5. Typography, Inputs & Touch Targets
    */
-  body, p, span, div {
-    font-size: 14px; /* Minimal font size */
+  body {
+    font-size: 14px;
   }
 
-  h1 { font-size: 1.5rem !important; }
-  h2 { font-size: 1.25rem !important; }
-  h3 { font-size: 1.1rem !important; }
-
-  /* Mencegah auto-zoom di iOS dengan mengatur font-size input ke 16px */
   input, select, textarea {
     font-size: 16px !important;
-    min-height: 44px;
+    min-height: 44px !important;
   }
 
-  /* Memastikan tombol minimal 44x44px untuk touch target */
   button, .btn-icon, .nav-item {
-    min-height: 44px;
+    min-height: 44px !important;
   }
   
   .user-info {
-    min-height: 44px;
+    min-height: 44px !important;
     gap: 0.35rem !important;
   }
   
   .user-info__name {
-    display: none; /* Sembunyikan nama user di top bar saat mobile */
+    display: none !important;
   }
 }

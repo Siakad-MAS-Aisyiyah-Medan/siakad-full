@@ -1,5 +1,5 @@
 import { ArrowLeft, Plus, Save, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { fetchKelasList } from '@/shared/akademik/kelas/services/kelas.service';
 import PageHeader from '@/shared/components/PageHeader';
 
@@ -32,57 +32,7 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>
-          {isEdit ? (
-            <div>
-              <EditRow label="Nama Murid">
-                <input name="nama_siswa" value={formData.nama_siswa || ''} onChange={onChange} className="form-control" required />
-              </EditRow>
-              <EditRow label="NISN">
-                <input name="nisn" value={formData.nisn || ''} onChange={onChange} className="form-control" required />
-              </EditRow>
-              <EditRow label="Jenis Kelamin">
-                <select name="jenis_kelamin" value={formData.jenis_kelamin || ''} onChange={onChange} className="form-control" required>
-                  <option value="L">Laki-laki</option>
-                  <option value="P">Perempuan</option>
-                </select>
-              </EditRow>
-              <EditRow label="No HP">
-                <input name="no_hp" value={formData.no_hp || ''} onChange={onChange} className="form-control" required />
-              </EditRow>
-              <EditRow label="Alamat">
-                <textarea name="alamat" value={formData.alamat || ''} onChange={onChange} className="form-control" rows={3} required />
-              </EditRow>
-              <EditRow label="Tahun Masuk">
-                <select name="tahun_masuk" value={formData.tahun_masuk || ''} onChange={onChange} className="form-control" required>
-                  {Array.from({ length: 10 }).map((_, i) => {
-                    const year = 2021 + i;
-                    return <option key={year} value={year}>{year}</option>;
-                  })}
-                </select>
-              </EditRow>
-              <EditRow label="Tahun Lulus">
-                <select name="tahun_lulus" value={formData.tahun_lulus || ''} onChange={onChange} className="form-control">
-                  <option value="">-</option>
-                  {Array.from({ length: 10 }).map((_, i) => {
-                    const year = 2024 + i;
-                    return <option key={year} value={year}>{year}</option>;
-                  })}
-                </select>
-              </EditRow>
-              <EditRow label="Status" last>
-                <select
-                  name="status_aktif"
-                  value={formData.status_aktif !== undefined ? (formData.status_aktif ? '1' : '0') : '1'}
-                  onChange={(e) => onChange({ target: { name: 'status_aktif', value: e.target.value === '1' } })}
-                  className="form-control"
-                >
-                  <option value="1">Aktif</option>
-                  <option value="0">Nonaktif</option>
-                </select>
-              </EditRow>
-            </div>
-          ) : (
-            <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
               <div>
                 <FormLabel required>Nama Murid</FormLabel>
                 <input name="nama_siswa" value={formData.nama_siswa || ''} onChange={onChange} className="form-control" placeholder="Masukkan nama murid" disabled={readOnly} required />
@@ -125,7 +75,7 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
               </div>
               <div>
                 <FormLabel required>Tanggal Lahir</FormLabel>
-                <input type="date" name="tanggal_lahir" value={formData.tanggal_lahir || formData.tgl_lahir || ''} onChange={onChange} className="form-control" disabled={readOnly} required />
+                <input type="date" name="tanggal_lahir" value={(formData.tanggal_lahir || formData.tgl_lahir || '').split('T')[0]} onChange={onChange} className="form-control" disabled={readOnly} required />
               </div>
 
               <div style={{ gridColumn: '1/-1' }}>
@@ -189,7 +139,7 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                 </div>
               </div>
             </div>
-          )}
+
 
           {!readOnly && (
             <div style={{ padding: '1.25rem 1.5rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', background: 'var(--color-background)', borderRadius: '0 0 16px 16px' }}>
@@ -216,18 +166,4 @@ function FormLabel({ children, required }) {
   );
 }
 
-function EditRow({ label, children, last = false }) {
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '160px 1fr',
-      alignItems: 'center',
-      gap: '1.25rem',
-      padding: '0.9rem 1.5rem',
-      borderBottom: last ? 'none' : '1px solid var(--color-border)',
-    }}>
-      <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-dark)' }}>{label}</label>
-      {children}
-    </div>
-  );
-}
+
