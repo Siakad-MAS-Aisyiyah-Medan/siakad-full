@@ -211,10 +211,20 @@ export function useMurid() {
           email: formData.email || `${generatedUsername}@mas.sch.id`,
           password: formData.password || defaultPassword,
         };
+        
+        if (payload.id_kelas === '') payload.id_kelas = null;
+        if (payload.tahun_lulus === '') payload.tahun_lulus = null;
+        if (payload.tanggal_lahir === '') payload.tanggal_lahir = null;
+
         await createMurid(payload);
         toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
-        await updateMurid(editId, formData);
+        const payload = { ...formData };
+        if (payload.id_kelas === '') payload.id_kelas = null;
+        if (payload.tahun_lulus === '') payload.tahun_lulus = null;
+        if (payload.tanggal_lahir === '') payload.tanggal_lahir = null;
+        
+        await updateMurid(editId, payload);
         toastSuccess('Berhasil', 'Data berhasil disimpan');
       }
       loadMurid();

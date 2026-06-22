@@ -5,6 +5,7 @@ import PageHeader from '@/shared/components/PageHeader';
 import { getStoredUser, getStoredProfile } from '@/shared/services/auth.service';
 import { getDisplayName } from '@/shared/utils/profile';
 import { fetchNilaiSiswa } from '@/shared/nilai/siswa/services/nilai.service';
+import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
 
 const fallbackRows = [
   ['Matematika', 85, 88, 90, 88],
@@ -21,13 +22,29 @@ export default function SiswaNilaiPage() {
   const name = getDisplayName(profile, user?.role, user?.username);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tahunAjaranList, setTahunAjaranList] = useState([]);
+  const [filters, setFilters] = useState({
+    semester: 'Ganjil',
+    tahun_ajaran: '2025/2026'
+  });
 
   useEffect(() => {
-    fetchNilaiSiswa({ semester: 'Ganjil', tahun_ajaran: '2025/2026' })
+    fetchTahunAjaran().then(data => {
+      setTahunAjaranList(data || []);
+      const active = data?.find(t => t.is_active);
+      if (active) {
+        setFilters(p => ({ ...p, tahun_ajaran: active.tahun_ajaran }));
+      }
+    }).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchNilaiSiswa({ semester: filters.semester, tahun_ajaran: filters.tahun_ajaran })
       .then((data) => setItems(Array.isArray(data) ? data : []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [filters]);
 
   const rows = useMemo(() => {
     if (!loading && items.length > 0) {
@@ -51,7 +68,28 @@ export default function SiswaNilaiPage() {
   return (
     <MainLayout role="siswa" name={name}>
       <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
-        <PageHeader title="Transkrip Akademik" subtitle="Lihat nilai akademik dan transkrip Anda" />
+        <PageHeader title="Transkrip Akademik" subtitle="Lihat nilai akademik dan transkrip Anda">
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <select
+              value={filters.tahun_ajaran}
+              onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
+              style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
+            >
+              {tahunAjaranList.map((ta, idx) => (
+                <option key={ta.id_tahun_ajaran || ta.tahun_ajaran || idx} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
+              ))}
+              {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
+            </select>
+            <select
+              value={filters.semester}
+              onChange={(e) => setFilters(p => ({ ...p, semester: e.target.value }))}
+              style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
+            >
+              <option value="Ganjil">Ganjil</option>
+              <option value="Genap">Genap</option>
+            </select>
+          </div>
+        </PageHeader>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '0 1.5rem 1.5rem 1.5rem' }}>
           {/* Print Header / Kop Surat (Hanya Tampil Saat Print) */}
@@ -82,10 +120,10 @@ export default function SiswaNilaiPage() {
                 <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: {profile?.kelas?.nama_kelas || 'X IPA 1'}</div>
 
                 <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">Tahun Ajaran</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: 2025/2026</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: {filters.tahun_ajaran}</div>
 
                 <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">Semester</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: Ganjil</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: {filters.semester}</div>
               </div>
             </div>
           </div>

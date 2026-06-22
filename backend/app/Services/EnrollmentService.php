@@ -73,7 +73,7 @@ class EnrollmentService
             : 'L';
     }
 
-    protected function generateUniqueNis(): string
+    public function generateUniqueNis(): string
     {
         $year = date('Y');
         $maxAttempts = 15;

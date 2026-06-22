@@ -173,8 +173,8 @@ class MuridController extends Controller
 
             $user->siswa()->create([
                 'nama_siswa' => $data['nama_siswa'],
-                'nisn' => $data['nisn'] ?? null,
-                'nis' => $data['nis'] ?? null,
+                'nisn' => $data['nisn'] ?? $data['username'],
+                'nis' => $data['nis'] ?? $this->enrollment->generateUniqueNis(),
                 'jenis_kelamin' => $data['jenis_kelamin'],
                 'tempat_lahir' => $data['tempat_lahir'] ?? '-',
                 'tgl_lahir' => $data['tanggal_lahir'] ?? now()->toDateString(),
@@ -221,6 +221,10 @@ class MuridController extends Controller
                 $fields = ['nama_siswa', 'nisn', 'nis', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp', 'tahun_masuk', 'tahun_lulus', 'id_kelas'];
                 foreach ($fields as $field) {
                     if (array_key_exists($field, $data)) {
+                        // Prevent wiping NOT NULL columns
+                        if (($field === 'nis' || $field === 'nisn') && $data[$field] === null) {
+                            continue;
+                        }
                         $siswaData[$field === 'tanggal_lahir' ? 'tgl_lahir' : $field] = $data[$field];
                     }
                 }

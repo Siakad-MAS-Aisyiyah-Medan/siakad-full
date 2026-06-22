@@ -5,6 +5,7 @@ import PageHeader from '@/shared/components/PageHeader';
 import { fetchMuridList } from '@/shared/akademik/murid/services/murid.service';
 import { fetchAdminStudentRaport } from '@/shared/nilai/admin/services/transkrip.service';
 import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
+import { fetchKelasList } from '@/shared/akademik/kelas/services/kelas.service';
 
 const DEFAULT_FILTERS = {
   semester: 'Ganjil',
@@ -13,13 +14,29 @@ const DEFAULT_FILTERS = {
 
 export default function AdminTranskripAkademikPage() {
   const [muridList, setMuridList] = useState([]);
+  const [kelasList, setKelasList] = useState([]);
   const [tahunAjaranList, setTahunAjaranList] = useState([]);
+  const [selectedKelas, setSelectedKelas] = useState(null);
   const [selectedMurid, setSelectedMurid] = useState(null);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [raport, setRaport] = useState(null);
   const [loadingMurid, setLoadingMurid] = useState(true);
+  const [loadingKelas, setLoadingKelas] = useState(true);
   const [loadingRaport, setLoadingRaport] = useState(false);
+
+  useEffect(() => {
+    const loadKelas = async () => {
+      setLoadingKelas(true);
+      try {
+        const data = await fetchKelasList();
+        setKelasList(data || []);
+      } finally {
+        setLoadingKelas(false);
+      }
+    };
+    loadKelas();
+  }, []);
 
   useEffect(() => {
     fetchTahunAjaran().then(data => {
@@ -62,14 +79,18 @@ export default function AdminTranskripAkademikPage() {
   }, [selectedMurid, filters]);
 
   const filteredMurid = useMemo(() => {
+    let list = muridList;
+    if (selectedKelas) {
+      list = list.filter((item) => item.siswa?.id_kelas === selectedKelas.id_kelas);
+    }
     const keyword = search.trim().toLowerCase();
-    if (!keyword) return muridList;
-    return muridList.filter((item) => {
+    if (!keyword) return list;
+    return list.filter((item) => {
       const nama = item.siswa?.nama_siswa || '';
       const nisn = item.siswa?.nisn || '';
       return nama.toLowerCase().includes(keyword) || String(nisn).toLowerCase().includes(keyword);
     });
-  }, [muridList, search]);
+  }, [muridList, search, selectedKelas]);
 
   const rows = raport?.mapel || [];
   const average = rows.length
@@ -129,7 +150,7 @@ export default function AdminTranskripAkademikPage() {
                 {[
                   ['Nama Murid', selectedMurid.siswa?.nama_siswa || '-'],
                   ['NISN', selectedMurid.siswa?.nisn || '-'],
-                  ['Kelas', selectedMurid.siswa?.kelas?.nama_kelas || selectedMurid.siswa?.nama_kelas || '-'],
+                  ['Kelas', selectedMurid.siswa?.kelas ? `${selectedMurid.siswa.kelas.nama_kelas} - ${selectedMurid.siswa.kelas.jurusan}` : (selectedMurid.siswa?.nama_kelas || '-')],
                   ['Semester', filters.semester],
                 ].map(([label, value]) => (
                   <div key={label} style={{ display: 'flex', gap: '0.5rem' }}>
@@ -216,11 +237,77 @@ export default function AdminTranskripAkademikPage() {
     );
   }
 
+  if (!selectedKelas && !selectedMurid) {
+    return (
+      <AdminPageShell>
+        <div className="animate-fade-in" style={{ paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingBottom: '2rem' }}>
+          <PageHeader title="Transkrip Akademik" subtitle="Pilih kelas terlebih dahulu" />
+          
+          {loadingKelas ? (
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>Memuat data kelas...</div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem', marginTop: '1.5rem' }}>
+              {kelasList.map(kelas => (
+                <div 
+                  key={kelas.id_kelas}
+                  onClick={() => setSelectedKelas(kelas)}
+                  style={{ 
+                    padding: '1.5rem', cursor: 'pointer', transition: 'all 0.2s', 
+                    border: '1px solid var(--color-border)', borderRadius: '12px',
+                    background: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                    display: 'flex', flexDirection: 'column', gap: '1rem'
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.05)';
+                    e.currentTarget.style.borderColor = 'var(--color-primary-light)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)';
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <h3 style={{ margin: 0, color: 'var(--color-primary-dark)', fontSize: '1.1rem', fontWeight: 700 }}>
+                      {kelas.nama_kelas}
+                    </h3>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', borderRadius: '50px' }}>
+                      {kelas.jurusan}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                    <span>Tingkat {kelas.tingkat} • {kelas.tahun_ajaran}</span>
+                  </div>
+                </div>
+              ))}
+              {!kelasList.length && (
+                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  Belum ada data kelas.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </AdminPageShell>
+    );
+  }
+
   return (
     <AdminPageShell>
-      <div className="animate-fade-in" style={{ paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-        <PageHeader title="Transkrip Akademik" subtitle="Lihat dan unduh transkrip nilai murid">
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+      <div className="animate-fade-in" style={{ paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingBottom: '2rem' }}>
+        <PageHeader title={`Transkrip Akademik: ${selectedKelas.nama_kelas} - ${selectedKelas.jurusan}`} subtitle="Pilih murid untuk melihat transkrip" onBack={() => { setSelectedKelas(null); setSearch(''); }}>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            {/* Search */}
+            <div style={{ position: 'relative', width: '300px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari nama murid atau NISN..."
+                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '100%', background: '#fff', color: 'var(--color-text-dark)' }}
+              />
+            </div>
             <select
               value={filters.tahun_ajaran}
               onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
@@ -241,17 +328,6 @@ export default function AdminTranskripAkademikPage() {
             </select>
           </div>
         </PageHeader>
-
-        {/* Search */}
-        <div style={{ position: 'relative', marginBottom: '1rem' }}>
-          <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari nama murid atau NISN..."
-            style={{ paddingLeft: '2.5rem', height: '42px', border: '1.5px solid var(--color-border)', borderRadius: '10px', fontSize: '0.9rem', outline: 'none', width: '100%', maxWidth: '400px', background: '#fff', color: 'var(--color-text-dark)' }}
-          />
-        </div>
 
         {/* Table */}
         <div className="table-container">
@@ -281,7 +357,7 @@ export default function AdminTranskripAkademikPage() {
                     <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
                     <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{item.siswa?.nama_siswa || '-'}</td>
                     <td>{item.siswa?.nisn || '-'}</td>
-                    <td>{item.siswa?.kelas?.nama_kelas || item.siswa?.nama_kelas || '-'}</td>
+                    <td>{item.siswa?.kelas ? `${item.siswa.kelas.nama_kelas} - ${item.siswa.kelas.jurusan}` : (item.siswa?.nama_kelas || '-')}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
                         <button
