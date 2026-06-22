@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import AppLogo from '@/shared/components/AppLogo';
 import { getRedirectPathForRole, login, saveSession } from '@/shared/services/auth.service';
@@ -15,7 +15,10 @@ const ACCESS_OPTIONS = [
 ];
 
 export default function LoginPage() {
-  const [access, setAccess] = useState('');
+  const location = useLocation();
+  const isCalonMuridLogin = location.pathname === '/login-calon-murid';
+  
+  const [access, setAccess] = useState(isCalonMuridLogin ? 'calon_siswa' : '');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -116,11 +119,12 @@ export default function LoginPage() {
           <header>
             <AppLogo size="lg" className="login-form-logo" />
             <h2>Selamat Datang</h2>
-            <p>Silakan pilih akses dan masuk ke akun Anda</p>
+            <p>Silakan {isCalonMuridLogin ? 'masukkan NISN / email' : 'pilih akses dan masuk'} ke akun Anda</p>
           </header>
 
-          <div className="input-group" style={{ marginBottom: '1.5rem', position: 'relative' }} ref={dropdownRef}>
-            <label>Pilih Akses</label>
+          {!isCalonMuridLogin && (
+            <div className="input-group" style={{ marginBottom: '1.5rem', position: 'relative' }} ref={dropdownRef}>
+              <label>Pilih Akses</label>
             <div
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               style={{
@@ -188,6 +192,7 @@ export default function LoginPage() {
               </div>
             )}
           </div>
+          )}
 
           <form onSubmit={handleLogin}>
             <div className="input-group">
@@ -240,7 +245,7 @@ export default function LoginPage() {
 
           <footer>
             <p>
-              Belum punya akun? <Link to="/register-calon-murid">Registrasi Akun</Link>
+              Belum punya akun? <Link to="/register-calon-murid">Registrasi Akun{isCalonMuridLogin ? ' Calon Murid' : ''}</Link>
             </p>
             <p style={{ marginTop: '10px' }}>
               <Link to="/home">Kembali ke Profil Sekolah</Link>
