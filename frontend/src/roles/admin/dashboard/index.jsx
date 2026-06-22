@@ -158,7 +158,11 @@ export default function AdminDashboard() {
                   </tr>
                 ) : audit.items.length ? (
                   audit.items.map((item, index) => {
-                    const dateObj = new Date(item.created_at || item.waktu);
+                    let dateStr = item.created_at || item.waktu;
+                    if (typeof dateStr === 'string' && dateStr.endsWith('Z')) {
+                      dateStr = dateStr.slice(0, -1);
+                    }
+                    const dateObj = new Date(dateStr);
                     const formattedDate = isNaN(dateObj.getTime()) ? '-' : dateObj.toLocaleString('id-ID', {
                       year: 'numeric', month: 'short', day: 'numeric',
                       hour: '2-digit', minute: '2-digit'
