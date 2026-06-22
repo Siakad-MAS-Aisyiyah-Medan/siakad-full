@@ -15,7 +15,12 @@ const formatDate = (dateString) => {
   try {
     const d = new Date(dateString);
     if (isNaN(d.getTime())) return dateString;
-    return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat('id-ID', { 
+      weekday: 'long', 
+      day: '2-digit', 
+      month: 'long', 
+      year: 'numeric' 
+    }).format(d);
   } catch {
     return dateString;
   }
@@ -70,7 +75,7 @@ function AdminPengumumanTable({ filteredData, searchQuery, onSearchChange, onAdd
                 <tr key={item.id}>
                   <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{index + 1}</td>
                   <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{item.judul}</td>
-                  <td>{item.tanggal_publikasi || '-'}</td>
+                  <td>{formatDate(item.tanggal_publikasi)}</td>
                   <td>
                     <span style={{
                       display: 'inline-block',

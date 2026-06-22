@@ -12,11 +12,16 @@ import {
   MapPin,
   Calendar,
   Phone,
-  Briefcase
+  Briefcase,
+  Download,
+  ExternalLink,
+  FolderOpen
 } from 'lucide-react';
 import AdminPageShell from '@/shared/components/AdminPageShell';
 import { fetchAdminPendaftarDetail } from '@/shared/services/ppdb.service';
 import { useAdminPpdb } from '@/shared/ppdb/hooks/useAdminPpdb';
+import { resolveStorageUrl } from '@/shared/services/apiHelpers';
+import { apiConfig } from '@/config/api.config';
 
 function InfoField({ label, value, icon: Icon, isFullWidth = false }) {
   return (
@@ -88,6 +93,33 @@ function StatusBadge({ status }) {
     }}>
       {labelMap[normalized] || 'Menunggu'}
     </span>
+  );
+}
+
+function FileLink({ label, path }) {
+  if (!path) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+        <span style={{ fontSize: '0.95rem', color: '#94a3b8', fontStyle: 'italic', fontWeight: 500 }}>Belum diunggah</span>
+      </div>
+    );
+  }
+
+  const url = resolveStorageUrl(path, apiConfig);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.85rem', fontSize: '0.85rem', background: '#f8fafc', color: 'var(--color-primary-dark)', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s' }} onMouseOver={e => { e.currentTarget.style.background = 'var(--color-primary-soft)'; e.currentTarget.style.borderColor = 'var(--color-primary-light)'; }} onMouseOut={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
+          <ExternalLink size={14} /> Lihat File
+        </a>
+        <a href={url} download target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none' }} onMouseOver={e => e.currentTarget.style.textDecoration = 'underline'} onMouseOut={e => e.currentTarget.style.textDecoration = 'none'}>
+          <Download size={14} /> Unduh
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -262,6 +294,17 @@ export default function AdminDetailPendaftar({ readOnly = false }) {
                     <InfoField label="No. HP" value={data.no_hp_ibu || data.telepon_ibu || data.hp_ibu} icon={Phone} />
                   </div>
                 </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Berkas Pendaftaran" icon={FolderOpen}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', rowGap: '2rem' }}>
+                <FileLink label="Kartu Keluarga (KK)" path={data.file_kk} />
+                <FileLink label="Akta Kelahiran / Surat Tanda Kelahiran" path={data.file_stk} />
+                <FileLink label="Pas Photo" path={data.file_pas_photo} />
+                <FileLink label="Ijazah Terakhir" path={data.file_ijazah} />
+                <FileLink label="Kartu NISN" path={data.file_nisn} />
+                <FileLink label="KTP Orang Tua" path={data.file_ktp_ortua} />
               </div>
             </SectionCard>
 
