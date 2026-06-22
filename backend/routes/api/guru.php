@@ -14,6 +14,7 @@ Route::middleware(['auth:sanctum', 'permission:manage_absensi_siswa'])->group(fu
     Route::get('/guru/absensi/siswa/form', [AbsensiController::class, 'guruFormData']);
     Route::post('/guru/absensi/siswa/bulk', [AbsensiController::class, 'guruBulkStore']);
     Route::get('/guru/absensi/siswa/rekap', [AbsensiController::class, 'guruRekapSiswa']);
+    Route::get('/guru/absensi/siswa/history', [AbsensiController::class, 'guruHistoryAbsensi']);
 });
 
 Route::middleware(['auth:sanctum', 'permission:manage_nilai_siswa'])->group(function () {

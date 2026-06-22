@@ -6,7 +6,7 @@ import apiClient from '@/shared/services/apiClient';
 import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
 import { getStoredProfile, getStoredUser } from '@/shared/services/auth.service';
 import { getDisplayName } from '@/shared/utils/profile';
-import { fetchAbsensiForm, saveAbsensiBulk } from '@/shared/absensi/guru/services/absensi.service';
+import { fetchAbsensiForm, saveAbsensiBulk, fetchHistoryAbsensi } from '@/shared/absensi/guru/services/absensi.service';
 import { toastError, toastSuccess } from '@/shared/hooks/useConfirm';
 import PageHeader from '@/shared/components/PageHeader';
 
@@ -161,122 +161,326 @@ function AbsensiContextForm({
   );
 }
 
-function AbsensiInputView({ context, rows, loading, saving, onBack, onChange, onSave, onSetSemuaStatus }) {
-  const meetingDates = buildMeetingDates(context.bulan, 7);
+function getDayName(dateStr) {
+  if (!dateStr) return '';
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return '';
+  const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  return isNaN(date.getTime()) ? '' : days[date.getDay()];
+}
+
+function AbsensiHistoryView({ context, onBack }) {
+  const [historyList, setHistoryList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const res = await fetchHistoryAbsensi({
+          id_kelas: context.id_kelas,
+          id_mapel: context.id_mapel
+        });
+        setHistoryList(res || []);
+      } catch (err) {
+        console.error(err);
+        toastError('Gagal', 'Gagal memuat riwayat absensi');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadHistory();
+  }, [context]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <PageHeader 
-        title="Isi Absensi Murid"
-        subtitle="Isi kehadiran murid untuk setiap pertemuan pada bulan yang dipilih."
+        title="Riwayat Absensi Kelas"
+        subtitle={`Riwayat absensi untuk kelas ${context.nama_kelas} - ${context.nama_mapel}`}
       />
 
-      <div className="glass" style={{ borderRadius: '16px', padding: '1.25rem 1.5rem', border: '1px solid var(--color-border)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1rem 2rem' }}>
-          <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Tahun Ajaran</div><strong>{context.tahun_ajaran}</strong></div>
-          <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Semester</div><strong>{context.semester}</strong></div>
-          <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Bulan</div><strong>{formatMonthLabel(context.bulan)}</strong></div>
-          <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Kelas</div><strong>{context.nama_kelas}</strong></div>
-          <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Mata Pelajaran</div><strong>{context.nama_mapel}</strong></div>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', color: 'var(--color-text-dark)' }}>
-        <span>Keterangan:</span>
-        <span className="btn-outline" style={{ pointerEvents: 'none' }}>H = Hadir</span>
-        <span className="btn-outline" style={{ pointerEvents: 'none' }}>S = Sakit</span>
-        <span className="btn-outline" style={{ pointerEvents: 'none' }}>I = Izin</span>
-        <span className="btn-outline" style={{ pointerEvents: 'none' }}>A = Alpha</span>
+      <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <button type="button" className="btn-outline" onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+          <ArrowLeft size={16} /> Kembali
+        </button>
       </div>
 
       <div className="table-container">
         <table className="data-table">
           <thead>
             <tr>
-              <th rowSpan="2">No</th>
-              <th rowSpan="2">Nama Murid</th>
-              <th rowSpan="2">NISN</th>
-              <th colSpan={meetingDates.length} style={{ textAlign: 'center' }}>Pertemuan Ke-</th>
-            </tr>
-            <tr>
-              {meetingDates.map((_, index) => (
-                <th key={`meeting-${index + 1}`} style={{ padding: '0.75rem 0.5rem', minWidth: '110px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                    <span>{index + 1}</span>
-                    <select 
-                      style={{ 
-                        padding: '0.15rem 0.25rem', 
-                        fontSize: '0.75rem', 
-                        borderRadius: '4px',
-                        border: '1px solid #d1d5db',
-                        background: '#ffffff',
-                        cursor: 'pointer',
-                        color: '#374151',
-                        outline: 'none'
-                      }} 
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          onSetSemuaStatus(index, e.target.value);
-                          e.target.value = "";
-                        }
-                      }}
-                      title={`Set status semua murid pada pertemuan ke-${index + 1}`}
-                      defaultValue=""
-                    >
-                      <option value="" disabled>Set...</option>
-                      {STATUS_OPTIONS.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </th>
-              ))}
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Hari</th>
+              <th>Jam Pelajaran</th>
+              <th style={{ textAlign: 'center' }}>Hadir</th>
+              <th style={{ textAlign: 'center' }}>Sakit</th>
+              <th style={{ textAlign: 'center' }}>Izin</th>
+              <th style={{ textAlign: 'center' }}>Alpa</th>
+              <th style={{ textAlign: 'center' }}>Terlambat</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3 + meetingDates.length} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
-                  Memuat daftar absensi murid...
+                <td colSpan="9" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  Memuat riwayat absensi...
                 </td>
               </tr>
-            ) : (
-              rows.map((row, rowIndex) => (
-                <tr key={row.id_user_siswa}>
-                  <td>{rowIndex + 1}</td>
-                  <td style={{ fontWeight: 600 }}>{row.nama_siswa || '-'}</td>
-                  <td>{row.nisn || '-'}</td>
-                  {meetingDates.map((dateValue, meetingIndex) => (
-                    <td key={`${row.id_user_siswa}-${dateValue}`}>
-                      <select
-                        value={row.pertemuan?.[meetingIndex] || '-'}
-                        onChange={(event) => onChange(row.id_user_siswa, meetingIndex, event.target.value)}
-                        className="form-control"
-                        style={{ minWidth: '90px' }}
-                      >
-                        {STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  ))}
+            ) : historyList.length > 0 ? (
+              historyList.map((row, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td style={{ fontWeight: 600 }}>{row.tanggal}</td>
+                  <td>{getDayName(row.tanggal)}</td>
+                  <td>{row.jam_mulai} - {row.jam_selesai}</td>
+                  <td style={{ textAlign: 'center', color: '#10B981', fontWeight: 600 }}>{row.count_hadir || 0}</td>
+                  <td style={{ textAlign: 'center', color: '#3B82F6', fontWeight: 600 }}>{row.count_sakit || 0}</td>
+                  <td style={{ textAlign: 'center', color: '#F59E0B', fontWeight: 600 }}>{row.count_izin || 0}</td>
+                  <td style={{ textAlign: 'center', color: '#EF4444', fontWeight: 600 }}>{row.count_alpa || 0}</td>
+                  <td style={{ textAlign: 'center', color: '#6B7280', fontWeight: 600 }}>{row.count_terlambat || 0}</td>
                 </tr>
               ))
+            ) : (
+              <tr>
+                <td colSpan="9" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  Belum ada riwayat absensi untuk kelas ini.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function TambahAbsensiView({ context, onBack }) {
+  const [form, setForm] = useState({
+    tanggal: new Date().toISOString().split('T')[0],
+    jam_mulai: '07:00',
+    jam_selesai: '08:30',
+  });
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    async function loadStudents() {
+      setLoadingStudents(true);
+      try {
+        const res = await fetchAbsensiForm({
+          id_kelas: context.id_kelas,
+          id_mapel: context.id_mapel,
+          tanggal: form.tanggal,
+          jam_mulai: form.jam_mulai,
+          jam_selesai: form.jam_selesai,
+          tahun_ajaran: context.tahun_ajaran,
+          semester: context.semester,
+        });
+        if (active) {
+          const rows = (res?.siswa || []).map(s => ({
+            id_user_siswa: s.id_user_siswa,
+            nama_siswa: s.nama_siswa,
+            nisn: s.nisn,
+            status: s.status || 'H',
+            keterangan: s.keterangan || ''
+          }));
+          setStudents(rows);
+        }
+      } catch (err) {
+        console.error(err);
+        toastError('Gagal', 'Gagal memuat daftar murid');
+      } finally {
+        if (active) setLoadingStudents(false);
+      }
+    }
+    loadStudents();
+    return () => { active = false; };
+  }, [form.tanggal, form.jam_mulai, form.jam_selesai, context]);
+
+  const handleStatusChange = (studentId, status) => {
+    setStudents(prev => prev.map(s => s.id_user_siswa === studentId ? { ...s, status } : s));
+  };
+
+  const handleSetAll = (status) => {
+    setStudents(prev => prev.map(s => ({ ...s, status })));
+  };
+
+  const handleSave = async () => {
+    if (students.length === 0) {
+      toastError('Gagal', 'Tidak ada murid untuk diabsen');
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveAbsensiBulk({
+        meta: {
+          id_kelas: context.id_kelas,
+          id_mapel: context.id_mapel,
+          tanggal: form.tanggal,
+          jam_mulai: form.jam_mulai,
+          jam_selesai: form.jam_selesai,
+          tahun_ajaran: context.tahun_ajaran,
+          semester: context.semester,
+        },
+        items: students.map(s => ({
+          id_user_siswa: s.id_user_siswa,
+          status: s.status,
+          keterangan: s.keterangan || null
+        }))
+      });
+      toastSuccess('Berhasil', 'Absensi berhasil disimpan');
+      onBack();
+    } catch (err) {
+      console.error(err);
+      toastError('Gagal', err?.response?.data?.message || 'Gagal menyimpan absensi');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <PageHeader 
+        title="Tambah Absensi Kelas"
+        subtitle={`Input absensi untuk kelas ${context.nama_kelas} - ${context.nama_mapel}`}
+      />
+
+      <div className="glass" style={{ borderRadius: '16px', padding: '1.5rem', border: '1px solid var(--color-border)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label className="form-label">Tanggal</label>
+            <input 
+              type="date" 
+              className="form-control" 
+              value={form.tanggal} 
+              onChange={e => setForm(prev => ({ ...prev, tanggal: e.target.value }))} 
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label className="form-label">Hari</label>
+            <input 
+              type="text" 
+              className="form-control" 
+              value={getDayName(form.tanggal)} 
+              readOnly 
+              style={{ background: '#f3f4f6', cursor: 'not-allowed', color: '#6b7280' }}
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label className="form-label">Jam Mulai</label>
+            <input 
+              type="time" 
+              className="form-control" 
+              value={form.jam_mulai} 
+              onChange={e => setForm(prev => ({ ...prev, jam_mulai: e.target.value }))} 
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label className="form-label">Jam Selesai</label>
+            <input 
+              type="time" 
+              className="form-control" 
+              value={form.jam_selesai} 
+              onChange={e => setForm(prev => ({ ...prev, jam_selesai: e.target.value }))} 
+            />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ color: 'var(--color-text-dark)', fontWeight: 600 }}>Set Semua Ke:</span>
+          <button type="button" className="btn-outline" onClick={() => handleSetAll('H')} style={{ borderColor: '#10B981', color: '#10B981', background: 'transparent' }}>Hadir (H)</button>
+          <button type="button" className="btn-outline" onClick={() => handleSetAll('S')} style={{ borderColor: '#3B82F6', color: '#3B82F6', background: 'transparent' }}>Sakit (S)</button>
+          <button type="button" className="btn-outline" onClick={() => handleSetAll('I')} style={{ borderColor: '#F59E0B', color: '#F59E0B', background: 'transparent' }}>Izin (I)</button>
+          <button type="button" className="btn-outline" onClick={() => handleSetAll('A')} style={{ borderColor: '#EF4444', color: '#EF4444', background: 'transparent' }}>Alpa (A)</button>
+        </div>
+      </div>
+
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Siswa</th>
+              <th>NISN</th>
+              <th style={{ textAlign: 'center' }}>Hadir (H)</th>
+              <th style={{ textAlign: 'center' }}>Sakit (S)</th>
+              <th style={{ textAlign: 'center' }}>Izin (I)</th>
+              <th style={{ textAlign: 'center' }}>Alpa (A)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loadingStudents ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  Memuat daftar murid...
+                </td>
+              </tr>
+            ) : students.length > 0 ? (
+              students.map((student, idx) => (
+                <tr key={student.id_user_siswa}>
+                  <td>{idx + 1}</td>
+                  <td style={{ fontWeight: 600 }}>{student.nama_siswa}</td>
+                  <td>{student.nisn}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <input 
+                      type="radio" 
+                      name={`status-${student.id_user_siswa}`} 
+                      checked={student.status === 'H'} 
+                      onChange={() => handleStatusChange(student.id_user_siswa, 'H')}
+                      style={{ transform: 'scale(1.3)', cursor: 'pointer', accentColor: '#10B981' }}
+                    />
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <input 
+                      type="radio" 
+                      name={`status-${student.id_user_siswa}`} 
+                      checked={student.status === 'S'} 
+                      onChange={() => handleStatusChange(student.id_user_siswa, 'S')}
+                      style={{ transform: 'scale(1.3)', cursor: 'pointer', accentColor: '#3B82F6' }}
+                    />
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <input 
+                      type="radio" 
+                      name={`status-${student.id_user_siswa}`} 
+                      checked={student.status === 'I'} 
+                      onChange={() => handleStatusChange(student.id_user_siswa, 'I')}
+                      style={{ transform: 'scale(1.3)', cursor: 'pointer', accentColor: '#F59E0B' }}
+                    />
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <input 
+                      type="radio" 
+                      name={`status-${student.id_user_siswa}`} 
+                      checked={student.status === 'A'} 
+                      onChange={() => handleStatusChange(student.id_user_siswa, 'A')}
+                      style={{ transform: 'scale(1.3)', cursor: 'pointer', accentColor: '#EF4444' }}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  Tidak ada data murid untuk kelas ini.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
         <button type="button" className="btn-outline" onClick={onBack}>
           Kembali
         </button>
-        <button type="button" className="btn-primary" onClick={onSave} disabled={saving}>
-          {saving ? 'Menyimpan...' : 'Simpan'}
+        <button type="button" className="btn-primary" onClick={handleSave} disabled={saving || students.length === 0}>
+          {saving ? 'Menyimpan...' : 'Simpan Absensi'}
         </button>
       </div>
     </div>
@@ -426,18 +630,6 @@ export default function GuruAbsensiPage() {
     setView('create');
   };
 
-  const openEdit = (row) => {
-    setForm({
-      id: row.id,
-      tahun_ajaran: row.tahun_ajaran,
-      semester: row.semester,
-      bulan: row.bulan,
-      id_kelas: String(row.id_kelas),
-      id_mapel: String(row.id_mapel),
-    });
-    setView('edit');
-  };
-
   const handleFormChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => {
@@ -497,138 +689,6 @@ export default function GuruAbsensiPage() {
     toastSuccess('Berhasil', 'Data absensi berhasil dihapus dari daftar kerja.');
   };
 
-  const openInput = async (row) => {
-    setActiveContext(row);
-    setView('input');
-    setInputLoading(true);
-
-    try {
-      const meetingDates = buildMeetingDates(row.bulan, 7);
-      const responses = await Promise.all(
-        meetingDates.map((dateValue) =>
-          fetchAbsensiForm({
-            id_kelas: Number(row.id_kelas),
-            id_mapel: Number(row.id_mapel),
-            tanggal: dateValue,
-            jam_mulai: FIXED_TIME.jam_mulai,
-            jam_selesai: FIXED_TIME.jam_selesai,
-            tahun_ajaran: row.tahun_ajaran,
-            semester: row.semester,
-          })
-        )
-      );
-
-      const rowMap = new Map();
-      responses.forEach((response, meetingIndex) => {
-        (response?.siswa || []).forEach((student) => {
-          if (!rowMap.has(student.id_user_siswa)) {
-            rowMap.set(student.id_user_siswa, {
-              id_user_siswa: student.id_user_siswa,
-              nama_siswa: student.nama_siswa,
-              nisn: student.nisn,
-              pertemuan: Array(meetingDates.length).fill('-'),
-            });
-          }
-
-          rowMap.get(student.id_user_siswa).pertemuan[meetingIndex] = student.status || '-';
-        });
-      });
-
-      setRows(Array.from(rowMap.values()));
-    } catch (error) {
-      console.error('Gagal memuat form absensi', error);
-      toastError('Gagal', error?.response?.data?.message || 'Gagal memuat absensi murid.');
-      setView('list');
-      setActiveContext(null);
-    } finally {
-      setInputLoading(false);
-    }
-  };
-
-  const handleStatusChange = (idUserSiswa, meetingIndex, value) => {
-    setRows((prev) =>
-      prev.map((item) =>
-        item.id_user_siswa === idUserSiswa
-          ? {
-              ...item,
-              pertemuan: item.pertemuan.map((status, index) =>
-                index === meetingIndex ? value : status
-              ),
-            }
-          : item
-      )
-    );
-  };
-
-  const handleSetSemuaStatus = (meetingIndex, newStatus) => {
-    setRows((prev) =>
-      prev.map((item) => ({
-        ...item,
-        pertemuan: item.pertemuan.map((status, index) => (index === meetingIndex ? newStatus : status)),
-      }))
-    );
-  };
-
-  const handleSaveAbsensi = async () => {
-    if (!activeContext) return;
-
-    if (!rows || rows.length === 0) {
-      toastError('Gagal', 'Tidak dapat menyimpan karena tidak ada murid di kelas ini.');
-      return;
-    }
-
-    const meetingDates = buildMeetingDates(activeContext.bulan, 7);
-    setSaving(true);
-
-    try {
-      const meetingsToSave = meetingDates
-        .map((dateValue, meetingIndex) => ({
-          dateValue,
-          meetingIndex,
-          hasData: rows.some((row) => row.pertemuan?.[meetingIndex] && row.pertemuan[meetingIndex] !== '-'),
-        }))
-        .filter((m) => m.hasData);
-
-      if (meetingsToSave.length === 0) {
-        toastSuccess('Berhasil', 'Tidak ada data absensi untuk disimpan.');
-        setView('list');
-        setActiveContext(null);
-        setSaving(false);
-        return;
-      }
-
-      await Promise.all(
-        meetingsToSave.map(({ dateValue, meetingIndex }) =>
-          saveAbsensiBulk({
-            meta: {
-              id_kelas: Number(activeContext.id_kelas),
-              id_mapel: Number(activeContext.id_mapel),
-              tanggal: dateValue,
-              jam_mulai: FIXED_TIME.jam_mulai,
-              jam_selesai: FIXED_TIME.jam_selesai,
-              tahun_ajaran: activeContext.tahun_ajaran,
-              semester: activeContext.semester,
-            },
-            items: rows.map((item) => ({
-              id_user_siswa: item.id_user_siswa,
-              status: item.pertemuan?.[meetingIndex] && item.pertemuan[meetingIndex] !== '-' ? item.pertemuan[meetingIndex] : 'H',
-              keterangan: null,
-            })),
-          })
-        )
-      );
-
-      toastSuccess('Berhasil', 'Absensi murid berhasil disimpan.');
-      setView('list');
-      setActiveContext(null);
-    } catch (error) {
-      console.error('Gagal menyimpan absensi', error);
-      toastError('Gagal', error?.response?.data?.message || 'Gagal menyimpan absensi murid.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <MainLayout role={user?.role} name={name}>
       <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
@@ -672,14 +732,20 @@ export default function GuruAbsensiPage() {
                         <td>{row.nama_mapel}</td>
                         <td>
                           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem' }}>
-                            <button type="button" className="btn-icon edit" title="Edit" onClick={() => openEdit(row)}>
-                              <Pencil size={16} />
+                            <button type="button" className="btn-icon edit" title="Tambah Absensi" onClick={() => {
+                              setActiveContext(row);
+                              setView('tambah_absen');
+                            }}>
+                              <Plus size={16} />
                             </button>
                             <button type="button" className="btn-icon delete" title="Hapus" onClick={() => deleteContext(row)}>
                               <Trash2 size={16} />
                             </button>
-                            <button type="button" className="btn-outline" onClick={() => openInput(row)}>
-                              Isi Absensi
+                            <button type="button" className="btn-outline" onClick={() => {
+                              setActiveContext(row);
+                              setView('history');
+                            }}>
+                              History Absensi
                             </button>
                           </div>
                         </td>
@@ -712,19 +778,23 @@ export default function GuruAbsensiPage() {
           />
         )}
 
-        {view === 'input' && activeContext && (
-          <AbsensiInputView
+        {view === 'history' && activeContext && (
+          <AbsensiHistoryView
             context={activeContext}
-            rows={rows}
-            loading={inputLoading}
-            saving={saving}
             onBack={() => {
               setView('list');
               setActiveContext(null);
             }}
-            onChange={handleStatusChange}
-            onSave={handleSaveAbsensi}
-            onSetSemuaStatus={handleSetSemuaStatus}
+          />
+        )}
+
+        {view === 'tambah_absen' && activeContext && (
+          <TambahAbsensiView
+            context={activeContext}
+            onBack={() => {
+              setView('list');
+              setActiveContext(null);
+            }}
           />
         )}
       </div>

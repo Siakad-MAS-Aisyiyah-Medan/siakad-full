@@ -10,16 +10,26 @@ import { apiConfig } from '@/config/api.config';
 
 function resolveStorageUrl(path) {
   if (!path) return null;
-  if (/^https?:\/\//i.test(path)) return path;
+  
+  // Jika path mengandung '/storage/', paksa ambil path dari '/storage/' ke belakang
+  const storageIndex = path.indexOf('/storage/');
+  let cleanPath = path;
+  if (storageIndex !== -1) {
+    cleanPath = path.substring(storageIndex);
+  } else if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+  
   const baseUrl = new URL(apiConfig.baseURL);
   const origin = `${baseUrl.protocol}//${baseUrl.host}`;
-  return `${origin}${path.startsWith('/storage/') ? path : `/storage/${path}`}`;
+  return `${origin}${cleanPath.startsWith('/storage/') ? cleanPath : `/storage/${cleanPath}`}`;
 }
 
 export default function PengaturanPpdbPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('umum');
+  const [previewImage, setPreviewImage] = useState(null);
   
   const [formData, setFormData] = useState({
     ppdb_judul: '',
@@ -210,22 +220,30 @@ export default function PengaturanPpdbPage() {
           </div>
           
           {formData.ppdb_brosur && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '220px' }}>
-              <a 
-                href={resolveStorageUrl(formData.ppdb_brosur)} 
-                target="_blank" 
-                rel="noreferrer" 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: '220px' }}>
+              <div style={{ width: '100%', maxWidth: '300px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--color-border)', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem' }}>
+                <img 
+                  src={resolveStorageUrl(formData.ppdb_brosur)} 
+                  alt="Preview Brosur" 
+                  style={{ width: '100%', height: 'auto', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in' }}
+                  onClick={() => setPreviewImage(resolveStorageUrl(formData.ppdb_brosur))}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+              <button 
+                type="button"
+                onClick={() => setPreviewImage(resolveStorageUrl(formData.ppdb_brosur))}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                   padding: '0.85rem 1.5rem', borderRadius: '12px', backgroundColor: '#f8fafc',
                   border: '1px solid var(--color-border)', color: 'var(--color-primary)',
-                  fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s'
+                  fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s', width: '100%', cursor: 'pointer'
                 }}
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--color-primary)'; e.currentTarget.style.color = '#fff'; }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#f8fafc'; e.currentTarget.style.color = 'var(--color-primary)'; }}
               >
-                <FileText size={18} /> Lihat Brosur Saat Ini
-              </a>
+                <FileText size={18} /> Buka Gambar Penuh
+              </button>
               <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
                 * Brosur sudah diunggah sebelumnya
               </span>
@@ -471,6 +489,35 @@ export default function PengaturanPpdbPage() {
         </div>
         )}
       </div>
+
+      {previewImage && (
+        <div 
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'
+          }}
+          onClick={() => setPreviewImage(null)}
+        >
+          <button 
+            type="button"
+            onClick={() => setPreviewImage(null)}
+            style={{
+              position: 'absolute', top: '20px', right: '20px',
+              background: 'white', color: 'black', border: 'none', borderRadius: '50%',
+              width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', zIndex: 10000, boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            }}
+          >
+            <X size={24} />
+          </button>
+          <img 
+            src={previewImage} 
+            alt="Brosur Penuh" 
+            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
+            onClick={e => e.stopPropagation()} 
+          />
+        </div>
+      )}
     </AdminPageShell>
   );
 }

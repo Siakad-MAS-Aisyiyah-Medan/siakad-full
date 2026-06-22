@@ -11,6 +11,11 @@ export async function saveAbsensiBulk(payload) {
   return unwrapData(response);
 }
 
+export async function fetchHistoryAbsensi(params) {
+  const response = await apiClient.get('/guru/absensi/siswa/history', { params });
+  return unwrapData(response);
+}
+
 export async function fetchRekapSiswa(params = {}) {
   const response = await apiClient.get('/guru/absensi/siswa/rekap', { params });
   return unwrapData(response);

@@ -138,6 +138,25 @@ class AbsensiController extends Controller
         }
     }
 
+    public function guruHistoryAbsensi(Request $request)
+    {
+        $validated = $request->validate([
+            'id_kelas' => 'required|exists:kelas,id_kelas',
+            'id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
+        ]);
+
+        try {
+            $history = $this->absensiService->getHistoryMeetings(
+                (int) auth()->id(),
+                $validated
+            );
+
+            return ApiResponse::success($history, 'Berhasil mengambil riwayat absensi');
+        } catch (InvalidArgumentException $e) {
+            return ApiResponse::error($e->getMessage(), 422);
+        }
+    }
+
     public function guruCheckIn(Request $request)
     {
         $validated = $request->validate([

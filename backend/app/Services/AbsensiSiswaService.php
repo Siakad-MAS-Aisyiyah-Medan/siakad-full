@@ -102,6 +102,25 @@ class AbsensiSiswaService
         });
     }
 
+    public function getHistoryMeetings(int $guruId, array $params): Collection
+    {
+        $this->assertGuruCanRecord($guruId, (int) $params['id_mapel']);
+
+        return Absensi::query()
+            ->select('tanggal', 'jam_mulai', 'jam_selesai', 'tahun_ajaran', 'semester')
+            ->selectRaw("SUM(CASE WHEN status = 'H' THEN 1 ELSE 0 END) as count_hadir")
+            ->selectRaw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as count_sakit")
+            ->selectRaw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as count_izin")
+            ->selectRaw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as count_alpa")
+            ->selectRaw("SUM(CASE WHEN status = 'T' THEN 1 ELSE 0 END) as count_terlambat")
+            ->where('id_kelas', $params['id_kelas'])
+            ->where('id_mapel', $params['id_mapel'])
+            ->groupBy('tanggal', 'jam_mulai', 'jam_selesai', 'tahun_ajaran', 'semester')
+            ->orderByDesc('tanggal')
+            ->orderByDesc('jam_mulai')
+            ->get();
+    }
+
     public function listForSiswa(int $userId, array $filters = []): Collection
     {
         $query = Absensi::with(['kelas', 'mapel', 'guruPencatat.guru'])
