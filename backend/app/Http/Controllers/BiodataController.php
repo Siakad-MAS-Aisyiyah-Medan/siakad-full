@@ -6,11 +6,13 @@ use App\Models\Admin;
 use App\Models\Guru;
 use App\Models\KepalaSekolah;
 use App\Models\Siswa;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BiodataController extends Controller
 {
+    use AuditsAdminActions;
     public function update(Request $request): JsonResponse
     {
         try {
@@ -143,6 +145,8 @@ class BiodataController extends Controller
                     'message' => 'Role tidak memiliki biodata.',
                 ], 400);
             }
+
+            $this->auditAdmin('profile.biodata.update', null, ['role' => $role]);
 
             return response()->json([
                 'success' => true,

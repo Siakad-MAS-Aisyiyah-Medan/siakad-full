@@ -115,7 +115,14 @@ class AkunController extends Controller
             'status_akun' => $validated['status'] ?? 'aktif',
         ]);
 
-        $this->auditAdmin('akun.create', $user, ['username' => $user->username]);
+        $prefix = match($user->role) {
+            'kepsek' => 'kepsek',
+            'guru' => 'guru',
+            'siswa' => 'murid',
+            'admin' => 'admin',
+            default => 'akun'
+        };
+        $this->auditAdmin("{$prefix}.create", $user, ['username' => $user->username]);
 
         return response()->json([
             'success' => true,
@@ -137,7 +144,14 @@ class AkunController extends Controller
 
         // We can optionally delete related profile data here if needed,
         // or rely on database cascading/soft deletes.
-        $this->auditAdmin('akun.delete', $user, ['username' => $user->username]);
+        $prefix = match($user->role) {
+            'kepsek' => 'kepsek',
+            'guru' => 'guru',
+            'siswa' => 'murid',
+            'admin' => 'admin',
+            default => 'akun'
+        };
+        $this->auditAdmin("{$prefix}.delete", $user, ['username' => $user->username]);
         $user->delete();
 
         return response()->json([
@@ -187,7 +201,14 @@ class AkunController extends Controller
             }
         }
 
-        $this->auditAdmin('akun.update', $user, ['username' => $user->username]);
+        $prefix = match($user->role) {
+            'kepsek' => 'kepsek',
+            'guru' => 'guru',
+            'siswa' => 'murid',
+            'admin' => 'admin',
+            default => 'akun'
+        };
+        $this->auditAdmin("{$prefix}.update", $user, ['username' => $user->username]);
 
         return response()->json([
             'success' => true,

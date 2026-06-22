@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Nilai;
 use App\Services\NilaiService;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class NilaiController extends Controller
 {
+    use AuditsAdminActions;
     public function __construct(
         private NilaiService $nilaiService
     ) {}
@@ -55,6 +57,13 @@ class NilaiController extends Controller
 
         try {
             $saved = $this->nilaiService->bulkSave((int) $request->user()->id_user, $validated);
+
+            $this->auditAdmin('guru.nilai.bulk_store', null, [
+                'id_kelas' => $validated['meta']['id_kelas'],
+                'id_mapel' => $validated['meta']['id_mapel'],
+                'semester' => $validated['meta']['semester'],
+                'tahun_ajaran' => $validated['meta']['tahun_ajaran']
+            ]);
 
             return ApiResponse::success($saved, 'Nilai siswa berhasil disimpan');
         } catch (InvalidArgumentException $e) {

@@ -6,9 +6,11 @@ use App\Utils\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Utils\AuditsAdminActions;
 
 class FotoProfilController extends Controller
 {
+    use AuditsAdminActions;
     public function upload(Request $request): JsonResponse
     {
         $request->validate([
@@ -32,6 +34,8 @@ class FotoProfilController extends Controller
         $profile->foto = '/storage/'.$path;
         $profile->save();
 
+        $this->auditAdmin('profile.foto.upload', null, ['foto_url' => $profile->foto]);
+
         return ApiResponse::success(
             ['foto_url' => $profile->foto],
             'Foto profil berhasil diperbarui.'
@@ -54,6 +58,8 @@ class FotoProfilController extends Controller
             $profile->foto = null;
             $profile->save();
         }
+
+        $this->auditAdmin('profile.foto.delete', null, []);
 
         return ApiResponse::success(null, 'Foto profil berhasil dihapus.');
     }

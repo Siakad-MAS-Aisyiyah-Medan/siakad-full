@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\SystemSetting;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PpdbSettingController extends Controller
 {
+    use AuditsAdminActions;
     /**
      * Get all PPDB settings
      */
@@ -195,6 +197,8 @@ class PpdbSettingController extends Controller
             $url = Storage::disk('public')->url($path);
             SystemSetting::setValue('ppdb_brosur', $url);
         }
+
+        $this->auditAdmin('admin.ppdb_setting.update', null, ['keys' => array_keys($data)]);
 
         return ApiResponse::success(null, 'Pengaturan PPDB berhasil disimpan');
     }

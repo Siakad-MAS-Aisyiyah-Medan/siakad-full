@@ -11,6 +11,7 @@ use App\Models\Mapel;
 use App\Models\User;
 use App\Services\AbsensiSiswaService;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -21,6 +22,8 @@ use InvalidArgumentException;
 
 class AbsensiController extends Controller
 {
+    use AuditsAdminActions;
+
     protected AbsensiSiswaService $absensiService;
 
     public function __construct(AbsensiSiswaService $absensiService)
@@ -104,6 +107,12 @@ class AbsensiController extends Controller
                 $validated
             );
 
+            $this->auditAdmin('guru.absensi.bulk_store', null, [
+                'id_kelas' => $validated['meta']['id_kelas'],
+                'id_mapel' => $validated['meta']['id_mapel'],
+                'tanggal' => $validated['meta']['tanggal']
+            ]);
+
             return ApiResponse::success($saved, 'Absensi siswa berhasil disimpan');
         } catch (InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);
@@ -169,6 +178,13 @@ class AbsensiController extends Controller
 
         try {
             $this->absensiService->deleteMeeting((int) auth()->id(), $validated);
+
+            $this->auditAdmin('guru.absensi.delete_meeting', null, [
+                'id_kelas' => $validated['id_kelas'],
+                'id_mapel' => $validated['id_mapel'],
+                'tanggal' => $validated['tanggal']
+            ]);
+
             return ApiResponse::success(null, 'Data absensi pertemuan berhasil dihapus');
         } catch (\Exception $e) {
             return ApiResponse::error($e->getMessage(), 500);
@@ -187,6 +203,8 @@ class AbsensiController extends Controller
                 $request->input('keterangan')
             );
 
+            $this->auditAdmin('guru.absensi.checkin', null, ['keterangan' => $request->input('keterangan')]);
+
             return ApiResponse::success($data, 'Absen masuk berhasil dicatat');
         } catch (InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);
@@ -204,6 +222,8 @@ class AbsensiController extends Controller
                 (int) auth()->id(),
                 $request->input('keterangan')
             );
+
+            $this->auditAdmin('guru.absensi.checkout', null, ['keterangan' => $request->input('keterangan')]);
 
             return ApiResponse::success($data, 'Absen pulang berhasil dicatat');
         } catch (InvalidArgumentException $e) {

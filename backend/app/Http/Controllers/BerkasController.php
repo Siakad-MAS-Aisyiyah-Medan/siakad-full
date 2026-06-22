@@ -12,10 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Utils\AuditsAdminActions;
 use InvalidArgumentException;
 
 class BerkasController extends Controller
 {
+    use AuditsAdminActions;
     public function index()
     {
         try {
@@ -42,6 +44,8 @@ class BerkasController extends Controller
                 $request->file('file')
             );
 
+            $this->auditAdmin('calon_siswa.berkas.upload', null, ['jenis_berkas' => $validated['jenis_berkas']]);
+
             return ApiResponse::success($item, 'Berkas berhasil diunggah');
         } catch (InvalidArgumentException $e) {
             return ApiResponse::error($e->getMessage(), 422);
@@ -52,6 +56,8 @@ class BerkasController extends Controller
     {
         try {
             $this->delete(Auth::user(), $jenis);
+
+            $this->auditAdmin('calon_siswa.berkas.delete', null, ['jenis_berkas' => $jenis]);
 
             return ApiResponse::success(null, 'Berkas berhasil dihapus');
         } catch (InvalidArgumentException $e) {

@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\SystemSetting;
 use App\Models\TahunAjaran;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class TahunAjaranController extends Controller
 {
+    use AuditsAdminActions;
     public function index()
     {
         $data = TahunAjaran::orderBy('tanggal_mulai', 'desc')->get();
@@ -37,6 +39,8 @@ class TahunAjaranController extends Controller
         }
 
         $tahunAjaran = TahunAjaran::create($validator->validated());
+
+        $this->auditAdmin('admin.tahun_ajaran.create', $tahunAjaran, ['tahun_ajaran' => $tahunAjaran->tahun_ajaran, 'semester' => $tahunAjaran->semester]);
 
         return ApiResponse::success($tahunAjaran, 'Tahun ajaran berhasil ditambahkan', 201);
     }
@@ -77,6 +81,8 @@ class TahunAjaranController extends Controller
 
         $tahunAjaran->update($validator->validated());
 
+        $this->auditAdmin('admin.tahun_ajaran.update', $tahunAjaran, ['tahun_ajaran' => $tahunAjaran->tahun_ajaran, 'semester' => $tahunAjaran->semester]);
+
         return ApiResponse::success($tahunAjaran, 'Tahun ajaran berhasil diperbarui');
     }
 
@@ -93,6 +99,8 @@ class TahunAjaranController extends Controller
 
         $tahunAjaran->delete();
 
+        $this->auditAdmin('admin.tahun_ajaran.delete', $tahunAjaran, ['tahun_ajaran' => $tahunAjaran->tahun_ajaran, 'semester' => $tahunAjaran->semester]);
+
         return ApiResponse::success(null, 'Tahun ajaran berhasil dihapus');
     }
 
@@ -107,6 +115,8 @@ class TahunAjaranController extends Controller
         $tahunAjaran->update(['status' => 'Aktif']);
 
         $this->updatePengaturanAktif($tahunAjaran->tahun_ajaran, $tahunAjaran->semester);
+
+        $this->auditAdmin('admin.tahun_ajaran.activate', $tahunAjaran, ['tahun_ajaran' => $tahunAjaran->tahun_ajaran, 'semester' => $tahunAjaran->semester]);
 
         return ApiResponse::success($tahunAjaran, 'Tahun ajaran berhasil diaktifkan');
     }

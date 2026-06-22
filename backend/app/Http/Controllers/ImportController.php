@@ -7,9 +7,11 @@ use App\Imports\SiswaImport;
 use Illuminate\Http\Request;
 use Exception;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Utils\AuditsAdminActions;
 
 class ImportController extends Controller
 {
+    use AuditsAdminActions;
     public function importSiswa(Request $request)
     {
         $request->validate([
@@ -22,6 +24,8 @@ class ImportController extends Controller
             $rows = (new FastExcel)->import($request->file('file'));
             $siswaImport->import($rows);
             
+            $this->auditAdmin('admin.import.siswa', null, ['id_kelas' => $request->id_kelas]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data Siswa berhasil diimport.',
@@ -45,6 +49,8 @@ class ImportController extends Controller
             $rows = (new FastExcel)->import($request->file('file'));
             $guruImport->import($rows);
             
+            $this->auditAdmin('admin.import.guru', null, []);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data Guru berhasil diimport.',

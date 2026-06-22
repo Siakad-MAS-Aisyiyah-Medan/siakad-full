@@ -14,6 +14,7 @@ use App\Services\Account\AccountRegistrationService;
 use App\Services\EnrollmentService;
 use App\Services\PendaftaranStateService;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,8 @@ use InvalidArgumentException;
 
 class PendaftaranController extends Controller
 {
+    use AuditsAdminActions;
+
     public function __construct(
         private PendaftaranStateService $state,
         private \App\Services\PpdbBerkasService $berkasService,
@@ -105,6 +108,8 @@ class PendaftaranController extends Controller
             'status_pendaftaran' => 'draft',
             'status_kelulusan' => 'Pending',
         ]);
+
+        $this->auditAdmin('calon_siswa.ppdb.start', $pendaftaran, ['nisn' => $user->username]);
 
         return ApiResponse::success(
             PpdbResource::applicant($pendaftaran->fresh(['berkas']))->resolve(),
@@ -290,6 +295,8 @@ class PendaftaranController extends Controller
         }
         $pendaftaran->save();
 
+        $this->auditAdmin('calon_siswa.ppdb.submit', $pendaftaran, ['no_registrasi' => $pendaftaran->no_registrasi]);
+
         return ApiResponse::success(
             PpdbResource::applicant($pendaftaran->fresh(['berkas']))->resolve(),
             'Pendaftaran berhasil diajukan'
@@ -334,6 +341,8 @@ class PendaftaranController extends Controller
 
         $pendaftaran->fill($data);
         $pendaftaran->save();
+
+        $this->auditAdmin('calon_siswa.ppdb.update_step', $pendaftaran, ['step' => $data['current_step'] ?? 'unknown']);
 
         return ApiResponse::success(
             PpdbResource::applicant($pendaftaran->fresh(['berkas']))->resolve(),
@@ -515,6 +524,8 @@ class PendaftaranController extends Controller
                 $validated['jenis_berkas'],
                 $request->file('file')
             );
+
+            $this->auditAdmin('calon_siswa.ppdb.upload_berkas', null, ['jenis_berkas' => $validated['jenis_berkas']]);
 
             return ApiResponse::success($berkas, 'Berkas berhasil diunggah');
         } catch (InvalidArgumentException $e) {

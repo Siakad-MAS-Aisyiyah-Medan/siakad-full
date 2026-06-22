@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\ProfilSekolah;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProfilSekolahController extends Controller
 {
+    use AuditsAdminActions;
     /**
      * Display the specified resource.
      */
@@ -86,6 +88,8 @@ class ProfilSekolahController extends Controller
 
         $profil->fill($data);
         $profil->save();
+
+        $this->auditAdmin('admin.profil_sekolah.update', null, ['nama_sekolah' => $profil->nama_sekolah]);
 
         return ApiResponse::success($profil, 'Profil Sekolah berhasil diperbarui');
     }

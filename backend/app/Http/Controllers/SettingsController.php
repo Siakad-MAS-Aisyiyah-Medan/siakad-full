@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\SystemSetting;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class SettingsController extends Controller
 {
+    use AuditsAdminActions;
     /**
      * Get all settings grouped.
      */
@@ -57,6 +59,8 @@ class SettingsController extends Controller
 
         $setting->update(['value' => $request->value]);
 
+        $this->auditAdmin('admin.settings.update', null, ['key' => $setting->key, 'value' => $request->value]);
+
         return ApiResponse::success([
             'key' => $setting->key,
             'value' => $setting->value,
@@ -89,6 +93,8 @@ class SettingsController extends Controller
                 ];
             }
         }
+
+        $this->auditAdmin('admin.settings.bulk_update', null, ['keys' => array_column($updated, 'key')]);
 
         return ApiResponse::success($updated, 'Settings berhasil diperbarui');
     }
