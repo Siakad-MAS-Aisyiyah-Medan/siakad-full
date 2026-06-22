@@ -1,8 +1,8 @@
-import { ArrowLeft, Plus, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Save, X, UploadCloud } from 'lucide-react';
 
 import PageHeader from '@/shared/components/PageHeader';
 
-export default function GuruForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
+export default function GuruForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false, onImport }) {
   const isEdit = view === 'edit' && !readOnly;
 
   return (
@@ -11,7 +11,19 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
         title={readOnly ? 'Detail Data Guru' : view === 'add' ? 'Tambah Data Guru' : 'Edit Data Guru'}
         subtitle={readOnly ? 'Informasi lengkap data guru' : view === 'add' ? 'Isi data untuk menambah guru baru' : 'Perbarui informasi data guru'}
         onBack={onCancel}
-      />
+      >
+        {view === 'add' && onImport && (
+          <button 
+            type="button" 
+            onClick={onImport} 
+            className="btn-outline" 
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}
+          >
+            <UploadCloud size={16} />
+            Unggah Spreadsheet
+          </button>
+        )}
+      </PageHeader>
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>

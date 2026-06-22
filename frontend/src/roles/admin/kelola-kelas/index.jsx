@@ -1,7 +1,9 @@
 import AdminPageShell from '@/shared/components/AdminPageShell';
 import KelasTable from '@/shared/akademik/kelas/components/KelasTable';
 import KelasForm from '@/shared/akademik/kelas/components/KelasForm';
+import KelasDetailMurid from '@/shared/akademik/kelas/components/KelasDetailMurid';
 import { useKelas } from '@/shared/akademik/kelas/hooks/useKelas';
+import { useState } from 'react';
 
 export default function KelasPage({ readOnly = false }) {
   const {
@@ -22,9 +24,16 @@ export default function KelasPage({ readOnly = false }) {
     isFetching,
   } = useKelas();
 
+  const [selectedKelas, setSelectedKelas] = useState(null);
+
   return (
     <AdminPageShell>
-      {view === 'list' ? (
+      {selectedKelas ? (
+        <KelasDetailMurid 
+          kelas={selectedKelas} 
+          onBack={() => setSelectedKelas(null)} 
+        />
+      ) : view === 'list' ? (
         <KelasTable
           filteredData={filteredData}
           searchQuery={searchQuery}
@@ -32,6 +41,7 @@ export default function KelasPage({ readOnly = false }) {
           onAdd={readOnly ? undefined : openAdd}
           onEdit={readOnly ? undefined : openEdit}
           onDelete={readOnly ? undefined : removeKelas}
+          onViewStudents={(kelas) => setSelectedKelas(kelas)}
           isFetching={isFetching}
           readOnly={readOnly}
         />

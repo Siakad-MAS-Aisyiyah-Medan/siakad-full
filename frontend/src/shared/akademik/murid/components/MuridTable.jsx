@@ -1,8 +1,8 @@
-import { Download, Pencil, Plus, Search, ShieldCheck, Trash2, UploadCloud } from 'lucide-react';
+import { Download, Pencil, Plus, Search, ShieldCheck, Trash2 } from 'lucide-react';
 
 import PageHeader from '@/shared/components/PageHeader';
 
-import { exportToCsv } from '@/shared/utils/exportCsv';
+import { exportToExcel } from '@/shared/utils/exportExcel';
 
 export default function MuridTable({
   data,
@@ -14,20 +14,26 @@ export default function MuridTable({
   isFetching = false,
   readOnly = false,
   onAdd,
-  onImport,
 }) {
   const handleDownload = () => {
-    const dataToExport = data.map(item => ({
-      'Nama Murid': item.nama_siswa || '-',
-      'NISN': item.nisn || '-',
-      'Jenis Kelamin': item.jenis_kelamin === 'L' ? 'Laki-Laki' : item.jenis_kelamin === 'P' ? 'Perempuan' : '-',
-      'Tahun Masuk': item.tahun_masuk || '-',
-      'Tahun Keluar': item.tahun_keluar || '-',
-      'Status': item.status || '-',
-      'No. HP Wali': item.no_hp_wali || '-',
-      'Alamat': item.alamat || '-',
-    }));
-    exportToCsv('Data_Murid.csv', dataToExport);
+    const dataToExport = data.map(item => {
+      const isAktif = item.status_aktif !== false;
+      const nama = item.siswa?.nama_siswa || item.pendaftaran?.nama_lengkap || '-';
+      const jenisKelamin = item.siswa?.jenis_kelamin || item.pendaftaran?.jenis_kelamin;
+      const jkelLabel = jenisKelamin === 'L' ? 'Laki-Laki' : jenisKelamin === 'P' ? 'Perempuan' : '-';
+
+      return {
+        'Nama Murid': nama,
+        'NISN': item.siswa?.nisn || item.pendaftaran?.nisn || '-',
+        'Jenis Kelamin': jkelLabel,
+        'Tahun Masuk': item.siswa?.tahun_masuk || item.pendaftaran?.tahun_masuk || '-',
+        'Tahun Keluar': item.siswa?.tahun_lulus || '-',
+        'Status': isAktif ? 'Aktif' : 'Nonaktif',
+        'No. HP Wali': item.siswa?.no_hp_wali || item.pendaftaran?.no_hp_wali || '-',
+        'Alamat': item.siswa?.alamat || item.pendaftaran?.alamat || '-',
+      };
+    });
+    exportToExcel('Data_Murid.xlsx', dataToExport);
   };
 
   return (
@@ -54,10 +60,6 @@ export default function MuridTable({
               <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
                 <Download size={16} />
                 Unduh Data
-              </button>
-              <button type="button" onClick={onImport} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
-                <UploadCloud size={16} />
-                Import Excel
               </button>
               <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Plus size={16} />

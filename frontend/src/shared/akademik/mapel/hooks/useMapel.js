@@ -6,14 +6,16 @@ import {
   updateMapel,
   deleteMapel,
 } from '../services/mapel.service';
+import { fetchKelasList } from '@/shared/akademik/kelas/services/kelas.service';
 import { confirmAction, toastSuccess, toastError } from '@/shared/hooks/useConfirm';
 
-const emptyForm = { nama_mapel: '', id_guru: '', tingkat: '', kelompok_mapel: '' };
+const emptyForm = { nama_mapel: '', id_guru: '', tingkat: '', kelompok_mapel: '', id_kelas: [] };
 
 export function useMapel() {
   const [view, setView] = useState('list');
   const [mapelData, setMapelData] = useState([]);
   const [guruData, setGuruData] = useState([]);
+  const [kelasData, setKelasData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
@@ -23,9 +25,10 @@ export function useMapel() {
   const loadData = useCallback(async () => {
     setIsFetching(true);
     try {
-      const [mapel, guru] = await Promise.all([fetchMapelList(), fetchGuruList()]);
+      const [mapel, guru, kelas] = await Promise.all([fetchMapelList(), fetchGuruList(), fetchKelasList({ per_page: 200 })]);
       setMapelData(mapel);
       setGuruData(guru);
+      setKelasData(kelas);
     } catch (error) {
       console.error('Error fetching mapel:', error);
     } finally {
@@ -59,6 +62,7 @@ export function useMapel() {
       id_guru: mapel.id_guru,
       tingkat: mapel.tingkat || '',
       kelompok_mapel: mapel.kelompok_mapel || '',
+      id_kelas: mapel.kelas ? mapel.kelas.map(k => k.id_kelas) : [],
     });
     setView('edit');
   };
@@ -115,6 +119,7 @@ export function useMapel() {
     setSearchQuery,
     filteredData,
     guruData,
+    kelasData,
     formData,
     loading,
     isFetching,

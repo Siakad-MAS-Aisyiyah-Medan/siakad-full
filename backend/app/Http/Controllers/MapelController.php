@@ -29,6 +29,8 @@ class MapelController extends Controller
             'id_guru' => 'required|exists:users,id_user',
             'tingkat' => 'required|in:X,XI,XII',
             'kelompok_mapel' => 'nullable|string|max:100',
+            'id_kelas' => 'nullable|array',
+            'id_kelas.*' => 'exists:kelas,id_kelas',
         ]);
 
         $mapel = $this->create($validated);
@@ -43,6 +45,8 @@ class MapelController extends Controller
             'id_guru' => 'required|exists:users,id_user',
             'tingkat' => 'required|in:X,XI,XII',
             'kelompok_mapel' => 'nullable|string|max:100',
+            'id_kelas' => 'nullable|array',
+            'id_kelas.*' => 'exists:kelas,id_kelas',
         ]);
 
         $mapel = $this->processUpdate((int) $id, $validated);
@@ -63,7 +67,19 @@ class MapelController extends Controller
 
     private function list(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
-        $query = Mapel::with(['guru.guru']);
+        $query = Mapel::with(['guru.guru', 'kelas']);
+        $user = auth()->user();
+
+        if ($user && $user->role === 'siswa') {
+            $siswa = \App\Models\Siswa::where('id_user', $user->id_user)->first();
+            if ($siswa && $siswa->id_kelas) {
+                $query->whereHas('kelas', function ($q) use ($siswa) {
+                    $q->where('kelas_mapel.id_kelas', $siswa->id_kelas);
+                });
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
 
         if ($term = SearchInput::escape($search)) {
             $query->where(function ($q) use ($term) {
@@ -82,19 +98,29 @@ class MapelController extends Controller
 
     private function create(array $data): array
     {
+        $idKelas = $data['id_kelas'] ?? [];
+        unset($data['id_kelas']);
+        
         $mapel = Mapel::create($data);
+        $mapel->kelas()->sync($idKelas);
+        
         $this->auditAdmin('mapel.create', $mapel, ['nama_mapel' => $mapel->nama_mapel]);
 
-        return (new MapelResource($mapel->load('guru.guru')))->resolve();
+        return (new MapelResource($mapel->load(['guru.guru', 'kelas'])))->resolve();
     }
 
     private function processUpdate(int $id, array $data): array
     {
+        $idKelas = $data['id_kelas'] ?? [];
+        unset($data['id_kelas']);
+        
         $mapel = Mapel::findOrFail($id);
         $mapel->update($data);
+        $mapel->kelas()->sync($idKelas);
+        
         $this->auditAdmin('mapel.update', $mapel, ['nama_mapel' => $mapel->nama_mapel]);
 
-        return (new MapelResource($mapel->fresh(['guru.guru'])))->resolve();
+        return (new MapelResource($mapel->fresh(['guru.guru', 'kelas'])))->resolve();
     }
 
     private function delete(int $id): void

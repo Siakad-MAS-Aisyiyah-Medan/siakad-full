@@ -34,7 +34,8 @@ class NilaiController extends Controller
 
     public function guruBulkStore(Request $request)
     {
-        $validated = $request->validate([
+        try {
+            $validated = $request->validate([
             'meta' => 'required|array',
             'meta.id_kelas' => 'required|exists:kelas,id_kelas',
             'meta.id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
@@ -48,6 +49,9 @@ class NilaiController extends Controller
             'items.*.nilai_praktik' => 'nullable|integer|min:0|max:100',
             'items.*.nilai_sikap' => 'nullable|integer|min:0|max:100',
         ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return \App\Utils\ApiResponse::error("Validasi gagal: " . json_encode($e->errors()), 422);
+        }
 
         try {
             $saved = $this->nilaiService->bulkSave((int) $request->user()->id_user, $validated);

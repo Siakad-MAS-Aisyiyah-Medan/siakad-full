@@ -1,8 +1,8 @@
-import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Download, Pencil, Plus, Search, Trash2, Users } from 'lucide-react';
 
 import PageHeader from '@/shared/components/PageHeader';
 
-import { exportToCsv } from '@/shared/utils/exportCsv';
+import { exportToExcel } from '@/shared/utils/exportExcel';
 
 function statusLabel(kelas) {
   const status = String(kelas.status || '').toLowerCase();
@@ -18,19 +18,21 @@ export default function KelasTable({
   onAdd,
   onEdit,
   onDelete,
+  onViewStudents,
   isFetching = false,
   readOnly = false,
 }) {
   const handleDownload = () => {
     const dataToExport = filteredData.map(item => ({
-      'Tahun Ajaran': item.tahun_ajaran?.tahun_ajaran || item.tahun_ajaran_id || '-',
+      'Tahun Ajaran': item.tahun_ajaran || '2025/2026',
       'Nama Kelas': item.nama_kelas || '-',
-      'Tingkatan': item.tingkatan || '-',
+      'Tingkatan': item.tingkat || '-',
       'Jurusan': item.jurusan || '-',
-      'Wali Kelas': item.wali_kelas?.nama_guru || item.wali_kelas_nama || '-',
+      'Wali Kelas': item.wali_kelas?.nama_guru || 'Belum ditentukan',
+      'Jumlah Murid': item.jumlah_siswa || 0,
       'Status': statusLabel(item),
     }));
-    exportToCsv('Data_Kelas.csv', dataToExport);
+    exportToExcel('Data_Kelas.xlsx', dataToExport);
   };
 
   return (
@@ -78,14 +80,15 @@ export default function KelasTable({
               <th>Tingkatan</th>
               <th>Jurusan</th>
               <th>Wali Kelas</th>
+              <th style={{ textAlign: 'center' }}>Jumlah Murid</th>
               <th>Status</th>
-              {!readOnly ? <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Aksi</th> : null}
+              <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Aksi</th>
             </tr>
           </thead>
           <tbody>
             {isFetching ? (
               <tr>
-                <td colSpan={readOnly ? 7 : 8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan={9} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
                     <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
                     Memuat data kelas...
@@ -107,6 +110,9 @@ export default function KelasTable({
                     </td>
                     <td>{kelas.jurusan || '-'}</td>
                     <td>{kelas.wali_kelas?.nama_guru || 'Belum ditentukan'}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 600, color: 'var(--color-text-dark)' }}>
+                      {kelas.jumlah_siswa || 0} Siswa
+                    </td>
                     <td>
                       <span style={{
                         display: 'inline-block',
@@ -121,24 +127,39 @@ export default function KelasTable({
                         {statusLabel(kelas)}
                       </span>
                     </td>
-                    {!readOnly ? (
-                      <td style={{ paddingRight: '2rem' }}>
-                        <div className="actions-cell">
-                          <button type="button" onClick={() => onEdit && onEdit(kelas)} className="btn-icon edit" title="Edit">
-                            <Pencil size={15} />
-                          </button>
-                          <button type="button" onClick={() => onDelete && onDelete(kelas.id_kelas)} className="btn-icon delete" title="Hapus">
-                            <Trash2 size={15} />
-                          </button>
-                        </div>
-                      </td>
-                    ) : null}
+                    <td style={{ paddingRight: '2rem' }}>
+                      <div className="actions-cell">
+                        <button 
+                          type="button" 
+                          onClick={() => onViewStudents && onViewStudents(kelas)} 
+                          className="btn-icon edit" 
+                          title="Lihat Daftar Murid"
+                          style={{
+                            color: 'var(--color-primary)',
+                            borderColor: 'var(--color-primary-light)',
+                            background: 'var(--color-primary-soft)'
+                          }}
+                        >
+                          <Users size={15} />
+                        </button>
+                        {!readOnly && (
+                          <>
+                            <button type="button" onClick={() => onEdit && onEdit(kelas)} className="btn-icon edit" title="Edit">
+                              <Pencil size={15} />
+                            </button>
+                            <button type="button" onClick={() => onDelete && onDelete(kelas.id_kelas)} className="btn-icon delete" title="Hapus">
+                              <Trash2 size={15} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan={readOnly ? 7 : 8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan={readOnly ? 8 : 9} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ fontSize: '2rem' }}>🏫</div>
                     <p style={{ fontWeight: 600 }}>Tidak ada data kelas</p>

@@ -13,86 +13,148 @@ class BiodataController extends Controller
 {
     public function update(Request $request): JsonResponse
     {
-        $user = auth()->user();
-        $role = $user->role;
+        try {
+            $user = auth()->user();
+            $role = $user->role;
 
-        if ($role === 'guru') {
-            $validated = $request->validate([
-                'nip_nuptk' => 'nullable|string|max:50',
-                'nama_guru' => 'required|string|max:255',
-                'jenis_kelamin' => 'nullable|string|in:L,P',
-                'tgl_lahir' => 'nullable|date',
-                'agama' => 'nullable|string|max:50',
-                'alamat' => 'nullable|string',
-                'no_hp' => 'nullable|string|max:20',
-            ]);
-            $profile = $user->guru;
-            if (! $profile) {
-                $profile = new Guru(['id_user' => $user->id_user]);
+            if ($role === 'guru') {
+                $validated = $request->validate([
+                    'nip_nuptk' => 'nullable|string|max:50',
+                    'nama_guru' => 'required|string|max:255',
+                    'jenis_kelamin' => 'nullable|string|in:L,P',
+                    'tgl_lahir' => 'nullable|date',
+                    'agama' => 'nullable|string|max:50',
+                    'alamat' => 'nullable|string',
+                    'no_hp' => 'nullable|string|max:20',
+                ]);
+                $profile = $user->guru;
+                if (! $profile) {
+                    $profile = new Guru(['id_user' => $user->id_user]);
+                }
+                $profile->fill($validated);
+                if (!$profile->nip_nuptk) {
+                    $profile->nip_nuptk = $user->username ?: '-';
+                }
+                if (!$profile->jenis_kelamin) {
+                    $profile->jenis_kelamin = 'L';
+                }
+                if (!$profile->agama) {
+                    $profile->agama = '-';
+                }
+                if (!$profile->alamat) {
+                    $profile->alamat = '-';
+                }
+                if (!$profile->no_hp) {
+                    $profile->no_hp = '-';
+                }
+                $profile->save();
+            } elseif ($role === 'siswa') {
+                $validated = $request->validate([
+                    'nisn' => 'nullable|string|max:20',
+                    'nis' => 'nullable|string|max:20',
+                    'nama_siswa' => 'required|string|max:255',
+                    'tempat_lahir' => 'nullable|string|max:100',
+                    'tgl_lahir' => 'nullable|date',
+                    'jenis_kelamin' => 'nullable|string|in:L,P',
+                    'agama' => 'nullable|string|max:50',
+                    'alamat' => 'nullable|string',
+                    'nama_wali' => 'nullable|string|max:255',
+                    'no_hp_wali' => 'nullable|string|max:20',
+                ]);
+                $profile = $user->siswa;
+                if (! $profile) {
+                    $profile = new Siswa(['id_user' => $user->id_user]);
+                }
+                $profile->fill($validated);
+                if (!$profile->nisn) {
+                    $profile->nisn = $user->username ?: '-';
+                }
+                if (!$profile->nis) {
+                    $profile->nis = $user->username ?: '-';
+                }
+                if (!$profile->tempat_lahir) {
+                    $profile->tempat_lahir = '-';
+                }
+                if (!$profile->tgl_lahir) {
+                    $profile->tgl_lahir = now()->format('Y-m-d');
+                }
+                if (!$profile->jenis_kelamin) {
+                    $profile->jenis_kelamin = 'L';
+                }
+                if (!$profile->agama) {
+                    $profile->agama = '-';
+                }
+                if (!$profile->alamat) {
+                    $profile->alamat = '-';
+                }
+                if (!$profile->nama_wali) {
+                    $profile->nama_wali = '-';
+                }
+                if (!$profile->no_hp_wali) {
+                    $profile->no_hp_wali = '-';
+                }
+                $profile->save();
+            } elseif ($role === 'kepsek') {
+                $validated = $request->validate([
+                    'nip' => 'nullable|string|max:50',
+                    'nama_lengkap' => 'required|string|max:255',
+                    'jenis_kelamin' => 'nullable|string|in:L,P',
+                    'tgl_lahir' => 'nullable|date',
+                    'no_hp' => 'nullable|string|max:20',
+                    'alamat' => 'nullable|string',
+                ]);
+                $validated['nama_kepsek'] = $validated['nama_lengkap'];
+                unset($validated['nama_lengkap']);
+                $profile = $user->kepalaSekolah;
+                if (! $profile) {
+                    $profile = new KepalaSekolah(['id_user' => $user->id_user]);
+                }
+                $profile->fill($validated);
+                if (!$profile->nip) {
+                    $profile->nip = $user->username ?: '-';
+                }
+                if (!$profile->no_hp) {
+                    $profile->no_hp = '-';
+                }
+                $profile->save();
+            } elseif ($role === 'admin') {
+                $validated = $request->validate([
+                    'nip' => 'nullable|string|max:50',
+                    'nama_lengkap' => 'required|string|max:255',
+                    'no_hp' => 'nullable|string|max:20',
+                ]);
+                $validated['nama_admin'] = $validated['nama_lengkap'];
+                unset($validated['nama_lengkap']);
+                $profile = $user->admin;
+                if (! $profile) {
+                    $profile = new Admin(['id_user' => $user->id_user]);
+                }
+                $profile->fill($validated);
+                if (!$profile->nip) {
+                    $profile->nip = $user->username ?: '-';
+                }
+                if (!$profile->no_hp) {
+                    $profile->no_hp = '-';
+                }
+                $profile->save();
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Role tidak memiliki biodata.',
+                ], 400);
             }
-            $profile->fill($validated);
-            $profile->save();
-        } elseif ($role === 'siswa') {
-            $validated = $request->validate([
-                'nisn' => 'nullable|string|max:20',
-                'nis' => 'nullable|string|max:20',
-                'nama_siswa' => 'required|string|max:255',
-                'tempat_lahir' => 'nullable|string|max:100',
-                'tgl_lahir' => 'nullable|date',
-                'jenis_kelamin' => 'nullable|string|in:L,P',
-                'agama' => 'nullable|string|max:50',
-                'alamat' => 'nullable|string',
-                'nama_wali' => 'nullable|string|max:255',
-                'no_hp_wali' => 'nullable|string|max:20',
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Biodata berhasil diperbarui.',
+                'data' => $profile,
             ]);
-            $profile = $user->siswa;
-            if (! $profile) {
-                $profile = new Siswa(['id_user' => $user->id_user]);
-            }
-            $profile->fill($validated);
-            $profile->save();
-        } elseif ($role === 'kepsek') {
-            $validated = $request->validate([
-                'nip' => 'nullable|string|max:50',
-                'nama_lengkap' => 'required|string|max:255',
-                'jenis_kelamin' => 'nullable|string|in:L,P',
-                'tgl_lahir' => 'nullable|date',
-                'no_hp' => 'nullable|string|max:20',
-                'alamat' => 'nullable|string',
-            ]);
-            $validated['nama_kepsek'] = $validated['nama_lengkap'];
-            unset($validated['nama_lengkap']);
-            $profile = $user->kepalaSekolah;
-            if (! $profile) {
-                $profile = new KepalaSekolah(['id_user' => $user->id_user]);
-            }
-            $profile->fill($validated);
-            $profile->save();
-        } elseif ($role === 'admin') {
-            $validated = $request->validate([
-                'nip' => 'nullable|string|max:50',
-                'nama_lengkap' => 'required|string|max:255',
-                'no_hp' => 'nullable|string|max:20',
-            ]);
-            $validated['nama_admin'] = $validated['nama_lengkap'];
-            unset($validated['nama_lengkap']);
-            $profile = $user->admin;
-            if (! $profile) {
-                $profile = new Admin(['id_user' => $user->id_user]);
-            }
-            $profile->fill($validated);
-            $profile->save();
-        } else {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role tidak memiliki biodata.',
-            ], 400);
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Biodata berhasil diperbarui.',
-            'data' => $profile,
-        ]);
     }
 }

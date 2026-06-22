@@ -19,6 +19,9 @@ class GuruImport
             // Kita mengubah cara mendapatkan indeks karena index FastExcel mulai dari 0 untuk row pertama isi data (baris 2)
             $rowIndex = 2; 
             foreach ($rows as $row) {
+                // Pastikan key array lowercase agar sesuai dengan kode
+                $row = array_change_key_case($row, CASE_LOWER);
+
                 // Lewati baris kosong
                 if (empty($row['nip_nuptk']) || empty($row['nama'])) {
                     $rowIndex++;

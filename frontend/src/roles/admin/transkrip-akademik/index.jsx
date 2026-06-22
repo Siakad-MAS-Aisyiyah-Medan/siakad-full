@@ -97,8 +97,8 @@ export default function AdminTranskripAkademikPage() {
                   onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
                   className="form-control no-print"
                 >
-                  {tahunAjaranList.map(ta => (
-                    <option key={ta.tahun_ajaran} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
+                  {tahunAjaranList.map((ta, idx) => (
+                    <option key={ta.id_tahun_ajaran || ta.tahun_ajaran || idx} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
                   ))}
                   {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
                 </select>
@@ -226,8 +226,8 @@ export default function AdminTranskripAkademikPage() {
               onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
               style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
             >
-              {tahunAjaranList.map(ta => (
-                <option key={ta.id_tahun_ajaran} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
+              {tahunAjaranList.map((ta, idx) => (
+                <option key={ta.id_tahun_ajaran || ta.tahun_ajaran || idx} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
               ))}
               {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
             </select>
@@ -299,19 +299,6 @@ export default function AdminTranskripAkademikPage() {
                         >
                           <Eye size={14} />
                           Lihat
-                        </button>
-                        <button 
-                          type="button" 
-                          title="Unduh" 
-                          style={{ 
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--color-border)',
-                            background: '#fff', color: 'var(--color-text-dark)', cursor: 'pointer', transition: 'all 0.2s'
-                          }}
-                          onMouseOver={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
-                          onMouseOut={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}
-                        >
-                          <Download size={15} />
                         </button>
                       </div>
                     </td>

@@ -2,8 +2,21 @@ import { ArrowLeft, Plus, Save, X } from 'lucide-react';
 import { guruLabel } from '@/shared/utils/guruLabel';
 import PageHeader from '@/shared/components/PageHeader';
 
-export default function MapelForm({ view, formData, guruData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
+export default function MapelForm({ view, formData, guruData, kelasData = [], loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const isEdit = view === 'edit' && !readOnly;
+  
+  const selectableKelas = kelasData.filter(k => !formData.tingkat || k.tingkat === formData.tingkat);
+  const selectedKelas = formData.id_kelas || [];
+
+  const toggleKelas = (id_kelas) => {
+    if (readOnly) return;
+    const current = selectedKelas;
+    const newValue = current.includes(id_kelas) 
+      ? current.filter(id => id !== id_kelas)
+      : [...current, id_kelas];
+      
+    onChange({ target: { name: 'id_kelas', value: newValue } });
+  };
 
   return (
     <div className="admin-page-wrapper animate-fade-in">
@@ -28,13 +41,30 @@ export default function MapelForm({ view, formData, guruData, loading, onChange,
                   ))}
                 </select>
               </EditRow>
-              <EditRow label="Tingkatan" last>
-                <select name="tingkat" value={formData.tingkat || ''} onChange={onChange} className="form-control" required>
+              <EditRow label="Tingkatan" last={!formData.tingkat}>
+                <select name="tingkat" value={formData.tingkat || ''} onChange={(e) => { onChange(e); onChange({ target: { name: 'id_kelas', value: [] } }); }} className="form-control" required>
+                  <option value="">Pilih tingkatan</option>
                   <option value="X">X</option>
                   <option value="XI">XI</option>
                   <option value="XII">XII</option>
                 </select>
               </EditRow>
+              {formData.tingkat && (
+                <EditRow label="Kelas yang Diajar" last>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid var(--color-border)', maxHeight: '200px', overflowY: 'auto' }}>
+                    {selectableKelas.length === 0 ? (
+                      <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Tidak ada kelas untuk tingkat ini</span>
+                    ) : (
+                      selectableKelas.map(k => (
+                        <label key={k.id_kelas} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: readOnly ? 'default' : 'pointer' }}>
+                          <input type="checkbox" checked={selectedKelas.includes(k.id_kelas)} onChange={() => toggleKelas(k.id_kelas)} disabled={readOnly} style={{ width: '16px', height: '16px', accentColor: 'var(--color-primary)' }} />
+                          {k.nama_kelas}
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </EditRow>
+              )}
             </div>
           ) : (
             <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -53,13 +83,30 @@ export default function MapelForm({ view, formData, guruData, loading, onChange,
               </div>
               <div>
                 <FormLabel required>Tingkatan</FormLabel>
-                <select name="tingkat" value={formData.tingkat || ''} onChange={onChange} className="form-control" disabled={readOnly} required>
+                <select name="tingkat" value={formData.tingkat || ''} onChange={(e) => { onChange(e); onChange({ target: { name: 'id_kelas', value: [] } }); }} className="form-control" disabled={readOnly} required>
                   <option value="">Pilih tingkatan</option>
                   <option value="X">X</option>
                   <option value="XI">XI</option>
                   <option value="XII">XII</option>
                 </select>
               </div>
+              {formData.tingkat && (
+                <div>
+                  <FormLabel>Kelas yang Diajar</FormLabel>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.75rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                    {selectableKelas.length === 0 ? (
+                      <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Tidak ada kelas untuk tingkat ini</span>
+                    ) : (
+                      selectableKelas.map(k => (
+                        <label key={k.id_kelas} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: readOnly ? 'default' : 'pointer', background: '#fff', padding: '0.5rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                          <input type="checkbox" checked={selectedKelas.includes(k.id_kelas)} onChange={() => toggleKelas(k.id_kelas)} disabled={readOnly} style={{ width: '16px', height: '16px', accentColor: 'var(--color-primary)' }} />
+                          {k.nama_kelas}
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -82,7 +82,6 @@ export default function MuridPage({ readOnly = false }) {
           isFetching={isFetching}
           readOnly={readOnly}
           onAdd={readOnly ? undefined : openAdd}
-          onImport={readOnly ? undefined : () => setIsImportModalOpen(true)}
         />
       ) : (
         <MuridForm
@@ -93,13 +92,14 @@ export default function MuridPage({ readOnly = false }) {
           onSubmit={submitForm}
           onCancel={cancelForm}
           readOnly={readOnly}
+          onImport={view === 'add' && !readOnly ? () => setIsImportModalOpen(true) : undefined}
         />
       )}
 
       <ImportExcelModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        title="Import Data Siswa"
+        title="Unggah Spreadsheet Murid"
         requiresClass={true}
         loading={isImporting}
         error={importError}

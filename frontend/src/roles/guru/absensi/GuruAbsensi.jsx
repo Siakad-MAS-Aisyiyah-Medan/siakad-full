@@ -17,7 +17,7 @@ import {
   formatMonthLabel,
 } from '../guruTeachingUtils';
 
-const STORAGE_KEY = 'guru_absensi_contexts_v2';
+const STORAGE_KEY_PREFIX = 'guru_absensi_contexts_v3_';
 const SEMESTER_OPTIONS = ['Ganjil', 'Genap'];
 const STATUS_OPTIONS = ['-', 'H', 'S', 'I', 'A'];
 const FIXED_TIME = {
@@ -25,17 +25,30 @@ const FIXED_TIME = {
   jam_selesai: '08:30',
 };
 
-function readStoredContexts() {
+function getStorageKey(user) {
+  return `${STORAGE_KEY_PREFIX}${user?.id_user || 'default'}`;
+}
+
+function readStoredContexts(user) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(getStorageKey(user));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item) => 
+      item &&
+      item.id_kelas &&
+      item.id_mapel &&
+      !isNaN(Number(item.id_kelas)) &&
+      !isNaN(Number(item.id_mapel))
+    );
   } catch {
     return [];
   }
 }
 
-function persistContexts(rows) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+function persistContexts(user, rows) {
+  localStorage.setItem(getStorageKey(user), JSON.stringify(rows));
 }
 
 function buildContextId(meta) {
@@ -139,7 +152,7 @@ function AbsensiContextForm({
           <button type="button" className="btn-outline" onClick={onCancel}>
             Batal
           </button>
-          <button type="button" className="btn-primary" onClick={onSubmit} style={{ background: '#111827', borderColor: '#111827' }}>
+          <button type="button" className="btn-primary" onClick={onSubmit}>
             {mode === 'create' ? 'Simpan' : 'Simpan Perubahan'}
           </button>
         </div>
@@ -148,7 +161,7 @@ function AbsensiContextForm({
   );
 }
 
-function AbsensiInputView({ context, rows, loading, saving, onBack, onChange, onSave }) {
+function AbsensiInputView({ context, rows, loading, saving, onBack, onChange, onSave, onSetSemuaStatus }) {
   const meetingDates = buildMeetingDates(context.bulan, 7);
 
   return (
@@ -187,7 +200,38 @@ function AbsensiInputView({ context, rows, loading, saving, onBack, onChange, on
             </tr>
             <tr>
               {meetingDates.map((_, index) => (
-                <th key={`meeting-${index + 1}`}>{index + 1}</th>
+                <th key={`meeting-${index + 1}`} style={{ padding: '0.75rem 0.5rem', minWidth: '110px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                    <span>{index + 1}</span>
+                    <select 
+                      style={{ 
+                        padding: '0.15rem 0.25rem', 
+                        fontSize: '0.75rem', 
+                        borderRadius: '4px',
+                        border: '1px solid #d1d5db',
+                        background: '#ffffff',
+                        cursor: 'pointer',
+                        color: '#374151',
+                        outline: 'none'
+                      }} 
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          onSetSemuaStatus(index, e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                      title={`Set status semua murid pada pertemuan ke-${index + 1}`}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Set...</option>
+                      {STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </th>
               ))}
             </tr>
           </thead>
@@ -231,7 +275,7 @@ function AbsensiInputView({ context, rows, loading, saving, onBack, onChange, on
         <button type="button" className="btn-outline" onClick={onBack}>
           Kembali
         </button>
-        <button type="button" className="btn-primary" onClick={onSave} disabled={saving} style={{ background: '#111827', borderColor: '#111827' }}>
+        <button type="button" className="btn-primary" onClick={onSave} disabled={saving}>
           {saving ? 'Menyimpan...' : 'Simpan'}
         </button>
       </div>
@@ -276,14 +320,14 @@ export default function GuruAbsensiPage() {
         const activeYear = getActiveAcademicYear(tahunAjaranResponse || []);
         const currentMonth = getDefaultMonth(activeYear, 'Ganjil');
         const defaultContexts = buildDefaultAbsensiContexts(jadwalRows, currentMonth);
-        const storedContexts = readStoredContexts();
+        const storedContexts = readStoredContexts(user);
         const mergedContexts = storedContexts.length > 0 ? storedContexts : defaultContexts;
 
         if (active) {
           setJadwalList(jadwalRows);
           setTahunAjaranList(tahunAjaranResponse || []);
           setContexts(mergedContexts);
-          persistContexts(mergedContexts);
+          persistContexts(user, mergedContexts);
         }
       } catch (error) {
         console.error('Gagal memuat data absensi guru', error);
@@ -437,7 +481,7 @@ export default function GuruAbsensiPage() {
       : [...contexts.filter((item) => item.id !== nextContext.id), nextContext];
 
     setContexts(nextRows);
-    persistContexts(nextRows);
+    persistContexts(user, nextRows);
     setView('list');
     toastSuccess('Berhasil', form.id ? 'Data absensi berhasil diperbarui.' : 'Data absensi berhasil ditambahkan.');
   };
@@ -449,7 +493,7 @@ export default function GuruAbsensiPage() {
 
     const nextRows = contexts.filter((item) => item.id !== row.id);
     setContexts(nextRows);
-    persistContexts(nextRows);
+    persistContexts(user, nextRows);
     toastSuccess('Berhasil', 'Data absensi berhasil dihapus dari daftar kerja.');
   };
 
@@ -516,6 +560,15 @@ export default function GuruAbsensiPage() {
     );
   };
 
+  const handleSetSemuaStatus = (meetingIndex, newStatus) => {
+    setRows((prev) =>
+      prev.map((item) => ({
+        ...item,
+        pertemuan: item.pertemuan.map((status, index) => (index === meetingIndex ? newStatus : status)),
+      }))
+    );
+  };
+
   const handleSaveAbsensi = async () => {
     if (!activeContext) return;
 
@@ -528,8 +581,24 @@ export default function GuruAbsensiPage() {
     setSaving(true);
 
     try {
+      const meetingsToSave = meetingDates
+        .map((dateValue, meetingIndex) => ({
+          dateValue,
+          meetingIndex,
+          hasData: rows.some((row) => row.pertemuan?.[meetingIndex] && row.pertemuan[meetingIndex] !== '-'),
+        }))
+        .filter((m) => m.hasData);
+
+      if (meetingsToSave.length === 0) {
+        toastSuccess('Berhasil', 'Tidak ada data absensi untuk disimpan.');
+        setView('list');
+        setActiveContext(null);
+        setSaving(false);
+        return;
+      }
+
       await Promise.all(
-        meetingDates.map((dateValue, meetingIndex) =>
+        meetingsToSave.map(({ dateValue, meetingIndex }) =>
           saveAbsensiBulk({
             meta: {
               id_kelas: Number(activeContext.id_kelas),
@@ -566,7 +635,7 @@ export default function GuruAbsensiPage() {
         {view === 'list' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <PageHeader title="Absensi Murid" subtitle="Kelola data absensi murid.">
-              <button type="button" onClick={openCreate} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: '#111827', borderColor: '#111827' }}>
+              <button type="button" onClick={openCreate} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Plus size={18} />
                 Tambah Absensi
               </button>
@@ -655,6 +724,7 @@ export default function GuruAbsensiPage() {
             }}
             onChange={handleStatusChange}
             onSave={handleSaveAbsensi}
+            onSetSemuaStatus={handleSetSemuaStatus}
           />
         )}
       </div>

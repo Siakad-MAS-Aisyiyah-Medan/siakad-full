@@ -204,8 +204,10 @@ class AbsensiSiswaService
 
         if (! empty($filters['id_kelas'])) {
             $kelasId = (int) $filters['id_kelas'];
-            $teachesKelas = JadwalPelajaran::where('id_guru', $guruId)
-                ->where('id_kelas', $kelasId)
+            $teachesKelas = \App\Models\Mapel::where('id_guru', $guruId)
+                ->whereHas('kelas', function ($q) use ($kelasId) {
+                    $q->where('kelas_mapel.id_kelas', $kelasId);
+                })
                 ->exists();
 
             if (! $teachesKelas) {

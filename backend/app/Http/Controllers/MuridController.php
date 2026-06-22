@@ -21,11 +21,13 @@ class MuridController extends Controller
         $validated = $request->validate([
             'search' => 'nullable|string',
             'per_page' => 'nullable|integer',
+            'id_kelas' => 'nullable|integer',
         ]);
 
         $paginator = $this->listMurid(
             $validated['search'] ?? null,
-            (int) ($validated['per_page'] ?? 15)
+            (int) ($validated['per_page'] ?? 15),
+            $validated['id_kelas'] ?? null
         );
 
         return ApiResponse::paginated($paginator, 'Berhasil mengambil data murid');
@@ -125,11 +127,15 @@ class MuridController extends Controller
 
     use AuditsAdminActions;
 
-    private function listMurid(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    private function listMurid(?string $search = null, int $perPage = 15, ?int $idKelas = null): LengthAwarePaginator
     {
         $query = User::query()
             ->with(['siswa.kelas', 'pendaftaran'])
             ->where('role', 'siswa');
+
+        if ($idKelas) {
+            $query->whereHas('siswa', fn ($s) => $s->where('id_kelas', $idKelas));
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {

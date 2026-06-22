@@ -2,6 +2,21 @@
  * Nama tampilan dari profil sesuai role (sinkron dengan User::resolveProfile di backend).
  */
 export function getDisplayName(profile, role, fallbackUsername = '') {
+  let accountName = '';
+  try {
+    const raw = localStorage.getItem('siakad_user') ?? localStorage.getItem('user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      accountName = u?.name || '';
+    }
+  } catch (e) {
+    // Silently ignore
+  }
+
+  if (accountName) {
+    return accountName;
+  }
+
   if (!profile) {
     return fallbackUsername || 'Pengguna';
   }
@@ -16,7 +31,7 @@ export function getDisplayName(profile, role, fallbackUsername = '') {
     case 'siswa':
       return profile.nama_siswa || fallbackUsername || 'Siswa';
     case 'calon_siswa':
-      return fallbackUsername || profile.nama_lengkap || 'Calon Siswa';
+      return profile.nama_lengkap || fallbackUsername || 'Calon Siswa';
     default:
       return fallbackUsername || 'Pengguna';
   }

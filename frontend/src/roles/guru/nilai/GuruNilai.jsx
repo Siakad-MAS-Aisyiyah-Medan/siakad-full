@@ -12,20 +12,33 @@ import PageHeader from '@/shared/components/PageHeader';
 
 import { buildDefaultNilaiContexts } from '../guruTeachingUtils';
 
-const STORAGE_KEY = 'guru_nilai_contexts_v2';
+const STORAGE_KEY_PREFIX = 'guru_nilai_contexts_v3_';
 const SEMESTER_OPTIONS = ['Ganjil', 'Genap'];
 
-function readStoredContexts() {
+function getStorageKey(user) {
+  return `${STORAGE_KEY_PREFIX}${user?.id_user || 'default'}`;
+}
+
+function readStoredContexts(user) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(getStorageKey(user));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item) => 
+      item &&
+      item.id_kelas &&
+      item.id_mapel &&
+      !isNaN(Number(item.id_kelas)) &&
+      !isNaN(Number(item.id_mapel))
+    );
   } catch {
     return [];
   }
 }
 
-function persistContexts(rows) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+function persistContexts(user, rows) {
+  localStorage.setItem(getStorageKey(user), JSON.stringify(rows));
 }
 
 function buildContextId(meta) {
@@ -109,7 +122,7 @@ function NilaiContextForm({
           <button type="button" className="btn-outline" onClick={onCancel}>
             Batal
           </button>
-          <button type="button" className="btn-primary" onClick={onSubmit} style={{ background: '#111827', borderColor: '#111827' }}>
+          <button type="button" className="btn-primary" onClick={onSubmit}>
             {mode === 'create' ? 'Simpan' : 'Simpan Perubahan'}
           </button>
         </div>
@@ -169,7 +182,7 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
                         type="number"
                         min={0}
                         max={100}
-                        value={row[field] ?? 0}
+                        value={row[field] !== null && row[field] !== undefined ? row[field] : ''}
                         onChange={(event) => onChange(row.id_user_siswa, field, event.target.value)}
                         className="form-control"
                         style={{ minWidth: '120px' }}
@@ -187,7 +200,7 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
         <button type="button" className="btn-outline" onClick={onBack}>
           Kembali
         </button>
-        <button type="button" className="btn-primary" onClick={onSave} disabled={saving} style={{ background: '#111827', borderColor: '#111827' }}>
+        <button type="button" className="btn-primary" onClick={onSave} disabled={saving}>
           {saving ? 'Menyimpan...' : 'Simpan'}
         </button>
       </div>
@@ -229,14 +242,14 @@ export default function GuruNilaiPage() {
 
         const jadwalRows = Array.isArray(jadwalResponse?.data?.data) ? jadwalResponse.data.data : [];
         const defaultContexts = buildDefaultNilaiContexts(jadwalRows);
-        const storedContexts = readStoredContexts();
+        const storedContexts = readStoredContexts(user);
         const mergedContexts = storedContexts.length > 0 ? storedContexts : defaultContexts;
 
         if (active) {
           setJadwalList(jadwalRows);
           setTahunAjaranList(tahunAjaranResponse || []);
           setContexts(mergedContexts);
-          persistContexts(mergedContexts);
+          persistContexts(user, mergedContexts);
         }
       } catch (error) {
         console.error('Gagal memuat data nilai guru', error);
@@ -370,7 +383,7 @@ export default function GuruNilaiPage() {
       : [...contexts.filter((item) => item.id !== nextContext.id), nextContext];
 
     setContexts(nextRows);
-    persistContexts(nextRows);
+    persistContexts(user, nextRows);
     setView('list');
     toastSuccess('Berhasil', form.id ? 'Daftar nilai berhasil diperbarui.' : 'Daftar nilai berhasil ditambahkan.');
   };
@@ -382,7 +395,7 @@ export default function GuruNilaiPage() {
 
     const nextRows = contexts.filter((item) => item.id !== row.id);
     setContexts(nextRows);
-    persistContexts(nextRows);
+    persistContexts(user, nextRows);
     toastSuccess('Berhasil', 'Daftar nilai berhasil dihapus dari daftar kerja.');
   };
 
@@ -402,9 +415,9 @@ export default function GuruNilaiPage() {
       setSiswaRows(
         (response?.siswa || []).map((item) => ({
           ...item,
-          nilai_tugas: item.nilai_tugas ?? 0,
-          nilai_uts: item.nilai_uts ?? 0,
-          nilai_uas: item.nilai_uas ?? 0,
+          nilai_tugas: item.nilai_tugas ?? '',
+          nilai_uts: item.nilai_uts ?? '',
+          nilai_uas: item.nilai_uas ?? '',
         }))
       );
     } catch (error) {
@@ -421,7 +434,7 @@ export default function GuruNilaiPage() {
     setSiswaRows((prev) =>
       prev.map((item) =>
         item.id_user_siswa === idUserSiswa
-          ? { ...item, [field]: Number(value) }
+          ? { ...item, [field]: value === '' ? '' : Number(value) }
           : item
       )
     );
@@ -446,9 +459,9 @@ export default function GuruNilaiPage() {
         },
         items: siswaRows.map((row) => ({
           id_user_siswa: row.id_user_siswa,
-          nilai_tugas: Number(row.nilai_tugas ?? 0),
-          nilai_uts: Number(row.nilai_uts ?? 0),
-          nilai_uas: Number(row.nilai_uas ?? 0),
+          nilai_tugas: row.nilai_tugas === '' ? 0 : Number(row.nilai_tugas),
+          nilai_uts: row.nilai_uts === '' ? 0 : Number(row.nilai_uts),
+          nilai_uas: row.nilai_uas === '' ? 0 : Number(row.nilai_uas),
           nilai_praktik: null,
           nilai_sikap: null,
         })),
@@ -458,7 +471,7 @@ export default function GuruNilaiPage() {
         item.id === activeContext.id ? { ...item, completed: true } : item
       );
       setContexts(nextRows);
-      persistContexts(nextRows);
+      persistContexts(user, nextRows);
       toastSuccess('Berhasil', 'Nilai murid berhasil disimpan.');
       setView('list');
       setActiveContext(null);
@@ -476,7 +489,7 @@ export default function GuruNilaiPage() {
         {view === 'list' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <PageHeader title="Daftar Nilai Murid" subtitle="Kelola data nilai murid.">
-              <button type="button" onClick={openCreate} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: '#111827', borderColor: '#111827' }}>
+              <button type="button" onClick={openCreate} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Plus size={18} />
                 Tambah Daftar Nilai
               </button>

@@ -1,9 +1,9 @@
-import { ArrowLeft, Plus, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Save, X, UploadCloud } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 import { fetchKelasList } from '@/shared/akademik/kelas/services/kelas.service';
 import PageHeader from '@/shared/components/PageHeader';
 
-export default function MuridForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false }) {
+export default function MuridForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false, onImport }) {
   const [kelasList, setKelasList] = useState([]);
   const isEdit = view === 'edit' && !readOnly;
 
@@ -28,7 +28,19 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
         title={readOnly ? 'Detail Data Murid' : view === 'add' ? 'Tambah Data Murid' : 'Edit Data Murid'}
         subtitle={readOnly ? 'Informasi lengkap data murid' : view === 'add' ? 'Isi data untuk menambah murid baru' : 'Perbarui informasi data murid'}
         onBack={onCancel}
-      />
+      >
+        {view === 'add' && onImport && (
+          <button 
+            type="button" 
+            onClick={onImport} 
+            className="btn-outline" 
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}
+          >
+            <UploadCloud size={16} />
+            Unggah Spreadsheet
+          </button>
+        )}
+      </PageHeader>
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>
@@ -56,7 +68,9 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                 <select name="id_kelas" value={formData.id_kelas || ''} onChange={onChange} className="form-control" disabled={readOnly}>
                   <option value="">Pilih kelas</option>
                   {filteredKelas.map((kelas) => (
-                    <option key={kelas.id_kelas} value={kelas.id_kelas}>{kelas.nama_kelas}</option>
+                    <option key={kelas.id_kelas} value={kelas.id_kelas}>
+                      {kelas.nama_kelas} {kelas.tingkat || kelas.jurusan ? `(${[kelas.tingkat ? `Tingkat ${kelas.tingkat}` : null, kelas.jurusan].filter(Boolean).join(' - ')})` : ''}
+                    </option>
                   ))}
                 </select>
               </div>

@@ -2,7 +2,7 @@ import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 import PageHeader from '@/shared/components/PageHeader';
 
-import { exportToCsv } from '@/shared/utils/exportCsv';
+import { exportToExcel } from '@/shared/utils/exportExcel';
 
 export default function MapelTable({
   filteredData,
@@ -21,7 +21,7 @@ export default function MapelTable({
       'Tingkatan': item.tingkat || '-',
       'Status': 'Aktif',
     }));
-    exportToCsv('Data_Mata_Pelajaran.csv', dataToExport);
+    exportToExcel('Data_Mata_Pelajaran.xlsx', dataToExport);
   };
 
   return (
@@ -69,13 +69,14 @@ export default function MapelTable({
               <th>Nama Mata Pelajaran</th>
               <th>Guru Pengampu</th>
               <th>Tingkatan</th>
+              <th>Kelas Diajar</th>
               {readOnly ? <th>Status</th> : <th style={{ textAlign: 'right' }}>Aksi</th>}
             </tr>
           </thead>
           <tbody>
             {isFetching ? (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
                     <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
                     Memuat mata pelajaran...
@@ -92,6 +93,19 @@ export default function MapelTable({
                     <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)' }}>
                       {mapel.tingkat || '-'}
                     </span>
+                  </td>
+                  <td style={{ maxWidth: '200px' }}>
+                    {mapel.kelas && mapel.kelas.length > 0 ? (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                        {mapel.kelas.map(k => (
+                          <span key={k.id_kelas} style={{ padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', whiteSpace: 'nowrap' }}>
+                            {k.nama_kelas}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>-</span>
+                    )}
                   </td>
                   {readOnly ? (
                     <td>
@@ -115,7 +129,7 @@ export default function MapelTable({
               ))
             ) : (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ fontSize: '2rem' }}>📚</div>
                     <p style={{ fontWeight: 600 }}>Tidak ada data mata pelajaran</p>

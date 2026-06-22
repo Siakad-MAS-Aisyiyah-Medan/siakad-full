@@ -25,6 +25,9 @@ class SiswaImport
         try {
             $rowIndex = 2;
             foreach ($rows as $row) {
+                // Pastikan key array lowercase agar sesuai dengan kode
+                $row = array_change_key_case($row, CASE_LOWER);
+
                 // Lewati baris kosong
                 if (empty($row['nis']) || empty($row['nama'])) {
                     $rowIndex++;

@@ -20,6 +20,11 @@ class MapelResource extends JsonResource
                 'username' => $this->guru?->username,
                 'nama_guru' => $this->guru?->guru?->nama_guru,
             ]),
+            'kelas' => $this->whenLoaded('kelas', fn () => $this->kelas->map(fn($k) => [
+                'id_kelas' => $k->id_kelas,
+                'nama_kelas' => $k->nama_kelas,
+                'tingkat' => $k->tingkat,
+            ])),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

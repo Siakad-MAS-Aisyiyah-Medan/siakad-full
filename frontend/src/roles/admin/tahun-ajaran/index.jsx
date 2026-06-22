@@ -45,19 +45,8 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
         <PageHeader 
           title={isAdd ? 'Tambah Tahun Ajaran' : 'Ubah Status Tahun Ajaran'} 
           subtitle={isAdd ? 'Buat tahun ajaran baru untuk sistem' : 'Perbarui status tahun ajaran ini'}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn-outline"
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-              height: '38px', background: '#fff'
-            }}
-          >
-            <ArrowLeft size={16} /> Batal
-          </button>
-        </PageHeader>
+          onBack={onClose}
+        />
 
         <div className="form-panel">
           <form onSubmit={onSubmit}>
@@ -105,9 +94,6 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
             </div>
 
             <div style={{ padding: '1.25rem 1.5rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', background: 'var(--color-background)', borderRadius: '0 0 16px 16px' }}>
-              <button type="button" onClick={onClose} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                <X size={16} /> Batal
-              </button>
               <button type="submit" disabled={saving} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1 }}>
                 {isAdd ? <Plus size={16} /> : <Save size={16} />}
                 {saving ? 'Menyimpan...' : isAdd ? 'Tambahkan' : 'Simpan Perubahan'}

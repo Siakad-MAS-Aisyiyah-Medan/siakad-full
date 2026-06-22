@@ -185,13 +185,37 @@ class JadwalController extends Controller
             return ApiResponse::error('Akses jadwal mengajar hanya untuk guru.', 403);
         }
 
-        $items = $this->listForGuru(
-            (int) $user->id_user,
-            $request->query('tahun_ajaran'),
-            $request->query('semester')
-        );
+        $tahunAjaran = \App\Models\TahunAjaran::where('status', 'aktif')->first()?->tahun_ajaran ?? '2025/2026';
+        $semester = (int) date('n') >= 7 || (int) date('n') <= 12 ? 'Ganjil' : 'Genap';
 
-        return ApiResponse::success($items, 'Berhasil mengambil jadwal mengajar');
+        $items = \App\Models\Mapel::with(['kelas'])
+            ->where('id_guru', $user->id_user)
+            ->get()
+            ->map(function ($mapel) use ($tahunAjaran, $semester) {
+                return $mapel->kelas->map(function ($kelas) use ($mapel, $tahunAjaran, $semester) {
+                    return [
+                        'id_mapel' => $mapel->id_mapel,
+                        'id_kelas' => $kelas->id_kelas,
+                        'tahun_ajaran' => $tahunAjaran,
+                        'semester' => $semester,
+                        'mapel' => [
+                            'id_mapel' => $mapel->id_mapel,
+                            'nama_mapel' => $mapel->nama_mapel,
+                            'tingkat' => $mapel->tingkat,
+                        ],
+                        'kelas' => [
+                            'id_kelas' => $kelas->id_kelas,
+                            'nama_kelas' => $kelas->nama_kelas,
+                            'tingkat' => $kelas->tingkat,
+                        ]
+                    ];
+                });
+            })
+            ->flatten(1)
+            ->values()
+            ->all();
+
+        return ApiResponse::success($items, 'Berhasil mengambil daftar penugasan kelas');
     }
 
     public function guruMuridDiajar(Request $request)
@@ -209,15 +233,14 @@ class JadwalController extends Controller
             'semester' => 'required|in:Ganjil,Genap',
         ]);
 
-        $jadwal = JadwalPelajaran::query()
+        $mapelExists = \App\Models\Mapel::where('id_mapel', $validated['id_mapel'])
             ->where('id_guru', $user->id_user)
-            ->where('id_kelas', $validated['id_kelas'])
-            ->where('id_mapel', $validated['id_mapel'])
-            ->where('tahun_ajaran', $validated['tahun_ajaran'])
-            ->where('semester', $validated['semester'])
+            ->whereHas('kelas', function ($q) use ($validated) {
+                $q->where('kelas_mapel.id_kelas', $validated['id_kelas']);
+            })
             ->exists();
 
-        if (! $jadwal) {
+        if (! $mapelExists) {
             return ApiResponse::error('Anda tidak mengampu kelas atau mata pelajaran ini.', 422);
         }
 

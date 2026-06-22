@@ -80,7 +80,6 @@ export default function GuruPage({ readOnly = false }) {
           onDelete={readOnly ? undefined : removeGuru}
           isFetching={isFetching}
           readOnly={readOnly}
-          onImport={readOnly ? undefined : () => setIsImportModalOpen(true)}
         />
       )}
       {(view === 'add' || view === 'edit') && (
@@ -92,13 +91,14 @@ export default function GuruPage({ readOnly = false }) {
           onSubmit={submitForm}
           onCancel={cancelForm}
           readOnly={readOnly}
+          onImport={view === 'add' && !readOnly ? () => setIsImportModalOpen(true) : undefined}
         />
       )}
 
       <ImportExcelModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        title="Import Data Guru"
+        title="Unggah Spreadsheet Guru"
         requiresClass={false}
         loading={isImporting}
         error={importError}

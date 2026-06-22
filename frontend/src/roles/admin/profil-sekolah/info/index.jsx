@@ -201,29 +201,17 @@ export default function InfoProfilPage({ readOnly = false }) {
       <PageHeader 
         title={isEditing ? 'Edit Profil Sekolah' : 'Kelola Profil Sekolah'}
         subtitle={isEditing ? 'Ubah informasi, foto, dan deskripsi sekolah.' : 'Kelola informasi profil sekolah, kontak, dan sambutan.'}
+        onBack={isEditing ? handleCancelEdit : undefined}
       >
-        {!loading && (
-          isEditing ? (
-            <button
-              type="button"
-              onClick={handleCancelEdit}
-              className="btn-outline"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}
-            >
-              <ArrowLeft size={16} /> Kembali
-            </button>
-          ) : (
-            !readOnly && (
-              <button 
-                type="button" 
-                onClick={() => setIsEditing(true)} 
-                className="btn-primary" 
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-              >
-                <Edit size={16} /> Edit Data
-              </button>
-            )
-          )
+        {!loading && !isEditing && !readOnly && (
+          <button 
+            type="button" 
+            onClick={() => setIsEditing(true)} 
+            className="btn-primary" 
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <Edit size={16} /> Edit Data
+          </button>
         )}
       </PageHeader>
 

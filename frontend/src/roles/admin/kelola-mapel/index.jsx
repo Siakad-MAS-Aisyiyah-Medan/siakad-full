@@ -19,6 +19,7 @@ export default function MapelPage({ readOnly = false }) {
     submitForm,
     removeMapel,
     isFetching,
+    kelasData,
   } = useMapel();
 
   return (
@@ -40,6 +41,7 @@ export default function MapelPage({ readOnly = false }) {
           view={view}
           formData={formData}
           guruData={guruData}
+          kelasData={kelasData}
           loading={loading}
           onChange={handleChange}
           onSubmit={submitForm}

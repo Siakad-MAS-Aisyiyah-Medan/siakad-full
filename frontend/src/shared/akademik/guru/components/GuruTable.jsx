@@ -1,8 +1,8 @@
-import { Download, Pencil, Plus, Search, Trash2, UploadCloud } from 'lucide-react';
+import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 
 import PageHeader from '@/shared/components/PageHeader';
 
-import { exportToCsv } from '@/shared/utils/exportCsv';
+import { exportToExcel } from '@/shared/utils/exportExcel';
 
 export default function GuruTable({
   filteredData,
@@ -13,18 +13,20 @@ export default function GuruTable({
   onDelete,
   isFetching = false,
   readOnly = false,
-  onImport,
 }) {
   const handleDownload = () => {
-    const dataToExport = filteredData.map(item => ({
-      'Nama Guru': item.nama_guru || '-',
-      'NIP/NUPTK': item.nip_nuptk || '-',
-      'Jenis Kelamin': item.jenis_kelamin === 'L' ? 'Laki-Laki' : item.jenis_kelamin === 'P' ? 'Perempuan' : '-',
-      'No. Handphone': item.no_hp || '-',
-      'Alamat': item.alamat || '-',
-      'Jabatan': item.role_label || 'Guru',
-    }));
-    exportToCsv('Data_Guru.csv', dataToExport);
+    const dataToExport = filteredData.map(item => {
+      const profile = item.guru || item.profile || {};
+      return {
+        'Nama Guru': profile.nama_guru || '-',
+        'NIP/NUPTK': profile.nip_nuptk || '-',
+        'Jenis Kelamin': profile.jenis_kelamin === 'L' ? 'Laki-Laki' : profile.jenis_kelamin === 'P' ? 'Perempuan' : '-',
+        'No. Handphone': profile.no_hp || '-',
+        'Alamat': profile.alamat || '-',
+        'Jabatan': item.role_label || 'Guru',
+      };
+    });
+    exportToExcel('Data_Guru.xlsx', dataToExport);
   };
 
   return (
@@ -69,10 +71,6 @@ export default function GuruTable({
               <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
                 <Download size={16} />
                 Unduh Data
-              </button>
-              <button type="button" onClick={onImport} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
-                <UploadCloud size={16} />
-                Import Excel
               </button>
               <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Plus size={16} />

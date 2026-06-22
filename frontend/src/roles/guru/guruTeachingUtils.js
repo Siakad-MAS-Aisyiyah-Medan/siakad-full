@@ -74,19 +74,20 @@ export function dedupeKelasDiajar(jadwalList) {
   const map = new Map();
 
   (jadwalList || []).forEach((item) => {
-    if (!item?.kelas?.id_kelas) return;
+    const idKelas = item.id_kelas || item.kelas?.id_kelas;
+    if (!idKelas || isNaN(Number(idKelas))) return;
 
-    const key = `${item.id_kelas}-${item.tahun_ajaran}-${item.semester}`;
+    const key = `${idKelas}-${item.tahun_ajaran}-${item.semester}`;
     if (!map.has(key)) {
       map.set(key, {
-        id_kelas: item.id_kelas,
+        id_kelas: Number(idKelas),
         nama_kelas: item.kelas?.nama_kelas || '-',
         tingkatan: item.kelas?.nama_kelas?.split(' ')[0] || '-',
         jurusan: item.kelas?.nama_kelas?.split(' ').slice(1).join(' ') || '-',
         wali_kelas: item.guru?.nama_guru || '-',
         tahun_ajaran: item.tahun_ajaran || '-',
         semester: item.semester || '-',
-        id_mapel: item.id_mapel,
+        id_mapel: item.id_mapel ? Number(item.id_mapel) : undefined,
       });
     }
   });
@@ -102,13 +103,15 @@ export function dedupeMapelDiampu(jadwalList) {
   const map = new Map();
 
   (jadwalList || []).forEach((item) => {
+    const idMapel = item.id_mapel || item.mapel?.id_mapel;
+    if (!idMapel || isNaN(Number(idMapel))) return;
     const namaKelas = item.kelas?.nama_kelas || '';
     const tingkatan = namaKelas.split(' ')[0] || '-';
-    const key = `${item.id_mapel}-${tingkatan}-${item.tahun_ajaran}`;
+    const key = `${idMapel}-${tingkatan}-${item.tahun_ajaran}`;
 
     if (!map.has(key)) {
       map.set(key, {
-        id_mapel: item.id_mapel,
+        id_mapel: Number(idMapel),
         nama_mapel: item.mapel?.nama_mapel || '-',
         tingkatan,
         tahun_ajaran: item.tahun_ajaran || '-',
@@ -127,15 +130,19 @@ export function buildDefaultNilaiContexts(jadwalList) {
   const map = new Map();
 
   (jadwalList || []).forEach((item) => {
-    const key = `${item.tahun_ajaran}|${item.semester}|${item.id_kelas}|${item.id_mapel}`;
+    const idKelas = item.id_kelas || item.kelas?.id_kelas;
+    const idMapel = item.id_mapel || item.mapel?.id_mapel;
+    if (!idKelas || !idMapel || isNaN(Number(idKelas)) || isNaN(Number(idMapel))) return;
+
+    const key = `${item.tahun_ajaran}|${item.semester}|${idKelas}|${idMapel}`;
 
     if (!map.has(key)) {
       map.set(key, {
         id: key,
         tahun_ajaran: item.tahun_ajaran,
         semester: item.semester,
-        id_kelas: item.id_kelas,
-        id_mapel: item.id_mapel,
+        id_kelas: Number(idKelas),
+        id_mapel: Number(idMapel),
         nama_kelas: item.kelas?.nama_kelas || '-',
         nama_mapel: item.mapel?.nama_mapel || '-',
       });
@@ -149,7 +156,11 @@ export function buildDefaultAbsensiContexts(jadwalList, monthValue) {
   const map = new Map();
 
   (jadwalList || []).forEach((item) => {
-    const key = `${item.tahun_ajaran}|${item.semester}|${monthValue}|${item.id_kelas}|${item.id_mapel}`;
+    const idKelas = item.id_kelas || item.kelas?.id_kelas;
+    const idMapel = item.id_mapel || item.mapel?.id_mapel;
+    if (!idKelas || !idMapel || isNaN(Number(idKelas)) || isNaN(Number(idMapel))) return;
+
+    const key = `${item.tahun_ajaran}|${item.semester}|${monthValue}|${idKelas}|${idMapel}`;
 
     if (!map.has(key)) {
       map.set(key, {
@@ -157,8 +168,8 @@ export function buildDefaultAbsensiContexts(jadwalList, monthValue) {
         tahun_ajaran: item.tahun_ajaran,
         semester: item.semester,
         bulan: monthValue,
-        id_kelas: item.id_kelas,
-        id_mapel: item.id_mapel,
+        id_kelas: Number(idKelas),
+        id_mapel: Number(idMapel),
         nama_kelas: item.kelas?.nama_kelas || '-',
         nama_mapel: item.mapel?.nama_mapel || '-',
       });

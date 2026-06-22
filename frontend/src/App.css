@@ -4865,3 +4865,41 @@ html.dark-mode .border-b.border-slate-200.px-6.py-5 {
     font-size: 0.9rem;
   }
 }
+
+@media print {
+  .sidebar,
+  .content-header,
+  .mobile-menu-btn,
+  .sidebar-overlay,
+  .no-print {
+    display: none !important;
+  }
+  
+  .dashboard-layout {
+    display: block !important;
+  }
+  
+  .dashboard-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  
+  .admin-page-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  .form-panel {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  body, .dashboard-layout {
+    background: white !important;
+  }
+}
