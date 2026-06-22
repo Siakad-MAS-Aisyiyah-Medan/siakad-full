@@ -13,6 +13,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfilSekolahController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TahunAjaranController;
+use App\Http\Controllers\ImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -26,6 +27,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/murid/{id}', [MuridController::class, 'update']);
         Route::post('/murid/{id}/enroll', [MuridController::class, 'enroll']);
         Route::delete('/murid/{id}', [MuridController::class, 'destroy']);
+        Route::post('/murid/import', [ImportController::class, 'importSiswa']);
+        Route::get('/murid/template-import', [ImportController::class, 'downloadTemplateSiswa']);
     });
 
     // Legacy PPDB routes (redirect ke modul baru - tetap untuk kompatibilitas)
@@ -39,6 +42,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/guru', [GuruController::class, 'store']);
         Route::put('/guru/{id}', [GuruController::class, 'update']);
         Route::delete('/guru/{id}', [GuruController::class, 'destroy']);
+        Route::post('/guru/import', [ImportController::class, 'importGuru']);
+        Route::get('/guru/template-import', [ImportController::class, 'downloadTemplateGuru']);
     });
 
     Route::get('/kelas', [KelasController::class, 'index'])->middleware('permission:manage_kelas,view_data_kelas,view_kelas_diajar,view_kelas_pribadi');

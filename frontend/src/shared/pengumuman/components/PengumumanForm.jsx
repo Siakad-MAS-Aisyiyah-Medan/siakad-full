@@ -15,9 +15,7 @@ import {
   Underline,
   X,
 } from 'lucide-react';
-import Flatpickr from 'react-flatpickr';
-import 'flatpickr/dist/themes/airbnb.css';
-import { Indonesian } from 'flatpickr/dist/l10n/id.js';
+
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import DOMPurify from 'dompurify';
@@ -53,8 +51,8 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
               />
             </div>
 
-            {/* Akses + Tanggal */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            {/* Akses */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
               <div>
                 <FormLabel required>Kategori / Akses</FormLabel>
                 <select
@@ -67,25 +65,6 @@ export default function PengumumanForm({ view, formData, loading, onChange, onSu
                   <option value="umum">Umum</option>
                   <option value="internal">Internal</option>
                 </select>
-              </div>
-              <div>
-                <FormLabel required>Tanggal Publikasi</FormLabel>
-                <Flatpickr
-                  value={formData.tanggal_publikasi}
-                  onChange={(selectedDates, dateStr) => {
-                    onChange({ target: { name: 'tanggal_publikasi', value: dateStr } });
-                  }}
-                  options={{
-                    locale: Indonesian,
-                    dateFormat: 'Y-m-d',
-                    altInput: true,
-                    altFormat: 'j F Y',
-                  }}
-                  className="form-control"
-                  disabled={readOnly}
-                  placeholder="Pilih tanggal..."
-                  style={{ background: '#fff' }}
-                />
               </div>
             </div>
 

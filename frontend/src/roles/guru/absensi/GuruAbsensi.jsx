@@ -519,6 +519,11 @@ export default function GuruAbsensiPage() {
   const handleSaveAbsensi = async () => {
     if (!activeContext) return;
 
+    if (!rows || rows.length === 0) {
+      toastError('Gagal', 'Tidak dapat menyimpan karena tidak ada murid di kelas ini.');
+      return;
+    }
+
     const meetingDates = buildMeetingDates(activeContext.bulan, 7);
     setSaving(true);
 

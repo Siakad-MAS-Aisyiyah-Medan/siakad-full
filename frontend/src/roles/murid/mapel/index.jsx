@@ -43,7 +43,7 @@ export default function SiswaMapelPage() {
     const keyword = search.trim().toLowerCase();
     if (!keyword) return mapelList;
     return mapelList.filter((mapel) => {
-      const guru = mapel.guru?.guru?.nama_guru || mapel.guru?.profile?.nama_guru || '';
+      const guru = mapel.guru?.nama_guru || mapel.guru?.guru?.nama_guru || mapel.guru?.profile?.nama_guru || '';
       return [
         mapel.nama_mapel,
         mapel.tingkat,
@@ -88,7 +88,7 @@ export default function SiswaMapelPage() {
           ) : filteredMapel.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
               {filteredMapel.map((mapel, i) => {
-                const guru = mapel.guru?.guru?.nama_guru || mapel.guru?.profile?.nama_guru;
+                const guru = mapel.guru?.nama_guru || mapel.guru?.guru?.nama_guru || mapel.guru?.profile?.nama_guru || mapel.guru?.name;
                 return (
                   <div key={mapel.id_mapel} className="animate-fade-in-up" style={{
                     borderRadius: '16px', background: '#fff', border: '1px solid #e2e8f0',

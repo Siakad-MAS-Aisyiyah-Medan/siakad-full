@@ -23,9 +23,16 @@ Route::get('/ppdb/info', [PendaftaranController::class, 'publicInfo']);
 
 Route::middleware([
     'auth:sanctum',
-    'permission:manage_pendaftaran_pribadi,manage_formulir_pendaftaran,manage_berkas_pendaftaran,submit_pendaftaran,view_status_pendaftaran',
+    'permission:view_status_pendaftaran,view_dashboard_siswa',
 ])->prefix('ppdb')->group(function () {
     Route::get('/my-registration', [PendaftaranController::class, 'myRegistration']);
+    Route::get('/status', [PendaftaranController::class, 'status']);
+});
+
+Route::middleware([
+    'auth:sanctum',
+    'permission:manage_pendaftaran_pribadi,manage_formulir_pendaftaran,manage_berkas_pendaftaran,submit_pendaftaran,view_status_pendaftaran',
+])->prefix('ppdb')->group(function () {
     Route::post('/start', [PendaftaranController::class, 'start']);
     Route::put('/step/keterangan-pribadi', [PendaftaranController::class, 'saveKeteranganPribadi']);
     Route::put('/step/kesehatan', [PendaftaranController::class, 'saveKesehatan']);
@@ -34,7 +41,6 @@ Route::middleware([
     Route::put('/step/kepribadian', [PendaftaranController::class, 'saveKepribadian']);
     Route::put('/step/dokumen', [PendaftaranController::class, 'saveDokumen']);
     Route::post('/submit', [PendaftaranController::class, 'submit']);
-    Route::get('/status', [PendaftaranController::class, 'status']);
 
     Route::get('/berkas', [BerkasController::class, 'index']);
     Route::post('/berkas', [BerkasController::class, 'store']);

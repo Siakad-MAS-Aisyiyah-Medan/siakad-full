@@ -112,7 +112,8 @@ export default function InfoProfilPage({ readOnly = false }) {
 
   const misiList = useMemo(() => {
     if (Array.isArray(formData.misi)) return formData.misi;
-    return String(formData.misi || '')
+    if (!formData.misi) return [];
+    return String(formData.misi)
       .split('\n')
       .map((item) => item.trim())
       .filter(Boolean);
@@ -140,19 +141,19 @@ export default function InfoProfilPage({ readOnly = false }) {
   const handleMisiChange = (index, value) => {
     const next = [...misiList];
     next[index] = value;
-    setFormData((prev) => ({ ...prev, misi: next.join('\n') }));
+    setFormData((prev) => ({ ...prev, misi: next }));
   };
 
   const handleAddMisi = () => {
     setFormData((prev) => ({
       ...prev,
-      misi: [...misiList, ''].join('\n'),
+      misi: [...misiList, ''],
     }));
   };
 
   const handleRemoveMisi = (index) => {
     const next = misiList.filter((_, itemIndex) => itemIndex !== index);
-    setFormData((prev) => ({ ...prev, misi: next.join('\n') }));
+    setFormData((prev) => ({ ...prev, misi: next }));
   };
 
   const handleCancelEdit = () => {
@@ -171,10 +172,19 @@ export default function InfoProfilPage({ readOnly = false }) {
 
     setSaving(true);
     try {
-      await updateProfilSekolah({
+      const payloadMisi = Array.isArray(formData.misi) ? formData.misi.filter(Boolean).join('\n') : formData.misi;
+      const res = await updateProfilSekolah({
         ...formData,
-        misi: misiList.filter(Boolean).join('\n'),
+        misi: payloadMisi,
       });
+
+      if (res?.data) {
+        setFormData((prev) => ({ ...prev, ...res.data }));
+      } else {
+        const fetchRes = await getProfilSekolah();
+        if (fetchRes?.data) setFormData((prev) => ({ ...prev, ...fetchRes.data }));
+      }
+
       toastSuccess('Berhasil', 'Profil sekolah berhasil diperbarui.');
       setIsEditing(false);
       setPrincipalImagePreview(null);

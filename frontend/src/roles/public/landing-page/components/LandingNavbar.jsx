@@ -7,14 +7,12 @@ import { resolveStorageUrl } from '@/shared/services/apiHelpers';
 import { apiConfig } from '@/config/api.config';
 
 export default function LandingNavbar({ profil, activeSection, menuOpen, scrolled, onToggleMenu, onScrollToSection, onCloseMenu }) {
-  const logoUrl = profil?.hero_image ? resolveStorageUrl(profil.hero_image, apiConfig) : undefined;
-  
   return (
     <>
       <header className={`lp-navbar ${scrolled ? 'lp-navbar--scrolled' : ''}`}>
         <div className="lp-container lp-navbar__inner">
           <Link to="/home" className="lp-navbar__brand">
-            <AppLogo size={52} srcUrl={logoUrl} />
+            <AppLogo size={52} />
             <div className="lp-navbar__brand-text">
               <span className="lp-navbar__brand-title">{profil?.nama_sekolah || 'MAS Aisyiyah Medan'}</span>
               <span className="lp-navbar__brand-sub">Sistem Informasi Akademik</span>

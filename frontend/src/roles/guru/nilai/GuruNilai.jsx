@@ -430,6 +430,11 @@ export default function GuruNilaiPage() {
   const handleSaveNilai = async () => {
     if (!activeContext) return;
 
+    if (!siswaRows || siswaRows.length === 0) {
+      toastError('Gagal', 'Tidak dapat menyimpan karena tidak ada murid di kelas ini.');
+      return;
+    }
+
     setSaving(true);
     try {
       await saveNilaiBulk({

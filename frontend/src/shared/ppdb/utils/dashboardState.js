@@ -12,6 +12,7 @@ const STATUS_ALIASES = {
   diterima: 'accepted',
   daftar_ulang: 'accepted',
   ditolak: 'rejected',
+  menjadi_murid: 'accepted',
 };
 
 /** @typedef {'none'|'draft'|'revision'|'documents'|'submitted'|'verified'|'accepted'|'rejected'} PpdbPhase */

@@ -13,6 +13,15 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
       .catch(() => setKelasList([]));
   }, []);
 
+  const uniqueJurusans = useMemo(() => {
+    return [...new Set(kelasList.map(k => k.jurusan).filter(Boolean))];
+  }, [kelasList]);
+
+  const filteredKelas = useMemo(() => {
+    if (!formData.jurusan) return kelasList;
+    return kelasList.filter(k => k.jurusan === formData.jurusan);
+  }, [kelasList, formData.jurusan]);
+
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader 
@@ -84,10 +93,19 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
               </div>
 
               <div>
+                <FormLabel>Jurusan</FormLabel>
+                <select name="jurusan" value={formData.jurusan || ''} onChange={onChange} className="form-control" disabled={readOnly}>
+                  <option value="">Semua Jurusan</option>
+                  {uniqueJurusans.map((j) => (
+                    <option key={j} value={j}>{j}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <FormLabel>Kelas</FormLabel>
                 <select name="id_kelas" value={formData.id_kelas || ''} onChange={onChange} className="form-control" disabled={readOnly}>
                   <option value="">Pilih kelas</option>
-                  {kelasList.map((kelas) => (
+                  {filteredKelas.map((kelas) => (
                     <option key={kelas.id_kelas} value={kelas.id_kelas}>{kelas.nama_kelas}</option>
                   ))}
                 </select>

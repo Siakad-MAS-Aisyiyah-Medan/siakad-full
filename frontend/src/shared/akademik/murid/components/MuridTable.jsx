@@ -1,4 +1,4 @@
-import { Download, Pencil, Plus, Search, ShieldCheck, Trash2 } from 'lucide-react';
+import { Download, Pencil, Plus, Search, ShieldCheck, Trash2, UploadCloud } from 'lucide-react';
 
 import PageHeader from '@/shared/components/PageHeader';
 
@@ -14,6 +14,7 @@ export default function MuridTable({
   isFetching = false,
   readOnly = false,
   onAdd,
+  onImport,
 }) {
   const handleDownload = () => {
     const dataToExport = data.map(item => ({
@@ -53,6 +54,10 @@ export default function MuridTable({
               <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
                 <Download size={16} />
                 Unduh Data
+              </button>
+              <button type="button" onClick={onImport} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
+                <UploadCloud size={16} />
+                Import Excel
               </button>
               <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Plus size={16} />

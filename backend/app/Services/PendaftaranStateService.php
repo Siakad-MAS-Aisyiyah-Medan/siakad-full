@@ -63,10 +63,10 @@ class PendaftaranStateService
     ];
 
     protected const ADMIN_TRANSITIONS = [
-        'terverifikasi' => ['diajukan'],
-        'revisi' => ['diajukan', 'terverifikasi'],
-        'diterima' => ['diajukan', 'terverifikasi', 'daftar_ulang'],
-        'ditolak' => ['diajukan', 'terverifikasi', 'revisi'],
+        'terverifikasi' => ['diajukan', 'submitted'],
+        'revisi' => ['diajukan', 'submitted', 'terverifikasi', 'verified'],
+        'diterima' => ['diajukan', 'submitted', 'terverifikasi', 'verified', 'daftar_ulang'],
+        'ditolak' => ['diajukan', 'submitted', 'terverifikasi', 'verified', 'revisi'],
     ];
 
     protected const REQUIRED_FORM = [

@@ -133,6 +133,7 @@ class GuruController extends Controller
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
+                'name' => $data['nama_guru'],
                 'username' => $data['username'],
                 'email' => $data['email'],
                 'password' => $data['password'],
@@ -175,6 +176,7 @@ class GuruController extends Controller
             }
 
             $user->fill([
+                'name' => $data['nama_guru'],
                 'username' => $data['username'],
                 'email' => $data['email'],
                 'status_aktif' => $data['status_aktif'] ?? $user->status_aktif,
