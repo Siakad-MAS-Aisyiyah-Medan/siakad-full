@@ -54,38 +54,49 @@ export default function SiswaNilaiPage() {
         <PageHeader title="Transkrip Akademik" subtitle="Lihat nilai akademik dan transkrip Anda" />
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '0 1.5rem 1.5rem 1.5rem' }}>
+          {/* Print Header / Kop Surat (Hanya Tampil Saat Print) */}
+          <div className="print-only-header" style={{ display: 'none', borderBottom: '3px solid black', paddingBottom: '1rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>MAS AISYIYAH MEDAN</h1>
+                <p style={{ margin: '0.2rem 0', fontSize: '0.9rem' }}>Jl. Demak No.3, Sei Rengas Permata, Kec. Medan Area, Kota Medan, Sumatera Utara 20211</p>
+                <p style={{ margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>TRANSKRIP NILAI AKADEMIK</p>
+              </div>
+            </div>
+          </div>
+
           {/* Informasi Murid Panel */}
-          <div className="animate-fade-in-up" style={{ borderRadius: '18px', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden', animationDelay: '0.1s', opacity: 0 }}>
-            <div style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
+          <div className="animate-fade-in-up print-panel" style={{ borderRadius: '18px', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden', animationDelay: '0.1s', opacity: 0 }}>
+            <div className="print-panel-header" style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
               <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#064e3b' }}>Informasi Murid</h2>
             </div>
             <div style={{ padding: '1.5rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: '1rem', alignItems: 'center', fontSize: '0.875rem' }}>
-                <div style={{ fontWeight: 600, color: '#64748b' }}>Nama Murid</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }}>: {profile?.nama_siswa || name || 'Andi Saputra'}</div>
+                <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">Nama Murid</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: {profile?.nama_siswa || name || 'Andi Saputra'}</div>
                 
-                <div style={{ fontWeight: 600, color: '#64748b' }}>NISN</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }}>: {profile?.nisn || '0051234567'}</div>
+                <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">NISN</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: {profile?.nisn || '0051234567'}</div>
                 
-                <div style={{ fontWeight: 600, color: '#64748b' }}>Kelas</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }}>: {profile?.kelas?.nama_kelas || 'X IPA 1'}</div>
+                <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">Kelas</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: {profile?.kelas?.nama_kelas || 'X IPA 1'}</div>
 
-                <div style={{ fontWeight: 600, color: '#64748b' }}>Tahun Ajaran</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }}>: 2025/2026</div>
+                <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">Tahun Ajaran</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: 2025/2026</div>
 
-                <div style={{ fontWeight: 600, color: '#64748b' }}>Semester</div>
-                <div style={{ fontWeight: 500, color: '#0f172a' }}>: Ganjil</div>
+                <div style={{ fontWeight: 600, color: '#64748b' }} className="print-text">Semester</div>
+                <div style={{ fontWeight: 500, color: '#0f172a' }} className="print-text">: Ganjil</div>
               </div>
             </div>
           </div>
 
           {/* Daftar Nilai Panel */}
-          <div className="animate-fade-in-up" style={{ borderRadius: '18px', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden', animationDelay: '0.2s', opacity: 0 }}>
-            <div style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
+          <div className="animate-fade-in-up print-panel" style={{ borderRadius: '18px', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden', animationDelay: '0.2s', opacity: 0 }}>
+            <div className="print-panel-header" style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
               <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#064e3b' }}>Daftar Nilai Akademik</h2>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <div className="table-container" style={{ margin: 0, padding: 0, boxShadow: 'none', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div className="table-container print-table" style={{ margin: 0, padding: 0, boxShadow: 'none', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <table className="data-table">
                   <thead>
                     <tr>
@@ -110,12 +121,12 @@ export default function SiswaNilaiPage() {
           </div>
 
           {/* Ringkasan Akademik Panel */}
-          <div className="animate-fade-in-up" style={{ borderRadius: '18px', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden', animationDelay: '0.3s', opacity: 0 }}>
-            <div style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
+          <div className="animate-fade-in-up print-panel" style={{ borderRadius: '18px', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden', animationDelay: '0.3s', opacity: 0 }}>
+            <div className="print-panel-header" style={{ padding: '1.15rem 1.5rem', borderBottom: '1px solid #f1f5f9' }}>
               <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#064e3b' }}>Ringkasan Akademik</h2>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <div className="table-container" style={{ margin: 0, padding: 0, boxShadow: 'none', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div className="table-container print-table" style={{ margin: 0, padding: 0, boxShadow: 'none', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <table className="data-table">
                   <thead>
                     <tr>
@@ -134,6 +145,20 @@ export default function SiswaNilaiPage() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Print Footer / Tanda Tangan (Hanya Tampil Saat Print) */}
+          <div className="print-only-footer" style={{ display: 'none', marginTop: '3rem', pageBreakInside: 'avoid' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 2rem' }}>
+              <div></div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ margin: 0 }}>Medan, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p style={{ margin: 0, fontWeight: 'bold' }}>Kepala Sekolah</p>
+                <div style={{ height: '80px' }}></div>
+                <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>Suhardi, S.Pd., M.M.</p>
+                <p style={{ margin: 0 }}>NIP. 19780101 200501 1 003</p>
               </div>
             </div>
           </div>
@@ -159,13 +184,76 @@ export default function SiswaNilaiPage() {
           <style>
             {`
               @media print {
-                body { background: #fff !important; }
-                .sidebar, .content-header { display: none !important; }
-                .dashboard-content { margin-left: 0 !important; padding: 0 !important; }
-                .admin-page-wrapper { box-shadow: none !important; margin: 0 !important; min-height: auto !important; }
-                button { display: none !important; }
-                .table-container { border: none !important; }
-                /* Untuk memastikan warna dan background tetap tercetak */
+                @page { margin: 10mm 15mm; } /* Menghilangkan URL dan Tanggal otomatis dari browser */
+                
+                body { 
+                  background: #fff !important; 
+                  color: #000 !important;
+                }
+                
+                /* Sembunyikan elemen UI website */
+                .sidebar, .content-header, button { display: none !important; }
+                
+                /* Layout utama untuk print */
+                .admin-page-wrapper { 
+                  box-shadow: none !important; 
+                  margin: 0 !important; 
+                  padding: 0 !important;
+                  background: white !important;
+                }
+                
+                /* Menampilkan elemen khusus print */
+                .print-only-header, .print-only-footer { display: block !important; }
+                
+                /* Modifikasi panel agar terlihat formal seperti kertas */
+                .print-panel {
+                  border: none !important;
+                  box-shadow: none !important;
+                  border-radius: 0 !important;
+                  margin-bottom: 2rem !important;
+                  padding: 0 !important;
+                }
+                
+                .print-panel-header {
+                  padding: 0 0 0.5rem 0 !important;
+                  border-bottom: 2px solid #000 !important;
+                  margin-bottom: 1rem !important;
+                }
+                
+                .print-panel-header h2 {
+                  color: #000 !important;
+                  font-size: 1.1rem !important;
+                }
+                
+                .print-panel > div:last-child {
+                  padding: 0 !important;
+                }
+                
+                .print-text {
+                  color: #000 !important;
+                }
+                
+                /* Format tabel formal */
+                .print-table {
+                  border: none !important;
+                  border-radius: 0 !important;
+                }
+                
+                .data-table {
+                  border-collapse: collapse !important;
+                  width: 100% !important;
+                }
+                
+                .data-table th, .data-table td {
+                  border: 1px solid #000 !important;
+                  padding: 8px !important;
+                  color: #000 !important;
+                }
+                
+                .data-table th {
+                  background-color: #f3f4f6 !important;
+                }
+                
                 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
               }
             `}

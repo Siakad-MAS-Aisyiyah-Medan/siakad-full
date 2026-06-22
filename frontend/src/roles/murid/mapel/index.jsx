@@ -57,7 +57,7 @@ export default function SiswaMapelPage() {
     <MainLayout role="siswa" name={name}>
       <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
         <PageHeader title="Mata Pelajaran" subtitle="Daftar mata pelajaran yang tersedia dalam sistem akademik sekolah.">
-          <div className="animate-fade-in" style={{ position: 'relative', width: '260px', animationDelay: '0.1s' }}>
+          <div className="animate-fade-in" style={{ position: 'relative', width: '100%', maxWidth: '260px', minWidth: '150px', animationDelay: '0.1s' }}>
             <Search style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', width: '16px', height: '16px' }} />
             <input
               type="text"
@@ -86,7 +86,7 @@ export default function SiswaMapelPage() {
           {loading ? (
             <div style={{ padding: '4rem 0', textAlign: 'center', color: '#94a3b8', fontSize: '0.95rem' }}>Memuat mata pelajaran...</div>
           ) : filteredMapel.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
               {filteredMapel.map((mapel, i) => {
                 const guru = mapel.guru?.nama_guru || mapel.guru?.guru?.nama_guru || mapel.guru?.profile?.nama_guru || mapel.guru?.name;
                 return (
