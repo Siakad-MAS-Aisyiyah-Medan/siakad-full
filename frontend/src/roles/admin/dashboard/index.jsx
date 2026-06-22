@@ -168,8 +168,26 @@ export default function AdminDashboard() {
                       hour: '2-digit', minute: '2-digit'
                     });
                     
-                    const actorName = item.actor?.username || item.actor?.name || item.aktor || '-';
-                    const subjectDisplay = item.subject_type ? `${item.subject_type} #${item.subject_id}` : (item.subject || item.subjek || '-');
+                    const actorName = item.actor?.role || item.actor?.username || item.aktor || '-';
+                    let modelName = '';
+                    if (item.subject_type) {
+                        modelName = item.subject_type.split('\\\\').pop(); // e.g. App\Models\User -> User
+                    }
+                    
+                    let metaInfo = '';
+                    if (item.meta && typeof item.meta === 'object') {
+                        if (item.meta.keys) {
+                            metaInfo = ` (${item.meta.keys.length} item)`;
+                        } else if (item.meta.key) {
+                            metaInfo = ` (${item.meta.key})`;
+                        }
+                    }
+
+                    // Jika backend memberikan subject_name (nama asli orang/objek), gunakan itu!
+                    const displayRole = item.subject_role || modelName;
+                    const subjectDisplay = item.subject_name 
+                        ? `${item.subject_name} (${displayRole})`
+                        : (modelName ? `${modelName} #${item.subject_id}${metaInfo}` : (item.subject || item.subjek || '-'));
 
                     return (
                       <tr key={item.id || index} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s' }}
@@ -182,7 +200,9 @@ export default function AdminDashboard() {
                             {item.action || item.aksi || '-'}
                           </span>
                         </td>
-                        <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#334155' }}>{subjectDisplay}</td>
+                        <td style={{ padding: '0.85rem 1.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+                          {subjectDisplay}
+                        </td>
                       </tr>
                     );
                   })
