@@ -1,18 +1,18 @@
 /* Landing page — scoped modern academic theme */
 .landing-page {
-  --lp-primary: #0F5C3A;
-  --lp-primary-dark: #083c24;
-  --lp-primary-light: rgba(15, 92, 58, 0.08);
+  --lp-primary: #059669;
+  --lp-primary-dark: #047857;
+  --lp-primary-light: rgba(5, 150, 105, 0.08);
   --lp-accent: #D4AF37;
   --lp-accent-dark: #b5952f;
-  --lp-emerald: #0F5C3A;
-  --lp-text: #1a2e28;
-  --lp-text-muted: #4a5c54;
+  --lp-emerald: #10b981;
+  --lp-text: #0f172a;
+  --lp-text-muted: #475569;
   --lp-surface: #ffffff;
-  --lp-border: rgba(15, 92, 58, 0.15);
-  --lp-shadow-sm: 0 4px 20px rgba(15, 92, 58, 0.08);
-  --lp-shadow-md: 0 12px 40px rgba(15, 92, 58, 0.12);
-  --lp-shadow-lg: 0 24px 60px rgba(15, 92, 58, 0.16);
+  --lp-border: rgba(5, 150, 105, 0.15);
+  --lp-shadow-sm: 0 4px 20px rgba(5, 150, 105, 0.08);
+  --lp-shadow-md: 0 12px 40px rgba(5, 150, 105, 0.12);
+  --lp-shadow-lg: 0 24px 60px rgba(5, 150, 105, 0.16);
   --lp-radius: 12px;
   --lp-radius-lg: 20px;
   --lp-radius-xl: 28px;
