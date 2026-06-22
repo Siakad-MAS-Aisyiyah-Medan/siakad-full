@@ -15,7 +15,7 @@ export function useAuditLogs() {
       const response = await fetchAuditLogs({
         search: search || undefined,
         action: action || undefined,
-        per_page: 25,
+        per_page: 1000,
       });
       const { items: rows, meta: pagination } = unwrapPaginated(response);
       setItems(rows);

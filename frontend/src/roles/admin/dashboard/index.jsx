@@ -136,7 +136,7 @@ export default function AdminDashboard() {
             </div>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#064e3b' }}>Audit Log</h2>
           </div>
-          <div style={{ overflowX: 'auto' }}>
+          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '450px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafb' }}>
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ) : audit.items.length ? (
-                  audit.items.slice(0, 5).map((item, index) => {
+                  audit.items.map((item, index) => {
                     const dateObj = new Date(item.created_at || item.waktu);
                     const formattedDate = isNaN(dateObj.getTime()) ? '-' : dateObj.toLocaleString('id-ID', {
                       year: 'numeric', month: 'short', day: 'numeric',

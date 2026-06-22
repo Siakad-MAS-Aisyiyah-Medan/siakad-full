@@ -94,6 +94,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        app(\App\Services\AuditLogService::class)->logAdminAction('auth.logout', $request->user());
         $request->user()->currentAccessToken()?->delete();
 
         return ApiResponse::success(null, 'Logout berhasil');
@@ -165,6 +166,21 @@ class AuthController extends Controller
         }
 
         $user->forceFill(['last_login_at' => now()])->save();
+
+        \App\Models\AuditLog::create([
+            'id_user' => $user->id_user,
+            'action' => 'auth.login',
+            'subject_type' => class_basename($user),
+            'subject_id' => $user->id_user,
+            'ip_address' => request()->ip(),
+            'user_agent' => substr((string) request()->userAgent(), 0, 500),
+        ]);
+        $count = \App\Models\AuditLog::count();
+        if ($count > 1000) {
+            $excess = $count - 1000;
+            $idsToDelete = \App\Models\AuditLog::orderBy('id', 'asc')->limit($excess)->pluck('id');
+            \App\Models\AuditLog::whereIn('id', $idsToDelete)->delete();
+        }
 
         $user->loadProfileRelations();
         $profile = $user->resolveProfile();

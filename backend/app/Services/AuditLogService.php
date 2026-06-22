@@ -14,7 +14,7 @@ class AuditLogService
     public function logAdminAction(string $action, ?Model $subject = null, array $meta = []): void
     {
         $user = auth()->user();
-        if (! $user instanceof User || ! $this->shouldAudit($user)) {
+        if (! $user instanceof User) {
             return;
         }
 
@@ -27,9 +27,16 @@ class AuditLogService
             'user_agent' => substr((string) Request::userAgent(), 0, 500),
             'meta' => $meta ?: null,
         ]);
+
+        $count = AuditLog::count();
+        if ($count > 1000) {
+            $excess = $count - 1000;
+            $idsToDelete = AuditLog::orderBy('id', 'asc')->limit($excess)->pluck('id');
+            AuditLog::whereIn('id', $idsToDelete)->delete();
+        }
     }
 
-    public function list(?string $action = null, ?string $search = null, int $perPage = 20)
+    public function list(?string $action = null, ?string $search = null, int $perPage = 1000)
     {
         $query = AuditLog::with('user')->orderByDesc('id');
 
@@ -48,12 +55,5 @@ class AuditLogService
         return $query->paginate($perPage);
     }
 
-    private function shouldAudit(User $user): bool
-    {
-        if ($user->role === 'admin') {
-            return true;
-        }
 
-        return in_array('manage_all', $this->permissions->permissionsForUser($user), true);
-    }
 }
