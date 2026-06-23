@@ -44,7 +44,7 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>
-          <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6">
               <div>
                 <FormLabel required>Nama Murid</FormLabel>
                 <input name="nama_siswa" value={formData.nama_siswa || ''} onChange={onChange} className="form-control" placeholder="Masukkan nama murid" disabled={readOnly} required />

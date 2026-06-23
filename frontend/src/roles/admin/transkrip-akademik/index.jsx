@@ -6,6 +6,7 @@ import { fetchMuridList } from '@/shared/akademik/murid/services/murid.service';
 import { fetchAdminStudentRaport } from '@/shared/nilai/admin/services/transkrip.service';
 import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
 import { fetchKelasList } from '@/shared/akademik/kelas/services/kelas.service';
+import CustomSelect from '@/shared/components/CustomSelect';
 
 const DEFAULT_FILTERS = {
   semester: 'Ganjil',
@@ -110,43 +111,42 @@ export default function AdminTranskripAkademikPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Filter Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', zIndex: 10 }}>
+              <div style={{ position: 'relative', zIndex: 11 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Tahun Ajaran</label>
-                <select
-                  value={filters.tahun_ajaran}
-                  onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
-                  className="form-control no-print"
-                >
-                  {tahunAjaranList.map((ta, idx) => (
-                    <option key={ta.id_tahun_ajaran || ta.tahun_ajaran || idx} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
-                  ))}
-                  {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
-                </select>
+                <div className="no-print">
+                  <CustomSelect
+                    value={filters.tahun_ajaran}
+                    onChange={(val) => setFilters(p => ({ ...p, tahun_ajaran: val }))}
+                    options={tahunAjaranList.length > 0 ? tahunAjaranList.map(ta => ({ value: ta.tahun_ajaran, label: ta.tahun_ajaran })) : [{ value: '2025/2026', label: '2025/2026' }]}
+                    style={{ width: '100%' }}
+                  />
+                </div>
               </div>
-              <div>
+              <div style={{ position: 'relative', zIndex: 10 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Semester</label>
-                <select
+                <CustomSelect
                   value={filters.semester}
-                  onChange={(e) => setFilters(p => ({ ...p, semester: e.target.value }))}
-                  className="form-control"
-                >
-                  <option value="Ganjil">Ganjil</option>
-                  <option value="Genap">Genap</option>
-                </select>
+                  onChange={(val) => setFilters(p => ({ ...p, semester: val }))}
+                  options={[
+                    { value: 'Ganjil', label: 'Ganjil' },
+                    { value: 'Genap', label: 'Genap' }
+                  ]}
+                  style={{ width: '100%' }}
+                />
               </div>
             </div>
 
             {/* Info Murid */}
             <div className="form-panel">
-              <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-border)', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>Informasi Murid</h3>
                 <button type="button" onClick={() => window.print()} className="btn-primary no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
                   <Download size={14} />
                   Unduh Transkrip
                 </button>
               </div>
-              <div style={{ padding: '1.25rem 1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 p-5 gap-4">
                 {[
                   ['Nama Murid', selectedMurid.siswa?.nama_siswa || '-'],
                   ['NISN', selectedMurid.siswa?.nisn || '-'],
@@ -210,7 +210,7 @@ export default function AdminTranskripAkademikPage() {
               <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--color-border)' }}>
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>Ringkasan Akademik</h3>
               </div>
-              <div style={{ padding: '1.25rem 1.5rem', display: 'flex', gap: '2rem' }}>
+              <div className="flex flex-wrap gap-4 sm:gap-8 p-5">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Rata-rata Nilai</span>
                   <span style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-primary-dark)' }}>{average}</span>
@@ -240,7 +240,7 @@ export default function AdminTranskripAkademikPage() {
   if (!selectedKelas && !selectedMurid) {
     return (
       <AdminPageShell>
-        <div className="animate-fade-in" style={{ paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingBottom: '2rem' }}>
+        <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
           <PageHeader title="Transkrip Akademik" subtitle="Pilih kelas terlebih dahulu" />
           
           {loadingKelas ? (
@@ -295,11 +295,11 @@ export default function AdminTranskripAkademikPage() {
 
   return (
     <AdminPageShell>
-      <div className="animate-fade-in" style={{ paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingBottom: '2rem' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
         <PageHeader title={`Transkrip Akademik: ${selectedKelas.nama_kelas} - ${selectedKelas.jurusan}`} subtitle="Pilih murid untuk melihat transkrip" onBack={() => { setSelectedKelas(null); setSearch(''); }}>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="flex flex-wrap gap-3 items-center w-full sm:w-auto">
             {/* Search */}
-            <div style={{ position: 'relative', width: '300px' }}>
+            <div className="relative flex-1 min-w-[200px] sm:min-w-[300px]">
               <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
               <input
                 value={search}
@@ -308,24 +308,23 @@ export default function AdminTranskripAkademikPage() {
                 style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '100%', background: '#fff', color: 'var(--color-text-dark)' }}
               />
             </div>
-            <select
-              value={filters.tahun_ajaran}
-              onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
-              style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
-            >
-              {tahunAjaranList.map((ta, idx) => (
-                <option key={ta.id_tahun_ajaran || ta.tahun_ajaran || idx} value={ta.tahun_ajaran}>{ta.tahun_ajaran}</option>
-              ))}
-              {tahunAjaranList.length === 0 && <option value="2025/2026">2025/2026</option>}
-            </select>
-            <select
-              value={filters.semester}
-              onChange={(e) => setFilters(p => ({ ...p, semester: e.target.value }))}
-              style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
-            >
-              <option value="Ganjil">Ganjil</option>
-              <option value="Genap">Genap</option>
-            </select>
+            <div className="flex gap-3 w-full sm:w-auto" style={{ zIndex: 100 }}>
+              <CustomSelect
+                value={filters.tahun_ajaran}
+                onChange={(val) => setFilters(p => ({ ...p, tahun_ajaran: val }))}
+                options={tahunAjaranList.length > 0 ? tahunAjaranList.map(ta => ({ value: ta.tahun_ajaran, label: ta.tahun_ajaran })) : [{ value: '2025/2026', label: '2025/2026' }]}
+                style={{ flex: 1 }}
+              />
+              <CustomSelect
+                value={filters.semester}
+                onChange={(val) => setFilters(p => ({ ...p, semester: val }))}
+                options={[
+                  { value: 'Ganjil', label: 'Ganjil' },
+                  { value: 'Genap', label: 'Genap' }
+                ]}
+                style={{ flex: 1 }}
+              />
+            </div>
           </div>
         </PageHeader>
 

@@ -58,7 +58,7 @@ export default function KelasForm({ view, formData, guruData, tahunAjaranData = 
               </EditRow>
             </div>
           ) : (
-            <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6">
               <div>
                 <FormLabel required>Tahun Ajaran</FormLabel>
                 <select name="tahun_ajaran" value={formData.tahun_ajaran || ''} onChange={onChange} className="form-control" disabled={readOnly} required>
@@ -138,12 +138,7 @@ function FormLabel({ children, required }) {
 
 function EditRow({ label, children, last = false }) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '160px 1fr',
-      alignItems: 'center',
-      gap: '1.25rem',
-      padding: '0.9rem 1.5rem',
+    <div className="flex flex-col sm:grid sm:grid-cols-[160px_1fr] sm:items-center gap-2 sm:gap-5 px-6 py-4" style={{
       borderBottom: last ? 'none' : '1px solid var(--color-border)',
     }}>
       <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-dark)' }}>{label}</label>

@@ -97,7 +97,7 @@ export default function GuruKelasPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader title="Data Kelas yang Diajar" subtitle="Berikut adalah daftar kelas yang Anda ajar.">
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />

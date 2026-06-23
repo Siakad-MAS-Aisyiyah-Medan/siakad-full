@@ -8,6 +8,7 @@ import {
   fetchTahunAjaran,
   updateTahunAjaran,
 } from '@/shared/services/tahunAjaran.service';
+import CustomSelect from '@/shared/components/CustomSelect';
 
 const EMPTY_FORM = {
   tahun_ajaran: '',
@@ -59,20 +60,28 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
                   </div>
                   <div>
                     <FormLabel required>Semester</FormLabel>
-                    <select name="semester" value={form.semester} onChange={onChange} className="form-control" required>
-                      <option value="">Pilih Semester</option>
-                      <option value="Ganjil">Ganjil</option>
-                      <option value="Genap">Genap</option>
-                    </select>
+                    <CustomSelect
+                      value={form.semester}
+                      onChange={(val) => onChange({ target: { name: 'semester', value: val } })}
+                      options={[
+                        { value: '', label: 'Pilih Semester' },
+                        { value: 'Ganjil', label: 'Ganjil' },
+                        { value: 'Genap', label: 'Genap' }
+                      ]}
+                    />
                   </div>
                   <div>
                     <FormLabel required>Status</FormLabel>
-                    <select name="status" value={form.status} onChange={onChange} className="form-control" required>
-                      <option value="">Pilih Status</option>
-                      <option value="Aktif">Aktif</option>
-                      <option value="Tidak Aktif">Tidak Aktif</option>
-                      <option value="Selesai">Selesai</option>
-                    </select>
+                    <CustomSelect
+                      value={form.status}
+                      onChange={(val) => onChange({ target: { name: 'status', value: val } })}
+                      options={[
+                        { value: '', label: 'Pilih Status' },
+                        { value: 'Aktif', label: 'Aktif' },
+                        { value: 'Tidak Aktif', label: 'Tidak Aktif' },
+                        { value: 'Selesai', label: 'Selesai' }
+                      ]}
+                    />
                   </div>
                 </>
               ) : (
@@ -83,11 +92,15 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
                   </div>
                   <div>
                     <FormLabel required>Status</FormLabel>
-                    <select name="status" value={form.status} onChange={onChange} className="form-control" required>
-                      <option value="Aktif">Aktif</option>
-                      <option value="Tidak Aktif">Nonaktif</option>
-                      <option value="Selesai">Selesai</option>
-                    </select>
+                    <CustomSelect
+                      value={form.status}
+                      onChange={(val) => onChange({ target: { name: 'status', value: val } })}
+                      options={[
+                        { value: 'Aktif', label: 'Aktif' },
+                        { value: 'Tidak Aktif', label: 'Nonaktif' },
+                        { value: 'Selesai', label: 'Selesai' }
+                      ]}
+                    />
                   </div>
                 </>
               )}

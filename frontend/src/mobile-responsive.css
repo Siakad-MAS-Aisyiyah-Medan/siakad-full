@@ -49,25 +49,65 @@
     overflow-x: hidden !important;
   }
 
+  /* Fix flexbox intrinsic width bug that causes horizontal overflow */
+  .admin-page-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  .admin-page-wrapper > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
   .content-header {
+    display: flex !important;
+    flex-direction: row !important;
     padding: 0.75rem 1rem !important;
     height: auto !important;
     min-height: 70px !important;
-    flex-wrap: nowrap !important;
-    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: var(--color-white) !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  }
+
+  /* Make header actions align to the left when they wrap on mobile */
+  .content-header .header-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    display: flex;
+  }
+
+  .content-header .header-actions > * {
+    flex: 0 1 auto !important;
+    justify-content: flex-start !important;
   }
 
   /* Cegah tulisan "Halo Administrator" menendang elemen lain */
   .content-header > div:first-child {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .content-header__greeting {
+    min-width: 0;
+    flex: 1;
+    margin-top: 0.2rem;
   }
 
   .content-header__greeting h2 {
-    font-size: 1rem !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.15rem !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    margin: 0;
   }
 
   .content-header__greeting p {
@@ -89,10 +129,32 @@
     flex-shrink: 0;
   }
 
+  /* Sembunyikan ikon garis 3 jika ada tombol kembali */
+  .content-header > div:first-child:has(button[title="Kembali"]) .mobile-menu-btn {
+    display: none !important;
+  }
+
   /* Pastikan elemen profil kanan bisa menyusut dengan baik */
   .content-header__right {
-    flex-shrink: 0;
+    flex: 1 1 auto;
     gap: 0.5rem !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: 0 !important; /* Aligns exactly under the hamburger menu */
+  }
+
+  #global-header-actions {
+    flex-wrap: wrap !important;
+    flex: 1 1 100% !important; /* Force to take full width on new line */
+    display: flex;
+    justify-content: flex-start !important; /* Align to the left (pinggir kiri) */
+    margin-top: 0.5rem; /* Add some space above it */
+  }
+
+  #global-header-actions:empty {
+    display: none !important;
   }
 
   /* 

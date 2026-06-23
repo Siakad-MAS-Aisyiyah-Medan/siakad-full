@@ -55,7 +55,7 @@ export default function SiswaMapelPage() {
 
   return (
     <MainLayout role="siswa" name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader title="Mata Pelajaran" subtitle="Daftar mata pelajaran yang tersedia dalam sistem akademik sekolah.">
           <div className="animate-fade-in" style={{ position: 'relative', width: '100%', maxWidth: '260px', minWidth: '150px', animationDelay: '0.1s' }}>
             <Search style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', width: '16px', height: '16px' }} />

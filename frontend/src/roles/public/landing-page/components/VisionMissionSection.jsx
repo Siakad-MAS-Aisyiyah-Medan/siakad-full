@@ -22,7 +22,7 @@ export default function VisionMissionSection({ profil }) {
           <h2 className="lp-section-title">Visi & Misi</h2>
         </div>
 
-        <div className="lp-visi-misi-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+        <div className="lp-visi-misi-grid">
           <article className="lp-card lp-visi-card">
             <div className="lp-card-icon">
               <Eye size={22} />

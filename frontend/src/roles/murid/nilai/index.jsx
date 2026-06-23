@@ -67,7 +67,7 @@ export default function SiswaNilaiPage() {
 
   return (
     <MainLayout role="siswa" name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader title="Transkrip Akademik" subtitle="Lihat nilai akademik dan transkrip Anda">
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <select

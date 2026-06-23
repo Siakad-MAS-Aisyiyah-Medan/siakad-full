@@ -173,14 +173,10 @@ export default function ProfilBiodataPage() {
       <PageHeader 
         title={isEditing ? 'Edit Biodata Diri' : 'Profil Saya'}
         subtitle={isEditing ? 'Perbarui informasi biodata diri Anda' : 'Informasi detail biodata dan peran Anda di sistem.'}
-        backTo=""
+        backTo={isEditing ? undefined : ""}
+        onBack={isEditing ? () => setIsEditing(false) : undefined}
         actions={
-          isEditing ? (
-            <button type="button" onClick={() => setIsEditing(false)} className="btn-outline">
-              <ArrowLeft size={18} />
-              <span style={{ fontWeight: 600 }}>Batal Edit</span>
-            </button>
-          ) : (
+          isEditing ? null : (
             <button type="button" onClick={() => setIsEditing(true)} className="btn-outline">
               <Edit3 size={18} />
               <span style={{ fontWeight: 600 }}>Edit Profil</span>

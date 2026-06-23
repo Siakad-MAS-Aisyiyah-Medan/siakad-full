@@ -27,7 +27,7 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
 
       <div className="form-panel">
         <form onSubmit={onSubmit}>
-          <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6">
               <div style={{ gridColumn: '1/-1' }}>
                 <FormLabel required>Nama Guru</FormLabel>
                 <input name="nama_guru" value={formData.nama_guru || ''} onChange={onChange} className="form-control" placeholder="Masukkan nama guru" disabled={readOnly} required />

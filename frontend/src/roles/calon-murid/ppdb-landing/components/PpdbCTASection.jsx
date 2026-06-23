@@ -23,14 +23,12 @@ export default function PpdbCTASection() {
                 href={content.brosur}
                 target="_blank"
                 rel="noreferrer"
-                className="pp-btn pp-btn--outline pp-btn--lg"
+                className="pp-btn pp-btn--outline-light pp-btn--lg"
                 style={{ 
                   textDecoration: 'none', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.5rem',
-                  borderColor: 'rgba(255,255,255,0.4)',
-                  color: '#fff'
+                  gap: '0.5rem'
                 }}
               >
                 Unduh Brosur

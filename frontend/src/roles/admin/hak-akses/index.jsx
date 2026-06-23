@@ -17,6 +17,7 @@ import AdminPageShell from '@/shared/components/AdminPageShell';
 import { confirmAction, toastError, toastSuccess, toastValidation } from '@/shared/hooks/useConfirm';
 import { createAdminAkun, deleteAdminAkun, fetchAdminAkunList, updateAdminAkun } from '@/shared/services/akun.service';
 import PageHeader from '@/shared/components/PageHeader';
+import CustomSelect from '@/shared/components/CustomSelect';
 
 const EMPTY_FORM = {
   nip_nisn: '',
@@ -183,18 +184,18 @@ export default function HakAksesPage() {
                   style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
                 />
               </div>
-              <select
+              <CustomSelect
                 value={filterRole}
-                onChange={(e) => { setFilterRole(e.target.value); setCurrentPage(1); }}
-                className="form-control"
-                style={{ height: '38px', cursor: 'pointer', minWidth: '160px', paddingRight: '2.5rem', paddingLeft: '1rem', backgroundPosition: 'right 0.75rem center' }}
-              >
-                <option value="">Semua Role</option>
-                <option value="admin">Administrator</option>
-                <option value="kepsek">Kepala Sekolah</option>
-                <option value="guru">Guru</option>
-                <option value="siswa">Murid</option>
-              </select>
+                onChange={(val) => { setFilterRole(val); setCurrentPage(1); }}
+                options={[
+                  { value: '', label: 'Semua Role' },
+                  { value: 'admin', label: 'Administrator' },
+                  { value: 'kepsek', label: 'Kepala Sekolah' },
+                  { value: 'guru', label: 'Guru' },
+                  { value: 'siswa', label: 'Murid' }
+                ]}
+                style={{ width: '160px' }}
+              />
             </div>
             <button type="button" onClick={handleAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <Plus size={16} />
@@ -391,12 +392,16 @@ export default function HakAksesPage() {
 
                 <div>
                   <FormLabel required>Role</FormLabel>
-                  <select value={formData.role} onChange={(e) => setFormData(p => ({ ...p, role: e.target.value }))} className="form-control">
-                    <option value="admin">Administrator</option>
-                    <option value="kepsek">Kepala Sekolah</option>
-                    <option value="guru">Guru</option>
-                    <option value="siswa">Murid</option>
-                  </select>
+                  <CustomSelect
+                    value={formData.role}
+                    onChange={(val) => setFormData(p => ({ ...p, role: val }))}
+                    options={[
+                      { value: 'admin', label: 'Administrator' },
+                      { value: 'kepsek', label: 'Kepala Sekolah' },
+                      { value: 'guru', label: 'Guru' },
+                      { value: 'siswa', label: 'Murid' }
+                    ]}
+                  />
                 </div>
                 <div>
                   <FormLabel>No. Handphone</FormLabel>
@@ -410,10 +415,14 @@ export default function HakAksesPage() {
 
                 <div>
                   <FormLabel required>Status</FormLabel>
-                  <select value={formData.status} onChange={(e) => setFormData(p => ({ ...p, status: e.target.value }))} className="form-control">
-                    <option value="aktif">Aktif</option>
-                    <option value="nonaktif">Nonaktif</option>
-                  </select>
+                  <CustomSelect
+                    value={formData.status}
+                    onChange={(val) => setFormData(p => ({ ...p, status: val }))}
+                    options={[
+                      { value: 'aktif', label: 'Aktif' },
+                      { value: 'nonaktif', label: 'Nonaktif' }
+                    ]}
+                  />
                 </div>
                 <div />
 

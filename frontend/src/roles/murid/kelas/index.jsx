@@ -31,7 +31,7 @@ export default function SiswaKelasPage() {
 
   return (
     <MainLayout role={user?.role || 'siswa'} name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader title="Data Kelas yang Dimasuki" subtitle="Informasi detail mengenai kelas yang sedang Anda masuki saat ini." />
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '0 1.5rem 1.5rem 1.5rem' }}>

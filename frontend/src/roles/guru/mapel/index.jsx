@@ -46,7 +46,7 @@ export default function GuruMapelPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader title="Mata Pelajaran yang Diampu" subtitle="Berikut adalah daftar mata pelajaran yang Anda ampu." />
 
           <div className="table-container">

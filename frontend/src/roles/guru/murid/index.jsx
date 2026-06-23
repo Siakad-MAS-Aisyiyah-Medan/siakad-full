@@ -177,7 +177,7 @@ export default function GuruMuridPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader title={`Murid - ${namaKelas}`} subtitle={`Berikut adalah daftar murid pada kelas ${namaKelas} yang Anda ajar.`} />
 
         <div className="glass" style={{ borderRadius: '16px', padding: '1.25rem 1.5rem', border: '1px solid var(--color-border)', display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -190,7 +190,7 @@ export default function GuruMuridPage() {
                 value={selectedKey}
                 onChange={(e) => handleContextChange(e.target.value)}
                 className="form-control"
-                style={{ minWidth: '360px', height: '38px', borderRadius: '10px', background: '#fff', border: '1px solid var(--color-border)' }}
+                style={{ width: '100%', maxWidth: '400px', height: '38px', borderRadius: '10px', background: '#fff', border: '1px solid var(--color-border)' }}
               >
                 {options.map((opt) => (
                   <option key={opt.key} value={opt.key}>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AdminPageShell from '@/shared/components/AdminPageShell';
 import PageHeader from '@/shared/components/PageHeader';
 import { Save, FileText, CheckCircle, Percent, Gift, MapPin, Building, UploadCloud, X, Plus } from 'lucide-react';
+import CustomSelect from '@/shared/components/CustomSelect';
 import { fetchAdminPpdbSettings, updateAdminPpdbSettings } from '@/shared/services/ppdb.service';
 import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
 import { getProfilSekolah } from '@/shared/services/profilSekolah.service';
@@ -171,14 +172,17 @@ export default function PengaturanPpdbPage() {
       </div>
       <div>
         <label className="form-label">Tahun Ajaran</label>
-        <select name="ppdb_tahun_ajaran" value={formData.ppdb_tahun_ajaran} onChange={handleChange} className="form-control">
-          <option value="" disabled>Pilih Tahun Ajaran</option>
-          {tahunAjaranOptions.map((ta) => (
-            <option key={ta.id} value={ta.tahun_ajaran}>
-              {ta.tahun_ajaran} - Semester {ta.semester}
-            </option>
-          ))}
-        </select>
+        <CustomSelect
+          value={formData.ppdb_tahun_ajaran}
+          onChange={(val) => handleChange({ target: { name: 'ppdb_tahun_ajaran', value: val } })}
+          options={[
+            { value: '', label: 'Pilih Tahun Ajaran' },
+            ...tahunAjaranOptions.map((ta) => ({
+              value: ta.tahun_ajaran,
+              label: `${ta.tahun_ajaran} - Semester ${ta.semester}`
+            }))
+          ]}
+        />
       </div>
       <div>
         <label className="form-label">Deskripsi Singkat</label>
@@ -190,8 +194,8 @@ export default function PengaturanPpdbPage() {
       </div>
       <div>
         <label className="form-label">Brosur PPDB (PDF/Gambar)</label>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem', marginTop: '0.5rem' }}>
-          <div style={{ flex: 1 }}>
+        <div className="flex flex-col md:flex-row gap-6 mt-2 items-start w-full">
+          <div className="w-full md:flex-1">
             <label 
               htmlFor="upload-brosur" 
               style={{
@@ -297,7 +301,7 @@ export default function PengaturanPpdbPage() {
                 <X size={16} /> Hapus
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="form-label">Nama Gelombang</label>
                 <input value={gel.judul} onChange={e => handleObjectArrayChange('ppdb_gelombang', idx, 'judul', e.target.value)} className="form-control" placeholder="Contoh: Gelombang 1" />
@@ -338,7 +342,7 @@ export default function PengaturanPpdbPage() {
           <Plus size={16} /> Tambah Promo
         </button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {formData.ppdb_promo.map((promo, idx) => (
           <div key={idx} style={{ padding: '1rem', border: '1px solid var(--color-border)', borderRadius: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
@@ -364,7 +368,7 @@ export default function PengaturanPpdbPage() {
             <Plus size={16} /> Tambah Fasilitas
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {formData.ppdb_fasilitas.map((f, idx) => (
             <div key={idx} style={{ display: 'flex', gap: '0.5rem' }}>
               <input value={f.nama} onChange={e => handleObjectArrayChange('ppdb_fasilitas', idx, 'nama', e.target.value)} className="form-control" placeholder="Nama Fasilitas" />
@@ -380,7 +384,7 @@ export default function PengaturanPpdbPage() {
             <Plus size={16} /> Tambah Ekstrakurikuler
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {formData.ppdb_ekstrakurikuler.map((f, idx) => (
             <div key={idx} style={{ display: 'flex', gap: '0.5rem' }}>
               <input value={f.nama} onChange={e => handleObjectArrayChange('ppdb_ekstrakurikuler', idx, 'nama', e.target.value)} className="form-control" placeholder="Ekstrakurikuler" />
@@ -403,16 +407,16 @@ export default function PengaturanPpdbPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {formData.ppdb_kontak.map((k, idx) => (
           <div key={idx} style={{ padding: '1.5rem', border: '1px solid var(--color-border)', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <input value={k.nama} onChange={e => handleObjectArrayChange('ppdb_kontak', idx, 'nama', e.target.value)} className="form-control" placeholder="Nama Panitia" style={{ width: '300px' }} />
-              <button type="button" onClick={() => handleRemoveArrayItem('ppdb_kontak', idx)} style={{ color: 'var(--color-danger)', background: 'none', border: 'none', cursor: 'pointer' }}><X size={16}/></button>
+            <div className="flex flex-col sm:flex-row justify-between gap-2 mb-4">
+              <input value={k.nama} onChange={e => handleObjectArrayChange('ppdb_kontak', idx, 'nama', e.target.value)} className="form-control w-full sm:max-w-xs" placeholder="Nama Panitia" />
+              <button type="button" onClick={() => handleRemoveArrayItem('ppdb_kontak', idx)} style={{ color: 'var(--color-danger)', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-end', padding: '0.5rem' }}><X size={16}/></button>
             </div>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Nomor Telepon/WA</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
                 {(k.telepon || []).map((tel, tIdx) => (
                   <div key={tIdx} style={{ display: 'flex', gap: '0.5rem' }}>
-                    <input value={tel} onChange={e => handleObjectArraySubChange('ppdb_kontak', idx, 'telepon', tIdx, e.target.value)} className="form-control" style={{ width: '250px' }} />
+                    <input value={tel} onChange={e => handleObjectArraySubChange('ppdb_kontak', idx, 'telepon', tIdx, e.target.value)} className="form-control w-full sm:max-w-xs" />
                     <button type="button" onClick={() => handleObjectArrayRemove('ppdb_kontak', idx, 'telepon', tIdx)} className="btn-outline" style={{ padding: '0.4rem', color: 'var(--color-danger)' }}><X size={14}/></button>
                   </div>
                 ))}
@@ -428,39 +432,37 @@ export default function PengaturanPpdbPage() {
   return (
     <AdminPageShell>
       <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <PageHeader 
-          title={
-            <div style={{ display: 'flex', overflowX: 'auto', gap: '0.5rem', marginTop: '0.25rem' }}>
-              {[
-                { id: 'umum', label: 'Umum & Brosur', icon: FileText },
-                { id: 'syarat', label: 'Syarat & Alur', icon: CheckCircle },
-                { id: 'promo', label: 'Gelombang & Promo', icon: Percent },
-                { id: 'fasilitas', label: 'Fasilitas', icon: Building },
-                { id: 'kontak', label: 'Kontak', icon: MapPin },
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  style={{
-                    padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    borderBottom: activeTab === tab.id ? '2px solid var(--color-primary)' : '2px solid transparent',
-                    color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                    fontWeight: activeTab === tab.id ? 700 : 600,
-                    background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', cursor: 'pointer',
-                    fontSize: '0.95rem'
-                  }}
-                >
-                  <tab.icon size={18} /> {tab.label}
-                </button>
-              ))}
-            </div>
-          }
-        >
+        <PageHeader title="Pengaturan PPDB">
           <button type="button" onClick={handleSave} disabled={saving || loading} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
           </button>
         </PageHeader>
+
+        <div style={{ display: 'flex', overflowX: 'auto', gap: '0.5rem', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)', WebkitOverflowScrolling: 'touch' }}>
+          {[
+            { id: 'umum', label: 'Umum & Brosur', icon: FileText },
+            { id: 'syarat', label: 'Syarat & Alur', icon: CheckCircle },
+            { id: 'promo', label: 'Gelombang & Promo', icon: Percent },
+            { id: 'fasilitas', label: 'Fasilitas', icon: Building },
+            { id: 'kontak', label: 'Kontak', icon: MapPin },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
+                borderBottom: activeTab === tab.id ? '2px solid var(--color-primary)' : '2px solid transparent',
+                color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                fontWeight: activeTab === tab.id ? 700 : 600,
+                background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', cursor: 'pointer',
+                fontSize: '0.95rem', whiteSpace: 'nowrap', flexShrink: 0
+              }}
+            >
+              <tab.icon size={18} /> {tab.label}
+            </button>
+          ))}
+        </div>
 
         {loading ? (
           <div style={{ padding: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', flex: 1 }}>
@@ -468,7 +470,7 @@ export default function PengaturanPpdbPage() {
             <p style={{ color: 'var(--color-text-muted)', fontWeight: 500, fontSize: '1.1rem' }}>Memuat data pengaturan...</p>
           </div>
         ) : (
-        <div style={{ padding: '2rem', background: '#fff', borderRadius: '12px', border: '1px solid var(--color-border)', flex: 1 }}>
+        <div className="bg-white rounded-xl border border-slate-200 flex-1 p-5 md:p-8">
           {activeTab === 'umum' && renderUmum()}
           {activeTab === 'syarat' && (
             <>

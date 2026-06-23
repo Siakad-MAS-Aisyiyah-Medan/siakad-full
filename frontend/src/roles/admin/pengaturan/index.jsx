@@ -21,12 +21,12 @@ function InfoCard({ label, value, icon: Icon, isPassword = false }) {
       }}>
         <Icon size={24} />
       </div>
-      <div>
-        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
         {isPassword ? (
           <p style={{ fontSize: '1.25rem', color: 'var(--color-text-dark)', letterSpacing: '0.2em', lineHeight: 1, margin: 0, marginTop: '0.3rem' }}>••••••••</p>
         ) : (
-          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-dark)', margin: 0 }}>{value || '-'}</p>
+          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-dark)', margin: 0, wordBreak: 'break-word', lineHeight: 1.3 }}>{value || '-'}</p>
         )}
       </div>
     </div>
@@ -171,24 +171,24 @@ export default function PengaturanSistemPage() {
         </PageHeader>
 
         {isEditing ? (
-          <form onSubmit={handleSave} className="form-panel" style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid var(--color-border)' }}>
-              <div style={{
-                width: '80px', height: '80px', borderRadius: '20px',
+          <form onSubmit={handleSave} className="form-panel p-4 sm:p-8">
+            <div className="flex flex-row items-center gap-4 sm:gap-6 mb-6 sm:mb-8 pb-6 sm:pb-8" style={{ borderBottom: '1px solid var(--color-border)' }}>
+              <div className="flex-shrink-0" style={{
+                width: '64px', height: '64px', borderRadius: '16px',
                 background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
                 color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em',
+                fontSize: '1.5rem', fontWeight: 800, letterSpacing: '0.05em',
                 boxShadow: '0 8px 24px rgba(5, 150, 105, 0.25)'
               }}>
                 {initials}
               </div>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}>Profil Utama</h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.2rem' }}>Informasi dasar akun Anda</p>
+              <div className="min-w-0 flex-1">
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0, wordBreak: 'break-word', lineHeight: 1.2 }}>Profil Utama</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.2rem', lineHeight: 1.4 }}>Informasi dasar akun Anda</p>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
               <div>
                 <FormLabel required>Nama Lengkap</FormLabel>
                 <div style={{ position: 'relative' }}>
@@ -213,18 +213,18 @@ export default function PengaturanSistemPage() {
               </div>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="flex-shrink-0" style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <KeyRound size={16} />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}>Ganti Password</h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.1rem' }}>Kosongkan jika tidak ingin mengubah password</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0, marginTop: '0.1rem', lineHeight: 1.3 }}>Kosongkan jika tidak ingin mengubah password</p>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
                 <div>
                   <FormLabel>Password Saat Ini</FormLabel>
                   <div style={{ position: 'relative' }}>
@@ -291,9 +291,9 @@ export default function PengaturanSistemPage() {
           <div className="form-panel" style={{ padding: 0, overflow: 'hidden' }}>
             <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'radial-gradient(#fff 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1.5rem', zIndex: 1 }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1.25rem', zIndex: 1, flexWrap: 'wrap' }}>
                 <div style={{
-                  width: '90px', height: '90px', borderRadius: '50%',
+                  width: '80px', height: '80px', borderRadius: '50%',
                   background: '#fff',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px',
@@ -303,13 +303,13 @@ export default function PengaturanSistemPage() {
                     width: '100%', height: '100%', borderRadius: '50%',
                     background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
                     color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '2rem', fontWeight: 800, letterSpacing: '0.05em'
+                    fontSize: '1.75rem', fontWeight: 800, letterSpacing: '0.05em'
                   }}>
                     {initials}
                   </div>
                 </div>
-                <div>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>{displayName}</h1>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.01em', wordBreak: 'break-word', lineHeight: 1.2 }}>{displayName}</h1>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '0.35rem 0.85rem', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 600, marginTop: '0.6rem', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     <ShieldCheck size={15} /> {roleLabel}
                   </div>

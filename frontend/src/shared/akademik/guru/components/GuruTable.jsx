@@ -30,9 +30,32 @@ export default function GuruTable({
   };
 
   return (
-    <div className="animate-fade-in" style={{ margin: '-1.5rem', background: 'var(--color-white)', minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
+    <div className="animate-fade-in" style={{ background: 'var(--color-white)', minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
       <PageHeader title="Data Guru" subtitle="Kelola data guru MAS Aisyiyah Medan">
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {readOnly ? (
+            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              <span className="hidden sm:inline">Unduh Data</span>
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
+                <Download size={16} />
+                <span className="hidden sm:inline">Unduh Data</span>
+              </button>
+              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={16} />
+                <span className="hidden sm:inline">Tambah Guru</span>
+                <span className="inline sm:hidden">Tambah</span>
+              </button>
+            </>
+          )}
+        </div>
+      </PageHeader>
+
+      <div className="flex flex-col sm:flex-row gap-4 mb-4 px-6 pt-4">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1, maxWidth: '400px' }}>
           <Search size={16} style={{ position: 'absolute', left: '1rem', color: '#94a3b8', pointerEvents: 'none', transition: 'color 0.2s ease' }} className="search-icon" />
           <input
             type="text"
@@ -42,7 +65,7 @@ export default function GuruTable({
             style={{
               paddingLeft: '2.75rem', paddingRight: '1rem', height: '42px',
               border: '1px solid var(--color-border)', borderRadius: '12px',
-              fontSize: '0.9rem', outline: 'none', width: '260px',
+              fontSize: '0.9rem', outline: 'none', width: '100%',
               background: '#f8fafc', color: 'var(--color-text-dark)',
               transition: 'all 0.2s ease', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
             }}
@@ -60,26 +83,7 @@ export default function GuruTable({
             }}
           />
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          {readOnly ? (
-            <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Download size={16} />
-              Unduh Data
-            </button>
-          ) : (
-            <>
-              <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
-                <Download size={16} />
-                Unduh Data
-              </button>
-              <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Plus size={16} />
-                Tambah Guru
-              </button>
-            </>
-          )}
-        </div>
-      </PageHeader>
+      </div>
 
       {/* Table */}
       <div style={{ flex: 1, overflowX: 'auto' }}>

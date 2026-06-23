@@ -18,9 +18,18 @@ export default function PageHeader({ title, subtitle, actions, backTo, onBack, c
   const actionsPortal = document.getElementById('global-header-actions');
 
   const handleBack = () => {
-    if (onBack) onBack();
-    else if (backTo) navigate(backTo);
-    else navigate(-1);
+    if (onBack) {
+      onBack();
+    } else if (backTo) {
+      navigate(backTo);
+    } else {
+      // Jika tidak ada history (misal karena refresh halaman), kembali ke root/dashboard
+      if (window.history.state && window.history.state.idx > 0) {
+        navigate(-1);
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
   };
 
   return (

@@ -4642,6 +4642,23 @@ html.dark-mode [class*="text-slate-400"] {
   color: #64748b !important;
 }
 
+/* Fix ReactQuill Toolbar size under Tailwind */
+.ql-toolbar.ql-snow button {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 3px !important;
+}
+.ql-toolbar.ql-snow button svg {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 auto !important;
+}
+.ql-snow .ql-picker {
+  height: 28px !important;
+}
+.ql-editor {
+  min-height: 200px;
+}
 html.dark-mode .border-slate-100,
 html.dark-mode [class*="border-slate-100"] {
   border-color: #1e293b !important;
@@ -4903,3 +4920,23 @@ html.dark-mode .border-b.border-slate-200.px-6.py-5 {
     background: white !important;
   }
 }
+
+ / *   F i x   R e a c t Q u i l l   T o o l b a r   s i z e   u n d e r   T a i l w i n d   * / 
+ . q l - t o o l b a r . q l - s n o w   b u t t o n   { 
+     w i d t h :   2 8 p x   ! i m p o r t a n t ; 
+     h e i g h t :   2 8 p x   ! i m p o r t a n t ; 
+     p a d d i n g :   3 p x   ! i m p o r t a n t ; 
+ } 
+ . q l - t o o l b a r . q l - s n o w   b u t t o n   s v g   { 
+     w i d t h :   1 8 p x   ! i m p o r t a n t ; 
+     h e i g h t :   1 8 p x   ! i m p o r t a n t ; 
+     m a r g i n :   0   a u t o   ! i m p o r t a n t ; 
+ } 
+ . q l - s n o w   . q l - p i c k e r   { 
+     h e i g h t :   2 8 p x   ! i m p o r t a n t ; 
+ } 
+ . q l - e d i t o r   { 
+     m i n - h e i g h t :   2 0 0 p x ; 
+ } 
+  
+ 

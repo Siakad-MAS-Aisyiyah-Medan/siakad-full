@@ -27,41 +27,43 @@ export default function MapelTable({
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader title="Mata Pelajaran" subtitle="Kelola data mata pelajaran MAS Aisyiyah Medan">
-        {readOnly && (
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-            <input
-              type="text"
-              placeholder="Cari mata pelajaran..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-              style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '220px', background: '#fff', color: 'var(--color-text-dark)' }}
-            />
-          </div>
-        )}
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           {readOnly ? (
             <button type="button" onClick={handleDownload} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <Download size={16} />
-              Unduh Data
+              <span className="hidden sm:inline">Unduh Data</span>
             </button>
           ) : (
             <>
               <button type="button" onClick={handleDownload} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff' }}>
                 <Download size={16} />
-                Unduh Data
+                <span className="hidden sm:inline">Unduh Data</span>
               </button>
               <button type="button" onClick={onAdd} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Plus size={16} />
-                Tambah Mapel
+                <span className="hidden sm:inline">Tambah Mapel</span>
+                <span className="inline sm:hidden">Tambah</span>
               </button>
             </>
           )}
         </div>
       </PageHeader>
 
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1, maxWidth: '400px' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            placeholder="Cari mata pelajaran..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            style={{ paddingLeft: '2.5rem', height: '42px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '100%', background: '#fff', color: 'var(--color-text-dark)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+          />
+        </div>
+      </div>
+
       {/* Table */}
-      <div className="table-container">
+      <div className="table-container overflow-x-auto">
         <table className="data-table">
           <thead>
             <tr>

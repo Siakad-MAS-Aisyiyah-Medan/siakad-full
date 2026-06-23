@@ -9,6 +9,37 @@ const apiClient = axios.create({
   headers: apiConfig.headers,
 });
 
+const GET_CACHE = new Map();
+
+const originalGet = apiClient.get;
+apiClient.get = async (url, config = {}) => {
+  if (config.cache === false || config.responseType === 'blob') {
+    return originalGet(url, config);
+  }
+
+  const cacheKey = url + JSON.stringify(config.params || {});
+  
+  if (GET_CACHE.has(cacheKey)) {
+    // SWR: Fetch fresh data in background silently
+    originalGet(url, config)
+      .then(res => GET_CACHE.set(cacheKey, res.data))
+      .catch(() => {});
+      
+    // Return cached data immediately
+    return {
+      data: GET_CACHE.get(cacheKey),
+      status: 200,
+      statusText: 'OK (Cached)',
+      headers: {},
+      config
+    };
+  }
+
+  const response = await originalGet(url, config);
+  GET_CACHE.set(cacheKey, response.data);
+  return response;
+};
+
 const AUTH_PUBLIC_PATHS = ['/login', '/register', '/auth/register-calon-siswa'];
 
 function isPublicAuthRequest(url = '') {
@@ -32,13 +63,21 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Clear cache on any data mutation
+    const method = response.config?.method?.toLowerCase();
+    if (['post', 'put', 'patch', 'delete'].includes(method)) {
+      GET_CACHE.clear();
+    }
+    return response;
+  },
   (error) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url ?? '';
 
     if (status === 401 && !isPublicAuthRequest(requestUrl)) {
       clearSession();
+      GET_CACHE.clear(); // Bersihkan cache saat unauthorized
       const msg =
         error.response?.data?.message || 'Sesi Anda telah berakhir. Silakan login kembali.';
       const loginBase = resolveLoginUrl();

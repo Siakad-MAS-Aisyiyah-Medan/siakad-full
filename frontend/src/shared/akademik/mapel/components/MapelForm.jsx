@@ -137,12 +137,7 @@ function FormLabel({ children, required }) {
 
 function EditRow({ label, children, last = false }) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '200px 1fr',
-      alignItems: 'center',
-      gap: '1.25rem',
-      padding: '0.9rem 1.5rem',
+    <div className="flex flex-col sm:grid sm:grid-cols-[200px_1fr] sm:items-center gap-2 sm:gap-5 px-6 py-4" style={{
       borderBottom: last ? 'none' : '1px solid var(--color-border)',
     }}>
       <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-dark)' }}>{label}</label>

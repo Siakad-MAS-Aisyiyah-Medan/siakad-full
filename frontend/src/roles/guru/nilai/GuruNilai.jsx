@@ -485,7 +485,7 @@ export default function GuruNilaiPage() {
 
   return (
     <MainLayout role={user?.role} name={name}>
-      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', margin: '-1.5rem', minHeight: 'calc(100vh - 84px)', background: 'var(--color-white)' }}>
+      <div className="admin-page-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {view === 'list' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <PageHeader title="Daftar Nilai Murid" subtitle="Kelola data nilai murid.">

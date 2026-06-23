@@ -165,14 +165,13 @@ function MotionUserInfo({ name, roleLabel, role, onLogout }) {
       {isOpen && (
         <div style={{
           position: 'absolute',
-          top: '100%',
-          right: 0,
-          marginTop: '0.5rem',
+          top: 'calc(100% + 0.5rem)',
+          right: '-0.5rem',
           background: '#fff',
           borderRadius: '12px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-          minWidth: '220px',
-          zIndex: 50,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+          minWidth: '200px',
+          zIndex: 1000,
           border: '1px solid var(--color-border)',
           display: 'flex',
           flexDirection: 'column',
@@ -180,16 +179,16 @@ function MotionUserInfo({ name, roleLabel, role, onLogout }) {
         }}>
           <div style={{ padding: '0.5rem' }}>
             {role !== 'admin' && (
-              <button className="dropdown-action-item" onClick={(e) => { e.stopPropagation(); handleNavigate('/profil-saya'); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.75rem', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-dark)', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.15s' }}>
+              <button className="dropdown-action-item" onClick={(e) => { e.stopPropagation(); handleNavigate('/profil-saya'); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.75rem', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-dark)', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.15s' }}>
                 <User size={16} /> Profil Saya
               </button>
             )}
-            <button className="dropdown-action-item" onClick={(e) => { e.stopPropagation(); handleNavigate('/pengaturan'); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.75rem', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-dark)', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.15s' }}>
+            <button className="dropdown-action-item" onClick={(e) => { e.stopPropagation(); handleNavigate('/pengaturan'); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.75rem', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-dark)', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.15s' }}>
               <Settings size={16} /> Pengaturan Akun
             </button>
           </div>
           <div style={{ borderTop: '1px solid var(--color-border)', padding: '0.5rem' }}>
-            <button className="dropdown-action-item danger" onClick={(e) => { e.stopPropagation(); onLogout(); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.75rem', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-danger)', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.15s' }}>
+            <button className="dropdown-action-item danger" onClick={(e) => { e.stopPropagation(); onLogout(); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.75rem', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-danger)', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.15s' }}>
               <LogOut size={16} /> Keluar
             </button>
           </div>
