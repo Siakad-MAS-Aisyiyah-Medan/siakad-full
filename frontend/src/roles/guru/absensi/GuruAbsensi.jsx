@@ -1,167 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 import MainLayout from '@/shared/layouts/MainLayout';
 import apiClient from '@/shared/services/apiClient';
-import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
 import { getStoredProfile, getStoredUser } from '@/shared/services/auth.service';
 import { getDisplayName } from '@/shared/utils/profile';
 import { fetchAbsensiForm, saveAbsensiBulk, fetchHistoryAbsensi, deleteAbsensiMeeting } from '@/shared/absensi/guru/services/absensi.service';
 import { toastError, toastSuccess } from '@/shared/hooks/useConfirm';
 import PageHeader from '@/shared/components/PageHeader';
 
-import {
-  buildDefaultAbsensiContexts,
-  buildMeetingDates,
-  buildSemesterMonthOptions,
-  formatMonthLabel,
-} from '../guruTeachingUtils';
-
 const formatLes = (timeStr) => timeStr ? parseInt(timeStr.split(':')[0], 10) : '-';
 
-const STORAGE_KEY_PREFIX = 'guru_absensi_contexts_v3_';
-const SEMESTER_OPTIONS = ['Ganjil', 'Genap'];
-const STATUS_OPTIONS = ['-', 'H', 'S', 'I', 'A'];
-const FIXED_TIME = {
-  jam_mulai: '07:00',
-  jam_selesai: '08:30',
-};
-
-function getStorageKey(user) {
-  return `${STORAGE_KEY_PREFIX}${user?.id_user || 'default'}`;
-}
-
-function readStoredContexts(user) {
-  try {
-    const raw = localStorage.getItem(getStorageKey(user));
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((item) => 
-      item &&
-      item.id_kelas &&
-      item.id_mapel &&
-      !isNaN(Number(item.id_kelas)) &&
-      !isNaN(Number(item.id_mapel))
-    );
-  } catch {
-    return [];
-  }
-}
-
-function persistContexts(user, rows) {
-  localStorage.setItem(getStorageKey(user), JSON.stringify(rows));
-}
-
-function buildContextId(meta) {
-  return `${meta.tahun_ajaran}|${meta.semester}|${meta.bulan}|${meta.id_kelas}|${meta.id_mapel}`;
-}
-
-function getActiveAcademicYear(tahunAjaranList) {
-  const active = (tahunAjaranList || []).find((item) => String(item.status || '').toLowerCase() === 'aktif');
-  return active?.tahun_ajaran || tahunAjaranList?.[0]?.tahun_ajaran || '2025/2026';
-}
-
-function getDefaultMonth(tahunAjaran, semester) {
-  const options = buildSemesterMonthOptions(tahunAjaran, semester);
-  const now = new Date();
-  const current = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  return options.find((item) => item.value === current)?.value || options[0]?.value || '';
-}
-
-function AbsensiContextForm({
-  mode,
-  form,
-  tahunAjaranOptions,
-  kelasOptions,
-  mapelOptions,
-  monthOptions,
-  onChange,
-  onCancel,
-  onSubmit,
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <PageHeader 
-        title={mode === 'create' ? 'Tambah Absensi' : 'Edit Absensi'}
-        subtitle={mode === 'create' ? 'Lengkapi data berikut untuk menambahkan absensi murid.' : 'Ubah data absensi yang telah dibuat.'}
-      />
-
-      <div className="form-panel glass" style={{ padding: '1.75rem' }}>
-        <div style={{ display: 'grid', gap: '1.5rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '180px minmax(0, 1fr)', alignItems: 'center', gap: '1.25rem' }}>
-            <label className="form-label">Tahun Ajaran *</label>
-            <select name="tahun_ajaran" value={form.tahun_ajaran} onChange={onChange} className="form-control" required>
-              <option value="">-- Masukkan tahun ajaran --</option>
-              {tahunAjaranOptions.map((item) => (
-                <option key={item.id_tahun_ajaran || item.tahun_ajaran} value={item.tahun_ajaran}>
-                  {item.tahun_ajaran}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '180px minmax(0, 1fr)', alignItems: 'center', gap: '1.25rem' }}>
-            <label className="form-label">Semester *</label>
-            <select name="semester" value={form.semester} onChange={onChange} className="form-control" required>
-              <option value="">-- Masukkan semester --</option>
-              {SEMESTER_OPTIONS.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '180px minmax(0, 1fr)', alignItems: 'center', gap: '1.25rem' }}>
-            <label className="form-label">Bulan *</label>
-            <select name="bulan" value={form.bulan} onChange={onChange} className="form-control" required>
-              <option value="">-- Pilih bulan --</option>
-              {monthOptions.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '180px minmax(0, 1fr)', alignItems: 'center', gap: '1.25rem' }}>
-            <label className="form-label">Kelas *</label>
-            <select name="id_kelas" value={form.id_kelas} onChange={onChange} className="form-control" required>
-              <option value="">-- Pilih kelas --</option>
-              {kelasOptions.map((item) => (
-                <option key={item.id_kelas} value={item.id_kelas}>
-                  {item.nama_kelas}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '180px minmax(0, 1fr)', alignItems: 'center', gap: '1.25rem' }}>
-            <label className="form-label">Mata Pelajaran *</label>
-            <select name="id_mapel" value={form.id_mapel} onChange={onChange} className="form-control" required>
-              <option value="">-- Pilih mata pelajaran --</option>
-              {mapelOptions.map((item) => (
-                <option key={item.id_mapel} value={item.id_mapel}>
-                  {item.nama_mapel}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
-          <button type="button" className="btn-outline" onClick={onCancel}>
-            Batal
-          </button>
-          <button type="button" className="btn-primary" onClick={onSubmit}>
-            {mode === 'create' ? 'Simpan' : 'Simpan Perubahan'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function getDayName(dateStr) {
   if (!dateStr) return '';
@@ -282,7 +131,7 @@ function AbsensiHistoryView({ context, onBack, onEdit }) {
   const [loading, setLoading] = useState(true);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
 
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetchHistoryAbsensi({
@@ -296,11 +145,11 @@ function AbsensiHistoryView({ context, onBack, onEdit }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [context.id_kelas, context.id_mapel]);
 
   useEffect(() => {
     loadHistory();
-  }, [context]);
+  }, [loadHistory]);
 
   const handleDelete = async (row) => {
     if (!window.confirm(`Hapus riwayat absensi tanggal ${row.tanggal.split('T')[0]} (Les ${formatLes(row.jam_mulai)} - ${formatLes(row.jam_selesai)})?`)) return;
@@ -511,7 +360,7 @@ function TambahAbsensiView({ context, meetingToEdit, onBack }) {
               type="date" 
               className="form-control" 
               value={form.tanggal} 
-              disabled
+              disabled={!!meetingToEdit}
               onChange={e => setForm(prev => ({ ...prev, tanggal: e.target.value }))} 
             />
           </div>
@@ -662,43 +511,23 @@ export default function GuruAbsensiPage() {
   const [activeContext, setActiveContext] = useState(null);
   const [meetingToEdit, setMeetingToEdit] = useState(null);
   const [jadwalList, setJadwalList] = useState([]);
-  const [tahunAjaranList, setTahunAjaranList] = useState([]);
-  const [contexts, setContexts] = useState([]);
-  const [form, setForm] = useState({
-    id: '',
-    tahun_ajaran: '',
-    semester: 'Ganjil',
-    bulan: '',
-    id_kelas: '',
-    id_mapel: '',
-  });
-  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [inputLoading, setInputLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     async function loadData() {
       try {
-        const [jadwalResponse, tahunAjaranResponse] = await Promise.all([
-          apiClient.get('/guru/jadwal'),
-          fetchTahunAjaran(),
-        ]);
-
-        const jadwalRows = Array.isArray(jadwalResponse?.data?.data) ? jadwalResponse.data.data : [];
-        const activeYear = getActiveAcademicYear(tahunAjaranResponse || []);
+        const response = await apiClient.get('/guru/jadwal');
+        const jadwalRows = Array.isArray(response?.data?.data) ? response.data.data : [];
 
         if (active) {
           setJadwalList(jadwalRows);
-          setTahunAjaranList(tahunAjaranResponse || []);
         }
       } catch (error) {
         console.error('Gagal memuat data absensi guru', error);
         if (active) {
           setJadwalList([]);
-          setTahunAjaranList([]);
         }
       } finally {
         if (active) {

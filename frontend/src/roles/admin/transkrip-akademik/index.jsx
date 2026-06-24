@@ -111,7 +111,7 @@ export default function AdminTranskripAkademikPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Filter Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', zIndex: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', zIndex: 10 }}>
               <div style={{ position: 'relative', zIndex: 11 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Tahun Ajaran</label>
                 <div className="no-print">
@@ -296,37 +296,78 @@ export default function AdminTranskripAkademikPage() {
   return (
     <AdminPageShell>
       <div className="admin-page-wrapper animate-fade-in" style={{ paddingTop: '1rem' }}>
-        <PageHeader title={`Transkrip Akademik: ${selectedKelas.nama_kelas} - ${selectedKelas.jurusan}`} subtitle="Pilih murid untuk melihat transkrip" onBack={() => { setSelectedKelas(null); setSearch(''); }}>
-          <div className="flex flex-wrap gap-3 items-center w-full sm:w-auto">
-            {/* Search */}
-            <div className="relative flex-1 min-w-[200px] sm:min-w-[300px]">
-              <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari nama murid atau NISN..."
-                style={{ paddingLeft: '2.5rem', height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', width: '100%', background: '#fff', color: 'var(--color-text-dark)' }}
-              />
+        <PageHeader 
+          title={`Transkrip Akademik: ${selectedKelas.nama_kelas} - ${selectedKelas.jurusan}`} 
+          subtitle="Pilih murid untuk melihat transkrip" 
+          onBack={() => { setSelectedKelas(null); setSearch(''); }} 
+        />
+
+        {/* Filter & Search Bar Card */}
+        <div className="form-panel" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: '#fff', marginTop: '1.25rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'flex-end' }}>
+            
+            {/* Search Input on the Left */}
+            <div style={{ flex: '2 1 300px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Cari Murid</span>
+              <div style={{ position: 'relative', width: '100%' }}>
+                <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Cari nama murid atau NISN..."
+                  style={{ 
+                    paddingLeft: '2.5rem', 
+                    height: '40px', 
+                    border: '1px solid var(--color-border)', 
+                    borderRadius: '12px', 
+                    fontSize: '0.875rem', 
+                    outline: 'none', 
+                    width: '100%', 
+                    background: '#f9fafb', 
+                    color: 'var(--color-text-dark)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'var(--color-primary)';
+                    e.target.style.backgroundColor = '#fff';
+                    e.target.style.boxShadow = '0 0 0 3px var(--color-primary-soft)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'var(--color-border)';
+                    e.target.style.backgroundColor = '#f9fafb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
             </div>
-            <div className="flex gap-3 w-full sm:w-auto" style={{ zIndex: 100 }}>
-              <CustomSelect
-                value={filters.tahun_ajaran}
-                onChange={(val) => setFilters(p => ({ ...p, tahun_ajaran: val }))}
-                options={tahunAjaranList.length > 0 ? tahunAjaranList.map(ta => ({ value: ta.tahun_ajaran, label: ta.tahun_ajaran })) : [{ value: '2025/2026', label: '2025/2026' }]}
-                style={{ flex: 1 }}
-              />
-              <CustomSelect
-                value={filters.semester}
-                onChange={(val) => setFilters(p => ({ ...p, semester: val }))}
-                options={[
-                  { value: 'Ganjil', label: 'Ganjil' },
-                  { value: 'Genap', label: 'Genap' }
-                ]}
-                style={{ flex: 1 }}
-              />
+
+            {/* Dropdown Filters on the Right */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', flex: '1 1 auto', minWidth: '280px', zIndex: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: '1 1 140px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Tahun Ajaran</span>
+                <CustomSelect
+                  value={filters.tahun_ajaran}
+                  onChange={(val) => setFilters(p => ({ ...p, tahun_ajaran: val }))}
+                  options={tahunAjaranList.length > 0 ? tahunAjaranList.map(ta => ({ value: ta.tahun_ajaran, label: ta.tahun_ajaran })) : [{ value: '2025/2026', label: '2025/2026' }]}
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: '1 1 120px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Semester</span>
+                <CustomSelect
+                  value={filters.semester}
+                  onChange={(val) => setFilters(p => ({ ...p, semester: val }))}
+                  options={[
+                    { value: 'Ganjil', label: 'Ganjil' },
+                    { value: 'Genap', label: 'Genap' }
+                  ]}
+                  style={{ width: '100%' }}
+                />
+              </div>
             </div>
+
           </div>
-        </PageHeader>
+        </div>
 
         {/* Table */}
         <div className="table-container">
