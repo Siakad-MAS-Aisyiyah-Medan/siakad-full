@@ -3,8 +3,6 @@ import { Menu, X } from 'lucide-react';
 import AppLogo from '@/shared/components/AppLogo';
 import DaftarSekarangButton from '@/shared/ppdb/components/DaftarSekarangButton';
 import { NAV_ITEMS } from '../data/landingData';
-import { resolveStorageUrl } from '@/shared/services/apiHelpers';
-import { apiConfig } from '@/config/api.config';
 
 export default function LandingNavbar({ profil, activeSection, menuOpen, scrolled, onToggleMenu, onScrollToSection, onCloseMenu }) {
   return (

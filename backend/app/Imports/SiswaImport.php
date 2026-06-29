@@ -4,10 +4,9 @@ namespace App\Imports;
 
 use App\Models\Siswa;
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Exception;
 
 class SiswaImport
 {
@@ -31,26 +30,27 @@ class SiswaImport
                 // Lewati baris kosong
                 if (empty($row['nis']) || empty($row['nama'])) {
                     $rowIndex++;
+
                     continue;
                 }
 
                 $nis = $row['nis'];
                 $nisn = $row['nisn'] ?? '-';
-                
+
                 // Cek apakah NIS atau NISN sudah ada
                 if (Siswa::where('nis', $nis)->orWhere('nisn', $nisn)->exists()) {
-                    throw new Exception("Baris " . $rowIndex . ": NIS ($nis) atau NISN ($nisn) sudah terdaftar di sistem.");
+                    throw new Exception('Baris '.$rowIndex.": NIS ($nis) atau NISN ($nisn) sudah terdaftar di sistem.");
                 }
 
                 if (User::where('username', $nis)->exists()) {
-                    throw new Exception("Baris " . $rowIndex . ": Username/NIS ($nis) sudah terdaftar di tabel pengguna.");
+                    throw new Exception('Baris '.$rowIndex.": Username/NIS ($nis) sudah terdaftar di tabel pengguna.");
                 }
 
                 // Buat User
                 $user = User::create([
                     'name' => $row['nama'],
                     'username' => $nis,
-                    'email' => $nis . '@siswa.siakad.sch.id',
+                    'email' => $nis.'@siswa.siakad.sch.id',
                     'password' => Hash::make('admin123'),
                     'role' => 'siswa',
                     'status_aktif' => true,
@@ -59,7 +59,7 @@ class SiswaImport
 
                 // Format Tanggal Lahir (FastExcel / OpenSpout biasanya me-return string Y-m-d atau DateTime)
                 $tglLahir = '2000-01-01';
-                if (!empty($row['tgl_lahir'])) {
+                if (! empty($row['tgl_lahir'])) {
                     if ($row['tgl_lahir'] instanceof \DateTimeInterface) {
                         $tglLahir = $row['tgl_lahir']->format('Y-m-d');
                     } else {

@@ -4,6 +4,7 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\MuridController;
@@ -13,7 +14,6 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfilSekolahController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TahunAjaranController;
-use App\Http\Controllers\ImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {

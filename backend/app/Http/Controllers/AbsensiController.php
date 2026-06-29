@@ -110,7 +110,7 @@ class AbsensiController extends Controller
             $this->auditAdmin('guru.absensi.bulk_store', null, [
                 'id_kelas' => $validated['meta']['id_kelas'],
                 'id_mapel' => $validated['meta']['id_mapel'],
-                'tanggal' => $validated['meta']['tanggal']
+                'tanggal' => $validated['meta']['tanggal'],
             ]);
 
             return ApiResponse::success($saved, 'Absensi siswa berhasil disimpan');
@@ -182,7 +182,7 @@ class AbsensiController extends Controller
             $this->auditAdmin('guru.absensi.delete_meeting', null, [
                 'id_kelas' => $validated['id_kelas'],
                 'id_mapel' => $validated['id_mapel'],
-                'tanggal' => $validated['tanggal']
+                'tanggal' => $validated['tanggal'],
             ]);
 
             return ApiResponse::success(null, 'Data absensi pertemuan berhasil dihapus');
@@ -444,7 +444,7 @@ class AbsensiController extends Controller
     {
         $month = (int) date('n');
 
-        return ($month >= 7 || $month <= 12) ? 'Ganjil' : 'Genap';
+        return ($month >= 7 && $month <= 12) ? 'Ganjil' : 'Genap';
     }
 
     private function applyFilters($query, array $filters): void

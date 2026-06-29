@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Utils\AuditsAdminActions;
 
 class FotoProfilController extends Controller
 {
     use AuditsAdminActions;
+
     public function upload(Request $request): JsonResponse
     {
         $request->validate([

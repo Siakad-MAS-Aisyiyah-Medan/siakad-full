@@ -1,8 +1,7 @@
 import AdminPageShell from '@/shared/components/AdminPageShell';
 import PendaftarTable from '@/shared/ppdb/components/PendaftarTable';
 import { useAdminPpdb } from '@/shared/ppdb/hooks/useAdminPpdb';
-import { CheckCircle2, Clock, Search, UserRoundPlus, XCircle, ChevronDown, Check } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { CheckCircle2, Clock, UserRoundPlus, XCircle } from 'lucide-react';
 
 import CustomSelect from '@/shared/components/CustomSelect';
 

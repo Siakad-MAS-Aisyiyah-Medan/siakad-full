@@ -54,6 +54,4 @@ class AuditLogService
 
         return $query->paginate($perPage);
     }
-
-
 }

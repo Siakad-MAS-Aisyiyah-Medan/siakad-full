@@ -9,7 +9,7 @@ export function getDisplayName(profile, role, fallbackUsername = '') {
       const u = JSON.parse(raw);
       accountName = u?.name || '';
     }
-  } catch (e) {
+  } catch {
     // Silently ignore
   }
 

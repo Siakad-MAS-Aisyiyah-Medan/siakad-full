@@ -160,7 +160,7 @@ export function getMenuItems() {
       label: labelOverrides[path] || item.label,
       iconKey: iconOverrides[path] || item.iconKey,
     };
-  }).filter((item) => !item.path.includes('/profil-saya'));
+  });
 
   const finalItems = normalizedItems.filter((item) => {
     if (item.label === 'Absensi Guru') return false;
@@ -188,8 +188,6 @@ export function getMenuItems() {
 
   const seen = new Set();
   return finalItems.filter((item) => {
-    if (item.label === 'Pengaturan Akun' || item.label === 'Pengaturan Akun Pribadi' || item.path.endsWith('/pengaturan')) return false;
-    if (item.path.includes('/profil-saya')) return false;
     if (seen.has(item.path)) return false;
     seen.add(item.path);
     return true;

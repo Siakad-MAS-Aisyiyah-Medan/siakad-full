@@ -269,7 +269,7 @@ export default function GuruNilaiPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [user]);
 
   const kelasOptions = useMemo(() => {
     const map = new Map();

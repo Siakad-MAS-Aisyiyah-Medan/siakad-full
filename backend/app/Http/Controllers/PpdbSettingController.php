@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class PpdbSettingController extends Controller
 {
     use AuditsAdminActions;
+
     /**
      * Get all PPDB settings
      */

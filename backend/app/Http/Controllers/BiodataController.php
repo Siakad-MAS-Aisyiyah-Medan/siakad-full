@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 class BiodataController extends Controller
 {
     use AuditsAdminActions;
+
     public function update(Request $request): JsonResponse
     {
         try {
@@ -34,19 +35,19 @@ class BiodataController extends Controller
                     $profile = new Guru(['id_user' => $user->id_user]);
                 }
                 $profile->fill($validated);
-                if (!$profile->nip_nuptk) {
+                if (! $profile->nip_nuptk) {
                     $profile->nip_nuptk = $user->username ?: '-';
                 }
-                if (!$profile->jenis_kelamin) {
+                if (! $profile->jenis_kelamin) {
                     $profile->jenis_kelamin = 'L';
                 }
-                if (!$profile->agama) {
+                if (! $profile->agama) {
                     $profile->agama = '-';
                 }
-                if (!$profile->alamat) {
+                if (! $profile->alamat) {
                     $profile->alamat = '-';
                 }
-                if (!$profile->no_hp) {
+                if (! $profile->no_hp) {
                     $profile->no_hp = '-';
                 }
                 $profile->save();
@@ -68,31 +69,31 @@ class BiodataController extends Controller
                     $profile = new Siswa(['id_user' => $user->id_user]);
                 }
                 $profile->fill($validated);
-                if (!$profile->nisn) {
+                if (! $profile->nisn) {
                     $profile->nisn = $user->username ?: '-';
                 }
-                if (!$profile->nis) {
+                if (! $profile->nis) {
                     $profile->nis = $user->username ?: '-';
                 }
-                if (!$profile->tempat_lahir) {
+                if (! $profile->tempat_lahir) {
                     $profile->tempat_lahir = '-';
                 }
-                if (!$profile->tgl_lahir) {
+                if (! $profile->tgl_lahir) {
                     $profile->tgl_lahir = now()->format('Y-m-d');
                 }
-                if (!$profile->jenis_kelamin) {
+                if (! $profile->jenis_kelamin) {
                     $profile->jenis_kelamin = 'L';
                 }
-                if (!$profile->agama) {
+                if (! $profile->agama) {
                     $profile->agama = '-';
                 }
-                if (!$profile->alamat) {
+                if (! $profile->alamat) {
                     $profile->alamat = '-';
                 }
-                if (!$profile->nama_wali) {
+                if (! $profile->nama_wali) {
                     $profile->nama_wali = '-';
                 }
-                if (!$profile->no_hp_wali) {
+                if (! $profile->no_hp_wali) {
                     $profile->no_hp_wali = '-';
                 }
                 $profile->save();
@@ -112,10 +113,10 @@ class BiodataController extends Controller
                     $profile = new KepalaSekolah(['id_user' => $user->id_user]);
                 }
                 $profile->fill($validated);
-                if (!$profile->nip) {
+                if (! $profile->nip) {
                     $profile->nip = $user->username ?: '-';
                 }
-                if (!$profile->no_hp) {
+                if (! $profile->no_hp) {
                     $profile->no_hp = '-';
                 }
                 $profile->save();
@@ -132,10 +133,10 @@ class BiodataController extends Controller
                     $profile = new Admin(['id_user' => $user->id_user]);
                 }
                 $profile->fill($validated);
-                if (!$profile->nip) {
+                if (! $profile->nip) {
                     $profile->nip = $user->username ?: '-';
                 }
-                if (!$profile->no_hp) {
+                if (! $profile->no_hp) {
                     $profile->no_hp = '-';
                 }
                 $profile->save();

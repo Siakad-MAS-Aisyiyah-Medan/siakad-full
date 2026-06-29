@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +19,7 @@ class AuditLogResource extends JsonResource
                 if ($this->subject_id == $this->id_user && $this->user) {
                     $subjectUser = $this->user;
                 } else {
-                    $subjectUser = \App\Models\User::with(['siswa', 'guru', 'kepalaSekolah', 'admin', 'pendaftaran'])->find($this->subject_id);
+                    $subjectUser = User::with(['siswa', 'guru', 'kepalaSekolah', 'admin', 'pendaftaran'])->find($this->subject_id);
                 }
 
                 if ($subjectUser) {
@@ -35,12 +36,12 @@ class AuditLogResource extends JsonResource
                     } elseif ($role === 'calon_siswa' && $subjectUser->pendaftaran) {
                         $subjectName = $subjectUser->pendaftaran->nama_lengkap;
                     }
-                    if (!$subjectName) {
+                    if (! $subjectName) {
                         $subjectName = $subjectUser->name ?? $subjectUser->username;
                     }
                 }
             } else {
-                $class = '\\App\\Models\\' . class_basename($this->subject_type);
+                $class = '\\App\\Models\\'.class_basename($this->subject_type);
                 if (class_exists($class)) {
                     $subject = $class::find($this->subject_id);
                     if ($subject) {
@@ -51,7 +52,7 @@ class AuditLogResource extends JsonResource
         }
 
         // Jika subjek sudah dihapus atau gagal diload, fallback ke meta
-        if (!$subjectName && is_array($this->meta)) {
+        if (! $subjectName && is_array($this->meta)) {
             $subjectName = $this->meta['username'] ?? $this->meta['nama_sekolah'] ?? $this->meta['nama_kelas'] ?? $this->meta['nama_mapel'] ?? $this->meta['judul'] ?? $this->meta['tahun_ajaran'] ?? null;
         }
 

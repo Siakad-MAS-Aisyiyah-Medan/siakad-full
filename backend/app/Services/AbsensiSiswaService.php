@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Http\Resources\AbsensiResource;
 use App\Models\Absensi;
-use App\Models\JadwalPelajaran;
 use App\Models\Mapel;
 use App\Models\Siswa;
 use App\Models\User;
@@ -121,7 +120,7 @@ class AbsensiSiswaService
             ->get()
             ->map(function ($row) {
                 return [
-                    'tanggal' => \Carbon\Carbon::parse($row->tanggal)->format('Y-m-d'),
+                    'tanggal' => Carbon::parse($row->tanggal)->format('Y-m-d'),
                     'jam_mulai' => $row->jam_mulai,
                     'jam_selesai' => $row->jam_selesai,
                     'tahun_ajaran' => $row->tahun_ajaran,
@@ -237,7 +236,7 @@ class AbsensiSiswaService
 
         if (! empty($filters['id_kelas'])) {
             $kelasId = (int) $filters['id_kelas'];
-            $teachesKelas = \App\Models\Mapel::where('id_guru', $guruId)
+            $teachesKelas = Mapel::where('id_guru', $guruId)
                 ->whereHas('kelas', function ($q) use ($kelasId) {
                     $q->where('kelas_mapel.id_kelas', $kelasId);
                 })
@@ -253,8 +252,8 @@ class AbsensiSiswaService
     {
         $this->assertGuruCanRecord($guruId, (int) $params['id_mapel']);
 
-        $jamMulai = $params['jam_mulai'] . ':00';
-        $jamSelesai = $params['jam_selesai'] . ':00';
+        $jamMulai = $params['jam_mulai'].':00';
+        $jamSelesai = $params['jam_selesai'].':00';
 
         Absensi::where('id_kelas', $params['id_kelas'])
             ->where('id_mapel', $params['id_mapel'])

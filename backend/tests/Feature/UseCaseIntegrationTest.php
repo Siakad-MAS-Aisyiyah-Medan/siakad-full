@@ -159,10 +159,19 @@ class UseCaseIntegrationTest extends TestCase
             'alamat_ortu' => 'Medan',
             'no_hp_ortu' => '081200000003',
         ])->assertOk();
+        $this->assertDatabaseHas('pendaftaran_orang_tua_wali', [
+            'nama_ayah' => 'Ayah Uji',
+            'nama_ibu' => 'Ibu Uji',
+            'no_hp_ortu' => '081200000003',
+        ]);
         $this->putJson('/api/ppdb/step/kepribadian', [
             'hobi' => 'Membaca',
             'cita_cita' => 'Guru',
         ])->assertOk();
+        $this->assertDatabaseHas('pendaftaran_kepribadian', [
+            'hobi' => 'Membaca',
+            'cita_cita' => 'Guru',
+        ]);
 
         $png = base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='

@@ -6,18 +6,19 @@ use App\Models\BerkasPendaftaran;
 use App\Models\Pendaftaran;
 use App\Models\User;
 use App\Utils\ApiResponse;
+use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Utils\AuditsAdminActions;
 use InvalidArgumentException;
 
 class BerkasController extends Controller
 {
     use AuditsAdminActions;
+
     public function index()
     {
         try {
@@ -208,7 +209,7 @@ class BerkasController extends Controller
             ->pluck('jenis_berkas')
             ->map(fn ($j) => self::normalizeJenis($j))
             ->unique()
-            ->all();
+            ->toArray();
 
         foreach (array_keys(self::JENIS) as $jenis) {
             if (! in_array($jenis, $uploaded, true)) {
@@ -249,6 +250,15 @@ class BerkasController extends Controller
 
         $mime = $file->getMimeType();
         $allowedMimes = config('ppdb.berkas.allowed_mimes', []);
+        // Default MIME types for common document/image formats
+        if (empty($allowedMimes)) {
+            $allowedMimes = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/jpg',
+            ];
+        }
         if ($mime && ! in_array($mime, $allowedMimes, true)) {
             throw new InvalidArgumentException('Tipe file tidak valid atau tidak aman.');
         }

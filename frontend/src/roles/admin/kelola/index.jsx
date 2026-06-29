@@ -54,7 +54,7 @@ export default function GuruPage({ readOnly = false }) {
     formDataObj.append('file', file);
 
     try {
-      const response = await apiClient.post('/guru/import', formDataObj, {
+      await apiClient.post('/guru/import', formDataObj, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setIsImportModalOpen(false);

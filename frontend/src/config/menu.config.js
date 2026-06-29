@@ -12,6 +12,7 @@ export const menuByRole = {
     { iconKey: 'FileText', label: 'Transkrip Akademik Murid', path: '/admin/transkrip-akademik', permission: 'view_transkrip_murid' },
     { iconKey: 'UserCheck', label: 'Data PPDB', path: '/admin/ppdb', permission: 'manage_ppdb' },
     { iconKey: 'ShieldCheck', label: 'Manajemen Pengguna', path: '/admin/hak-akses', permission: 'manage_users' },
+    { iconKey: 'Settings2', label: 'Pengaturan Akun', path: '/admin/pengaturan', permission: 'manage_pengaturan_akun' },
   ],
   kepsek: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/kepala-sekolah/dashboard', permission: 'view_dashboard_kepsek' },
@@ -23,6 +24,7 @@ export const menuByRole = {
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/kepala-sekolah/data-mapel', permission: 'view_mapel' },
     { iconKey: 'BarChart3', label: 'Transkrip Akademik', path: '/kepala-sekolah/transkrip-akademik', permission: 'view_transkrip_murid' },
     { iconKey: 'UserCheck', label: 'Data PPDB', path: '/kepala-sekolah/data-ppdb', permission: 'view_data_ppdb' },
+    { iconKey: 'Settings2', label: 'Pengaturan Akun', path: '/kepala-sekolah/pengaturan', permission: 'manage_pengaturan_akun' },
   ],
   guru: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/guru/dashboard', permission: 'view_dashboard_guru' },
@@ -33,6 +35,7 @@ export const menuByRole = {
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran yang Diampu', path: '/guru/mapel', permission: 'view_mapel_diampu' },
     { iconKey: 'FileText', label: 'Daftar Nilai Murid', path: '/guru/nilai', permission: 'manage_nilai_siswa' },
     { iconKey: 'ClipboardList', label: 'Absensi Murid', path: '/guru/absensi', permission: 'manage_absensi_siswa' },
+    { iconKey: 'Settings2', label: 'Pengaturan Akun', path: '/guru/pengaturan', permission: 'manage_pengaturan_akun' },
   ],
   siswa: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/siswa/dashboard', permission: 'view_dashboard_siswa' },
@@ -42,12 +45,15 @@ export const menuByRole = {
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/siswa/mapel', permission: 'view_mapel' },
     { iconKey: 'ClipboardList', label: 'Transkrip Akademik', path: '/siswa/nilai', permission: 'view_transkrip_pribadi' },
     { iconKey: 'ClipboardList', label: 'Absensi Pribadi', path: '/siswa/absensi', permission: 'view_absensi_pribadi' },
+    { iconKey: 'Settings2', label: 'Pengaturan Akun', path: '/siswa/pengaturan', permission: 'manage_pengaturan_akun' },
   ],
   calon_siswa: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/calon-murid/dashboard', permission: 'view_dashboard_calon_siswa' },
     { iconKey: 'FileText', label: 'Formulir Pendaftaran', path: '/ppdb/registrasi', permission: 'manage_formulir_pendaftaran' },
     { iconKey: 'Upload', label: 'Berkas Pendaftaran', path: '/calon-murid/upload-berkas', permission: 'manage_berkas_pendaftaran' },
+    { iconKey: 'Send', label: 'Daftarkan Diri', path: '/calon-murid/kirim-pendaftaran', permission: 'submit_pendaftaran' },
     { iconKey: 'ClipboardList', label: 'Status Pendaftaran', path: '/calon-murid/status', permission: 'view_status_pendaftaran' },
+    { iconKey: 'Settings2', label: 'Pengaturan Akun', path: '/calon-murid/pengaturan', permission: 'manage_pengaturan_akun' },
   ],
 };
 

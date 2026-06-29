@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class SettingsController extends Controller
 {
     use AuditsAdminActions;
+
     /**
      * Get all settings grouped.
      */

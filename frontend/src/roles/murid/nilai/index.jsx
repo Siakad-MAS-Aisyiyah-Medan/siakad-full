@@ -7,14 +7,7 @@ import { getDisplayName } from '@/shared/utils/profile';
 import { fetchNilaiSiswa } from '@/shared/nilai/siswa/services/nilai.service';
 import { fetchTahunAjaran } from '@/shared/services/tahunAjaran.service';
 
-const fallbackRows = [
-  ['Matematika', 85, 88, 90, 88],
-  ['Bahasa Indonesia', 82, 84, 86, 84],
-  ['Bahasa Inggris', 90, 89, 92, 90],
-  ['Biologi', 87, 85, 88, 87],
-  ['Fisika', 80, 82, 85, 82],
-  ['Kimia', 84, 86, 88, 86],
-];
+
 
 export default function SiswaNilaiPage() {
   const user = getStoredUser();
@@ -31,7 +24,7 @@ export default function SiswaNilaiPage() {
   useEffect(() => {
     fetchTahunAjaran().then(data => {
       setTahunAjaranList(data || []);
-      const active = data?.find(t => t.is_active);
+      const active = data?.find(t => String(t.status || '').toLowerCase() === 'aktif');
       if (active) {
         setFilters(p => ({ ...p, tahun_ajaran: active.tahun_ajaran }));
       }
@@ -39,11 +32,29 @@ export default function SiswaNilaiPage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    fetchNilaiSiswa({ semester: filters.semester, tahun_ajaran: filters.tahun_ajaran })
-      .then((data) => setItems(Array.isArray(data) ? data : []))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
+    let active = true;
+
+    async function loadNilai() {
+      try {
+        const data = await fetchNilaiSiswa({ semester: filters.semester, tahun_ajaran: filters.tahun_ajaran });
+        if (active) {
+          setItems(Array.isArray(data) ? data : []);
+        }
+      } catch {
+        if (active) {
+          setItems([]);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadNilai();
+    return () => {
+      active = false;
+    };
   }, [filters]);
 
   const rows = useMemo(() => {
@@ -56,7 +67,7 @@ export default function SiswaNilaiPage() {
         row.nilai_akhir ?? '-',
       ]);
     }
-    return fallbackRows;
+    return [];
   }, [items, loading]);
 
   const average = useMemo(() => {
@@ -72,7 +83,10 @@ export default function SiswaNilaiPage() {
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <select
               value={filters.tahun_ajaran}
-              onChange={(e) => setFilters(p => ({ ...p, tahun_ajaran: e.target.value }))}
+              onChange={(e) => {
+                setLoading(true);
+                setFilters(p => ({ ...p, tahun_ajaran: e.target.value }));
+              }}
               style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
             >
               {tahunAjaranList.map((ta, idx) => (
@@ -82,7 +96,10 @@ export default function SiswaNilaiPage() {
             </select>
             <select
               value={filters.semester}
-              onChange={(e) => setFilters(p => ({ ...p, semester: e.target.value }))}
+              onChange={(e) => {
+                setLoading(true);
+                setFilters(p => ({ ...p, semester: e.target.value }));
+              }}
               style={{ height: '38px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.875rem', outline: 'none', padding: '0 0.75rem', background: '#fff', color: 'var(--color-text-dark)' }}
             >
               <option value="Ganjil">Ganjil</option>
@@ -152,6 +169,13 @@ export default function SiswaNilaiPage() {
                         ))}
                       </tr>
                     ))}
+                    {!rows.length && (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-muted)' }}>
+                          Belum ada nilai pada periode ini.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

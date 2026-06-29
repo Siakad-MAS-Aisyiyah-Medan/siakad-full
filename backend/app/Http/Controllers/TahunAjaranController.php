@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class TahunAjaranController extends Controller
 {
     use AuditsAdminActions;
+
     public function index()
     {
         $data = TahunAjaran::orderBy('tanggal_mulai', 'desc')->get();

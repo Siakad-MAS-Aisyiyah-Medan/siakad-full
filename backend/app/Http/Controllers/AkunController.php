@@ -32,9 +32,13 @@ class AkunController extends Controller
 
         if ($request->filled('status')) {
             if ($request->status === 'aktif') {
-                $query->where('status_akun', 'aktif')->orWhere('status_aktif', true);
+                $query->where(function ($q) {
+                    $q->where('status_akun', 'aktif')->orWhere('status_aktif', true);
+                });
             } elseif ($request->status === 'nonaktif') {
-                $query->where('status_akun', 'nonaktif')->orWhere('status_aktif', false);
+                $query->where(function ($q) {
+                    $q->where('status_akun', 'nonaktif')->orWhere('status_aktif', false);
+                });
             }
         }
 
@@ -115,7 +119,7 @@ class AkunController extends Controller
             'status_akun' => $validated['status'] ?? 'aktif',
         ]);
 
-        $prefix = match($user->role) {
+        $prefix = match ($user->role) {
             'kepsek' => 'kepsek',
             'guru' => 'guru',
             'siswa' => 'murid',
@@ -144,7 +148,7 @@ class AkunController extends Controller
 
         // We can optionally delete related profile data here if needed,
         // or rely on database cascading/soft deletes.
-        $prefix = match($user->role) {
+        $prefix = match ($user->role) {
             'kepsek' => 'kepsek',
             'guru' => 'guru',
             'siswa' => 'murid',
@@ -201,7 +205,7 @@ class AkunController extends Controller
             }
         }
 
-        $prefix = match($user->role) {
+        $prefix = match ($user->role) {
             'kepsek' => 'kepsek',
             'guru' => 'guru',
             'siswa' => 'murid',
@@ -227,16 +231,21 @@ class AkunController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
             'current_password' => 'nullable|string',
             'new_password' => 'nullable|string|min:6|confirmed',
-            'password' => 'nullable|string|min:6',
         ]);
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        } elseif ($request->filled('new_password')) {
+        if ($request->filled('new_password')) {
             if (! $request->filled('current_password') || ! Hash::check($request->current_password, $user->password)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Password saat ini salah.',
+                    'errors' => ['current_password' => ['Password saat ini tidak sesuai.']],
+                ], 422);
+            }
+            if ($request->new_password !== $request->new_password_confirmation) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Konfirmasi password tidak sesuai.',
+                    'errors' => ['new_password_confirmation' => ['Konfirmasi password tidak cocok.']],
                 ], 422);
             }
             $user->password = Hash::make($request->new_password);

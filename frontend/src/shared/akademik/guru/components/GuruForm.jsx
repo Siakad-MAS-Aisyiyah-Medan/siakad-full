@@ -3,8 +3,6 @@ import { ArrowLeft, Plus, Save, X, UploadCloud } from 'lucide-react';
 import PageHeader from '@/shared/components/PageHeader';
 
 export default function GuruForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false, onImport }) {
-  const isEdit = view === 'edit' && !readOnly;
-
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader 
@@ -104,5 +102,4 @@ function FormLabel({ children, required }) {
     </label>
   );
 }
-
 

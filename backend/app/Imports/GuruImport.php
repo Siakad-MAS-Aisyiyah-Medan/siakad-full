@@ -4,10 +4,9 @@ namespace App\Imports;
 
 use App\Models\Guru;
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Exception;
 
 class GuruImport
 {
@@ -17,7 +16,7 @@ class GuruImport
 
         try {
             // Kita mengubah cara mendapatkan indeks karena index FastExcel mulai dari 0 untuk row pertama isi data (baris 2)
-            $rowIndex = 2; 
+            $rowIndex = 2;
             foreach ($rows as $row) {
                 // Pastikan key array lowercase agar sesuai dengan kode
                 $row = array_change_key_case($row, CASE_LOWER);
@@ -25,25 +24,26 @@ class GuruImport
                 // Lewati baris kosong
                 if (empty($row['nip_nuptk']) || empty($row['nama'])) {
                     $rowIndex++;
+
                     continue;
                 }
 
                 $nip = $row['nip_nuptk'];
-                
+
                 // Cek apakah NIP sudah ada
                 if (Guru::where('nip_nuptk', $nip)->exists()) {
-                    throw new Exception("Baris " . $rowIndex . ": NIP/NUPTK ($nip) sudah terdaftar di sistem.");
+                    throw new Exception('Baris '.$rowIndex.": NIP/NUPTK ($nip) sudah terdaftar di sistem.");
                 }
 
                 if (User::where('username', $nip)->exists()) {
-                    throw new Exception("Baris " . $rowIndex . ": Username/NIP ($nip) sudah terdaftar di tabel pengguna.");
+                    throw new Exception('Baris '.$rowIndex.": Username/NIP ($nip) sudah terdaftar di tabel pengguna.");
                 }
 
                 // Buat User
                 $user = User::create([
                     'name' => $row['nama'],
                     'username' => $nip,
-                    'email' => $nip . '@guru.siakad.sch.id',
+                    'email' => $nip.'@guru.siakad.sch.id',
                     'password' => Hash::make('admin123'),
                     'role' => 'guru',
                     'status_aktif' => true,
@@ -61,7 +61,7 @@ class GuruImport
                     'no_hp' => $row['no_hp'] ?? '-',
                     'status' => 'aktif',
                 ]);
-                
+
                 $rowIndex++;
             }
             DB::commit();

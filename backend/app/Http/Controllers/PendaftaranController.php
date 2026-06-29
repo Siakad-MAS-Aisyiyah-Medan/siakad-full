@@ -109,10 +109,29 @@ class PendaftaranController extends Controller
             'status_kelulusan' => 'Pending',
         ]);
 
+        $pendaftaran->keteranganPribadi()->updateOrCreate(
+            ['pendaftaran_id' => $pendaftaran->id_pendaftaran],
+            [
+                'nisn' => $pendaftaran->nisn,
+                'nama_lengkap' => $pendaftaran->nama_lengkap,
+                'tempat_lahir' => $pendaftaran->tempat_lahir,
+                'tgl_lahir' => $pendaftaran->tgl_lahir,
+                'jenis_kelamin' => $pendaftaran->jenis_kelamin,
+                'agama' => $pendaftaran->agama,
+                'kewarganegaraan' => $pendaftaran->kewarganegaraan,
+                'anak_ke' => $pendaftaran->anak_ke,
+                'jml_saudara_kandung' => $pendaftaran->jml_saudara_kandung,
+                'jml_saudara_tiri' => $pendaftaran->jml_saudara_tiri,
+                'alamat' => $pendaftaran->alamat,
+                'no_telp' => $pendaftaran->no_telp,
+                'status_yatim' => $pendaftaran->status_yatim,
+            ]
+        );
+
         $this->auditAdmin('calon_siswa.ppdb.start', $pendaftaran, ['nisn' => $user->username]);
 
         return ApiResponse::success(
-            PpdbResource::applicant($pendaftaran->fresh(['berkas']))->resolve(),
+            PpdbResource::applicant($pendaftaran->fresh($this->pendaftaranRelations()))->resolve(),
             'Draft pendaftaran dibuat',
             201
         );
@@ -269,7 +288,7 @@ class PendaftaranController extends Controller
         }
 
         // Validasi kelengkapan berkas
-        $uploaded = $pendaftaran->berkas()->pluck('jenis_berkas')->all();
+        $uploaded = $pendaftaran->berkas()->pluck('jenis_berkas')->toArray();
         foreach (\App\Services\PpdbBerkasService::allJenisKeys() as $jenis) {
             $normalized = \App\Services\PpdbBerkasService::normalizeJenis($jenis);
             if (! in_array($normalized, $uploaded, true)) {
@@ -341,11 +360,12 @@ class PendaftaranController extends Controller
 
         $pendaftaran->fill($data);
         $pendaftaran->save();
+        $this->syncPendaftaranDetail($pendaftaran, $data);
 
         $this->auditAdmin('calon_siswa.ppdb.update_step', $pendaftaran, ['step' => $data['current_step'] ?? 'unknown']);
 
         return ApiResponse::success(
-            PpdbResource::applicant($pendaftaran->fresh(['berkas']))->resolve(),
+            PpdbResource::applicant($pendaftaran->fresh($this->pendaftaranRelations()))->resolve(),
             $msg
         );
     }
@@ -798,9 +818,102 @@ class PendaftaranController extends Controller
 
     private function getByUser(User $user): ?Pendaftaran
     {
-        return Pendaftaran::with('berkas', 'user')
+        return Pendaftaran::with($this->pendaftaranRelations())
             ->where('id_user', $user->id_user)
             ->first();
+    }
+
+    private function pendaftaranRelations(): array
+    {
+        return [
+            'berkas',
+            'user',
+            'keteranganPribadi',
+            'kesehatan',
+            'pendidikanAsal',
+            'orangTuaWali',
+            'kepribadian',
+            'dokumen',
+        ];
+    }
+
+    private function syncPendaftaranDetail(Pendaftaran $pendaftaran, array $data): void
+    {
+        $groups = [
+            'keteranganPribadi' => [
+                'nisn',
+                'nama_lengkap',
+                'tempat_lahir',
+                'tgl_lahir',
+                'jenis_kelamin',
+                'agama',
+                'kewarganegaraan',
+                'anak_ke',
+                'jml_saudara_kandung',
+                'jml_saudara_tiri',
+                'alamat',
+                'no_telp',
+                'status_yatim',
+            ],
+            'kesehatan' => [
+                'berat_badan',
+                'tinggi_badan',
+                'gol_darah',
+                'penyakit_diderita',
+                'cacat_badan',
+            ],
+            'pendidikanAsal' => [
+                'sekolah_asal',
+                'tahun_lulus',
+                'no_sttb',
+                'pindahan_dari',
+                'no_surat_pindah',
+            ],
+            'orangTuaWali' => [
+                'nama_ayah',
+                'nama_ibu',
+                'pendidikan_ayah',
+                'pendidikan_ibu',
+                'pekerjaan_ayah',
+                'pekerjaan_ibu',
+                'agama_ortu',
+                'alamat_ortu',
+                'no_hp_ortu',
+                'no_hp_ayah',
+                'no_hp_ibu',
+                'nama_wali',
+                'pendidikan_wali',
+                'pekerjaan_wali',
+                'agama_wali',
+                'alamat_wali',
+            ],
+            'kepribadian' => [
+                'hobi',
+                'cita_cita',
+            ],
+            'dokumen' => [
+                'file_ijazah',
+                'file_stk',
+                'file_pas_photo',
+                'file_nisn',
+                'file_kk',
+                'file_ktp_ortua',
+                'catatan_dokumen',
+            ],
+        ];
+
+        foreach ($groups as $relation => $fields) {
+            $payload = array_intersect_key($data, array_flip($fields));
+
+            if ($payload === []) {
+                continue;
+            }
+
+            $pendaftaran->{$relation}()->updateOrCreate(
+                ['pendaftaran_id' => $pendaftaran->id_pendaftaran],
+                $payload
+            );
+        }
     }
 
     private function saveFormulir(User $user, array $data): Pendaftaran
@@ -959,6 +1072,28 @@ class PendaftaranController extends Controller
             'ditolak',
             $catatan
         );
+    }
+
+    /**
+     * PATCH /admin/ppdb/{id}/status — legacy route compatibility.
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:terverifikasi,diterima,ditolak,revisi',
+            'catatan' => 'nullable|string|max:1000',
+        ]);
+
+        $status = $validated['status'];
+        $catatan = $validated['catatan'] ?? '';
+
+        return match ($status) {
+            'terverifikasi' => $this->adminPpdbVerifikasi($id),
+            'diterima' => $this->adminPpdbTerima($request, $id),
+            'ditolak' => $this->adminPpdbTolak($request, $id),
+            'revisi' => $this->adminPpdbRevisi($request, $id),
+            default => ApiResponse::error('Status tidak valid', 422),
+        };
     }
 
     public function adminPpdbJadikanMurid(Request $request, $id)

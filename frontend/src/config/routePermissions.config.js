@@ -54,6 +54,7 @@ export const ROUTE_PERMISSIONS = {
   '/calon-murid/formulir': 'manage_formulir_pendaftaran',
   '/calon-murid/berkas': 'manage_berkas_pendaftaran',
   '/calon-murid/upload-berkas': 'manage_berkas_pendaftaran',
+  '/calon-murid/kirim-pendaftaran': 'submit_pendaftaran',
   '/calon-murid/status': 'view_status_pendaftaran',
   '/calon-murid/bukti': 'view_status_pendaftaran',
   '/calon-murid/pengaturan': 'manage_pengaturan_akun',

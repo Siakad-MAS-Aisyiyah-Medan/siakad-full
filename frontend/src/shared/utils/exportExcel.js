@@ -34,7 +34,7 @@ export async function exportToExcel(filename, rows) {
 
   // Style all data rows and auto-adjust widths
   worksheet.eachRow((row, rowNumber) => {
-    row.eachCell((cell, colNumber) => {
+    row.eachCell((cell) => {
       // Add borders to all cells
       cell.border = {
         top: { style: 'thin', color: { argb: 'FFCCCCCC' } },

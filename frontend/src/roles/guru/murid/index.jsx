@@ -75,7 +75,7 @@ export default function GuruMuridPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   // Sync state if URL changes
   useEffect(() => {

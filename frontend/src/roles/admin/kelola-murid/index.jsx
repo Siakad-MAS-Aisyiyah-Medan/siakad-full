@@ -56,7 +56,7 @@ export default function MuridPage({ readOnly = false }) {
     formDataObj.append('id_kelas', id_kelas);
 
     try {
-      const response = await apiClient.post('/murid/import', formDataObj, {
+      await apiClient.post('/murid/import', formDataObj, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setIsImportModalOpen(false);

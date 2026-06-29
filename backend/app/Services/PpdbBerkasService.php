@@ -159,7 +159,7 @@ class PpdbBerkasService
             ->pluck('jenis_berkas')
             ->map(fn ($j) => self::normalizeJenis($j))
             ->unique()
-            ->all();
+            ->toArray();
 
         foreach (array_keys(self::JENIS) as $jenis) {
             if (! in_array($jenis, $uploaded, true)) {
@@ -200,6 +200,15 @@ class PpdbBerkasService
 
         $mime = $file->getMimeType();
         $allowedMimes = config('ppdb.berkas.allowed_mimes', []);
+        // Default MIME types for common document/image formats
+        if (empty($allowedMimes)) {
+            $allowedMimes = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/jpg',
+            ];
+        }
         if ($mime && ! in_array($mime, $allowedMimes, true)) {
             throw new InvalidArgumentException('Tipe file tidak valid atau tidak aman.');
         }

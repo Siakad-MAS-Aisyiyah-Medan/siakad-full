@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class ProfilSekolahController extends Controller
 {
     use AuditsAdminActions;
+
     /**
      * Display the specified resource.
      */
@@ -42,20 +43,20 @@ class ProfilSekolahController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nama_sekolah' => 'nullable|string|max:255',
+            'nama_sekolah' => 'required|string|max:255',
             'npsn' => 'nullable|string|max:20',
             'akreditasi' => 'nullable|string|max:10',
             'hero_subtitle' => 'nullable|string|max:255',
             'hero_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            'tentang_kami' => 'nullable|string',
-            'alamat' => 'nullable|string',
-            'kata_sambutan' => 'nullable|string',
-            'nama_kepsek' => 'nullable|string|max:255',
-            'no_hp' => 'nullable|string|max:25',
-            'email' => 'nullable|email|max:255',
+            'tentang_kami' => 'required|string',
+            'alamat' => 'required|string',
+            'kata_sambutan' => 'required|string',
+            'nama_kepsek' => 'required|string|max:255',
+            'no_hp' => 'required|string|max:25',
+            'email' => 'required|email|max:255',
             'foto_kepsek' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'visi' => 'nullable|string',
-            'misi' => 'nullable|string',
+            'visi' => 'required|string',
+            'misi' => 'required|string',
             'instagram' => 'nullable|string',
             'facebook' => 'nullable|string',
             'youtube' => 'nullable|string',

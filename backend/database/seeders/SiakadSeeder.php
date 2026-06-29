@@ -17,14 +17,17 @@ class SiakadSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed Admin
-        $adminUser = User::create([
-            'username' => 'admin',
-            'email' => 'admin@siakad.com',
-            'password' => 'password',
-            'role' => 'admin',
-            'status_aktif' => true,
-        ]);
-        Admin::create([
+        $adminUser = User::firstOrCreate(
+            ['username' => 'admin'],
+            [
+                'email' => 'admin@siakad.com',
+                'password' => 'password',
+                'role' => 'admin',
+                'status_aktif' => true,
+            ]
+        );
+        $adminUser->forceFill(['role' => 'admin', 'status_aktif' => true])->save();
+        Admin::updateOrCreate(['id_user' => $adminUser->id_user], [
             'id_user' => $adminUser->id_user,
             'nip' => '123456789',
             'nama_admin' => 'Administrator',
@@ -32,14 +35,17 @@ class SiakadSeeder extends Seeder
         ]);
 
         // 2. Seed Kepala Sekolah
-        $kepsekUser = User::create([
-            'username' => 'kepsek',
-            'email' => 'kepsek@siakad.com',
-            'password' => 'password',
-            'role' => 'kepsek',
-            'status_aktif' => true,
-        ]);
-        KepalaSekolah::create([
+        $kepsekUser = User::firstOrCreate(
+            ['username' => 'kepsek'],
+            [
+                'email' => 'kepsek@siakad.com',
+                'password' => 'password',
+                'role' => 'kepsek',
+                'status_aktif' => true,
+            ]
+        );
+        $kepsekUser->forceFill(['role' => 'kepsek', 'status_aktif' => true])->save();
+        KepalaSekolah::updateOrCreate(['id_user' => $kepsekUser->id_user], [
             'id_user' => $kepsekUser->id_user,
             'nip' => '987654321',
             'nama_kepsek' => 'Dr. H. Budi Santoso',
@@ -47,14 +53,17 @@ class SiakadSeeder extends Seeder
         ]);
 
         // 3. Seed Guru
-        $guruUser = User::create([
-            'username' => 'guru',
-            'email' => 'guru@siakad.com',
-            'password' => 'password',
-            'role' => 'guru',
-            'status_aktif' => true,
-        ]);
-        Guru::create([
+        $guruUser = User::firstOrCreate(
+            ['username' => 'guru'],
+            [
+                'email' => 'guru@siakad.com',
+                'password' => 'password',
+                'role' => 'guru',
+                'status_aktif' => true,
+            ]
+        );
+        $guruUser->forceFill(['role' => 'guru', 'status_aktif' => true])->save();
+        Guru::updateOrCreate(['id_user' => $guruUser->id_user], [
             'id_user' => $guruUser->id_user,
             'nip_nuptk' => '1122334455',
             'nama_guru' => 'Siti Aminah, S.Pd',
@@ -65,14 +74,17 @@ class SiakadSeeder extends Seeder
         ]);
 
         // 4. Seed Siswa
-        $siswaUser = User::create([
-            'username' => 'siswa',
-            'email' => 'siswa@siakad.com',
-            'password' => 'password',
-            'role' => 'siswa',
-            'status_aktif' => true,
-        ]);
-        Siswa::create([
+        $siswaUser = User::firstOrCreate(
+            ['username' => 'siswa'],
+            [
+                'email' => 'siswa@siakad.com',
+                'password' => 'password',
+                'role' => 'siswa',
+                'status_aktif' => true,
+            ]
+        );
+        $siswaUser->forceFill(['role' => 'siswa', 'status_aktif' => true])->save();
+        Siswa::updateOrCreate(['id_user' => $siswaUser->id_user], [
             'id_user' => $siswaUser->id_user,
             'nisn' => '0011223344',
             'nis' => '10001',

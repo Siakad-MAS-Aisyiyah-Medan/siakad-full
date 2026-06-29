@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Exceptions\JadwalConflictException;
 use App\Http\Resources\JadwalResource;
 use App\Models\JadwalPelajaran;
+use App\Models\Mapel;
 use App\Models\Siswa;
+use App\Models\TahunAjaran;
 use App\Models\WaktuPelajaran;
+use App\Services\JadwalConflictService;
 use App\Utils\ApiResponse;
 use App\Utils\AuditsAdminActions;
 use App\Utils\GuruPengampuUser;
@@ -19,6 +22,8 @@ use InvalidArgumentException;
 
 class JadwalController extends Controller
 {
+    public function __construct(private JadwalConflictService $conflicts) {}
+
     public function adminMatrix(Request $request, $id_kelas)
     {
         $request->validate([
@@ -185,10 +190,10 @@ class JadwalController extends Controller
             return ApiResponse::error('Akses jadwal mengajar hanya untuk guru.', 403);
         }
 
-        $tahunAjaran = \App\Models\TahunAjaran::where('status', 'aktif')->first()?->tahun_ajaran ?? '2025/2026';
+        $tahunAjaran = TahunAjaran::where('status', 'aktif')->first()?->tahun_ajaran ?? '2025/2026';
         $semester = (int) date('n') >= 7 || (int) date('n') <= 12 ? 'Ganjil' : 'Genap';
 
-        $items = \App\Models\Mapel::with(['kelas'])
+        $items = Mapel::with(['kelas'])
             ->where('id_guru', $user->id_user)
             ->get()
             ->map(function ($mapel) use ($tahunAjaran, $semester) {
@@ -207,7 +212,7 @@ class JadwalController extends Controller
                             'id_kelas' => $kelas->id_kelas,
                             'nama_kelas' => $kelas->nama_kelas,
                             'tingkat' => $kelas->tingkat,
-                        ]
+                        ],
                     ];
                 });
             })
@@ -233,7 +238,7 @@ class JadwalController extends Controller
             'semester' => 'required|in:Ganjil,Genap',
         ]);
 
-        $mapelExists = \App\Models\Mapel::where('id_mapel', $validated['id_mapel'])
+        $mapelExists = Mapel::where('id_mapel', $validated['id_mapel'])
             ->where('id_guru', $user->id_user)
             ->whereHas('kelas', function ($q) use ($validated) {
                 $q->where('kelas_mapel.id_kelas', $validated['id_kelas']);

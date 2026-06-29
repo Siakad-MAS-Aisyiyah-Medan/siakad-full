@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\MapelResource;
 use App\Models\Mapel;
+use App\Models\Siswa;
 use App\Utils\ApiResponse;
 use App\Utils\AuditsAdminActions;
 use App\Utils\SearchInput;
@@ -71,7 +72,7 @@ class MapelController extends Controller
         $user = auth()->user();
 
         if ($user && $user->role === 'siswa') {
-            $siswa = \App\Models\Siswa::where('id_user', $user->id_user)->first();
+            $siswa = Siswa::where('id_user', $user->id_user)->first();
             if ($siswa && $siswa->id_kelas) {
                 $query->whereHas('kelas', function ($q) use ($siswa) {
                     $q->where('kelas_mapel.id_kelas', $siswa->id_kelas);
@@ -100,10 +101,10 @@ class MapelController extends Controller
     {
         $idKelas = $data['id_kelas'] ?? [];
         unset($data['id_kelas']);
-        
+
         $mapel = Mapel::create($data);
         $mapel->kelas()->sync($idKelas);
-        
+
         $this->auditAdmin('mapel.create', $mapel, ['nama_mapel' => $mapel->nama_mapel]);
 
         return (new MapelResource($mapel->load(['guru.guru', 'kelas'])))->resolve();
@@ -113,11 +114,11 @@ class MapelController extends Controller
     {
         $idKelas = $data['id_kelas'] ?? [];
         unset($data['id_kelas']);
-        
+
         $mapel = Mapel::findOrFail($id);
         $mapel->update($data);
         $mapel->kelas()->sync($idKelas);
-        
+
         $this->auditAdmin('mapel.update', $mapel, ['nama_mapel' => $mapel->nama_mapel]);
 
         return (new MapelResource($mapel->fresh(['guru.guru', 'kelas'])))->resolve();

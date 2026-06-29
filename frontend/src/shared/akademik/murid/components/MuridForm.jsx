@@ -5,7 +5,6 @@ import PageHeader from '@/shared/components/PageHeader';
 
 export default function MuridForm({ view, formData, loading, onChange, onSubmit, onCancel, readOnly = false, onImport }) {
   const [kelasList, setKelasList] = useState([]);
-  const isEdit = view === 'edit' && !readOnly;
 
   useEffect(() => {
     fetchKelasList()
@@ -179,5 +178,4 @@ function FormLabel({ children, required }) {
     </label>
   );
 }
-
 

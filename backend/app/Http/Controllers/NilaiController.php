@@ -7,11 +7,13 @@ use App\Services\NilaiService;
 use App\Utils\ApiResponse;
 use App\Utils\AuditsAdminActions;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 class NilaiController extends Controller
 {
     use AuditsAdminActions;
+
     public function __construct(
         private NilaiService $nilaiService
     ) {}
@@ -38,21 +40,21 @@ class NilaiController extends Controller
     {
         try {
             $validated = $request->validate([
-            'meta' => 'required|array',
-            'meta.id_kelas' => 'required|exists:kelas,id_kelas',
-            'meta.id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
-            'meta.tahun_ajaran' => 'required|string|max:20',
-            'meta.semester' => 'required|in:Ganjil,Genap',
-            'items' => 'required|array|min:1',
-            'items.*.id_user_siswa' => 'required|exists:users,id_user',
-            'items.*.nilai_tugas' => 'required|integer|min:0|max:100',
-            'items.*.nilai_uts' => 'required|integer|min:0|max:100',
-            'items.*.nilai_uas' => 'required|integer|min:0|max:100',
-            'items.*.nilai_praktik' => 'nullable|integer|min:0|max:100',
-            'items.*.nilai_sikap' => 'nullable|integer|min:0|max:100',
-        ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return \App\Utils\ApiResponse::error("Validasi gagal: " . json_encode($e->errors()), 422);
+                'meta' => 'required|array',
+                'meta.id_kelas' => 'required|exists:kelas,id_kelas',
+                'meta.id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
+                'meta.tahun_ajaran' => 'required|string|max:20',
+                'meta.semester' => 'required|in:Ganjil,Genap',
+                'items' => 'required|array|min:1',
+                'items.*.id_user_siswa' => 'required|exists:users,id_user',
+                'items.*.nilai_tugas' => 'required|integer|min:0|max:100',
+                'items.*.nilai_uts' => 'required|integer|min:0|max:100',
+                'items.*.nilai_uas' => 'required|integer|min:0|max:100',
+                'items.*.nilai_praktik' => 'nullable|integer|min:0|max:100',
+                'items.*.nilai_sikap' => 'nullable|integer|min:0|max:100',
+            ]);
+        } catch (ValidationException $e) {
+            return ApiResponse::error('Validasi gagal: '.json_encode($e->errors()), 422);
         }
 
         try {
@@ -62,7 +64,7 @@ class NilaiController extends Controller
                 'id_kelas' => $validated['meta']['id_kelas'],
                 'id_mapel' => $validated['meta']['id_mapel'],
                 'semester' => $validated['meta']['semester'],
-                'tahun_ajaran' => $validated['meta']['tahun_ajaran']
+                'tahun_ajaran' => $validated['meta']['tahun_ajaran'],
             ]);
 
             return ApiResponse::success($saved, 'Nilai siswa berhasil disimpan');

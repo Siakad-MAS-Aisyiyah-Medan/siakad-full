@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Imports\GuruImport;
 use App\Imports\SiswaImport;
-use Illuminate\Http\Request;
-use Exception;
-use Rap2hpoutre\FastExcel\FastExcel;
 use App\Utils\AuditsAdminActions;
+use Exception;
+use Illuminate\Http\Request;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class ImportController extends Controller
 {
     use AuditsAdminActions;
+
     public function importSiswa(Request $request)
     {
         $request->validate([
@@ -23,7 +24,7 @@ class ImportController extends Controller
             $siswaImport = new SiswaImport($request->id_kelas);
             $rows = (new FastExcel)->import($request->file('file'));
             $siswaImport->import($rows);
-            
+
             $this->auditAdmin('admin.import.siswa', null, ['id_kelas' => $request->id_kelas]);
 
             return response()->json([
@@ -33,7 +34,7 @@ class ImportController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengimport data: ' . $e->getMessage(),
+                'message' => 'Gagal mengimport data: '.$e->getMessage(),
             ], 422);
         }
     }
@@ -45,10 +46,10 @@ class ImportController extends Controller
         ]);
 
         try {
-            $guruImport = new GuruImport();
+            $guruImport = new GuruImport;
             $rows = (new FastExcel)->import($request->file('file'));
             $guruImport->import($rows);
-            
+
             $this->auditAdmin('admin.import.guru', null, []);
 
             return response()->json([
@@ -58,7 +59,7 @@ class ImportController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengimport data: ' . $e->getMessage(),
+                'message' => 'Gagal mengimport data: '.$e->getMessage(),
             ], 422);
         }
     }
@@ -68,17 +69,17 @@ class ImportController extends Controller
         // Menyediakan satu baris kosong dengan key (header) yang benar
         $data = collect([
             [
-                'NISN' => '', 
-                'NIS' => '', 
-                'nama' => '', 
-                'tempat_lahir' => '', 
-                'tgl_lahir' => '', 
-                'lp' => '', 
-                'agama' => '', 
-                'alamat' => '', 
-                'nama_wali' => '', 
-                'no_hp_wali' => ''
-            ]
+                'NISN' => '',
+                'NIS' => '',
+                'nama' => '',
+                'tempat_lahir' => '',
+                'tgl_lahir' => '',
+                'lp' => '',
+                'agama' => '',
+                'alamat' => '',
+                'nama_wali' => '',
+                'no_hp_wali' => '',
+            ],
         ]);
 
         return (new FastExcel($data))->download('template_siswa.xlsx');
@@ -89,13 +90,13 @@ class ImportController extends Controller
         // Menyediakan satu baris kosong dengan key (header) yang benar
         $data = collect([
             [
-                'nip_nuptk' => '', 
-                'nama' => '', 
-                'lp' => '', 
-                'agama' => '', 
-                'alamat' => '', 
-                'no_hp' => ''
-            ]
+                'nip_nuptk' => '',
+                'nama' => '',
+                'lp' => '',
+                'agama' => '',
+                'alamat' => '',
+                'no_hp' => '',
+            ],
         ]);
 
         return (new FastExcel($data))->download('template_guru.xlsx');

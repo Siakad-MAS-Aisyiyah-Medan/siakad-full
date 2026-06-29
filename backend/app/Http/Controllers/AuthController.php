@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Models\AuditLog;
 use App\Models\User;
 use App\Services\Account\AccountRegistrationService;
+use App\Services\AuditLogService;
 use App\Services\PermissionService;
 use App\Utils\ApiResponse;
 use Illuminate\Http\Request;
@@ -94,7 +96,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        app(\App\Services\AuditLogService::class)->logAdminAction('auth.logout', $request->user());
+        app(AuditLogService::class)->logAdminAction('auth.logout', $request->user());
         $request->user()->currentAccessToken()?->delete();
 
         return ApiResponse::success(null, 'Logout berhasil');
@@ -167,7 +169,7 @@ class AuthController extends Controller
 
         $user->forceFill(['last_login_at' => now()])->save();
 
-        \App\Models\AuditLog::create([
+        AuditLog::create([
             'id_user' => $user->id_user,
             'action' => 'auth.login',
             'subject_type' => class_basename($user),
@@ -175,11 +177,11 @@ class AuthController extends Controller
             'ip_address' => request()->ip(),
             'user_agent' => substr((string) request()->userAgent(), 0, 500),
         ]);
-        $count = \App\Models\AuditLog::count();
+        $count = AuditLog::count();
         if ($count > 1000) {
             $excess = $count - 1000;
-            $idsToDelete = \App\Models\AuditLog::orderBy('id', 'asc')->limit($excess)->pluck('id');
-            \App\Models\AuditLog::whereIn('id', $idsToDelete)->delete();
+            $idsToDelete = AuditLog::orderBy('id', 'asc')->limit($excess)->pluck('id');
+            AuditLog::whereIn('id', $idsToDelete)->delete();
         }
 
         $user->loadProfileRelations();

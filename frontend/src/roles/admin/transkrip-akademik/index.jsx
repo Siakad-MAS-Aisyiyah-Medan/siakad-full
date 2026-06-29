@@ -42,7 +42,7 @@ export default function AdminTranskripAkademikPage() {
   useEffect(() => {
     fetchTahunAjaran().then(data => {
       setTahunAjaranList(data || []);
-      const active = data?.find(t => t.is_active);
+      const active = data?.find(t => String(t.status || '').toLowerCase() === 'aktif');
       if (active) {
         setFilters(p => ({ ...p, tahun_ajaran: active.tahun_ajaran }));
       }

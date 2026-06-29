@@ -9,20 +9,37 @@ export default function KelasDetailMurid({ kelas, onBack }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    if (kelas?.id_kelas) {
+    let active = true;
+
+    async function loadStudents() {
+      if (!kelas?.id_kelas) {
+        setStudents([]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
-      fetchMuridList({ id_kelas: kelas.id_kelas, per_page: 200 })
-        .then((data) => {
+      try {
+        const data = await fetchMuridList({ id_kelas: kelas.id_kelas, per_page: 200 });
+        if (active) {
           setStudents(data || []);
-        })
-        .catch((err) => {
-          console.error("Gagal memuat murid kelas", err);
+        }
+      } catch (err) {
+        console.error("Gagal memuat murid kelas", err);
+        if (active) {
           setStudents([]);
-        })
-        .finally(() => {
+        }
+      } finally {
+        if (active) {
           setLoading(false);
-        });
+        }
+      }
     }
+
+    loadStudents();
+    return () => {
+      active = false;
+    };
   }, [kelas]);
 
   const filteredStudents = students.filter((item) => {
