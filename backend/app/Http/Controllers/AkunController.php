@@ -204,7 +204,7 @@ class AkunController extends Controller
         $user->save();
 
         if ($request->has('no_hp')) {
-            $phone = $validated['no_hp'] ?: null;
+            $phone = $validated['no_hp'] ?: '-';
 
             if ($user->role === 'admin' && $user->admin) {
                 $user->admin->update(['no_hp' => $phone]);
