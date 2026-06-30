@@ -47,22 +47,26 @@ Setiap entitas dalam sistem dibatasi oleh hak akses spesifik (Role) untuk menjag
 
 Repositori ini memuat kedua bagian aplikasi dalam dua folder besar. Memahami pembagian ini akan mempercepat proses navigasi Anda.
 
-### 1. Folder `backend/`
-Pusat pengolahan data. Folder kunci yang harus dipahami:
-- `app/Http/Controllers/`: File pengendali rute. Menangani penerimaan request, memanggil service/model, dan mengembalikan response JSON.
-- `app/Http/Requests/`: Menyimpan aturan validasi input dari pengguna sebelum diproses lebih lanjut.
-- `app/Models/`: Model Eloquent untuk berinteraksi dengan database MySQL dan mengatur relasi antar tabel (One-to-Many, dll).
-- `database/migrations/`: Cetak biru (blueprint) tabel database.
-- `database/seeders/`: Penyedia data master awal (seperti Role dan Permission yang wajib diinjeksi).
-- `routes/api.php`: File utama pendaftaran seluruh endpoint REST API.
-
-### 2. Folder `frontend/`
-Pusat antarmuka visual. Folder kunci yang harus dipahami:
-- `src/roles/`: Folder berisi halaman-halaman yang dikelompokkan berdasarkan hak akses (admin, guru, kepsek, murid, calon-murid). Setiap folder memiliki konfigurasi rute React-nya masing-masing (`routes.jsx`).
-- `src/shared/`: Komponen atau logika (fungsi hook) yang bersifat universal dan dapat digunakan secara silang di antara berbagai role.
-  - `src/shared/components/`: Komponen UI modular (Tabel, Header, Input).
-  - `src/shared/akademik/`: Logika pemanggilan API (fetcher/services) yang khusus menangani entitas akademik.
-- `src/config/`: File konfigurasi dasar, seperti pengaturan URL Backend (`api.config.js`) dan pengaturan Menu.
+```text
+siakad-full/
+├── backend/               Pusat pengolahan data (REST API).
+│   ├── app/
+│   │   ├── Http/Controllers/  File pengendali rute. Menangani request dan mengembalikan response JSON.
+│   │   ├── Http/Requests/     Menyimpan aturan validasi input dari pengguna.
+│   │   └── Models/            Model Eloquent untuk interaksi dengan database MySQL dan mengatur relasi.
+│   ├── database/
+│   │   ├── migrations/        Cetak biru (blueprint) tabel database.
+│   │   └── seeders/           Penyedia data master awal (Role, Permission, Akun Default).
+│   └── routes/api.php         File utama pendaftaran seluruh endpoint REST API.
+│
+└── frontend/              Pusat antarmuka visual (React UI).
+    └── src/
+        ├── config/            Pengaturan dasar, seperti URL Backend (api.config.js) dan konfigurasi navigasi.
+        ├── roles/             Halaman-halaman UI yang dipisah per hak akses (admin, guru, kepsek, murid, calon-murid).
+        └── shared/            Komponen UI dan fungsi universal yang dipakai secara silang.
+            ├── components/    Komponen UI modular (Tabel, Header, Input).
+            └── akademik/      Logika pemanggilan API (fetcher/services) khusus entitas akademik.
+```
 
 ---
 

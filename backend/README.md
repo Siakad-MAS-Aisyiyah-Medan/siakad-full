@@ -28,33 +28,28 @@ Untuk memudahkan pemeliharaan, arsitektur backend ini memisahkan tanggung jawab 
 
 ---
 
-## Struktur Direktori
+Berikut adalah gambaran struktur direktori beserta fungsi spesifiknya:
 
-Berikut adalah penjelasan fungsi setiap direktori di dalam backend untuk memandu Anda saat mencari file yang spesifik:
-
-- app/Http/Controllers/
-  Berisi file pengendali alur. File dikelompokkan berdasarkan entitas, misalnya `GuruController.php` untuk manipulasi data guru, `SiswaController.php` untuk data siswa.
-
-- app/Http/Requests/
-  Berisi file aturan validasi. Saat klien mengirim form, sistem akan mengecek aturan di sini sebelum masuk ke Controller. Jika gagal, API otomatis mengembalikan status 422 Unprocessable Entity.
-
-- app/Models/
-  Mewakili tabel database. Contoh: `User.php` mewakili tabel users, `Guru.php` mewakili tabel guru. Di sini relasi antar tabel ditulis dalam fungsi seperti `hasOne()`, `hasMany()`, atau `belongsTo()`.
-
-- app/Imports/ & app/Exports/
-  Menangani skrip pemrosesan perpindahan data massal menggunakan file Excel/CSV.
-
-- database/migrations/
-  Berisi skrip cetak biru (blueprint) untuk membangun struktur database (tabel, kolom, indeks, dan tipe data). Digunakan untuk melacak perubahan skema database secara terstruktur.
-
-- database/seeders/
-  Berisi data awal (master data). File terpenting adalah `RbacSeeder.php`, yang menyuntikkan data Role dan Permission awal ke database, sehingga sistem hak akses (RBAC) dapat berfungsi.
-
-- routes/api.php
-  Daftar lengkap endpoint API. Pengelompokan rute (Route Groups) diterapkan di sini berdasarkan prefix (misal: `/admin`, `/guru`, `/siswa`) dan Middleware terkait.
-
-- config/
-  Menyimpan konfigurasi server. Konfigurasi CORS (Cross-Origin Resource Sharing) yang mengizinkan komunikasi dengan Frontend yang berbeda port (localhost:5173) diatur di dalam folder ini.
+```text
+backend/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/   Menerima request, memvalidasi alur kerja, dan mengembalikan response JSON. Contoh: GuruController.php.
+│   │   ├── Requests/      Menyimpan aturan validasi input form agar Controller tetap bersih. Mengembalikan 422 jika gagal.
+│   │   ├── Resources/     Memformat data (API Resource) agar struktur JSON yang dikirim ke frontend selalu konsisten.
+│   │   └── Middleware/    Menjaga rute dari akses tanpa login dan memeriksa hak akses (Role).
+│   ├── Models/            Representasi tabel database (Eloquent ORM) beserta penentuan relasinya (hasOne, belongsTo).
+│   ├── Services/          Berisi logika komputasi berat dan proses bisnis kompleks agar tidak menumpuk di Controller.
+│   └── Imports/           Menangani logika pengunggahan data massal (misalnya import data siswa dari file Excel).
+│
+├── config/                Menyimpan pengaturan aplikasi, termasuk pengaturan CORS untuk integrasi frontend.
+├── database/
+│   ├── migrations/        Blueprint/skema yang membangun struktur tabel dan kolom database secara terprogram.
+│   └── seeders/           Penyuntik data awal. RbacSeeder.php berada di sini untuk membangun Role dan Permission sistem.
+├── routes/
+│   └── api.php            Daftar lengkap endpoint API dan konfigurasi pengelompokan rutenya berdasarkan hak akses.
+└── tests/                 Pusat skrip pengujian otomatis (Unit Testing dan Feature Testing).
+```
 
 ---
 
