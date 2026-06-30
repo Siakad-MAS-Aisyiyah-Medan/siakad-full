@@ -27,10 +27,12 @@ class SiswaImport
                 // Pastikan key array lowercase agar sesuai dengan kode
                 $row = array_change_key_case($row, CASE_LOWER);
 
-                // Lewati baris kosong
-                if (empty($row['nis']) || empty($row['nama'])) {
+                // Lewati baris kosong atau jika diisi strip (-)
+                if (
+                    empty(trim($row['nis'] ?? '')) || trim($row['nis']) === '-' ||
+                    empty(trim($row['nama'] ?? '')) || trim($row['nama']) === '-'
+                ) {
                     $rowIndex++;
-
                     continue;
                 }
 

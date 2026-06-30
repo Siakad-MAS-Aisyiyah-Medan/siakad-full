@@ -21,10 +21,12 @@ class GuruImport
                 // Pastikan key array lowercase agar sesuai dengan kode
                 $row = array_change_key_case($row, CASE_LOWER);
 
-                // Lewati baris kosong
-                if (empty($row['nip_nuptk']) || empty($row['nama'])) {
+                // Lewati baris kosong atau jika diisi strip (-)
+                if (
+                    empty(trim($row['nip_nuptk'] ?? '')) || trim($row['nip_nuptk']) === '-' ||
+                    empty(trim($row['nama'] ?? '')) || trim($row['nama']) === '-'
+                ) {
                     $rowIndex++;
-
                     continue;
                 }
 

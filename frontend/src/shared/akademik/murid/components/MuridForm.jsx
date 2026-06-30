@@ -137,20 +137,22 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
                 </select>
               </div>
               
-              <div style={{ gridColumn: '1/-1', marginTop: '0.5rem' }}>
-                <div style={{ padding: '1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#166534', fontSize: '0.875rem' }}>
-                  <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '1.1rem' }}>🔐</span> Informasi Akun Otomatis
-                  </strong>
-                  <p style={{ margin: '0.5rem 0 0', lineHeight: 1.5 }}>
-                    Sistem akan secara otomatis membuatkan akun login untuk murid ini menggunakan data yang Anda masukkan:
-                  </p>
-                  <ul style={{ margin: '0.25rem 0 0', paddingLeft: '1.5rem', lineHeight: 1.6 }}>
-                    <li><strong>Username:</strong> {formData.username || formData.nisn || formData.no_hp || '(Menunggu input NISN/No HP)'}</li>
-                    <li><strong>Password:</strong> admin123</li>
-                  </ul>
+              {view === 'add' && (
+                <div style={{ gridColumn: '1/-1', marginTop: '0.5rem' }}>
+                  <div style={{ padding: '1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#166534', fontSize: '0.875rem' }}>
+                    <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '1.1rem' }}>🔐</span> Informasi Akun Otomatis
+                    </strong>
+                    <p style={{ margin: '0.5rem 0 0', lineHeight: 1.5 }}>
+                      Sistem akan secara otomatis membuatkan akun login untuk murid ini menggunakan data yang Anda masukkan:
+                    </p>
+                    <ul style={{ margin: '0.25rem 0 0', paddingLeft: '1.5rem', lineHeight: 1.6 }}>
+                      <li><strong>Username:</strong> {formData.username || formData.nisn || formData.no_hp || '(Menunggu input NISN/No HP)'}</li>
+                      <li><strong>Password:</strong> admin123</li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
 

@@ -169,8 +169,8 @@ export function useGuru() {
       await deleteGuru(id_user);
       toastSuccess('Berhasil!', 'Status guru menjadi nonaktif');
       loadGuru();
-    } catch {
-      toastError('Gagal', 'Gagal menonaktifkan guru.');
+    } catch (error) {
+      toastError('Gagal', error.response?.data?.message || 'Gagal menonaktifkan guru.');
     }
   };
 

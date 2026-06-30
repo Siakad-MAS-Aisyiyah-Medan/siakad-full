@@ -148,8 +148,8 @@ export function useMurid() {
       await deleteMurid(id_user);
       toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadMurid();
-    } catch {
-      toastError('Gagal', 'Gagal menghapus data murid.');
+    } catch (error) {
+      toastError('Gagal', error.response?.data?.message || 'Gagal menghapus data murid.');
     }
   };
 

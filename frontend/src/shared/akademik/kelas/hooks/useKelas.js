@@ -149,8 +149,8 @@ export function useKelas() {
       await deleteKelas(id_kelas);
       toastSuccess('Terhapus!', 'Data berhasil dihapus');
       loadData();
-    } catch {
-      toastError('Gagal', 'Gagal menghapus data kelas.');
+    } catch (error) {
+      toastError('Gagal', error.response?.data?.message || 'Gagal menghapus data kelas.');
     }
   };
 
