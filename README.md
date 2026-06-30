@@ -1,125 +1,124 @@
-<div align="center">
-  <h1>🎓 SIAKAD MAS Aisyiyah Medan</h1>
-  <p><strong>Sistem Informasi Akademik Terpadu untuk MAS Aisyiyah Medan</strong></p>
-  <p>
-    Sistem komprehensif yang dirancang untuk mengelola seluruh ekosistem akademik sekolah, mulai dari Penerimaan Peserta Didik Baru (PPDB), manajemen kelas, jadwal pelajaran, hingga penilaian dan kelulusan siswa.
-  </p>
-</div>
+# SIAKAD MAS Aisyiyah Medan
+
+Dokumentasi ini ditujukan untuk memandu pengembang (developer), penguji, atau akademisi yang ingin memahami, menjalankan, dan memodifikasi Sistem Informasi Akademik (SIAKAD) MAS Aisyiyah Medan. 
+
+Proyek ini adalah sistem komprehensif yang dirancang untuk mengotomatisasi pengelolaaan data akademik sekolah, mencakup Penerimaan Peserta Didik Baru (PPDB), manajemen kelas, jadwal pelajaran, penilaian, hingga rekapitulasi absensi.
 
 ---
 
-## 📖 Tentang Proyek (Skripsi)
+## Informasi Proyek Akademik (Skripsi)
 
-Proyek **Sistem Informasi Akademik (SIAKAD) Berbasis Web pada MAS Aisyiyah Medan** ini dikembangkan sebagai bagian dari tugas akhir (Skripsi) pada Program Studi S-1 Teknik Informatika, Fakultas Informatika, **Universitas Mikroskil** (Medan, 2026).
+Proyek ini dikembangkan sebagai bagian dari Tugas Akhir (Skripsi) pada Program Studi S-1 Teknik Informatika, Fakultas Informatika, Universitas Mikroskil (Medan, 2026).
 
-**Tim Pengembang (Kelompok Skripsi):**
-1. **Chairul Fitra Ramadhan** (NIM: 221112302)
-2. **Rehuel Mirror Pertiwi Br. Saragih** (NIM: 221111489)
-3. **Maudi Natalsyah Br Simatupang** (NIM: 221112432)
-
----
-
-## 🌟 Fitur Utama
-
-Sistem ini mendukung berbagai hak akses (*Role-Based Access Control*) yang disesuaikan dengan kebutuhan civitas akademika:
-
-*   **👨‍💻 Administrator:** Kontrol penuh terhadap sistem, manajemen pengguna, pengaturan tahun ajaran, dan konfigurasi master data.
-*   **👔 Kepala Sekolah:** Dashboard analitik dan laporan komprehensif untuk memantau performa sekolah secara keseluruhan.
-*   **🧑‍🏫 Guru:** Pengelolaan nilai siswa, absensi kelas, dan jadwal mengajar secara digital.
-*   **👨‍🎓 Siswa:** Akses transkrip nilai, jadwal pelajaran harian, absensi, dan informasi pengumuman sekolah.
-*   **📝 Calon Siswa:** Portal khusus untuk proses PPDB (Penerimaan Peserta Didik Baru) yang terintegrasi secara online.
-
-## 🛠️ Teknologi & Arsitektur
-
-Proyek ini dibangun menggunakan arsitektur *Decoupled* (terpisah antara Frontend dan Backend) untuk memastikan skalabilitas, keamanan, dan performa maksimal.
-
-*   **Frontend:** React.js + Vite
-*   **Backend:** Laravel (REST API)
-*   **Database:** MySQL / MariaDB
+Tim Pengembang:
+1. Chairul Fitra Ramadhan (NIM: 221112302)
+2. Rehuel Mirror Pertiwi Br. Saragih (NIM: 221111489)
+3. Maudi Natalsyah Br Simatupang (NIM: 221112432)
 
 ---
 
-## 📂 Struktur Direktori Proyek
+## Arsitektur Sistem
 
-Proyek ini dibagi menjadi dua direktori utama: `backend` dan `frontend`. Memahami struktur ini sangat penting bagi pengembang, penguji, maupun dosen pembimbing yang ingin melakukan pengecekan kode sumber.
+Sistem ini mengadopsi arsitektur Decoupled (pemisahan sistem penuh antara antarmuka pengguna dan logika server). Pemisahan ini membagi proyek menjadi dua aplikasi utama yang berjalan secara mandiri:
 
-### 1. Direktori `backend/` (Laravel)
-Menangani logika bisnis, interaksi ke database, dan menyediakan layanan REST API untuk *frontend*.
+1. Frontend (React.js + Vite)
+   Bertanggung jawab sepenuhnya atas antarmuka pengguna (UI) dan interaksi klien (Single Page Application). Berjalan pada sisi klien dan mengkonsumsi data dari Backend melalui HTTP Request.
+   
+2. Backend (Laravel REST API)
+   Bertanggung jawab atas manipulasi database, autentikasi, otorisasi, dan validasi logika bisnis. Backend ini hanya menerima permintaan dan mengembalikan data dalam format JSON. Backend tidak memproduksi halaman HTML (tanpa Blade).
 
-*   **`app/Http/Controllers/`**
-    Tempat seluruh kontroler utama berada. Di sinilah logika pemrosesan *request* dari pengguna dikelola (contoh: `AkunController.php`, `PendaftaranController.php`).
-*   **`app/Models/`**
-    Berisi *Eloquent ORM Model* yang merepresentasikan setiap tabel di database. Konfigurasi relasi antar entitas (seperti relasi tabel `User` dengan tabel `Guru` atau `Siswa`) juga ada di sini.
-*   **`app/Imports/` & `app/Exports/`**
-    Menangani fungsionalitas impor dan ekspor data (seperti format *spreadsheet* Excel) untuk mempercepat manipulasi data massal.
-*   **`database/migrations/`**
-    Kumpulan skrip migrasi untuk mendefinisikan dan membuat struktur tabel di database secara otomatis tanpa harus melalui antarmuka SQL.
-*   **`database/seeders/`**
-    Digunakan untuk memasukkan data awal (*dummy data* / *master data*) ke dalam database. File krusial yang mengatur izin akses (*permissions*) ada pada `RbacSeeder.php`.
-*   **`routes/api.php`**
-    Pusat pendaftaran seluruh rute (*endpoints*) API. Di file ini, hak akses pada setiap URL juga dilindungi menggunakan *middleware* sesuai *role* pengguna.
-
-### 2. Direktori `frontend/` (React + Vite)
-Menangani antarmuka pengguna (UI) secara dinamis (*Single Page Application*) dan berinteraksi langsung dengan sistem *backend*.
-
-*   **`src/assets/`**
-    Tempat penyimpanan aset statis seperti gambar, ikon grafis, dan logo MAS Aisyiyah Medan.
-*   **`src/config/`**
-    Folder untuk mengatur konfigurasi global proyek. Terdapat pengaturan menu navigasi per *role* dan rute dasar pemanggilan API (contoh: `api.config.js`).
-*   **`src/roles/`**
-    Struktur utama pembagian UI berdasarkan hak akses. Di dalamnya terdapat direktori terpisah untuk `admin`, `guru`, `kepsek`, `murid`, dan `calon-murid`. Masing-masing folder *role* memiliki rutenya sendiri (`routes.jsx`).
-*   **`src/shared/`**
-    Komponen UI, layanan komunikasi API, dan instruksi modular (*hooks*) yang dirancang untuk dapat digunakan ulang di berbagai *role* secara efisien:
-    *   **`components/`:** Kumpulan modul visual (*buttons*, *inputs*, `PageHeader`, `CustomSelect`, tabel data).
-    *   **`akademik/`:** Logika bisnis spesifik bagian akademik yang dipisahkan untuk menjaga kerapian kode (arsitektur rapi).
+Sistem basis data yang digunakan adalah MySQL atau MariaDB.
 
 ---
 
-## 🚀 Panduan Instalasi & Menjalankan Project
+## Fitur dan Hak Akses (Role-Based Access Control)
 
-### 1. Persyaratan Sistem (*Prerequisites*)
-*   [PHP](https://www.php.net/) (Minimal versi 8.1)
-*   [Composer](https://getcomposer.org/)
-*   [Node.js & npm](https://nodejs.org/) (Minimal versi 18)
-*   MySQL / MariaDB Database Server
+Setiap entitas dalam sistem dibatasi oleh hak akses spesifik (Role) untuk menjaga keamanan data:
 
-### 2. Setup Backend (Laravel)
-Buka terminal dan jalankan:
+- Administrator: Akses tak terbatas. Bertugas mengelola data master (Tahun Ajaran, Mata Pelajaran, Kelas, Akun Pengguna, dan Konfigurasi PPDB).
+- Kepala Sekolah: Akses pengawasan (eksekutif). Bertugas melihat laporan statistik akademik, memantau absensi, dan memantau kinerja guru.
+- Guru: Akses operasional harian. Bertugas mengelola data nilai murid, memasukkan absensi murid harian, dan melihat jadwal mengajar pribadi.
+- Siswa: Akses personal. Bertugas melihat daftar kehadiran pribadi, mencetak transkrip nilai, dan membaca papan pengumuman sekolah.
+- Calon Siswa: Akses pendaftaran. Bertugas membuat akun pendaftaran sementara, mengisi formulir PPDB, dan mengunggah berkas persyaratan.
+
+---
+
+## Struktur Direktori Utama
+
+Repositori ini memuat kedua bagian aplikasi dalam dua folder besar. Memahami pembagian ini akan mempercepat proses navigasi Anda.
+
+### 1. Folder `backend/`
+Pusat pengolahan data. Folder kunci yang harus dipahami:
+- `app/Http/Controllers/`: File pengendali rute. Menangani penerimaan request, memanggil service/model, dan mengembalikan response JSON.
+- `app/Http/Requests/`: Menyimpan aturan validasi input dari pengguna sebelum diproses lebih lanjut.
+- `app/Models/`: Model Eloquent untuk berinteraksi dengan database MySQL dan mengatur relasi antar tabel (One-to-Many, dll).
+- `database/migrations/`: Cetak biru (blueprint) tabel database.
+- `database/seeders/`: Penyedia data master awal (seperti Role dan Permission yang wajib diinjeksi).
+- `routes/api.php`: File utama pendaftaran seluruh endpoint REST API.
+
+### 2. Folder `frontend/`
+Pusat antarmuka visual. Folder kunci yang harus dipahami:
+- `src/roles/`: Folder berisi halaman-halaman yang dikelompokkan berdasarkan hak akses (admin, guru, kepsek, murid, calon-murid). Setiap folder memiliki konfigurasi rute React-nya masing-masing (`routes.jsx`).
+- `src/shared/`: Komponen atau logika (fungsi hook) yang bersifat universal dan dapat digunakan secara silang di antara berbagai role.
+  - `src/shared/components/`: Komponen UI modular (Tabel, Header, Input).
+  - `src/shared/akademik/`: Logika pemanggilan API (fetcher/services) yang khusus menangani entitas akademik.
+- `src/config/`: File konfigurasi dasar, seperti pengaturan URL Backend (`api.config.js`) dan pengaturan Menu.
+
+---
+
+## Panduan Instalasi dan Konfigurasi Lokal
+
+Untuk menjalankan sistem ini pada komputer lokal Anda, pastikan telah terpasang PHP (>= 8.1), Composer, Node.js (>= 18), npm, dan server MySQL.
+
+### 1. Persiapan Database MySQL
+Buatlah sebuah database kosong di MySQL Anda (misalnya dengan nama `siakad`).
+
+### 2. Instalasi Backend (Laravel)
+Buka terminal dan arahkan ke dalam folder `backend/`:
+
 ```bash
 cd backend
 composer install
 copy .env.example .env
-# Penting: Buka file .env dan sesuaikan kredensial database MySQL Anda
+```
+Buka file `.env` menggunakan teks editor, lalu cari konfigurasi database. Sesuaikan `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD` dengan konfigurasi MySQL Anda. Setelah itu jalankan perintah berikut:
+
+```bash
 php artisan key:generate
 php artisan migrate --seed
 php artisan serve --host=127.0.0.1 --port=8000
 ```
+Perintah di atas akan membangun struktur tabel, mengisi master data, dan menghidupkan server API pada `http://127.0.0.1:8000`. Biarkan terminal ini tetap menyala.
 
-### 3. Setup Frontend (React)
-Buka terminal baru (biarkan server backend tetap berjalan) dan jalankan:
+### 3. Instalasi Frontend (React)
+Buka terminal baru (jangan menutup terminal backend) dan arahkan ke dalam folder `frontend/`:
+
 ```bash
 cd frontend
 npm install
 copy .env.example .env
-# Pastikan konfigurasi VITE_API_URL pada .env mengarah ke alamat backend (http://127.0.0.1:8000/api)
+```
+Pastikan isi dari file `.env` di dalam folder frontend ini memiliki variabel `VITE_API_URL=http://127.0.0.1:8000/api` agar bisa berkomunikasi dengan backend. Kemudian jalankan:
+
+```bash
 npm run dev
 ```
-Sistem SIAKAD dapat diakses melalui browser pada `http://localhost:5173`.
+Setelah proses selesai, buka browser web Anda dan ketikkan alamat `http://localhost:5173` untuk melihat sistem beroperasi.
 
 ---
 
-## 🧪 Pemeriksaan Kualitas Kode (*Testing & Linting*)
+## Standar Pengujian Kode (Linting & Testing)
 
-Untuk memastikan tidak ada galat (error) dasar sebelum peluncuran kode:
+Sistem ini mematuhi standar penulisan kode modern. Sebelum melakukan pengiriman perubahan kode, jalankan pengujian berikut:
 
-**Di direktori Backend:**
+Backend:
 ```bash
 cd backend
 php artisan test
-vendor\bin\pint --test
+vendor/bin/pint --test
 ```
 
-**Di direktori Frontend:**
+Frontend:
 ```bash
 cd frontend
 npm run lint
@@ -128,18 +127,11 @@ npm run build
 
 ---
 
-## 🔍 Informasi Tambahan untuk Pengembang (*Troubleshooting*)
+## Panduan Pencarian Kendala (Troubleshooting Flow)
 
-Apabila Anda hendak melakukan modifikasi (*maintenance*) sistem atau melacak sumber kendala (bug), kami merekomendasikan alur kerja berikut:
+Jika Anda ingin memperbaiki bug atau memodifikasi alur kerja, gunakan rute pelacakan (tracing) berikut secara runut:
 
-1.  **Identifikasi Antarmuka:** Mulai pencarian dari *role* pengguna dan cari file `routes.jsx` di direktori `frontend/src/roles/`. Kenali *React Component* (Halaman) mana yang sedang dirender.
-2.  **Pelacakan Permintaan Data:** Pada halaman terkait, temukan fungsi layanan API (berada di folder `frontend/src/shared`) untuk mengetahui *endpoint* URL persis yang diakses.
-3.  **Pengecekan Routing Backend:** Buka `backend/routes/api.php` dan cari *endpoint* yang cocok. Anda akan melihat nama `Controller` yang dipanggil.
-4.  **Verifikasi Logika Bisnis & Basis Data:** Buka `Controller` tersebut, telusuri *validasi* dari *request*, lalu cermati perintah-perintah *Eloquent Model* untuk memastikan alur manipulasi database.
-
-<div align="center">
-  <br>
-  <b>Dikembangkan untuk memenuhi syarat kelulusan dan memajukan pendidikan di MAS Aisyiyah Medan.</b>
-  <br>
-  <i>Universitas Mikroskil - 2026</i>
-</div>
+1. Frontend UI: Cari halaman yang bermasalah pada direktori `frontend/src/roles/`. Temukan nama komponen berektensi `.jsx` yang sedang di-render.
+2. Frontend API Service: Pada komponen tersebut, cari fungsi yang melakukan pertukaran data. Fungsi ini biasanya memanggil endpoint API dari `frontend/src/shared/`.
+3. Backend Route: Salin path API (misal `/api/guru`) dan cari di file `backend/routes/api.php`. Di sana Anda akan menemukan nama Controller yang bertugas.
+4. Backend Controller: Buka Controller terkait di `backend/app/Http/Controllers/`. Periksa alur validasi dan bagaimana ia memanggil Model atau Service untuk menyelesaikan proses bisnis database.

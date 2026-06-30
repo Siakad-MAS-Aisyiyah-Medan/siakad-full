@@ -1,111 +1,126 @@
-<div align="center">
-  <h1>⚙️ Backend SIAKAD (REST API)</h1>
-  <p><strong>Layanan API berbasis Laravel untuk Sistem Informasi Akademik MAS Aisyiyah Medan</strong></p>
-</div>
+# Backend SIAKAD (REST API)
+
+Dokumentasi ini ditujukan untuk pengembang (developer) yang akan memelihara atau mengembangkan lebih lanjut sistem backend dari Sistem Informasi Akademik (SIAKAD) MAS Aisyiyah Medan.
+
+Backend ini dibangun menggunakan framework Laravel (PHP) dan bertindak secara eksklusif sebagai penyedia REST API. Proyek ini tidak memiliki tampilan antarmuka (UI) (seperti file Blade), melainkan hanya mengembalikan data dalam format JSON yang nantinya akan dikonsumsi oleh aplikasi Frontend (React).
 
 ---
 
-## 📖 Tentang Backend
+## Arsitektur dan Alur Kerja (Request Lifecycle)
 
-Proyek backend ini dirancang menggunakan kerangka kerja (framework) **Laravel**. Fokus utamanya adalah menyediakan RESTful API yang aman, cepat, dan terstruktur untuk dikonsumsi oleh aplikasi *frontend* (React). Proyek ini sepenuhnya berfokus pada logika bisnis, manajemen basis data, serta autentikasi, tanpa menangani urusan antarmuka pengguna (UI).
+Untuk memudahkan pemeliharaan, arsitektur backend ini memisahkan tanggung jawab (Separation of Concerns). Alur pemrosesan data (request) dari klien (frontend) berjalan secara terurut:
 
-## 🛠️ Teknologi yang Digunakan
+1. Route (routes/api.php)
+   Menerima request HTTP (GET, POST, PUT, DELETE) dari frontend. Pada tahap ini, rute dilindungi oleh Middleware untuk memastikan pengguna sudah login (autentikasi) dan memiliki hak akses (otorisasi/role) yang sesuai.
 
-*   **Framework:** Laravel (PHP)
-*   **Database:** MySQL / MariaDB
-*   **Autentikasi:** Laravel Sanctum (Token-based Authentication)
-*   **Arsitektur API:** RESTful API dengan format respons standar (JSON)
+2. Controller (app/Http/Controllers/)
+   Menerima request yang sudah lolos dari Middleware. Controller bertugas mengatur alur: memvalidasi input, memanggil logika bisnis, dan mengembalikan response.
+   - Validasi Input: Controller memisahkan logika validasi dengan menggunakan FormRequest (berada di app/Http/Requests/).
 
----
+3. Service (app/Services/)
+   Berisi logika bisnis atau kalkulasi yang kompleks. Jika Controller hanya bertugas sebagai pengatur lalu lintas, Service mengeksekusi operasi berat (seperti import file, kalkulasi nilai, atau manipulasi data kompleks) sebelum memanggil database.
 
-## 📂 Struktur Direktori Utama
+4. Model (app/Models/)
+   Berinteraksi langsung dengan database menggunakan Eloquent ORM. Model mendefinisikan tabel database, kolom yang diizinkan untuk diisi (fillable), dan hubungan (relationship) antar tabel (seperti One-to-Many atau Many-to-Many).
 
-Untuk memudahkan pengembangan dan pemeliharaan, arsitektur kode diatur dengan rapi. Berikut adalah penjelasan direktori utama:
-
-```text
-backend/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/   # Menerima HTTP request, mengelola alur kerja, dan mengembalikan HTTP response (JSON).
-│   │   ├── Middleware/    # Menjaga rute dari akses ilegal (Autentikasi, pengecekan Role & Permission).
-│   │   ├── Requests/      # Kelas FormRequest untuk memisahkan logika validasi data input dari Controller.
-│   │   └── Resources/     # API Resources (Data Transformer) untuk menyeragamkan format respon JSON.
-│   ├── Models/            # Representasi tabel database (Eloquent ORM) dan penentuan relasi antar entitas.
-│   ├── Services/          # Layer logika bisnis. Digunakan agar Controller tetap bersih dan tipis (Thin Controllers).
-│   ├── Imports/           # Kelas untuk menangani fitur unggah data massal (contoh: Import File Excel).
-│   └── Utils/             # Fungsi bantuan (Helpers/Traits) yang bisa dipakai silang oleh beberapa modul.
-│
-├── routes/
-│   └── api.php            # Tempat seluruh rute (endpoints) API didaftarkan, dikelompokkan dengan Middleware keamanan.
-│
-├── database/
-│   ├── migrations/        # Skrip (blueprint) pembentuk struktur tabel, kolom, dan constraint relasi pada database.
-│   └── seeders/           # Data dummy/master data (seperti Akun Admin, Role, dan Menu) untuk di-generate otomatis.
-│
-├── config/                # Berisi file konfigurasi aplikasi, sistem file, environment, database, hingga CORS.
-└── tests/                 # Tempat menulis skrip pengujian otomatis perangkat lunak (Unit & Feature Testing).
-```
+5. Response (app/Http/Resources/)
+   Setelah data diambil dari database, data dilewatkan ke kelas API Resource untuk diformat. Tujuannya adalah memastikan format respons JSON yang dikirimkan ke frontend selalu konsisten dan seragam.
 
 ---
 
-## 🔄 Alur Siklus Hidup Permintaan (*Request Lifecycle*)
+## Struktur Direktori
 
-Setiap *request* yang masuk dari *frontend* akan diproses melalui alur berikut untuk menjaga agar kode mematuhi prinsip tanggung jawab tunggal (*Single Responsibility Principle*):
+Berikut adalah penjelasan fungsi setiap direktori di dalam backend untuk memandu Anda saat mencari file yang spesifik:
 
-1.  **`Route`:** Permintaan jaringan masuk ke rute yang didefinisikan di `routes/api.php` lalu dicegat oleh *Middleware* (untuk validasi token/role).
-2.  **`Controller`:** Rute meneruskan data ke *Controller*. Di sini, input biasanya divalidasi terlebih dahulu menggunakan `FormRequest`.
-3.  **`Service`:** Bila ada perhitungan kompleks, manipulasi file, atau validasi logika bisnis yang mendalam, *Controller* akan meneruskannya ke *Service Layer*.
-4.  **`Model & Database`:** *Service* dan *Controller* berkomunikasi dengan database menggunakan *Model* (Eloquent ORM).
-5.  **`Response`:** Data dikembalikan ke *Controller*, dibungkus dengan *API Resource* agar format JSON seragam, lalu dikirim ke *frontend* dengan kode status HTTP (200, 201, 404, dll).
+- app/Http/Controllers/
+  Berisi file pengendali alur. File dikelompokkan berdasarkan entitas, misalnya `GuruController.php` untuk manipulasi data guru, `SiswaController.php` untuk data siswa.
 
----
+- app/Http/Requests/
+  Berisi file aturan validasi. Saat klien mengirim form, sistem akan mengecek aturan di sini sebelum masuk ke Controller. Jika gagal, API otomatis mengembalikan status 422 Unprocessable Entity.
 
-## 🔐 Autentikasi dan Hak Akses (*Role-Based Access Control*)
+- app/Models/
+  Mewakili tabel database. Contoh: `User.php` mewakili tabel users, `Guru.php` mewakili tabel guru. Di sini relasi antar tabel ditulis dalam fungsi seperti `hasOne()`, `hasMany()`, atau `belongsTo()`.
 
-Backend ini dilengkapi dengan sistem keamanan yang ketat:
-*   **Autentikasi:** Menggunakan *Bearer Token* (dihasilkan oleh Laravel Sanctum) untuk memvalidasi setiap *request* setelah pengguna berhasil masuk (login).
-*   **Role & Permission:** Hak akses awal diatur di dalam `RbacSeeder.php`. Hanya grup *role* tertentu yang diizinkan untuk mengakses fitur API tertentu (misalnya, hanya guru yang bisa input nilai).
-*   **CORS (Cross-Origin Resource Sharing):** Dikonfigurasi agar secara eksklusif mengizinkan pertukaran data dari domain atau *port* *frontend* resmi (seperti `localhost:5173`), memblokir akses liar dari pihak ketiga.
+- app/Imports/ & app/Exports/
+  Menangani skrip pemrosesan perpindahan data massal menggunakan file Excel/CSV.
 
----
+- database/migrations/
+  Berisi skrip cetak biru (blueprint) untuk membangun struktur database (tabel, kolom, indeks, dan tipe data). Digunakan untuk melacak perubahan skema database secara terstruktur.
 
-## 🚀 Panduan Instalasi dan Menjalankan Server Lokal
+- database/seeders/
+  Berisi data awal (master data). File terpenting adalah `RbacSeeder.php`, yang menyuntikkan data Role dan Permission awal ke database, sehingga sistem hak akses (RBAC) dapat berfungsi.
 
-Pastikan komputer Anda sudah memenuhi prasyarat, termasuk terinstalnya PHP (>= 8.1), Composer, dan server MySQL/MariaDB.
+- routes/api.php
+  Daftar lengkap endpoint API. Pengelompokan rute (Route Groups) diterapkan di sini berdasarkan prefix (misal: `/admin`, `/guru`, `/siswa`) dan Middleware terkait.
 
-```bash
-# 1. Unduh (Install) seluruh dependensi vendor PHP
-composer install
-
-# 2. Buat file .env dari template
-copy .env.example .env
-# PENTING: Buka .env dan atur kredensial (DB_DATABASE, DB_USERNAME, DB_PASSWORD) sesuai setelan MySQL Anda.
-
-# 3. Hasilkan kunci rahasia Laravel untuk mengenkripsi sesi dan kata sandi
-php artisan key:generate
-
-# 4. Bangun struktur tabel dan suntikkan master data ke MySQL Anda
-php artisan migrate --seed
-
-# 5. Nyalakan layanan backend lokal
-php artisan serve --host=127.0.0.1 --port=8000
-```
+- config/
+  Menyimpan konfigurasi server. Konfigurasi CORS (Cross-Origin Resource Sharing) yang mengizinkan komunikasi dengan Frontend yang berbeda port (localhost:5173) diatur di dalam folder ini.
 
 ---
 
-## 🧪 Pengujian & Standarisasi Penulisan Kode (*Testing & Linting*)
+## Keamanan
 
-Untuk memastikan tidak ada kerusakan logika program (*breaking changes*) setelah mengubah kode:
+1. Autentikasi (Token-based)
+   Menggunakan Laravel Sanctum. Setelah pengguna memasukkan username dan password yang benar di rute login, backend akan menghasilkan string token. Frontend harus menyertakan token ini pada header `Authorization: Bearer <token>` untuk setiap request berikutnya.
 
-```bash
-# Menjalankan pengujian fungsional otomatis
-php artisan test
+2. Otorisasi (Role & Permission)
+   Setiap akun terikat pada peran (Role) tertentu (Admin, Kepsek, Guru, Siswa, Calon Siswa). Rute API dilindungi agar tidak bisa diakses lintas peran.
 
-# Memeriksa kepatuhan penulisan kode sesuai standar PHP (PSR) menggunakan Laravel Pint
-vendor\bin\pint --test
-```
+---
 
-Jika terdapat gaya penulisan (*code style*) yang tidak rapi, Anda dapat merapikannya secara otomatis dengan mengeksekusi:
-```bash
-vendor\bin\pint
-```
+## Prasyarat dan Panduan Instalasi Lokal
+
+Sebelum menjalankan backend, pastikan spesifikasi lingkungan kerja (environment) berikut terpenuhi:
+- PHP versi 8.1 atau lebih baru.
+- Composer (Manajer dependensi PHP).
+- MySQL atau MariaDB.
+
+Langkah-langkah instalasi:
+
+1. Unduh dependensi pihak ketiga:
+   ```bash
+   composer install
+   ```
+
+2. Konfigurasi Environment:
+   ```bash
+   copy .env.example .env
+   ```
+   Buka file `.env` dan atur parameter database (DB_DATABASE, DB_USERNAME, DB_PASSWORD).
+
+3. Hasilkan Application Key (Kunci Enkripsi Laravel):
+   ```bash
+   php artisan key:generate
+   ```
+
+4. Migrasi dan Seeding Database:
+   ```bash
+   php artisan migrate --seed
+   ```
+   Perintah ini akan membuat semua tabel di MySQL dan mengisinya dengan data awal (termasuk akun administrator default).
+
+5. Jalankan Server:
+   ```bash
+   php artisan serve --host=127.0.0.1 --port=8000
+   ```
+
+---
+
+## Standar Pengujian dan Kualitas Kode
+
+Sistem ini mendukung pengujian otomatis dan pemformatan standar PSR. Jika Anda menambahkan fitur baru, jalankan perintah berikut untuk memastikan integritas kode:
+
+- Menjalankan pengujian (Automated Testing):
+  ```bash
+  php artisan test
+  ```
+
+- Memeriksa standar kode:
+  ```bash
+  vendor/bin/pint --test
+  ```
+
+- Memperbaiki standar kode secara otomatis:
+  ```bash
+  vendor/bin/pint
+  ```
