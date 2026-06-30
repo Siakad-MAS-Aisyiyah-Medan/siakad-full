@@ -1032,7 +1032,7 @@ class PendaftaranController extends Controller
         $query = Pendaftaran::with(['user', 'berkas'])->orderByDesc('updated_at');
 
         if ($status === 'submitted') {
-            $query->whereIn('ppdb_status', ['submitted', 'diajukan', 'terverifikasi', 'verified']);
+            $query->whereIn('ppdb_status', ['draft', 'submitted', 'diajukan', 'terverifikasi', 'verified']);
         } elseif ($status === 'diterima') {
             $query->whereIn('ppdb_status', ['diterima', 'accepted', 'menjadi_murid']);
         } elseif ($status === 'ditolak') {
