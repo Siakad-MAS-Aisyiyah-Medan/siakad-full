@@ -114,6 +114,7 @@ export default function RegisterCalonMurid() {
     const errors = {};
     if (!form.name.trim()) errors.name = 'Nama lengkap wajib diisi.';
     if (!form.username.trim()) errors.username = 'NISN wajib diisi.';
+    else if (form.username.trim().length < 10) errors.username = 'NISN minimal 10 karakter.';
     if (!form.email.trim()) {
       errors.email = 'Email wajib diisi.';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {

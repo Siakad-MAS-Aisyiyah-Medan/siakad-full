@@ -50,7 +50,7 @@ export default function MuridForm({ view, formData, loading, onChange, onSubmit,
               </div>
               <div>
                 <FormLabel required>NISN</FormLabel>
-                <input name="nisn" value={formData.nisn || ''} onChange={onChange} className="form-control" placeholder="Masukkan NISN" disabled={readOnly} required />
+                <input name="nisn" value={formData.nisn || ''} onChange={onChange} className="form-control" placeholder="Masukkan NISN" disabled={readOnly} required minLength={10} />
               </div>
 
               <div>

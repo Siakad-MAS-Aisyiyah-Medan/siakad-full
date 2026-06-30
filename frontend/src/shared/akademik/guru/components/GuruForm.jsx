@@ -33,7 +33,7 @@ export default function GuruForm({ view, formData, loading, onChange, onSubmit, 
 
               <div>
                 <FormLabel required>NIP/NUPTK</FormLabel>
-                <input name="nip_nuptk" value={formData.nip_nuptk || ''} onChange={onChange} className="form-control" placeholder="Masukkan NIP/NUPTK" disabled={readOnly} required />
+                <input name="nip_nuptk" value={formData.nip_nuptk || ''} onChange={onChange} className="form-control" placeholder="Masukkan NIP/NUPTK" disabled={readOnly} required minLength={10} />
               </div>
               <div>
                 <FormLabel required>Jenis Kelamin</FormLabel>

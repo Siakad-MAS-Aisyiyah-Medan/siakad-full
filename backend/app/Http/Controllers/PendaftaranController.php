@@ -150,7 +150,7 @@ class PendaftaranController extends Controller
         ]));
 
         $validated = $request->validate([
-            'nisn' => 'sometimes|string|max:20',
+            'nisn' => 'sometimes|string|min:10|max:20',
             'nama_lengkap' => 'sometimes|string|max:255',
             'jenis_kelamin' => 'sometimes|in:L,P',
             'tempat_lahir' => 'sometimes|string|max:100',
@@ -473,7 +473,7 @@ class PendaftaranController extends Controller
             'nama_lengkap' => 'required_without:nama|string|max:255',
             'nama' => 'required_without:nama_lengkap|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'nisn' => 'required|string|max:20|unique:users,username',
+            'nisn' => 'required|string|min:10|max:20|unique:users,username',
             'no_hp' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -498,7 +498,7 @@ class PendaftaranController extends Controller
     public function calonPpdbSaveFormulir(Request $request)
     {
         $validated = $request->validate([
-            'nisn' => 'sometimes|string|max:20',
+            'nisn' => 'sometimes|string|min:10|max:20',
             'nama_lengkap' => 'sometimes|string|max:255',
             'jenis_kelamin' => 'sometimes|in:L,P',
             'tempat_lahir' => 'sometimes|string|max:100',
