@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\Guru;
+use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
