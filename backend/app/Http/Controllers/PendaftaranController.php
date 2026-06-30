@@ -613,17 +613,17 @@ class PendaftaranController extends Controller
     public function downloadBrosur()
     {
         $path = $this->resolveBrosurStoragePath();
-        if (!$path) {
+        if (! $path) {
             return response()->json(['message' => 'Brosur not found'], 404);
         }
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
-        $downloadName = 'brosur-ppdb-mas-aisyiyah-medan' . ($extension ? '.' . $extension : '');
+        $downloadName = 'brosur-ppdb-mas-aisyiyah-medan'.($extension ? '.'.$extension : '');
         $mimeType = Storage::disk('public')->mimeType($path) ?: 'application/octet-stream';
 
         return Storage::disk('public')->download($path, $downloadName, [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
+            'Content-Disposition' => 'attachment; filename="'.$downloadName.'"',
         ]);
     }
 
@@ -842,6 +842,7 @@ class PendaftaranController extends Controller
     private function resolveBrosurPublicUrl(): ?string
     {
         $path = $this->resolveBrosurStoragePath();
+
         return $path ? Storage::disk('public')->url($path) : null;
     }
 

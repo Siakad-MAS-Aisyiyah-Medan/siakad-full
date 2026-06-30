@@ -21,7 +21,7 @@ export default function KelasForm({ view, formData, guruData, tahunAjaranData = 
               <EditRow label="Tahun Ajaran">
                 <select name="tahun_ajaran" value={formData.tahun_ajaran || ''} onChange={onChange} className="form-control" required>
                   <option value="">Pilih tahun ajaran</option>
-                  {tahunAjaranData.map(ta => (
+                  {tahunAjaranData.filter(ta => ta.status === 'Aktif' || ta.tahun_ajaran === formData.tahun_ajaran).map(ta => (
                     <option key={ta.id} value={ta.tahun_ajaran}>{ta.tahun_ajaran} - {ta.semester}</option>
                   ))}
                 </select>
@@ -63,7 +63,7 @@ export default function KelasForm({ view, formData, guruData, tahunAjaranData = 
                 <FormLabel required>Tahun Ajaran</FormLabel>
                 <select name="tahun_ajaran" value={formData.tahun_ajaran || ''} onChange={onChange} className="form-control" disabled={readOnly} required>
                   <option value="">Pilih tahun ajaran</option>
-                  {tahunAjaranData.map(ta => (
+                  {tahunAjaranData.filter(ta => ta.status === 'Aktif' || ta.tahun_ajaran === formData.tahun_ajaran).map(ta => (
                     <option key={ta.id} value={ta.tahun_ajaran}>{ta.tahun_ajaran} - {ta.semester}</option>
                   ))}
                 </select>

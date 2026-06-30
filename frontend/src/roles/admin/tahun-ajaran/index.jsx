@@ -94,7 +94,7 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
                       value={form.status}
                       onChange={(val) => onChange({ target: { name: 'status', value: val } })}
                       options={[
-                        { value: 'Aktif', label: 'Aktif' },
+                        ...(form.original_status === 'Selesai' ? [] : [{ value: 'Aktif', label: 'Aktif' }]),
                         { value: 'Tidak Aktif', label: 'Nonaktif' },
                         { value: 'Selesai', label: 'Selesai' }
                       ]}
@@ -157,6 +157,7 @@ export default function TahunAjaranPage() {
       tanggal_mulai: row.tanggal_mulai || '',
       tanggal_selesai: row.tanggal_selesai || '',
       status: row.status || 'Tidak Aktif',
+      original_status: row.status,
     });
     setEditId(row.id);
     setMode('edit');

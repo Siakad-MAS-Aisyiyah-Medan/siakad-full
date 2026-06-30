@@ -236,7 +236,7 @@ class GuruController extends Controller
 
             // Menonaktifkan akun user
             $user->update(['status_aktif' => false]);
-            
+
             // Menonaktifkan profil guru
             Guru::where('id_user', $id)->update(['status' => 'nonaktif']);
 
