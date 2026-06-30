@@ -25,7 +25,7 @@ export function useMapel() {
   const loadData = useCallback(async () => {
     setIsFetching(true);
     try {
-      const [mapel, guru, kelas] = await Promise.all([fetchMapelList(), fetchGuruList(), fetchKelasList({ per_page: 200 })]);
+      const [mapel, guru, kelas] = await Promise.all([fetchMapelList({ per_page: 500 }), fetchGuruList({ role: 'guru', per_page: 500 }), fetchKelasList({ per_page: 200 })]);
       setMapelData(mapel);
       setGuruData(guru);
       setKelasData(kelas);

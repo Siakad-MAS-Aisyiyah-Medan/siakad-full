@@ -45,7 +45,7 @@ export function useMurid() {
     setIsFetching(true);
     try {
       const [data, statsData] = await Promise.all([
-        fetchMuridList({ search: searchQuery || undefined }),
+        fetchMuridList({ search: searchQuery || undefined, per_page: 2000 }),
         fetchMuridStats()
       ]);
       setMuridData(data);

@@ -34,7 +34,7 @@ export function useGuru() {
   const loadGuru = useCallback(async () => {
     try {
       setIsFetching(true);
-      const data = await fetchGuruList();
+      const data = await fetchGuruList({ per_page: 1000 });
       setGuruData(data);
     } catch (error) {
       console.error('Error fetching guru:', error);

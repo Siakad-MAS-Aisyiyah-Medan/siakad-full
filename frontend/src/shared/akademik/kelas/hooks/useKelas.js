@@ -38,7 +38,7 @@ export function useKelas() {
       if (filterJurusan !== 'Semua') params.jurusan = filterJurusan;
 
       const [kelas, statsData, guru, tahunAjaran] = await Promise.all([
-        fetchKelasList(params),
+        fetchKelasList({ ...params, per_page: 500 }),
         fetchKelasStats(),
         fetchGuruList({ role: 'guru', per_page: 100 }),
         fetchTahunAjaran()

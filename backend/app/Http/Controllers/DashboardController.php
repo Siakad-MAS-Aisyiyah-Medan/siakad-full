@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\Guru;
-use App\Models\Kelas;
 use App\Models\Mapel;
-use App\Models\Siswa;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
     public function index(): JsonResponse
     {
-        $totalGuru = Guru::count();
-        $totalMurid = Siswa::count();
+        $totalGuru = User::where('role', 'guru')->count();
+        $totalMurid = User::where('role', 'siswa')->count();
         $totalMapel = Mapel::count();
         $totalKelas = Kelas::count();
 
