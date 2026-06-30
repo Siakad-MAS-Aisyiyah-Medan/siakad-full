@@ -142,7 +142,7 @@ export default function GuruTable({
                           <button type="button" onClick={() => onEdit && onEdit(user)} className="btn-icon edit" title="Edit">
                             <Pencil size={15} />
                           </button>
-                          <button type="button" onClick={() => onDelete && onDelete(user.id_user)} className="btn-icon delete" title="Hapus">
+                          <button type="button" onClick={() => onDelete && onDelete(user.id_user)} className="btn-icon delete" title="Nonaktifkan">
                             <Trash2 size={15} />
                           </button>
                         </div>

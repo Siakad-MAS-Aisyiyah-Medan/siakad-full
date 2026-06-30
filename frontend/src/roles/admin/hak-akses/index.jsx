@@ -226,6 +226,7 @@ export default function HakAksesPage() {
                 <tr>
                   <th>No</th>
                   <th>NIP/NISN</th>
+                  <th>Nama</th>
                   <th>E-mail</th>
                   <th>Role</th>
                   <th>Status</th>
@@ -235,7 +236,7 @@ export default function HakAksesPage() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
                         <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'var(--color-primary)', borderRadius: '50%' }} />
                         Memuat data akun...
@@ -249,6 +250,7 @@ export default function HakAksesPage() {
                         {((currentPage - 1) * (pagination.per_page || 10)) + idx + 1}
                       </td>
                       <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{akun.nip_nisn || akun.username || '-'}</td>
+                      <td style={{ fontWeight: 500 }}>{akun.name}</td>
                       <td>{akun.email}</td>
                       <td>
                         <span style={{
@@ -295,7 +297,7 @@ export default function HakAksesPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{ fontSize: '2rem' }}>👤</div>
                         <p style={{ fontWeight: 600 }}>Tidak ada data akun</p>
@@ -427,7 +429,7 @@ export default function HakAksesPage() {
                 <div />
 
                 <div style={{ gridColumn: '1/-1' }}>
-                  <FormLabel>Password {view === 'edit' ? '(kosongkan jika tidak ingin mengubah)' : ''}</FormLabel>
+                  <FormLabel required={view === 'add'}>Password {view === 'edit' ? '(kosongkan jika tidak ingin mengubah)' : ''}</FormLabel>
                   <div style={{ position: 'relative' }}>
                     <input
                       type={showPassword ? 'text' : 'password'}

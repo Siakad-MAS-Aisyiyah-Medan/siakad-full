@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import MainLayout from '@/shared/layouts/MainLayout';
 import apiClient from '@/shared/services/apiClient';
@@ -9,8 +9,8 @@ import PageHeader from '@/shared/components/PageHeader';
 import { dedupeMapelDiampu } from '../guruTeachingUtils';
 
 export default function GuruMapelPage() {
-  const user = getStoredUser();
-  const profile = getStoredProfile();
+  const user = useMemo(() => getStoredUser(), []);
+  const profile = useMemo(() => getStoredProfile(), []);
   const name = getDisplayName(profile, user?.role, user?.username);
 
   const [mapelList, setMapelList] = useState([]);

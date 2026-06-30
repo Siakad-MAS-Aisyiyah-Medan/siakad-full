@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 import MainLayout from '@/shared/layouts/MainLayout';
@@ -9,8 +8,8 @@ import { getDisplayName } from '@/shared/utils/profile';
 import PageHeader from '@/shared/components/PageHeader';
 
 export default function GuruMuridPage() {
-  const user = getStoredUser();
-  const profile = getStoredProfile();
+  const user = useMemo(() => getStoredUser(), []);
+  const profile = useMemo(() => getStoredProfile(), []);
   const name = getDisplayName(profile, user?.role, user?.username);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -35,9 +34,10 @@ export default function GuruMuridPage() {
         const rowsList = Array.isArray(response?.data?.data) ? response.data.data : [];
         if (active) {
           setJadwalList(rowsList);
-          
-          const currentIdKelas = searchParams.get('id_kelas') || '';
-          const currentIdMapel = searchParams.get('id_mapel') || '';
+
+          const currentParams = new URLSearchParams(window.location.search);
+          const currentIdKelas = currentParams.get('id_kelas') || '';
+          const currentIdMapel = currentParams.get('id_mapel') || '';
           
           if ((!currentIdKelas || !currentIdMapel) && rowsList.length > 0) {
             const first = rowsList[0];
@@ -75,7 +75,7 @@ export default function GuruMuridPage() {
     return () => {
       active = false;
     };
-  }, [searchParams, setSearchParams]);
+  }, [setSearchParams]);
 
   // Sync state if URL changes
   useEffect(() => {

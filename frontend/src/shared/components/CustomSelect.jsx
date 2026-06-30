@@ -19,7 +19,7 @@ export default function CustomSelect({ value, onChange, options, style, disabled
   const selectedOption = options.find(opt => String(opt.value) === String(value)) || options[0] || { label: 'Pilih...', value: '' };
 
   return (
-    <div className="relative" ref={dropdownRef} style={{ position: 'relative', width: '100%', minWidth: '120px', ...style }}>
+    <div className="relative" ref={dropdownRef} style={{ position: 'relative', width: '100%', minWidth: '120px', zIndex: isOpen ? 50 : 1, ...style }}>
       <style>
         {`
           @keyframes dropdownSmooth {

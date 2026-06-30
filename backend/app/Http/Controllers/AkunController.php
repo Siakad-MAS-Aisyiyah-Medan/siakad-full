@@ -47,29 +47,31 @@ class AkunController extends Controller
         $users = collect($paginator->items())->map(function ($user) {
             $nipNisn = $user->username ?: '-';
             $noHp = '-';
-            if ($user->role === 'admin' && $user->admin) {
-                $nipNisn = $user->admin->nip ?? '-';
-            } elseif ($user->role === 'guru' && $user->guru) {
-                $nipNisn = $user->guru->nip_nuptk ?? '-';
-            } elseif ($user->role === 'kepsek' && $user->kepalaSekolah) {
-                $nipNisn = $user->kepalaSekolah->nip ?? '-';
-            } elseif ($user->role === 'siswa' && $user->siswa) {
-                $nipNisn = $user->siswa->nisn ?? '-';
-            }
+            $realName = $user->name;
 
             if ($user->role === 'admin' && $user->admin) {
+                $nipNisn = $user->admin->nip ?? '-';
                 $noHp = $user->admin->no_hp ?? '-';
+                if (empty(trim($realName))) $realName = $user->admin->nama_admin ?? '-';
             } elseif ($user->role === 'guru' && $user->guru) {
+                $nipNisn = $user->guru->nip_nuptk ?? '-';
                 $noHp = $user->guru->no_hp ?? '-';
+                if (empty(trim($realName))) $realName = $user->guru->nama_guru ?? '-';
             } elseif ($user->role === 'kepsek' && $user->kepalaSekolah) {
+                $nipNisn = $user->kepalaSekolah->nip ?? '-';
                 $noHp = $user->kepalaSekolah->no_hp ?? '-';
+                if (empty(trim($realName))) $realName = $user->kepalaSekolah->nama_kepsek ?? '-';
             } elseif ($user->role === 'siswa' && $user->siswa) {
+                $nipNisn = $user->siswa->nisn ?? '-';
                 $noHp = $user->siswa->no_hp_wali ?? '-';
+                if (empty(trim($realName))) $realName = $user->siswa->nama_siswa ?? '-';
+            } elseif ($user->role === 'calon_siswa' && $user->pendaftaran) {
+                if (empty(trim($realName))) $realName = $user->pendaftaran->nama_lengkap ?? '-';
             }
 
             return [
                 'id' => $user->id_user,
-                'name' => $user->name,
+                'name' => $realName ?: '-',
                 'username' => $user->username,
                 'email' => $user->email,
                 'role' => $user->role,

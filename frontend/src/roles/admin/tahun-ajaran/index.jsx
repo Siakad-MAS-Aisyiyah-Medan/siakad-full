@@ -12,10 +12,10 @@ import CustomSelect from '@/shared/components/CustomSelect';
 
 const EMPTY_FORM = {
   tahun_ajaran: '',
-  semester: '',
+  semester: 'Ganjil',
   tanggal_mulai: '',
   tanggal_selesai: '',
-  status: '',
+  status: 'Tidak Aktif',
 };
 
 function withDefaultDates(form) {
@@ -51,7 +51,7 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
 
         <div className="form-panel">
           <form onSubmit={onSubmit}>
-            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'relative', zIndex: 10 }}>
               {isAdd ? (
                 <>
                   <div>
@@ -64,7 +64,6 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
                       value={form.semester}
                       onChange={(val) => onChange({ target: { name: 'semester', value: val } })}
                       options={[
-                        { value: '', label: 'Pilih Semester' },
                         { value: 'Ganjil', label: 'Ganjil' },
                         { value: 'Genap', label: 'Genap' }
                       ]}
@@ -76,7 +75,6 @@ function TahunAjaranForm({ form, onChange, onClose, onSubmit, saving, mode }) {
                       value={form.status}
                       onChange={(val) => onChange({ target: { name: 'status', value: val } })}
                       options={[
-                        { value: '', label: 'Pilih Status' },
                         { value: 'Aktif', label: 'Aktif' },
                         { value: 'Tidak Aktif', label: 'Tidak Aktif' },
                         { value: 'Selesai', label: 'Selesai' }
@@ -172,6 +170,12 @@ export default function TahunAjaranPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (mode === 'add' && (!form.tahun_ajaran?.trim() || !form.semester?.trim() || !form.status?.trim())) {
+      import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
+        toastValidation('Periksa Kembali', 'Semua kolom yang bertanda bintang merah wajib diisi.');
+      });
+      return;
+    }
     setSaving(true);
     try {
       const payload = withDefaultDates(form);
@@ -259,9 +263,11 @@ export default function TahunAjaranPage() {
                         <button type="button" onClick={() => openEdit(row)} className="btn-icon edit" title="Edit">
                           <Pencil size={15} />
                         </button>
-                        <button type="button" onClick={() => handleDelete(row.id)} className="btn-icon delete" title="Hapus">
-                          <Trash2 size={15} />
-                        </button>
+                        {row.status !== 'Aktif' && (
+                          <button type="button" onClick={() => handleDelete(row.id)} className="btn-icon delete" title="Hapus">
+                            <Trash2 size={15} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

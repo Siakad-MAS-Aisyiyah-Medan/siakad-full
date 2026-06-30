@@ -185,18 +185,33 @@ export function getStepPayload(stepKey, forms) {
 
 /** 
  * Menghitung progres persentase formulir pendaftaran 
- * murni berdasarkan 'current_step' (Langkah terakhir yang di-Save & Next)
+ * murni berdasarkan kelengkapan data aktual (validasi)
  */
 export function calculateFormulirProgress(registration) {
   if (!registration) return 0;
   if (['diajukan', 'terverifikasi', 'diterima', 'ditolak', 'menjadi_murid'].includes(registration.ppdb_status || registration.status_pendaftaran)) return 100;
 
-  const currentStepIndex = stepIndexFromCurrentStep(registration.current_step);
   const formSteps = PPDB_STEPS.length - 1; // 5 steps formulir, excluding review
-  
-  // Jika index melebihi formSteps (misal di halaman review atau sudah submit), cap 100%
-  const completed = Math.min(formSteps, currentStepIndex);
-  
   if (formSteps === 0) return 0;
-  return Math.min(100, Math.round((completed / formSteps) * 100));
+
+  // Flatten object to simulate forms data
+  const formsData = {
+    keteranganPribadi: registration,
+    kesehatan: registration,
+    pendidikanAsal: registration,
+    orangTuaWali: registration,
+    kepribadian: registration,
+  };
+
+  let validStepsCount = 0;
+  PPDB_STEPS.forEach((step) => {
+    if (step.key === 'review') return;
+    const { valid } = validateStep(step.key, formsData);
+    if (valid) validStepsCount++;
+  });
+
+  const currentStepIndex = stepIndexFromCurrentStep(registration.current_step);
+  const maxCompleted = Math.max(validStepsCount, Math.min(formSteps, currentStepIndex));
+
+  return Math.min(100, Math.round((maxCompleted / formSteps) * 100));
 }

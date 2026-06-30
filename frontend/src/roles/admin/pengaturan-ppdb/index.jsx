@@ -48,7 +48,18 @@ export default function PengaturanPpdbPage() {
   });
 
   const [brosurFile, setBrosurFile] = useState(null);
+  const [brosurPreviewUrl, setBrosurPreviewUrl] = useState(null);
   const [tahunAjaranOptions, setTahunAjaranOptions] = useState([]);
+
+  useEffect(() => {
+    if (brosurFile && brosurFile.type.startsWith('image/')) {
+      const objectUrl = URL.createObjectURL(brosurFile);
+      setBrosurPreviewUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setBrosurPreviewUrl(null);
+    }
+  }, [brosurFile]);
 
   useEffect(() => {
     loadSettings();
@@ -136,6 +147,13 @@ export default function PengaturanPpdbPage() {
   };
 
   const handleSave = async () => {
+    if (!formData.ppdb_judul?.trim() || !formData.ppdb_tahun_ajaran || !formData.ppdb_deskripsi?.trim()) {
+      import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
+        toastValidation('Periksa Kembali', 'Judul PPDB, Tahun Ajaran, dan Deskripsi Singkat wajib diisi.');
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = new FormData();
@@ -167,11 +185,11 @@ export default function PengaturanPpdbPage() {
   const renderUmum = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div>
-        <label className="form-label">Judul PPDB</label>
-        <input name="ppdb_judul" value={formData.ppdb_judul} onChange={handleChange} className="form-control" />
+        <FormLabel required>Judul PPDB</FormLabel>
+        <input name="ppdb_judul" value={formData.ppdb_judul} onChange={handleChange} className="form-control" placeholder="Contoh: Penerimaan Peserta Didik Baru 2026/2027" />
       </div>
       <div>
-        <label className="form-label">Tahun Ajaran</label>
+        <FormLabel required>Tahun Ajaran</FormLabel>
         <CustomSelect
           value={formData.ppdb_tahun_ajaran}
           onChange={(val) => handleChange({ target: { name: 'ppdb_tahun_ajaran', value: val } })}
@@ -185,8 +203,8 @@ export default function PengaturanPpdbPage() {
         />
       </div>
       <div>
-        <label className="form-label">Deskripsi Singkat</label>
-        <textarea name="ppdb_deskripsi" value={formData.ppdb_deskripsi} onChange={handleChange} className="form-control" rows={4} />
+        <FormLabel required>Deskripsi Singkat</FormLabel>
+        <textarea name="ppdb_deskripsi" value={formData.ppdb_deskripsi} onChange={handleChange} className="form-control" rows={4} placeholder="Jelaskan secara singkat tentang PPDB tahun ini..." />
       </div>
       <div>
         <label className="form-label">Alamat Sekolah <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 'normal'}}>(Diatur dari Profil Sekolah)</span></label>
@@ -223,20 +241,20 @@ export default function PengaturanPpdbPage() {
             />
           </div>
           
-          {formData.ppdb_brosur && (
+          {(brosurPreviewUrl || formData.ppdb_brosur) && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: '220px' }}>
               <div style={{ width: '100%', maxWidth: '300px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--color-border)', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem' }}>
                 <img 
-                  src={resolveStorageUrl(formData.ppdb_brosur)} 
+                  src={brosurPreviewUrl || resolveStorageUrl(formData.ppdb_brosur)} 
                   alt="Preview Brosur" 
                   style={{ width: '100%', height: 'auto', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in' }}
-                  onClick={() => setPreviewImage(resolveStorageUrl(formData.ppdb_brosur))}
+                  onClick={() => setPreviewImage(brosurPreviewUrl || resolveStorageUrl(formData.ppdb_brosur))}
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
               </div>
               <button 
                 type="button"
-                onClick={() => setPreviewImage(resolveStorageUrl(formData.ppdb_brosur))}
+                onClick={() => setPreviewImage(brosurPreviewUrl || resolveStorageUrl(formData.ppdb_brosur))}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                   padding: '0.85rem 1.5rem', borderRadius: '12px', backgroundColor: '#f8fafc',
@@ -249,7 +267,7 @@ export default function PengaturanPpdbPage() {
                 <FileText size={18} /> Buka Gambar Penuh
               </button>
               <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-                * Brosur sudah diunggah sebelumnya
+                {brosurPreviewUrl ? '* Preview gambar yang akan diunggah' : '* Brosur sudah diunggah sebelumnya'}
               </span>
             </div>
           )}
@@ -370,9 +388,25 @@ export default function PengaturanPpdbPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {formData.ppdb_fasilitas.map((f, idx) => (
-            <div key={idx} style={{ display: 'flex', gap: '0.5rem' }}>
-              <input value={f.nama} onChange={e => handleObjectArrayChange('ppdb_fasilitas', idx, 'nama', e.target.value)} className="form-control" placeholder="Nama Fasilitas" />
-              <button type="button" onClick={() => handleRemoveArrayItem('ppdb_fasilitas', idx)} className="btn-outline" style={{ color: 'var(--color-danger)' }}><X size={16}/></button>
+            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', border: '1px solid var(--color-border)', padding: '0.75rem', borderRadius: '8px', background: '#f8fafc' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input value={f.nama} onChange={e => handleObjectArrayChange('ppdb_fasilitas', idx, 'nama', e.target.value)} className="form-control" placeholder="Nama Fasilitas" />
+                <button type="button" onClick={() => handleRemoveArrayItem('ppdb_fasilitas', idx)} className="btn-outline" style={{ color: 'var(--color-danger)', padding: '0.5rem' }}><X size={16}/></button>
+              </div>
+              <select value={f.ikon || 'building'} onChange={e => handleObjectArrayChange('ppdb_fasilitas', idx, 'ikon', e.target.value)} className="form-control" style={{ fontSize: '0.85rem' }}>
+                <option value="building">Bangunan / Ruang</option>
+                <option value="monitor">Komputer / Layar</option>
+                <option value="library">Perpustakaan</option>
+                <option value="book">Buku / Pelajaran</option>
+                <option value="church">Tempat Ibadah</option>
+                <option value="volleyball">Olahraga (Bola)</option>
+                <option value="dumbbell">Olahraga (Fisik)</option>
+                <option value="utensils">Kantin / Tata Boga</option>
+                <option value="users">Orang / Kelompok</option>
+                <option value="shield">Perisai / Beladiri</option>
+                <option value="heart">Hati / Peduli / Seni</option>
+                <option value="gift">Hadiah / Keistimewaan</option>
+              </select>
             </div>
           ))}
         </div>
@@ -386,9 +420,23 @@ export default function PengaturanPpdbPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {formData.ppdb_ekstrakurikuler.map((f, idx) => (
-            <div key={idx} style={{ display: 'flex', gap: '0.5rem' }}>
-              <input value={f.nama} onChange={e => handleObjectArrayChange('ppdb_ekstrakurikuler', idx, 'nama', e.target.value)} className="form-control" placeholder="Ekstrakurikuler" />
-              <button type="button" onClick={() => handleRemoveArrayItem('ppdb_ekstrakurikuler', idx)} className="btn-outline" style={{ color: 'var(--color-danger)' }}><X size={16}/></button>
+            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', border: '1px solid var(--color-border)', padding: '0.75rem', borderRadius: '8px', background: '#f8fafc' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input value={f.nama} onChange={e => handleObjectArrayChange('ppdb_ekstrakurikuler', idx, 'nama', e.target.value)} className="form-control" placeholder="Ekstrakurikuler" />
+                <button type="button" onClick={() => handleRemoveArrayItem('ppdb_ekstrakurikuler', idx)} className="btn-outline" style={{ color: 'var(--color-danger)', padding: '0.5rem' }}><X size={16}/></button>
+              </div>
+              <select value={f.ikon || 'users'} onChange={e => handleObjectArrayChange('ppdb_ekstrakurikuler', idx, 'ikon', e.target.value)} className="form-control" style={{ fontSize: '0.85rem' }}>
+                <option value="users">Orang / Kelompok</option>
+                <option value="shield">Perisai / Pramuka / Beladiri</option>
+                <option value="volleyball">Olahraga (Bola)</option>
+                <option value="dumbbell">Olahraga (Fisik)</option>
+                <option value="heart">Hati / Seni / Peduli</option>
+                <option value="book">Buku / Agama / Jurnalistik</option>
+                <option value="monitor">Komputer / Teknologi</option>
+                <option value="utensils">Tata Boga / Keterampilan</option>
+                <option value="building">Bangunan / Ruangan</option>
+                <option value="church">Tempat Ibadah</option>
+              </select>
             </div>
           ))}
         </div>
@@ -521,5 +569,13 @@ export default function PengaturanPpdbPage() {
         </div>
       )}
     </AdminPageShell>
+  );
+}
+
+function FormLabel({ children, required = false }) {
+  return (
+    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-dark)', marginBottom: '0.4rem' }}>
+      {children} {required && <span style={{ color: 'var(--color-danger)' }}>*</span>}
+    </label>
   );
 }

@@ -165,8 +165,16 @@ export default function InfoProfilPage({ readOnly = false }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!formData.nama_sekolah?.trim() || !formData.nama_kepsek?.trim()) {
-      toastValidation('Periksa Kembali', 'Nama sekolah dan nama kepala sekolah wajib diisi.');
+    if (
+      !formData.nama_sekolah?.trim() ||
+      !formData.nama_kepsek?.trim() ||
+      !(formData.tentang_kami?.trim() || formData.hero_subtitle?.trim()) ||
+      !formData.kata_sambutan?.trim() ||
+      !formData.alamat?.trim() ||
+      !formData.no_hp?.trim() ||
+      !formData.email?.trim()
+    ) {
+      toastValidation('Periksa Kembali', 'Semua kolom yang bertanda bintang merah wajib diisi.');
       return;
     }
 
@@ -225,30 +233,30 @@ export default function InfoProfilPage({ readOnly = false }) {
       ) : isEditing ? (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Edit Box 1: School Name & Description */}
-            <div className="form-panel flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start p-5 md:p-8">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flexShrink: 0 }}>
-                <div style={{ width: '220px', height: '220px', background: '#f8fafc', borderRadius: '16px', border: '2px dashed #cbd5e1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1', position: 'relative', overflow: 'hidden' }}>
+            <div className="form-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2rem', alignItems: 'flex-start' }}>
+              <div style={{ flex: '0 0 240px', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
+                <FormLabel>Foto Utama Sekolah</FormLabel>
+                <div style={{ width: '100%', height: '210px', background: '#f8fafc', borderRadius: '16px', border: '2px dashed #cbd5e1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1', position: 'relative', overflow: 'hidden', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
                   {schoolImageUrl ? (
                     <img src={schoolImageUrl} alt="Profil Sekolah" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <>
-                      <ImageIcon size={48} style={{ color: '#94a3b8', marginBottom: '0.5rem' }} />
-                      <p style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500 }}>Belum ada foto</p>
-                    </>
+                    <div style={{ textAlign: 'center', padding: '1rem' }}>
+                      <ImageIcon size={48} style={{ color: '#94a3b8', marginBottom: '0.5rem', margin: '0 auto' }} />
+                      <p style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500, margin: 0 }}>Belum ada foto</p>
+                    </div>
                   )}
-                  <div style={{ position: 'absolute', bottom: '1rem' }}>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '50px', background: '#fff', color: 'var(--color-primary-dark)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                      <Camera size={16} /> Ubah Foto
+                  <div style={{ position: 'absolute', bottom: '0.75rem', left: '50%', transform: 'translateX(-50%)', width: 'max-content' }}>
+                    <label style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '50px', background: '#fff', color: 'var(--color-primary-dark)', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', border: '1px solid var(--color-border)' }}>
+                      <Camera size={15} /> Ubah Foto
                       <input type="file" accept="image/*" onChange={handleSchoolPhotoChange} style={{ display: 'none' }} />
                     </label>
                   </div>
                 </div>
               </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingTop: '0.5rem' }}>
-                <div>
-                  <FormLabel required>Nama Sekolah</FormLabel>
+              <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <input name="nama_sekolah" value={formData.nama_sekolah || ''} onChange={handleChange} className="form-control" placeholder="Masukkan nama sekolah" required />
                 </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div>
                   <FormLabel required>Deskripsi Singkat / Tentang Kami</FormLabel>
                   <textarea 
@@ -257,6 +265,7 @@ export default function InfoProfilPage({ readOnly = false }) {
                     onChange={(event) => setFormData((prev) => ({ ...prev, tentang_kami: event.target.value, hero_subtitle: event.target.value.slice(0, 255) }))} 
                     className="form-control" 
                     rows={5} 
+                    style={{ flex: 1, resize: 'vertical' }}
                     placeholder="Masukkan deskripsi singkat tentang sekolah..." 
                     required 
                   />
@@ -268,40 +277,41 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Edit Box 2: Sambutan & Kepala Sekolah */}
-            <div className="form-panel grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 p-5 md:p-8">
-              <div>
+            <div className="form-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2rem' }}>
+              <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column' }}>
                 <FormLabel required>Kata Sambutan Kepala Sekolah</FormLabel>
                 <textarea 
                   name="kata_sambutan" 
                   value={formData.kata_sambutan || ''} 
                   onChange={handleChange} 
                   className="form-control" 
-                  rows={6} 
+                  rows={8} 
+                  style={{ flex: 1, resize: 'vertical' }}
                   placeholder="Tuliskan kata sambutan kepala sekolah..." 
                   required 
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ flex: '0 0 320px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <div>
                   <FormLabel required>Nama Kepala Sekolah</FormLabel>
                   <input name="nama_kepsek" value={formData.nama_kepsek || ''} onChange={handleChange} className="form-control" placeholder="Masukkan nama kepala sekolah beserta gelar" required />
                 </div>
                 <div>
                   <FormLabel>Foto Kepala Sekolah</FormLabel>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f1f5f9', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem', marginTop: '0.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '12px', background: '#fff', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {principalImageUrl ? (
                         <img src={principalImageUrl} alt="Kepala Sekolah" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <UserCircle2 size={32} color="#94a3b8" />
+                        <UserCircle2 size={36} color="#94a3b8" />
                       )}
                     </div>
-                    <div>
-                      <label className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginBottom: '0.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <label className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem 1rem', fontSize: '0.85rem', margin: 0, width: '100%' }}>
                         <Camera size={16} /> Upload Foto
                         <input type="file" accept="image/*" onChange={handlePrincipalPhotoChange} style={{ display: 'none' }} />
                       </label>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: 0 }}>Format: JPG/PNG. Maks 2MB</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.4 }}>Format: JPG/PNG.<br/>Maks 2MB</p>
                     </div>
                   </div>
                 </div>
@@ -309,15 +319,15 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Edit Box 3 & 4: Visi & Misi */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-panel p-5 md:p-8">
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+              <div className="form-panel" style={{ padding: '2rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Target size={18} /> Visi Sekolah
                 </h3>
                 <textarea name="visi" value={formData.visi || ''} onChange={handleChange} className="form-control" rows={6} placeholder="Tuliskan visi sekolah..." />
               </div>
-              <div className="form-panel p-5 md:p-8">
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div className="form-panel" style={{ padding: '2rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <BookOpen size={18} /> Misi Sekolah
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -337,11 +347,11 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Edit Box 5: Kontak */}
-            <div className="form-panel p-5 md:p-8">
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="form-panel" style={{ padding: '2rem' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <MapPin size={18} /> Informasi Kontak Sekolah
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
                 <div>
                   <FormLabel required>Alamat Lengkap</FormLabel>
                   <textarea name="alamat" value={formData.alamat || ''} onChange={handleChange} className="form-control" rows={3} placeholder="Masukkan alamat lengkap sekolah..." required />
@@ -358,11 +368,11 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Edit Box 6: Social Media */}
-            <div className="form-panel p-5 md:p-8">
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="form-panel" style={{ padding: '2rem' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Share2 size={18} /> Media Sosial
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
                 <div>
                   <FormLabel>Instagram</FormLabel>
                   <input name="instagram" value={formData.instagram || ''} onChange={handleChange} className="form-control" placeholder="https://instagram.com/..." />
@@ -378,7 +388,7 @@ export default function InfoProfilPage({ readOnly = false }) {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
               <button type="button" onClick={handleCancelEdit} className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 2rem' }}>
                 <X size={18} /> Batal
               </button>
@@ -390,8 +400,8 @@ export default function InfoProfilPage({ readOnly = false }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Box 1: School Name & Description */}
-            <div className="form-panel flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start p-5 md:p-8 text-center md:text-left">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flexShrink: 0 }}>
+            <div className="form-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2rem', alignItems: 'flex-start' }}>
+              <div style={{ flex: '0 0 220px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ width: '220px', height: '220px', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1', position: 'relative', overflow: 'hidden', border: '1px solid #f1f5f9', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
                   {schoolImageUrl ? (
                     <img src={schoolImageUrl} alt="Profil Sekolah" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -408,7 +418,7 @@ export default function InfoProfilPage({ readOnly = false }) {
                   </button>
                 )}
               </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2rem', paddingTop: '0.5rem' }}>
+              <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingTop: '0.5rem' }}>
                 <div>
                   <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>Nama Sekolah</h3>
                   <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-dark)', margin: 0, letterSpacing: '-0.02em' }}>{formData.nama_sekolah || 'Belum Diatur'}</p>
@@ -421,7 +431,7 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Box 2: Sambutan & Kepala Sekolah */}
-            <div className="form-panel grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 p-5 md:p-8">
+            <div className="form-panel" style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
               <div>
                 <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>Kata Sambutan Kepala Sekolah</h3>
                 <p style={{ fontSize: '1.05rem', color: '#334155', lineHeight: 1.8, whiteSpace: 'pre-line', fontStyle: 'italic', margin: 0 }}>
@@ -431,11 +441,11 @@ export default function InfoProfilPage({ readOnly = false }) {
               <div>
                 <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>Kepala Sekolah</h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#f1f5f9', border: '2px solid #fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#f1f5f9', border: '2px solid #fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {principalImageUrl ? (
                       <img src={principalImageUrl} alt="Kepala Sekolah" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                      <UserCircle2 size={32} color="#94a3b8" />
+                      <UserCircle2 size={36} color="#94a3b8" />
                     )}
                   </div>
                   <div>
@@ -447,12 +457,12 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Box 3 & 4: Visi & Misi */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-panel p-5 md:p-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+              <div className="form-panel" style={{ padding: '2rem' }}>
                 <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>Visi Sekolah</h3>
                 <p style={{ fontSize: '1.05rem', color: '#334155', lineHeight: 1.8, whiteSpace: 'pre-line', margin: 0 }}>{formData.visi || 'Belum ada visi.'}</p>
               </div>
-              <div className="form-panel p-5 md:p-8">
+              <div className="form-panel" style={{ padding: '2rem' }}>
                 <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>Misi Sekolah</h3>
                 {misiList.length > 0 ? (
                   <ul style={{ paddingLeft: '1.2rem', margin: 0, color: '#334155', fontSize: '1.05rem', lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -467,9 +477,9 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Box 5: Kontak */}
-            <div className="form-panel p-5 md:p-8">
+            <div className="form-panel" style={{ padding: '2rem' }}>
               <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Informasi Kontak Sekolah</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
                   <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <MapPin size={20} />
@@ -501,38 +511,36 @@ export default function InfoProfilPage({ readOnly = false }) {
             </div>
 
             {/* Box 6: Social Media */}
-            <div className="form-panel p-5 md:p-8">
+            <div className="form-panel" style={{ padding: '2rem' }}>
               <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Media Sosial</h3>
-              <div className="flex flex-col md:flex-row gap-6 md:gap-12">
-                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
-                  <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Share2 size={20} />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Share2 size={20} />
+                </div>
+                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Instagram</h4>
+                    {formData.instagram ? (
+                      <a href={formData.instagram} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none', wordBreak: 'break-all' }}>{formData.instagram}</a>
+                    ) : (
+                      <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
+                    )}
                   </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Instagram</h4>
-                      {formData.instagram ? (
-                        <a href={formData.instagram} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none' }}>{formData.instagram}</a>
-                      ) : (
-                        <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
-                      )}
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Facebook</h4>
-                      {formData.facebook ? (
-                        <a href={formData.facebook} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none' }}>{formData.facebook}</a>
-                      ) : (
-                        <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
-                      )}
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>YouTube</h4>
-                      {formData.youtube ? (
-                        <a href={formData.youtube} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none' }}>{formData.youtube}</a>
-                      ) : (
-                        <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
-                      )}
-                    </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Facebook</h4>
+                    {formData.facebook ? (
+                      <a href={formData.facebook} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none', wordBreak: 'break-all' }}>{formData.facebook}</a>
+                    ) : (
+                      <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
+                    )}
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>YouTube</h4>
+                    {formData.youtube ? (
+                      <a href={formData.youtube} target="_blank" rel="noreferrer" style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-primary)', textDecoration: 'none', wordBreak: 'break-all' }}>{formData.youtube}</a>
+                    ) : (
+                      <p style={{ fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-dark)', margin: 0 }}>Belum diatur</p>
+                    )}
                   </div>
                 </div>
               </div>

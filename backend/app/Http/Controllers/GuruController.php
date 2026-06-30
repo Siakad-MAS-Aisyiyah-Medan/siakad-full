@@ -234,8 +234,13 @@ class GuruController extends Controller
 
             $this->assertCanDeleteGuru($id);
 
-            $this->auditAdmin('guru.delete', $user, ['username' => $user->username]);
-            $user->delete();
+            // Menonaktifkan akun user
+            $user->update(['status_aktif' => false]);
+            
+            // Menonaktifkan profil guru
+            Guru::where('id_user', $id)->update(['status' => 'nonaktif']);
+
+            $this->auditAdmin('guru.deactivate', $user, ['username' => $user->username]);
         });
     }
 
@@ -243,25 +248,25 @@ class GuruController extends Controller
     {
         if (Kelas::where('id_wali_kelas', $userId)->exists()) {
             throw new InvalidArgumentException(
-                'Guru tidak dapat dihapus karena masih menjadi wali kelas. Ubah wali kelas terlebih dahulu.'
+                'Guru tidak dapat dinonaktifkan karena masih menjadi wali kelas. Ubah wali kelas terlebih dahulu.'
             );
         }
 
         if (Mapel::where('id_guru', $userId)->exists()) {
             throw new InvalidArgumentException(
-                'Guru tidak dapat dihapus karena masih menjadi pengampu mata pelajaran.'
+                'Guru tidak dapat dinonaktifkan karena masih menjadi pengampu mata pelajaran.'
             );
         }
 
         if (JadwalPelajaran::where('id_guru', $userId)->exists()) {
             throw new InvalidArgumentException(
-                'Guru tidak dapat dihapus karena masih memiliki jadwal mengajar.'
+                'Guru tidak dapat dinonaktifkan karena masih memiliki jadwal mengajar.'
             );
         }
 
         if (Ekskul::where('id_pembina', $userId)->exists()) {
             throw new InvalidArgumentException(
-                'Guru tidak dapat dihapus karena masih menjadi pembina ekstrakurikuler.'
+                'Guru tidak dapat dinonaktifkan karena masih menjadi pembina ekstrakurikuler.'
             );
         }
     }

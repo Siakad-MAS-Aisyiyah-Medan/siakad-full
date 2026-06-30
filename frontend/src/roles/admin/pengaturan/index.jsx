@@ -105,6 +105,12 @@ export default function PengaturanSistemPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!form.name?.trim() || !form.email?.trim()) {
+      import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
+        toastValidation('Periksa Kembali', 'Nama Lengkap dan Alamat Email wajib diisi.');
+      });
+      return;
+    }
     if (form.new_password && form.new_password !== form.new_password_confirmation) {
       toastError('Gagal', 'Konfirmasi password tidak cocok.');
       return;

@@ -409,7 +409,7 @@
   background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Dashboard Layout */
@@ -1478,7 +1478,7 @@
   background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .custom-form {

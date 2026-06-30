@@ -89,11 +89,26 @@ export function useKelas() {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const submitForm = async (e) => {
     e.preventDefault();
+
+    if (
+      !formData.nama_kelas?.trim() ||
+      !formData.tahun_ajaran?.trim() ||
+      !formData.tingkat?.trim() ||
+      !formData.jurusan?.trim() ||
+      !formData.status?.trim()
+    ) {
+      import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
+        toastValidation('Periksa Kembali', 'Semua kolom yang bertanda bintang merah wajib diisi.');
+      });
+      return;
+    }
+
     setLoading(true);
     const payload = {
       nama_kelas: formData.nama_kelas,

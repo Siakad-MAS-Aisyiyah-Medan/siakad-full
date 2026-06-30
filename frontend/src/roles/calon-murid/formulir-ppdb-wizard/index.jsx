@@ -212,7 +212,7 @@ export default function FormulirPpdbWizard() {
               <AutoSaveHint status={w.autoSaveStatus || 'idle'} />
               <span className="wizard-meta-pill">
                 TP {w.forms.meta?.tahun || '2026/2027'}
-                {w.forms.meta?.nomor ? ` ┬╖ #${w.forms.meta.nomor}` : ''}
+                {w.forms.meta?.nomor ? ` • #${w.forms.meta.nomor}` : ''}
               </span>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function FormulirPpdbWizard() {
           {w.isLocked && (
             <div className="wizard-locked-banner">
               <AlertCircle size={16} className="shrink-0" />
-              <span>Formulir terkunci ΓÇö pendaftaran sudah diajukan dan menunggu verifikasi admin.</span>
+              <span>Formulir terkunci - pendaftaran sudah diajukan dan menunggu verifikasi admin.</span>
             </div>
           )}
 
@@ -241,9 +241,9 @@ export default function FormulirPpdbWizard() {
               onSaveDraft={stepKey === 'review' ? undefined : w.saveDraft}
               draftLoading={w.saving}
               onPrimary={stepKey === 'review' ? w.submit : w.saveAndNext}
-              primaryLabel={stepKey === 'review' ? 'Submit Pendaftaran' : 'Simpan & Lanjut'}
+              primaryLabel={stepKey === 'review' ? 'Lanjut Unggah Berkas' : 'Simpan & Lanjut'}
               primaryLoading={w.saving}
-              primaryLoadingLabel={stepKey === 'review' ? 'Mengirim...' : 'Menyimpan...'}
+              primaryLoadingLabel={stepKey === 'review' ? 'Mengalihkan...' : 'Menyimpan...'}
               disabled={disabled}
               isReview={stepKey === 'review'}
               showSaveDraft={stepKey !== 'review'}

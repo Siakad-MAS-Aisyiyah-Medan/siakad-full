@@ -1,5 +1,5 @@
 import { PPDB_DEFAULTS } from '../data/ppdbDefaults';
-import { resolveIcon } from './iconMap';
+import { resolveIcon, guessIconKey } from './iconMap';
 import { resolveStorageUrl } from '@/shared/services/apiHelpers';
 import { apiConfig } from '@/config/api.config';
 
@@ -58,11 +58,17 @@ function mapNamedIcons(apiList, defaults) {
 
   return source.map((item, i) => {
     if (typeof item === 'string') {
-      return { name: item, icon: defaults[i]?.icon ?? resolveIcon() };
+      const guessed = guessIconKey(item);
+      return { name: item, icon: defaults[i]?.icon ?? resolveIcon(guessed) };
     }
+    const name = pickString(item.nama, item.name, defaults[i]?.name);
+    const guessed = guessIconKey(name);
+    // Prefer guessed icon based on name, otherwise fallback to item.ikon or defaults
+    const iconKey = guessed || item.ikon || item.icon;
+    
     return {
-      name: pickString(item.nama, item.name, defaults[i]?.name),
-      icon: resolveIcon(item.ikon ?? item.icon, defaults[i]?.icon),
+      name,
+      icon: resolveIcon(iconKey, defaults[i]?.icon),
     };
   }).filter((x) => x.name);
 }

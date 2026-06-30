@@ -7,6 +7,7 @@ import RegistrationWaveSection from './components/RegistrationWaveSection';
 import PromoSection from './components/PromoSection';
 import RequirementSection from './components/RequirementSection';
 import FacilitySection from './components/FacilitySection';
+import ExtracurricularSection from './components/ExtracurricularSection';
 import RegistrationFlowSection from './components/RegistrationFlowSection';
 import ContactSection from './components/ContactSection';
 import PpdbCTASection from './components/PpdbCTASection';
@@ -28,6 +29,7 @@ function PpdbLandingContent() {
         <PromoSection />
         <RequirementSection />
         <FacilitySection />
+        <ExtracurricularSection />
         <RegistrationFlowSection />
         <ContactSection />
         <PpdbCTASection />

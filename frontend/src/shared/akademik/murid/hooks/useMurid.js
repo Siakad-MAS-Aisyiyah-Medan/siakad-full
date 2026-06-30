@@ -198,6 +198,24 @@ export function useMurid() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+
+    if (
+      !formData.nama_siswa?.trim() ||
+      !formData.nisn?.trim() ||
+      !formData.jenis_kelamin ||
+      !formData.tempat_lahir?.trim() ||
+      !formData.tanggal_lahir ||
+      !formData.alamat?.trim() ||
+      !formData.no_hp?.trim() ||
+      !formData.tahun_masuk ||
+      formData.status_aktif === undefined
+    ) {
+      import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
+        toastValidation('Periksa Kembali', 'Semua kolom yang bertanda bintang merah wajib diisi.');
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       if (view === 'add') {

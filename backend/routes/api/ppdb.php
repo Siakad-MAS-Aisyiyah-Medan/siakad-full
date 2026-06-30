@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/ppdb/info', [PendaftaranController::class, 'publicInfo']);
+Route::get('/ppdb/brosur/download', [PendaftaranController::class, 'downloadBrosur']);
 
 Route::middleware([
     'auth:sanctum',

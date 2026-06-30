@@ -99,9 +99,9 @@
 
 .sp-status-info dl div { 
   display: grid; 
-  grid-template-columns: 200px 20px 1fr; 
-  align-items: center;
-  font-size: 1.05rem;
+  grid-template-columns: minmax(130px, auto) 16px 1fr; 
+  align-items: start;
+  font-size: 0.95rem;
 }
 
 .sp-status-info dl div::after { 
@@ -126,8 +126,8 @@
 
 .sp-progress-grid { 
   display: grid; 
-  grid-template-columns: repeat(2, 1fr); 
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+  gap: 1.25rem;
 }
 
 .sp-progress-item { 
@@ -163,7 +163,7 @@
 }
 
 .sp-progress-label strong { 
-  font-size: 1.05rem; 
+  font-size: 0.95rem; 
   color: #1e293b;
   flex: 1;
 }

@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class PendaftaranController extends Controller
@@ -609,6 +610,23 @@ class PendaftaranController extends Controller
         return ApiResponse::success($this->getPublicInfo(), 'Informasi PPDB');
     }
 
+    public function downloadBrosur()
+    {
+        $path = $this->resolveBrosurStoragePath();
+        if (!$path) {
+            return response()->json(['message' => 'Brosur not found'], 404);
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $downloadName = 'brosur-ppdb-mas-aisyiyah-medan' . ($extension ? '.' . $extension : '');
+        $mimeType = Storage::disk('public')->mimeType($path) ?: 'application/octet-stream';
+
+        return Storage::disk('public')->download($path, $downloadName, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
+        ]);
+    }
+
     // --- Inlined from PendaftaranService ---
 
     private function saveDraftForUser(User $user, array $data, Request $request): Pendaftaran
@@ -791,9 +809,40 @@ class PendaftaranController extends Controller
                 ],
             ]),
             'alamat' => $profil?->alamat ?: 'Jl. Demak No. 3, Medan',
-            'brosur' => SystemSetting::getValue('ppdb_brosur'),
+            'brosur' => $this->resolveBrosurPublicUrl(),
             'diperbarui_pada' => now()->toIso8601String(),
         ];
+    }
+
+    private function resolveBrosurStoragePath(): ?string
+    {
+        $brosurUrl = SystemSetting::getValue('ppdb_brosur');
+
+        if ($brosurUrl) {
+            $path = parse_url($brosurUrl, PHP_URL_PATH) ?: '';
+            $path = preg_replace('/^\/storage\//', '', $path);
+
+            if ($path && Storage::disk('public')->exists($path)) {
+                return $path;
+            }
+        }
+
+        $files = Storage::disk('public')->files('ppdb/brosur');
+        if (empty($files)) {
+            return null;
+        }
+
+        usort($files, function ($a, $b) {
+            return Storage::disk('public')->lastModified($b) <=> Storage::disk('public')->lastModified($a);
+        });
+
+        return $files[0] ?? null;
+    }
+
+    private function resolveBrosurPublicUrl(): ?string
+    {
+        $path = $this->resolveBrosurStoragePath();
+        return $path ? Storage::disk('public')->url($path) : null;
     }
 
     /**

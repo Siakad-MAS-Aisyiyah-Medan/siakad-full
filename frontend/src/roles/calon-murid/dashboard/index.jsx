@@ -1,12 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ClipboardList, CircleAlert, ListChecks, Phone, MapPin, ChevronRight } from 'lucide-react';
+import { CalendarDays, ClipboardList, ListChecks, Phone, MapPin, ChevronRight, Check, Clock3, Info, Loader2, TriangleAlert, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CalonMuridLayout from '@/shared/ppdb/layouts/CalonMuridLayout';
-import { fetchMyRegistration, fetchPpdbInfo } from '@/shared/services/ppdb.service';
+import { fetchMyRegistration, fetchPpdbInfo, fetchPpdbStatus } from '@/shared/services/ppdb.service';
 import { startOrResumePpdb } from '@/shared/ppdb/utils/startOrResumePpdb';
+import { downloadBrosurPpdb } from '@/shared/ppdb/utils/downloadBrosur';
 import { toastValidation } from '@/shared/hooks/useConfirm';
-import { resolveStorageUrl } from '@/shared/services/apiHelpers';
-import apiClient from '@/shared/services/apiClient';
+import { normalizePpdbStatus } from '@/shared/ppdb/utils/dashboardState';
+import '../status/status-pendaftaran.css';
+
+const STATUS_COPY = {
+  none: ['Belum Mendaftar', 'Silakan lengkapi formulir dan berkas pendaftaran Anda.'],
+  draft: ['Belum Dikirim', 'Lengkapi formulir dan berkas, lalu kirim pendaftaran Anda.'],
+  revision: ['Perlu Perbaikan', 'Periksa catatan sekolah dan perbaiki data pendaftaran Anda.'],
+  submitted: ['Menunggu Verifikasi', 'Pendaftaran Anda sedang dalam proses verifikasi oleh pihak sekolah.'],
+  verified: ['Sudah Diverifikasi', 'Data Anda telah diverifikasi dan sedang menunggu keputusan sekolah.'],
+  accepted: ['Pendaftaran Diterima', 'Selamat, pendaftaran Anda telah diterima oleh pihak sekolah.'],
+  rejected: ['Pendaftaran Ditolak', 'Pendaftaran belum dapat diterima. Silakan lihat keterangan dari sekolah.'],
+};
 
 function formatDateLabel(value) {
   if (!value) return '-';
@@ -25,6 +36,7 @@ function Section({ icon, title, children, delay = 0 }) {
         paddingBottom: '1.5rem',
         animationDelay: `${delay}s`,
         opacity: 0,
+        margin: 0,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
@@ -45,20 +57,40 @@ function Section({ icon, title, children, delay = 0 }) {
   );
 }
 
+function Progress({ label, percent }) {
+  return (
+    <div className="sp-progress-item">
+      <div className="sp-progress-label">
+        <span className={percent === 100 ? 'is-complete' : ''}>
+          {percent === 100 ? <Check size={18} strokeWidth={2.5} /> : null}
+        </span>
+        <strong>{label}</strong>
+        <b>{percent}%</b>
+      </div>
+      <div className="sp-progress-track">
+        <i style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardCalonMurid() {
   const navigate = useNavigate();
   const [registration, setRegistration] = useState(null);
   const [ppdbInfo, setPpdbInfo] = useState(null);
+  const [ppdbStatusData, setPpdbStatusData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetchMyRegistration().catch(() => ({ has_registration: false, pendaftaran: null })),
       fetchPpdbInfo().catch(() => null),
+      fetchPpdbStatus().catch(() => null),
     ])
-      .then(([regData, info]) => {
+      .then(([regData, info, statusData]) => {
         setRegistration(regData);
         setPpdbInfo(info);
+        setPpdbStatusData(statusData);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -79,14 +111,41 @@ export default function DashboardCalonMurid() {
     navigate(result.path);
   };
 
+  const statusEnum = normalizePpdbStatus(ppdbStatusData ? { ppdb_status: ppdbStatusData.status } : null);
+  const [statusTitle, statusDescription] = STATUS_COPY[statusEnum] || STATUS_COPY.none;
+  const StatusIcon = statusEnum === 'accepted' || statusEnum === 'verified' ? Check : statusEnum === 'rejected' ? XCircle : statusEnum === 'revision' ? TriangleAlert : Clock3;
+
+  if (loading) {
+    return (
+      <CalonMuridLayout title="Dashboard" subtitle="Portal pendaftaran murid baru">
+        <div className="flex flex-col items-center justify-center p-12 text-slate-400">
+          <Loader2 size={40} className="animate-spin mb-4" />
+          <p>Memuat informasi...</p>
+        </div>
+      </CalonMuridLayout>
+    );
+  }
+
   return (
     <CalonMuridLayout>
       <div className="mx-auto flex max-w-[1120px] flex-col gap-5 px-1 py-2">
-        <div className="animate-fade-in">
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#064e3b', letterSpacing: '-0.02em' }}>Dashboard</h1>
-          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.25rem' }}>Portal pendaftaran murid baru</p>
+
+
+        {/* STATUS PENDAFTARAN */}
+        <div className={`sp-status-page sp-status-page--${statusEnum} animate-fade-in-up`} style={{ animationDelay: '0.05s', padding: 0 }}>
+          <section className="sp-status-hero" style={{ marginBottom: '1.25rem' }}>
+            <p>Status Pendaftaran Anda</p>
+            <div className="sp-status-hero__title">
+              <StatusIcon size={64} strokeWidth={1.8} />
+              <h2>{statusTitle}</h2>
+            </div>
+            <span>{statusDescription}</span>
+          </section>
+
+
         </div>
 
+        {/* INFORMASI LAINNYA */}
         <div
           className="animate-fade-in-up"
           style={{
@@ -156,34 +215,30 @@ export default function DashboardCalonMurid() {
           {/* Action buttons */}
           <div style={{ marginTop: '1.25rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '0.85rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
             {ppdbInfo?.brosur && (
-              <a
-                href={resolveStorageUrl(ppdbInfo.brosur, apiClient.defaults)}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  try {
+                    await downloadBrosurPpdb();
+                  } catch (error) {
+                    console.error('Download error:', error);
+                    alert('Gagal mengunduh brosur. Silakan coba lagi nanti.');
+                  }
+                }}
                 style={{
                   borderRadius: '14px', border: '1.5px solid #e2e8f0', padding: '0.75rem 1.5rem',
-                  fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', background: '#f8fafc',
+                  fontSize: '0.875rem', fontWeight: 600, color: '#475569', background: '#ffffff',
                   cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '0.5rem',
                   textDecoration: 'none'
                 }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#a7f3d0'; e.currentTarget.style.background = '#ecfdf5'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#ffffff'; }}
               >
                 <ClipboardList style={{ width: '16px', height: '16px', color: '#0ea5e9' }} />
                 Unduh Brosur
-              </a>
+              </button>
             )}
-            <button
-              type="button"
-              onClick={() => navigate('/calon-murid/status')}
-              style={{
-                borderRadius: '14px', border: '1.5px solid #e2e8f0', padding: '0.75rem 1.5rem',
-                fontSize: '0.875rem', fontWeight: 600, color: '#475569', background: '#ffffff',
-                cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '0.5rem',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#a7f3d0'; e.currentTarget.style.background = '#ecfdf5'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#ffffff'; }}
-            >
-              Lihat Status Pendaftaran
-            </button>
             <button
               type="button"
               onClick={handleQuickStart}
@@ -202,8 +257,6 @@ export default function DashboardCalonMurid() {
             </button>
           </div>
         </div>
-
-        {loading && <p style={{ padding: '0.5rem', fontSize: '0.9rem', color: '#94a3b8' }}>Memuat informasi pendaftaran...</p>}
       </div>
     </CalonMuridLayout>
   );

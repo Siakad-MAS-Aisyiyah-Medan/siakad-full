@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CheckCircle2, FileSpreadsheet, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, FileSpreadsheet, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import MainLayout from '@/shared/layouts/MainLayout';
 import apiClient from '@/shared/services/apiClient';
@@ -15,13 +15,13 @@ import { buildDefaultNilaiContexts } from '../guruTeachingUtils';
 const STORAGE_KEY_PREFIX = 'guru_nilai_contexts_v3_';
 const SEMESTER_OPTIONS = ['Ganjil', 'Genap'];
 
-function getStorageKey(user) {
-  return `${STORAGE_KEY_PREFIX}${user?.id_user || 'default'}`;
+function getStorageKey(userId) {
+  return `${STORAGE_KEY_PREFIX}${userId || 'default'}`;
 }
 
-function readStoredContexts(user) {
+function readStoredContexts(userId) {
   try {
-    const raw = localStorage.getItem(getStorageKey(user));
+    const raw = localStorage.getItem(getStorageKey(userId));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -37,8 +37,8 @@ function readStoredContexts(user) {
   }
 }
 
-function persistContexts(user, rows) {
-  localStorage.setItem(getStorageKey(user), JSON.stringify(rows));
+function persistContexts(userId, rows) {
+  localStorage.setItem(getStorageKey(userId), JSON.stringify(rows));
 }
 
 function buildContextId(meta) {
@@ -170,6 +170,12 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
                   Memuat daftar murid...
                 </td>
               </tr>
+            ) : siswaRows.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                  Tidak ada murid di kelas ini. Pastikan admin telah menambahkan murid ke kelas ini.
+                </td>
+              </tr>
             ) : (
               siswaRows.map((row, index) => (
                 <tr key={row.id_user_siswa}>
@@ -208,10 +214,35 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
   );
 }
 
+function InlineListActions({ onAdd }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        gap: '0.75rem',
+        flexWrap: 'wrap',
+      }}
+    >
+      <button
+        type="button"
+        onClick={onAdd}
+        className="btn-primary"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}
+      >
+        <Plus size={18} />
+        Tambah Daftar Nilai
+      </button>
+    </div>
+  );
+}
+
 export default function GuruNilaiPage() {
-  const user = getStoredUser();
-  const profile = getStoredProfile();
+  const user = useMemo(() => getStoredUser(), []);
+  const profile = useMemo(() => getStoredProfile(), []);
   const name = getDisplayName(profile, user?.role, user?.username);
+  const userId = user?.id_user || 'default';
 
   const [view, setView] = useState('list');
   const [jadwalList, setJadwalList] = useState([]);
@@ -242,14 +273,14 @@ export default function GuruNilaiPage() {
 
         const jadwalRows = Array.isArray(jadwalResponse?.data?.data) ? jadwalResponse.data.data : [];
         const defaultContexts = buildDefaultNilaiContexts(jadwalRows);
-        const storedContexts = readStoredContexts(user);
+        const storedContexts = readStoredContexts(userId);
         const mergedContexts = storedContexts.length > 0 ? storedContexts : defaultContexts;
 
         if (active) {
           setJadwalList(jadwalRows);
           setTahunAjaranList(tahunAjaranResponse || []);
           setContexts(mergedContexts);
-          persistContexts(user, mergedContexts);
+          persistContexts(userId, mergedContexts);
         }
       } catch (error) {
         console.error('Gagal memuat data nilai guru', error);
@@ -269,7 +300,7 @@ export default function GuruNilaiPage() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [userId]);
 
   const kelasOptions = useMemo(() => {
     const map = new Map();
@@ -383,7 +414,7 @@ export default function GuruNilaiPage() {
       : [...contexts.filter((item) => item.id !== nextContext.id), nextContext];
 
     setContexts(nextRows);
-    persistContexts(user, nextRows);
+    persistContexts(userId, nextRows);
     setView('list');
     toastSuccess('Berhasil', form.id ? 'Daftar nilai berhasil diperbarui.' : 'Daftar nilai berhasil ditambahkan.');
   };
@@ -395,7 +426,7 @@ export default function GuruNilaiPage() {
 
     const nextRows = contexts.filter((item) => item.id !== row.id);
     setContexts(nextRows);
-    persistContexts(user, nextRows);
+    persistContexts(userId, nextRows);
     toastSuccess('Berhasil', 'Daftar nilai berhasil dihapus dari daftar kerja.');
   };
 
@@ -471,7 +502,7 @@ export default function GuruNilaiPage() {
         item.id === activeContext.id ? { ...item, completed: true } : item
       );
       setContexts(nextRows);
-      persistContexts(user, nextRows);
+      persistContexts(userId, nextRows);
       toastSuccess('Berhasil', 'Nilai murid berhasil disimpan.');
       setView('list');
       setActiveContext(null);
@@ -494,6 +525,8 @@ export default function GuruNilaiPage() {
                 Tambah Daftar Nilai
               </button>
             </PageHeader>
+
+            <InlineListActions onAdd={openCreate} />
 
             <div className="table-container">
               <table className="data-table">
@@ -557,7 +590,18 @@ export default function GuruNilaiPage() {
                   ) : (
                     <tr>
                       <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
-                        Belum ada daftar nilai. Tambahkan daftar nilai terlebih dahulu.
+                        <div style={{ display: 'grid', justifyItems: 'center', gap: '1rem' }}>
+                          <span>Belum ada daftar nilai. Tambahkan daftar nilai terlebih dahulu.</span>
+                          <button
+                            type="button"
+                            onClick={openCreate}
+                            className="btn-primary"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}
+                          >
+                            <Plus size={18} />
+                            Tambah Daftar Nilai
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )}

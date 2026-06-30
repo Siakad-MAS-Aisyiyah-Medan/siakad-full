@@ -5,7 +5,7 @@ import {
   updatePengumuman,
   deletePengumuman,
 } from '../services/pengumuman.service';
-import { confirmAction, toastSuccess, toastError } from '@/shared/hooks/useConfirm';
+import { confirmAction, toastSuccess, toastError, toastValidation } from '@/shared/hooks/useConfirm';
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -108,6 +108,14 @@ export function usePengumuman() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+    
+    // Validasi Quill Editor (cek apakah kosong atau hanya berisi tag HTML kosong)
+    const isiText = formData.isi?.replace(/<[^>]*>?/gm, '')?.trim();
+    if (!formData.judul?.trim() || !isiText) {
+      toastValidation('Periksa Kembali', 'Judul dan isi pengumuman wajib diisi.');
+      return;
+    }
+
     setLoading(true);
     try {
       if (view === 'add') {

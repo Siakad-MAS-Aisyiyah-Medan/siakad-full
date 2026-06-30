@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
 import DaftarSekarangButton from '@/shared/ppdb/components/DaftarSekarangButton';
 import { usePpdbContent } from '../context/PpdbContentContext';
+import { downloadBrosurPpdb } from '@/shared/ppdb/utils/downloadBrosur';
 
 export default function HeroPPDBSection() {
   const { content, loading } = usePpdbContent();
@@ -20,17 +19,22 @@ export default function HeroPPDBSection() {
           <p className="pp-hero__subtitle">{description}</p>
           <div className="pp-hero__actions">
             <DaftarSekarangButton className="pp-btn pp-btn--primary pp-btn--lg" />
-            {content.brosur && (
-              <a
-                href={content.brosur}
-                target="_blank"
-                rel="noreferrer"
-                className="pp-btn pp-btn--outline pp-btn--lg"
-                style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-              >
-                Unduh Brosur
-              </a>
-            )}
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.preventDefault();
+                try {
+                  await downloadBrosurPpdb();
+                } catch (error) {
+                  console.error('Download error:', error);
+                  alert('Gagal mengunduh brosur. Silakan coba lagi nanti.');
+                }
+              }}
+              className="pp-btn pp-btn--outline pp-btn--lg"
+              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'transparent' }}
+            >
+              Unduh Brosur
+            </button>
           </div>
         </div>
 

@@ -98,6 +98,21 @@ export function useGuru() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+
+    if (
+      !formData.nama_guru?.trim() ||
+      !formData.nip_nuptk?.trim() ||
+      !formData.jenis_kelamin ||
+      !formData.no_hp?.trim() ||
+      !formData.alamat?.trim() ||
+      !formData.status
+    ) {
+      import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
+        toastValidation('Periksa Kembali', 'Semua kolom yang bertanda bintang merah wajib diisi.');
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       if (view === 'add') {
@@ -144,18 +159,18 @@ export function useGuru() {
 
   const removeGuru = async (id_user) => {
     const ok = await confirmAction({
-      title: 'Hapus Data Guru?',
-      text: 'Tenaga pendidik beserta akun loginnya akan dihapus permanen!',
-      confirmText: 'Ya, Hapus!',
+      title: 'Nonaktifkan Guru?',
+      text: 'Akun login guru akan dinonaktifkan. Data guru tetap ada dalam riwayat.',
+      confirmText: 'Ya, Nonaktifkan!',
       confirmColor: '#ef4444',
     });
     if (!ok) return;
     try {
       await deleteGuru(id_user);
-      toastSuccess('Terhapus!', 'Data berhasil dihapus');
+      toastSuccess('Berhasil!', 'Status guru menjadi nonaktif');
       loadGuru();
     } catch {
-      toastError('Gagal', 'Gagal menghapus data guru.');
+      toastError('Gagal', 'Gagal menonaktifkan guru.');
     }
   };
 

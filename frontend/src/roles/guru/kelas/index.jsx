@@ -12,8 +12,8 @@ import PageHeader from '@/shared/components/PageHeader';
 import { dedupeKelasDiajar, normalizeText } from '../guruTeachingUtils';
 
 export default function GuruKelasPage() {
-  const user = getStoredUser();
-  const profile = getStoredProfile();
+  const user = useMemo(() => getStoredUser(), []);
+  const profile = useMemo(() => getStoredProfile(), []);
   const name = getDisplayName(profile, user?.role, user?.username);
   const navigate = useNavigate();
 

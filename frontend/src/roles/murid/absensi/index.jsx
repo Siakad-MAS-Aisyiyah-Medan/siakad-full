@@ -67,7 +67,7 @@ export default function SiswaAbsensiPage() {
                   <tr key={row.id_absensi}>
                     <td>{row.tanggal}</td>
                     <td>
-                      {(row.jam_mulai || '').slice(0, 5)} – {(row.jam_selesai || '').slice(0, 5)}
+                      Jam ke {row.jam_mulai ? parseInt(row.jam_mulai.split(':')[0], 10) : '-'} - {row.jam_selesai ? parseInt(row.jam_selesai.split(':')[0], 10) : '-'}
                     </td>
                     <td>{row.mapel?.nama_mapel || '-'}</td>
                     <td>

@@ -14,7 +14,6 @@ import {
   saveStepKeteranganPribadi,
   saveStepOrangTuaWali,
   saveStepPendidikanAsal,
-  submitPendaftaran,
 } from '@/shared/services/ppdb.service';
 import { startOrResumePpdb } from '../utils/startOrResumePpdb';
 import {
@@ -348,33 +347,18 @@ export function usePpdbWizard() {
 
     const confirm = await Swal.fire({
       icon: 'question',
-      title: 'Ajukan Pendaftaran?',
-      text: 'Setelah submit, formulir tidak dapat diubah hingga admin meminta revisi.',
+      title: 'Simpan Formulir & Lanjut?',
+      text: 'Anda akan dialihkan ke halaman pengumpulan berkas.',
       showCancelButton: true,
-      confirmButtonText: 'Ya, Ajukan',
+      confirmButtonText: 'Ya, Lanjut',
       cancelButtonText: 'Batal',
       confirmButtonColor: '#0f7a5c',
     });
 
     if (!confirm.isConfirmed) return false;
 
-    setSaving(true);
-    try {
-      await submitPendaftaran();
-      setIsLocked(true);
-      await Swal.fire({
-        icon: 'success',
-        title: 'Pendaftaran Diajukan',
-        text: 'Formulir terkunci. Menunggu verifikasi admin.',
-      });
-      navigate('/calon-murid/status', { replace: true });
-      return true;
-    } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Gagal submit', text: extractApiError(err).message });
-      return false;
-    } finally {
-      setSaving(false);
-    }
+    navigate('/calon-murid/upload-berkas', { replace: true });
+    return true;
   };
 
   const percent = calculateFormulirProgress({

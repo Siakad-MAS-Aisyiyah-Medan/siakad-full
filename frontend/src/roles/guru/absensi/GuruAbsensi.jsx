@@ -503,8 +503,8 @@ function TambahAbsensiView({ context, meetingToEdit, onBack }) {
 }
 
 export default function GuruAbsensiPage() {
-  const user = getStoredUser();
-  const profile = getStoredProfile();
+  const user = useMemo(() => getStoredUser(), []);
+  const profile = useMemo(() => getStoredProfile(), []);
   const name = getDisplayName(profile, user?.role, user?.username);
 
   const [view, setView] = useState('list'); // list, history, tambah_absen
