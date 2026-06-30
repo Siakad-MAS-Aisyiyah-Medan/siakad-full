@@ -2,20 +2,21 @@ import { Link } from 'react-router-dom';
 import { CheckCircle2, Eye, XCircle } from 'lucide-react';
 
 function statusLabel(status) {
-  const value = status || 'submitted';
+  const value = status || 'draft';
   if (['diterima', 'accepted', 'menjadi_murid'].includes(value)) return 'Diterima';
   if (['ditolak', 'rejected'].includes(value)) return 'Ditolak';
-  return 'Menunggu';
+  if (['draft'].includes(value)) return 'Belum Mengirim';
+  if (['revisi', 'dikembalikan'].includes(value)) return 'Revisi';
+  return 'Sudah Mengirim';
 }
 
 function getStatusStyle(status) {
   const value = statusLabel(status);
-  if (value === 'Diterima') {
-    return { bg: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', border: 'var(--color-primary-light)' };
-  }
-  if (value === 'Ditolak') {
-    return { bg: '#fef2f2', color: '#991b1b', border: '#fecaca' };
-  }
+  if (value === 'Diterima') return { bg: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', border: 'var(--color-primary-light)' };
+  if (value === 'Ditolak') return { bg: '#fef2f2', color: '#991b1b', border: '#fecaca' };
+  if (value === 'Belum Mengirim') return { bg: '#f8fafc', color: '#64748b', border: '#e2e8f0' };
+  if (value === 'Revisi') return { bg: '#fefce8', color: '#a16207', border: '#fef08a' };
+  // Sudah Mengirim
   return { bg: '#fffbeb', color: '#92400e', border: '#fde68a' };
 }
 
@@ -81,7 +82,7 @@ export default function PendaftarTable({ ppdb, readOnly = false }) {
                           <Eye size={14} />
                           Detail
                         </Link>
-                        {!readOnly && statusLabel(row.status || row.ppdb_status) === 'Menunggu' && (
+                        {!readOnly && statusLabel(row.status || row.ppdb_status) === 'Sudah Mengirim' && (
                           <>
                             <button type="button" onClick={() => terima(row.id || row.id_pendaftaran)} className="btn-icon" title="Terima" style={{ color: '#16a34a', borderColor: '#bbf7d0', background: '#f0fdf4' }}>
                               <CheckCircle2 size={15} />

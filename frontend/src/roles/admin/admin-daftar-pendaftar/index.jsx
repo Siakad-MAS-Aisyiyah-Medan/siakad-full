@@ -26,7 +26,9 @@ export default function AdminDaftarPendaftar({ readOnly = false }) {
               onChange={setStatusFilter}
               options={[
                 { value: '', label: 'Semua Status' },
-                { value: 'submitted', label: 'Menunggu' },
+                { value: 'belum_mengirim', label: 'Belum Mengirim' },
+                { value: 'sudah_mengirim', label: 'Sudah Mengirim' },
+                { value: 'revisi', label: 'Revisi' },
                 { value: 'diterima', label: 'Diterima' },
                 { value: 'ditolak', label: 'Ditolak' }
               ]}
@@ -43,6 +45,24 @@ export default function AdminDaftarPendaftar({ readOnly = false }) {
             gradient="linear-gradient(135deg, #0f172a, #334155)"
           />
           <StatCard
+            label="Belum Mengirim"
+            value={stats.belum_mengirim || 0}
+            icon={<Clock size={22} />}
+            gradient="linear-gradient(135deg, #475569, #64748b)"
+          />
+          <StatCard
+            label="Sudah Mengirim"
+            value={stats.sudah_mengirim || 0}
+            icon={<Clock size={22} />}
+            gradient="linear-gradient(135deg, #d97706, #f59e0b)"
+          />
+          <StatCard
+            label="Revisi"
+            value={stats.revisi || 0}
+            icon={<XCircle size={22} />}
+            gradient="linear-gradient(135deg, #ca8a04, #eab308)"
+          />
+          <StatCard
             label="Diterima"
             value={stats.diterima || 0}
             icon={<CheckCircle2 size={22} />}
@@ -53,12 +73,6 @@ export default function AdminDaftarPendaftar({ readOnly = false }) {
             value={stats.ditolak || 0}
             icon={<XCircle size={22} />}
             gradient="linear-gradient(135deg, #dc2626, #ef4444)"
-          />
-          <StatCard
-            label="Menunggu"
-            value={stats.menunggu || 0}
-            icon={<Clock size={22} />}
-            gradient="linear-gradient(135deg, #d97706, #f59e0b)"
           />
         </div>
 

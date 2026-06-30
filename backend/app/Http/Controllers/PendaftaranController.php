@@ -1004,18 +1004,20 @@ class PendaftaranController extends Controller
     public function adminPpdbStats()
     {
         $total = Pendaftaran::count();
-        $verified = Pendaftaran::where('ppdb_status', 'terverifikasi')->count();
         $accepted = Pendaftaran::whereIn('ppdb_status', ['diterima', 'accepted', 'menjadi_murid'])->count();
         $rejected = Pendaftaran::whereIn('ppdb_status', ['ditolak', 'rejected'])->count();
-        $waiting = Pendaftaran::whereIn('ppdb_status', ['draft', 'submitted', 'diajukan', 'terverifikasi', 'verified'])->count();
+        
+        $belum_mengirim = Pendaftaran::where('ppdb_status', 'draft')->count();
+        $sudah_mengirim = Pendaftaran::whereIn('ppdb_status', ['submitted', 'diajukan', 'terverifikasi', 'verified'])->count();
+        $revisi = Pendaftaran::whereIn('ppdb_status', ['revisi', 'dikembalikan'])->count();
 
         return ApiResponse::success([
             'total' => $total,
-            'verified' => $verified,
-            'accepted' => $accepted,
             'diterima' => $accepted,
             'ditolak' => $rejected,
-            'menunggu' => $waiting,
+            'belum_mengirim' => $belum_mengirim,
+            'sudah_mengirim' => $sudah_mengirim,
+            'revisi' => $revisi,
         ]);
     }
 
@@ -1031,8 +1033,12 @@ class PendaftaranController extends Controller
     {
         $query = Pendaftaran::with(['user', 'berkas'])->orderByDesc('updated_at');
 
-        if ($status === 'submitted') {
-            $query->whereIn('ppdb_status', ['draft', 'submitted', 'diajukan', 'terverifikasi', 'verified']);
+        if ($status === 'belum_mengirim') {
+            $query->where('ppdb_status', 'draft');
+        } elseif ($status === 'sudah_mengirim') {
+            $query->whereIn('ppdb_status', ['submitted', 'diajukan', 'terverifikasi', 'verified']);
+        } elseif ($status === 'revisi') {
+            $query->whereIn('ppdb_status', ['revisi', 'dikembalikan']);
         } elseif ($status === 'diterima') {
             $query->whereIn('ppdb_status', ['diterima', 'accepted', 'menjadi_murid']);
         } elseif ($status === 'ditolak') {
