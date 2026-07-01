@@ -8,7 +8,6 @@ use App\Models\JadwalPelajaran;
 use App\Models\Mapel;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
-use App\Models\TahunAjaran;
 use App\Utils\ApiResponse;
 use App\Utils\AuditsAdminActions;
 use App\Utils\GuruPengampuUser;
