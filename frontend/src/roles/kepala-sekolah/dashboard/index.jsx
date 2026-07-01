@@ -76,10 +76,6 @@ export default function KepsekDashboard() {
   return (
     <MainLayout role="kepsek" name={name}>
       <div className="mx-auto flex max-w-[1180px] flex-col gap-6 px-5 py-6">
-        <div className="animate-fade-in">
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#064e3b', letterSpacing: '-0.02em' }}>Dashboard</h1>
-          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.25rem' }}>Ringkasan data sekolah</p>
-        </div>
 
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {topCards.map((card, i) => (
