@@ -214,30 +214,6 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
   );
 }
 
-function InlineListActions({ onAdd }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        gap: '0.75rem',
-        flexWrap: 'wrap',
-      }}
-    >
-      <button
-        type="button"
-        onClick={onAdd}
-        className="btn-primary"
-        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}
-      >
-        <Plus size={18} />
-        Tambah Daftar Nilai
-      </button>
-    </div>
-  );
-}
-
 export default function GuruNilaiPage() {
   const user = useMemo(() => getStoredUser(), []);
   const profile = useMemo(() => getStoredProfile(), []);
@@ -526,8 +502,6 @@ export default function GuruNilaiPage() {
               </button>
             </PageHeader>
 
-            <InlineListActions onAdd={openCreate} />
-
             <div className="table-container">
               <table className="data-table">
                 <thead>
@@ -592,15 +566,6 @@ export default function GuruNilaiPage() {
                       <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                         <div style={{ display: 'grid', justifyItems: 'center', gap: '1rem' }}>
                           <span>Belum ada daftar nilai. Tambahkan daftar nilai terlebih dahulu.</span>
-                          <button
-                            type="button"
-                            onClick={openCreate}
-                            className="btn-primary"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}
-                          >
-                            <Plus size={18} />
-                            Tambah Daftar Nilai
-                          </button>
                         </div>
                       </td>
                     </tr>
