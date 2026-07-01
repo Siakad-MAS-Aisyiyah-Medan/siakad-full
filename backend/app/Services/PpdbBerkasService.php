@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\BerkasPendaftaran;
 use App\Models\Pendaftaran;
+use App\Models\PendaftaranDokumen;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
- * Upload berkas PPDB — aman, satu jenis satu file, replace & delete terkontrol.
+ * Upload berkas PPDB — aman, menggunakan tabel PendaftaranDokumen.
  */
 class PpdbBerkasService
 {
@@ -33,13 +33,13 @@ class PpdbBerkasService
         'akta_kelahiran' => 'nisn',
     ];
 
-    private const LEGACY_FILE_COLUMNS = [
+    private const FILE_COLUMNS = [
         'ijazah_atau_skl' => 'file_ijazah',
         'kartu_keluarga' => 'file_kk',
         'pas_foto' => 'file_pas_photo',
         'stk' => 'file_stk',
         'nisn' => 'file_nisn',
-        'ktp_orang_tua' => 'file_ktp_ortu',
+        'ktp_orang_tua' => 'file_ktp_ortua',
     ];
 
     public function __construct(private PendaftaranStateService $state) {}
@@ -69,13 +69,14 @@ class PpdbBerkasService
             ];
         }
 
-        $pendaftaran->load('berkas');
-        $byJenis = $pendaftaran->berkas->keyBy(fn ($b) => self::normalizeJenis($b->jenis_berkas));
+        $pendaftaran->load('dokumen');
+        $dokumen = $pendaftaran->dokumen;
 
         $items = [];
         foreach (self::JENIS as $key => $label) {
-            $row = $byJenis->get($key);
-            $items[] = $this->formatBerkasItem($key, $label, $row);
+            $col = self::FILE_COLUMNS[$key];
+            $filePath = $dokumen ? $dokumen->$col : null;
+            $items[] = $this->formatBerkasItem($key, $label, $filePath, $dokumen);
         }
 
         return [
@@ -97,12 +98,16 @@ class PpdbBerkasService
         $this->assertAllowedFile($file, $jenis);
 
         $disk = config('ppdb.berkas.storage_disk', 'public');
-        $existing = BerkasPendaftaran::where('pendaftaran_id', $pendaftaran->id_pendaftaran)
-            ->whereIn('jenis_berkas', [$jenis, ...array_keys(array_filter(self::LEGACY_JENIS_MAP, fn ($v) => $v === $jenis))])
-            ->first();
+        
+        $dokumen = PendaftaranDokumen::firstOrCreate(
+            ['pendaftaran_id' => $pendaftaran->id_pendaftaran]
+        );
 
-        if ($existing?->file_path && Storage::disk($disk)->exists($existing->file_path)) {
-            Storage::disk($disk)->delete($existing->file_path);
+        $col = self::FILE_COLUMNS[$jenis];
+        $existingPath = $dokumen->$col;
+
+        if ($existingPath && Storage::disk($disk)->exists($existingPath)) {
+            Storage::disk($disk)->delete($existingPath);
         }
 
         $ext = strtolower($file->getClientOriginalExtension());
@@ -113,22 +118,10 @@ class PpdbBerkasService
             $disk
         );
 
-        $berkas = BerkasPendaftaran::updateOrCreate(
-            [
-                'pendaftaran_id' => $pendaftaran->id_pendaftaran,
-                'jenis_berkas' => $jenis,
-            ],
-            [
-                'file_path' => $storedPath,
-                'status_verifikasi' => 'pending',
-                'catatan' => null,
-            ]
-        );
+        $dokumen->$col = $storedPath;
+        $dokumen->save();
 
-        $this->syncLegacyColumn($pendaftaran, $jenis, $storedPath);
-        $this->removeLegacyDuplicateRows($pendaftaran->id_pendaftaran, $jenis);
-
-        return $this->formatBerkasItem($jenis, self::JENIS[$jenis], $berkas->fresh());
+        return $this->formatBerkasItem($jenis, self::JENIS[$jenis], $storedPath, $dokumen);
     }
 
     public function delete(User $user, string $jenis): void
@@ -136,34 +129,38 @@ class PpdbBerkasService
         $jenis = self::normalizeJenis($jenis);
         $pendaftaran = $this->resolveEditablePendaftaran($user);
 
-        $berkas = BerkasPendaftaran::where('pendaftaran_id', $pendaftaran->id_pendaftaran)
-            ->where('jenis_berkas', $jenis)
-            ->first();
+        $dokumen = PendaftaranDokumen::where('pendaftaran_id', $pendaftaran->id_pendaftaran)->first();
+        if (! $dokumen) {
+            throw new InvalidArgumentException('Berkas tidak ditemukan.');
+        }
 
-        if (! $berkas) {
+        $col = self::FILE_COLUMNS[$jenis];
+        $existingPath = $dokumen->$col;
+
+        if (! $existingPath) {
             throw new InvalidArgumentException('Berkas tidak ditemukan.');
         }
 
         $disk = config('ppdb.berkas.storage_disk', 'public');
-        if ($berkas->file_path && Storage::disk($disk)->exists($berkas->file_path)) {
-            Storage::disk($disk)->delete($berkas->file_path);
+        if (Storage::disk($disk)->exists($existingPath)) {
+            Storage::disk($disk)->delete($existingPath);
         }
 
-        $berkas->delete();
-        $this->clearLegacyColumn($pendaftaran, $jenis);
+        $dokumen->$col = null;
+        $dokumen->save();
     }
 
     public function assertAllRequiredUploaded(Pendaftaran $pendaftaran): void
     {
-        $uploaded = $pendaftaran->berkas()
-            ->pluck('jenis_berkas')
-            ->map(fn ($j) => self::normalizeJenis($j))
-            ->unique()
-            ->toArray();
+        $dokumen = $pendaftaran->dokumen;
+        if (! $dokumen) {
+            throw new InvalidArgumentException('Anda belum mengunggah berkas apapun.');
+        }
 
-        foreach (array_keys(self::JENIS) as $jenis) {
-            if (! in_array($jenis, $uploaded, true)) {
-                throw new InvalidArgumentException('Berkas '.self::JENIS[$jenis].' wajib diunggah sebelum submit.');
+        foreach (self::JENIS as $jenis => $label) {
+            $col = self::FILE_COLUMNS[$jenis];
+            if (empty($dokumen->$col)) {
+                throw new InvalidArgumentException('Berkas '.$label.' wajib diunggah sebelum submit.');
             }
         }
     }
@@ -200,7 +197,6 @@ class PpdbBerkasService
 
         $mime = $file->getMimeType();
         $allowedMimes = config('ppdb.berkas.allowed_mimes', []);
-        // Default MIME types for common document/image formats
         if (empty($allowedMimes)) {
             $allowedMimes = [
                 'application/pdf',
@@ -220,9 +216,9 @@ class PpdbBerkasService
         }
     }
 
-    protected function formatBerkasItem(string $jenis, string $label, ?BerkasPendaftaran $row): array
+    protected function formatBerkasItem(string $jenis, string $label, ?string $filePath, ?PendaftaranDokumen $row): array
     {
-        if (! $row || ! $row->file_path) {
+        if (! $filePath) {
             return [
                 'jenis_berkas' => $jenis,
                 'label' => $label,
@@ -239,42 +235,32 @@ class PpdbBerkasService
         }
 
         $disk = config('ppdb.berkas.storage_disk', 'public');
-        $url = Storage::disk($disk)->url($row->file_path);
-        $ext = strtolower(pathinfo($row->file_path, PATHINFO_EXTENSION));
+        $url = Storage::disk($disk)->url($filePath);
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
         return [
-            'id' => $row->id,
+            'id' => clone $row ? $row->id : null,
             'jenis_berkas' => $jenis,
             'label' => $label,
-            'status' => $this->normalizeStatus($row->status_verifikasi),
-            'status_verifikasi' => $row->status_verifikasi,
+            'status' => 'valid', 
+            'status_verifikasi' => 'valid',
             'url' => $url,
             'preview_url' => $url,
-            'file_name' => basename($row->file_path),
-            'file_size' => Storage::disk($disk)->exists($row->file_path)
-                ? Storage::disk($disk)->size($row->file_path)
+            'file_name' => basename($filePath),
+            'file_size' => Storage::disk($disk)->exists($filePath)
+                ? Storage::disk($disk)->size($filePath)
                 : null,
             'mime_type' => $this->mimeFromExtension($ext),
-            'catatan' => $row->catatan,
-            'uploaded_at' => $row->updated_at?->toIso8601String(),
+            'catatan' => $row ? $row->catatan_dokumen : null,
+            'uploaded_at' => $row ? $row->updated_at?->toIso8601String() : null,
         ];
-    }
-
-    protected function normalizeStatus(?string $dbStatus): string
-    {
-        return match ($dbStatus) {
-            'diterima', 'valid', 'terverifikasi' => 'valid',
-            'ditolak', 'rejected' => 'ditolak',
-            'pending', 'menunggu_verifikasi' => 'menunggu_verifikasi',
-            default => 'menunggu_verifikasi',
-        };
     }
 
     protected function buildPlaceholderItems(): array
     {
         $items = [];
         foreach (self::JENIS as $key => $label) {
-            $items[] = $this->formatBerkasItem($key, $label, null);
+            $items[] = $this->formatBerkasItem($key, $label, null, null);
         }
 
         return $items;
@@ -290,44 +276,8 @@ class PpdbBerkasService
         };
     }
 
-    protected function syncLegacyColumn(Pendaftaran $pendaftaran, string $jenis, string $path): void
-    {
-        if (! isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
-            return;
-        }
-        $col = self::LEGACY_FILE_COLUMNS[$jenis];
-        if (Schema::hasColumn('pendaftaran', $col)) {
-            $pendaftaran->{$col} = $path;
-            $pendaftaran->save();
-        }
-    }
-
-    protected function clearLegacyColumn(Pendaftaran $pendaftaran, string $jenis): void
-    {
-        if (! isset(self::LEGACY_FILE_COLUMNS[$jenis])) {
-            return;
-        }
-        $col = self::LEGACY_FILE_COLUMNS[$jenis];
-        if (Schema::hasColumn('pendaftaran', $col)) {
-            $pendaftaran->{$col} = null;
-            $pendaftaran->save();
-        }
-    }
-
     protected function getPendaftaranByUser(User $user): ?Pendaftaran
     {
         return Pendaftaran::where('id_user', $user->id_user)->first();
-    }
-
-    protected function removeLegacyDuplicateRows(int $pendaftaranId, string $canonicalJenis): void
-    {
-        $legacyKeys = array_keys(array_filter(self::LEGACY_JENIS_MAP, fn ($v) => $v === $canonicalJenis));
-        if (! $legacyKeys) {
-            return;
-        }
-
-        BerkasPendaftaran::where('pendaftaran_id', $pendaftaranId)
-            ->whereIn('jenis_berkas', $legacyKeys)
-            ->delete();
     }
 }

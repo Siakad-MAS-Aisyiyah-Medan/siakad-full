@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\MenuItem;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -12,28 +11,6 @@ class RbacSeeder extends Seeder
 {
     public function run(): void
     {
-        User::where('role', 'wali_kelas')->update(['role' => 'guru']);
-
-        if ($waliRole = Role::where('key', 'wali_kelas')->first()) {
-            $waliRole->permissions()->detach();
-            $waliRole->delete();
-        }
-
-        Permission::whereIn('key', [
-            'view_dashboard_wali',
-            'view_siswa_kelas',
-            'view_absensi_kelas',
-            'validate_nilai',
-        ])->get()->each(function (Permission $permission) {
-            $permission->roles()->detach();
-            $permission->delete();
-        });
-
-        MenuItem::where('path', 'like', '/wali%')->delete();
-        MenuItem::where('path', 'like', '/kepsek%')->delete();
-        MenuItem::where('path', '/admin/pengaturan/tahun-ajaran')->delete();
-        MenuItem::whereIn('label', ['Riwayat Absensi', 'Nilai Pribadi', 'Data PPDB Baru', 'Data Diri'])->delete();
-
         $permissions = [
             ['key' => 'manage_all', 'name' => 'Kelola Semua', 'group' => 'admin'],
             ['key' => 'manage_profil_sekolah', 'name' => 'Kelola Profil Sekolah', 'group' => 'admin'],
@@ -125,61 +102,6 @@ class RbacSeeder extends Seeder
                     ->all();
                 $role->permissions()->sync($ids);
             }
-        }
-
-        $menus = [
-            ['permission_key' => 'manage_all', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/admin/dashboard', 'sort_order' => 10],
-            ['permission_key' => 'manage_profil_sekolah', 'icon_key' => 'School', 'label' => 'Profil Sekolah', 'path' => '/admin/profil-sekolah', 'sort_order' => 20],
-            ['permission_key' => 'manage_tahun_ajaran', 'icon_key' => 'CalendarDays', 'label' => 'Tahun Ajaran', 'path' => '/admin/tahun-ajaran', 'sort_order' => 30],
-            ['permission_key' => 'manage_pengumuman', 'icon_key' => 'Bell', 'label' => 'Pengumuman Sekolah', 'path' => '/admin/pengumuman', 'sort_order' => 40],
-            ['permission_key' => 'manage_guru', 'icon_key' => 'Users', 'label' => 'Data Guru', 'path' => '/admin/guru', 'sort_order' => 50],
-            ['permission_key' => 'manage_murid', 'icon_key' => 'GraduationCap', 'label' => 'Data Murid', 'path' => '/admin/murid', 'sort_order' => 60],
-            ['permission_key' => 'manage_kelas', 'icon_key' => 'BookOpen', 'label' => 'Data Kelas', 'path' => '/admin/kelas', 'sort_order' => 70],
-            ['permission_key' => 'manage_mapel', 'icon_key' => 'ClipboardList', 'label' => 'Mata Pelajaran', 'path' => '/admin/mapel', 'sort_order' => 80],
-            ['permission_key' => 'view_transkrip_murid', 'icon_key' => 'FileText', 'label' => 'Transkrip Akademik Murid', 'path' => '/admin/transkrip-akademik', 'sort_order' => 90],
-            ['permission_key' => 'manage_ppdb', 'icon_key' => 'UserCheck', 'label' => 'Data PPDB', 'path' => '/admin/ppdb', 'sort_order' => 100],
-            ['permission_key' => 'manage_users', 'icon_key' => 'ShieldCheck', 'label' => 'Akun Pengguna & Hak Akses', 'path' => '/admin/hak-akses', 'sort_order' => 110],
-            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/admin/pengaturan', 'sort_order' => 120],
-
-            ['permission_key' => 'view_dashboard_kepsek', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/kepala-sekolah/dashboard', 'sort_order' => 210],
-            ['permission_key' => 'manage_profil_pribadi', 'icon_key' => 'User', 'label' => 'Profil Pribadi', 'path' => '/kepala-sekolah/profil-saya', 'sort_order' => 220],
-            ['permission_key' => 'view_pengumuman', 'icon_key' => 'Bell', 'label' => 'Pengumuman Sekolah', 'path' => '/kepala-sekolah/pengumuman', 'sort_order' => 230],
-            ['permission_key' => 'view_data_guru', 'icon_key' => 'Users', 'label' => 'Data Guru', 'path' => '/kepala-sekolah/data-guru', 'sort_order' => 240],
-            ['permission_key' => 'view_data_siswa', 'icon_key' => 'GraduationCap', 'label' => 'Data Murid', 'path' => '/kepala-sekolah/data-murid', 'sort_order' => 250],
-            ['permission_key' => 'view_data_kelas', 'icon_key' => 'BookOpen', 'label' => 'Data Kelas', 'path' => '/kepala-sekolah/data-kelas', 'sort_order' => 260],
-            ['permission_key' => 'view_mapel', 'icon_key' => 'ClipboardList', 'label' => 'Mata Pelajaran', 'path' => '/kepala-sekolah/data-mapel', 'sort_order' => 270],
-            ['permission_key' => 'view_transkrip_murid', 'icon_key' => 'FileText', 'label' => 'Transkrip Akademik Murid', 'path' => '/kepala-sekolah/transkrip-akademik', 'sort_order' => 280],
-            ['permission_key' => 'view_data_ppdb', 'icon_key' => 'UserCheck', 'label' => 'Data PPDB', 'path' => '/kepala-sekolah/data-ppdb', 'sort_order' => 290],
-            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/kepala-sekolah/pengaturan', 'sort_order' => 300],
-
-            ['permission_key' => 'view_dashboard_guru', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/guru/dashboard', 'sort_order' => 410],
-            ['permission_key' => 'manage_profil_pribadi', 'icon_key' => 'User', 'label' => 'Profil Pribadi', 'path' => '/guru/profil-saya', 'sort_order' => 420],
-            ['permission_key' => 'view_pengumuman', 'icon_key' => 'Bell', 'label' => 'Pengumuman Sekolah', 'path' => '/guru/pengumuman', 'sort_order' => 430],
-            ['permission_key' => 'view_murid_diajar', 'icon_key' => 'Users', 'label' => 'Data Murid yang Diajar', 'path' => '/guru/murid', 'sort_order' => 440],
-            ['permission_key' => 'view_kelas_diajar', 'icon_key' => 'BookOpen', 'label' => 'Data Kelas yang Diajar', 'path' => '/guru/kelas', 'sort_order' => 450],
-            ['permission_key' => 'view_mapel_diampu', 'icon_key' => 'ClipboardList', 'label' => 'Mata Pelajaran yang Diampu', 'path' => '/guru/mapel', 'sort_order' => 460],
-            ['permission_key' => 'manage_nilai_siswa', 'icon_key' => 'FileText', 'label' => 'Nilai Akademik Murid', 'path' => '/guru/nilai', 'sort_order' => 470],
-            ['permission_key' => 'manage_absensi_siswa', 'icon_key' => 'ClipboardList', 'label' => 'Absensi Murid', 'path' => '/guru/absensi', 'sort_order' => 480],
-            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/guru/pengaturan', 'sort_order' => 490],
-
-            ['permission_key' => 'view_dashboard_siswa', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/siswa/dashboard', 'sort_order' => 610],
-            ['permission_key' => 'manage_profil_pribadi', 'icon_key' => 'User', 'label' => 'Profil Pribadi', 'path' => '/siswa/profil-saya', 'sort_order' => 620],
-            ['permission_key' => 'view_pengumuman', 'icon_key' => 'Bell', 'label' => 'Pengumuman Sekolah', 'path' => '/siswa/pengumuman', 'sort_order' => 630],
-            ['permission_key' => 'view_kelas_pribadi', 'icon_key' => 'BookOpen', 'label' => 'Data Kelas yang Dimasuki', 'path' => '/siswa/kelas', 'sort_order' => 640],
-            ['permission_key' => 'view_mapel', 'icon_key' => 'ClipboardList', 'label' => 'Mata Pelajaran', 'path' => '/siswa/mapel', 'sort_order' => 650],
-            ['permission_key' => 'view_transkrip_pribadi', 'icon_key' => 'FileText', 'label' => 'Transkrip Akademik Pribadi', 'path' => '/siswa/nilai', 'sort_order' => 660],
-            ['permission_key' => 'view_absensi_pribadi', 'icon_key' => 'ClipboardList', 'label' => 'Absensi Pribadi', 'path' => '/siswa/absensi', 'sort_order' => 670],
-            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/siswa/pengaturan', 'sort_order' => 680],
-
-            ['permission_key' => 'view_dashboard_calon_siswa', 'icon_key' => 'LayoutDashboard', 'label' => 'Dashboard', 'path' => '/calon-murid/dashboard', 'sort_order' => 810],
-            ['permission_key' => 'manage_formulir_pendaftaran', 'icon_key' => 'FileText', 'label' => 'Formulir Pendaftaran', 'path' => '/ppdb/registrasi', 'sort_order' => 820],
-            ['permission_key' => 'manage_berkas_pendaftaran', 'icon_key' => 'Upload', 'label' => 'Berkas Pendaftaran', 'path' => '/calon-murid/upload-berkas', 'sort_order' => 830],
-            ['permission_key' => 'view_status_pendaftaran', 'icon_key' => 'ClipboardList', 'label' => 'Status Pendaftaran', 'path' => '/calon-murid/status', 'sort_order' => 840],
-            ['permission_key' => 'manage_pengaturan_akun', 'icon_key' => 'Settings2', 'label' => 'Pengaturan Akun Pribadi', 'path' => '/calon-murid/pengaturan', 'sort_order' => 850],
-        ];
-
-        foreach ($menus as $menu) {
-            MenuItem::updateOrCreate(['path' => $menu['path']], $menu);
         }
     }
 }

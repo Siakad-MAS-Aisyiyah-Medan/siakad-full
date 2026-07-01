@@ -124,13 +124,7 @@ class PpdbService
                 ['nama' => 'Ruang Komputer', 'ikon' => 'monitor'],
                 ['nama' => 'Ruang Keterampilan', 'ikon' => 'utensils'],
             ],
-            'ekstrakurikuler' => [
-                ['nama' => 'Pramuka', 'ikon' => 'shield'],
-                ['nama' => 'Futsal', 'ikon' => 'dumbbell'],
-                ['nama' => 'Tapak Suci', 'ikon' => 'users'],
-                ['nama' => 'Tahfidz', 'ikon' => 'book'],
-                ['nama' => 'Tata Boga', 'ikon' => 'utensils'],
-            ],
+
             'alur' => [
                 'Lihat informasi PPDB',
                 'Buat akun calon murid',

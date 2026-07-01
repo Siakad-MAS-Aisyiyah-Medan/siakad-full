@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ekskul;
+
 use App\Models\Guru;
 use App\Models\JadwalPelajaran;
 use App\Models\Kelas;
@@ -43,7 +43,7 @@ class GuruController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
             'nama_guru' => 'required|string|max:255',
-            'nip_nuptk' => 'required|string|min:10|max:50|unique:guru,nip_nuptk',
+            'nip' => 'required|string|min:10|max:50|unique:guru,nip',
             'jenis_kelamin' => 'required|in:L,P',
             'agama' => 'required|string|max:50',
             'alamat' => 'required|string',
@@ -71,7 +71,7 @@ class GuruController extends Controller
             'email' => 'required|email|unique:users,email,'.$id.',id_user',
             'password' => 'nullable|min:8',
             'nama_guru' => 'required|string|max:255',
-            'nip_nuptk' => 'required|string|min:10|max:50|unique:guru,nip_nuptk,'.$id.',id_user',
+            'nip' => 'required|string|min:10|max:50|unique:guru,nip,'.$id.',id_user',
             'jenis_kelamin' => 'required|in:L,P',
             'agama' => 'required|string|max:50',
             'alamat' => 'required|string',
@@ -149,7 +149,7 @@ class GuruController extends Controller
 
             Guru::create([
                 'id_user' => $user->id_user,
-                'nip_nuptk' => $data['nip_nuptk'],
+                'nip' => $data['nip'],
                 'nama_guru' => $data['nama_guru'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
                 'agama' => $data['agama'],
@@ -200,7 +200,7 @@ class GuruController extends Controller
             }
 
             $profilePayload = [
-                'nip_nuptk' => $data['nip_nuptk'],
+                'nip' => $data['nip'],
                 'nama_guru' => $data['nama_guru'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
                 'agama' => $data['agama'],
@@ -264,10 +264,5 @@ class GuruController extends Controller
             );
         }
 
-        if (Ekskul::where('id_pembina', $userId)->exists()) {
-            throw new InvalidArgumentException(
-                'Guru tidak dapat dinonaktifkan karena masih menjadi pembina ekstrakurikuler.'
-            );
-        }
     }
 }

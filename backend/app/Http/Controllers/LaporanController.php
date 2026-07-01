@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AbsensiGuruResource;
 use App\Http\Resources\AbsensiResource;
 use App\Http\Resources\JadwalResource;
 use App\Http\Resources\NilaiResource;
 use App\Models\Absensi;
-use App\Models\AbsensiGuru;
 use App\Models\JadwalPelajaran;
 use App\Models\Mapel;
 use App\Models\Nilai;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Models\User;
-use App\Services\AbsensiGuruService;
 use App\Services\AbsensiSiswaService;
 use App\Utils\ApiResponse;
 use Carbon\Carbon;
@@ -25,8 +22,7 @@ use InvalidArgumentException;
 class LaporanController extends Controller
 {
     public function __construct(
-        private AbsensiSiswaService $absensiSiswa,
-        private AbsensiGuruService $absensiGuru
+        private AbsensiSiswaService $absensiSiswa
     ) {}
 
     public function index(Request $request)
@@ -66,7 +62,6 @@ class LaporanController extends Controller
             'guru' => $this->laporanGuru($filters, $perPage),
             'ppdb' => $this->laporanPpdb($filters, $perPage),
             'absensi_siswa' => $this->laporanAbsensiSiswa($filters, $perPage),
-            'absensi_guru' => $this->laporanAbsensiGuru($filters, $perPage),
             'nilai' => $this->laporanNilai($filters, $perPage),
             'jadwal' => $this->laporanJadwal($filters, $perPage),
             default => throw new InvalidArgumentException('Jenis laporan tidak dikenal.'),
@@ -153,7 +148,7 @@ class LaporanController extends Controller
             'username' => $u->username,
             'role' => $u->role,
             'nama_guru' => $u->guru?->nama_guru,
-            'nip_nuptk' => $u->guru?->nip_nuptk,
+            'nip' => $u->guru?->nip,
             'status_aktif' => $u->status_aktif,
         ])->values()->all();
 
@@ -233,22 +228,6 @@ class LaporanController extends Controller
         ];
     }
 
-    private function laporanAbsensiGuru(array $filters, int $perPage): array
-    {
-        $query = AbsensiGuru::with('guru.guru');
-        $this->applyAbsensiGuruFilters($query, $filters);
-
-        $paginator = $query->orderByDesc('tanggal')->paginate($perPage);
-        $paginator->getCollection()->transform(
-            fn ($item) => (new AbsensiGuruResource($item))->resolve()
-        );
-
-        return [
-            'summary' => $this->absensiGuru->rekap($filters),
-            'items' => $paginator->items(),
-            'meta' => $this->metaFromPaginator($paginator),
-        ];
-    }
 
     private function laporanNilai(array $filters, int $perPage): array
     {
@@ -417,27 +396,6 @@ class LaporanController extends Controller
         }
     }
 
-    private function applyAbsensiGuruFilters($query, array $filters): void
-    {
-        if (! empty($filters['id_user_guru'])) {
-            $query->where('id_user_guru', $filters['id_user_guru']);
-        }
-        if (! empty($filters['tanggal_dari'])) {
-            $query->whereDate('tanggal', '>=', $filters['tanggal_dari']);
-        }
-        if (! empty($filters['tanggal_sampai'])) {
-            $query->whereDate('tanggal', '<=', $filters['tanggal_sampai']);
-        }
-        if (! empty($filters['semester'])) {
-            $query->where('semester', $filters['semester']);
-        }
-        if (! empty($filters['tahun_ajaran'])) {
-            $query->where('tahun_ajaran', $filters['tahun_ajaran']);
-        }
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-    }
 
     private function applyNilaiFilters($query, array $filters): void
     {

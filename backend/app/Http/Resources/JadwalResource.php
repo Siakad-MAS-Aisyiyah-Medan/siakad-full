@@ -14,14 +14,6 @@ class JadwalResource extends JsonResource
             'id_kelas' => $this->id_kelas,
             'id_mapel' => $this->id_mapel,
             'id_guru' => $this->id_guru,
-            'hari' => $this->hari,
-            'id_waktu' => $this->id_waktu,
-            'waktu' => $this->whenLoaded('waktu', fn () => [
-                'jam_ke' => $this->waktu?->jam_ke,
-                'jam_mulai' => $this->waktu?->jam_mulai,
-                'jam_selesai' => $this->waktu?->jam_selesai,
-            ]),
-            'ruangan' => $this->ruangan,
             'tahun_ajaran' => $this->tahun_ajaran,
             'semester' => $this->semester,
             'kelas' => $this->whenLoaded('kelas', fn () => [

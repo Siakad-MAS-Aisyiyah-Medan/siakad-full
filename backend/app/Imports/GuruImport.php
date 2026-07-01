@@ -23,17 +23,17 @@ class GuruImport
 
                 // Lewati baris kosong atau jika diisi strip (-)
                 if (
-                    empty(trim($row['nip_nuptk'] ?? '')) || trim($row['nip_nuptk']) === '-' ||
+                    empty(trim($row['nip'] ?? '')) || trim($row['nip']) === '-' ||
                     empty(trim($row['nama'] ?? '')) || trim($row['nama']) === '-'
                 ) {
                     $rowIndex++;
                     continue;
                 }
 
-                $nip = $row['nip_nuptk'];
+                $nip = $row['nip'];
 
                 // Cek apakah NIP sudah ada
-                if (Guru::where('nip_nuptk', $nip)->exists()) {
+                if (Guru::where('nip', $nip)->exists()) {
                     throw new Exception('Baris '.$rowIndex.": NIP/NUPTK ($nip) sudah terdaftar di sistem.");
                 }
 
@@ -55,7 +55,7 @@ class GuruImport
                 // Buat Guru
                 Guru::create([
                     'id_user' => $user->id_user,
-                    'nip_nuptk' => $nip,
+                    'nip' => $nip,
                     'nama_guru' => $row['nama'],
                     'jenis_kelamin' => isset($row['lp']) && strtoupper($row['lp']) == 'P' ? 'P' : 'L',
                     'agama' => $row['agama'] ?? 'Islam',

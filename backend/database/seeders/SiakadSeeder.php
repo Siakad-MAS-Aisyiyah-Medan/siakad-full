@@ -65,7 +65,7 @@ class SiakadSeeder extends Seeder
         $guruUser->forceFill(['role' => 'guru', 'status_aktif' => true])->save();
         Guru::updateOrCreate(['id_user' => $guruUser->id_user], [
             'id_user' => $guruUser->id_user,
-            'nip_nuptk' => '1122334455',
+            'nip' => '1122334455',
             'nama_guru' => 'Siti Aminah, S.Pd',
             'jenis_kelamin' => 'P',
             'agama' => 'Islam',

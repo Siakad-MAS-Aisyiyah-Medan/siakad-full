@@ -56,7 +56,7 @@ class AkunController extends Controller
                     $realName = $user->admin->nama_admin ?? '-';
                 }
             } elseif ($user->role === 'guru' && $user->guru) {
-                $nipNisn = $user->guru->nip_nuptk ?? '-';
+                $nipNisn = $user->guru->nip ?? '-';
                 $noHp = $user->guru->no_hp ?? '-';
                 if (empty(trim($realName))) {
                     $realName = $user->guru->nama_guru ?? '-';

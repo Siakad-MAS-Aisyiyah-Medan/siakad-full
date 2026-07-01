@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PendaftaranResource;
 use App\Http\Resources\PpdbResource;
 use App\Http\Resources\UserResource;
-use App\Models\BerkasPendaftaran;
+
 use App\Models\Pendaftaran;
 use App\Models\ProfilSekolah;
 use App\Models\SystemSetting;
@@ -777,13 +777,7 @@ class PendaftaranController extends Controller
                 ['nama' => 'Ruang Komputer', 'ikon' => 'monitor'],
                 ['nama' => 'Ruang Keterampilan', 'ikon' => 'utensils'],
             ]),
-            'ekstrakurikuler' => $getJson('ppdb_ekstrakurikuler', [
-                ['nama' => 'Pramuka', 'ikon' => 'shield'],
-                ['nama' => 'Futsal', 'ikon' => 'dumbbell'],
-                ['nama' => 'Tapak Suci', 'ikon' => 'users'],
-                ['nama' => 'Tahfidz', 'ikon' => 'book'],
-                ['nama' => 'Tata Boga', 'ikon' => 'utensils'],
-            ]),
+
             'alur' => $getJson('ppdb_alur', [
                 'Lihat informasi PPDB',
                 'Buat akun calon murid',
@@ -970,23 +964,19 @@ class PendaftaranController extends Controller
     {
         $mapped = $this->mapFormulirInput($data);
         $pendaftaran = $this->state->saveDraft($user, $mapped);
+        $this->syncPendaftaranDetail($pendaftaran, $mapped);
 
         if (! empty($data['nisn'])) {
             $pendaftaran->nisn = $data['nisn'];
             $pendaftaran->save();
         }
 
-        return $pendaftaran->fresh(['berkas']);
+        return $pendaftaran->fresh($this->pendaftaranRelations());
     }
 
-    private function uploadBerkas(User $user, string $jenis, UploadedFile $file): BerkasPendaftaran
+    private function uploadBerkas(User $user, string $jenis, UploadedFile $file): array
     {
-        $this->berkasService->upload($user, $jenis, $file);
-        $pendaftaran = $this->state->getOwnedOrFail($user);
-
-        return BerkasPendaftaran::where('pendaftaran_id', $pendaftaran->id_pendaftaran)
-            ->where('jenis_berkas', PpdbBerkasService::normalizeJenis($jenis))
-            ->firstOrFail();
+        return $this->berkasService->upload($user, $jenis, $file);
     }
 
     private function processSubmit(User $user): Pendaftaran

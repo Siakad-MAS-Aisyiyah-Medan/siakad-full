@@ -26,7 +26,7 @@ class PpdbSettingController extends Controller
             'ppdb_promo',
             'ppdb_persyaratan',
             'ppdb_fasilitas',
-            'ppdb_ekstrakurikuler',
+
             'ppdb_alur',
             'ppdb_kontak',
             'ppdb_alamat',
@@ -115,13 +115,7 @@ class PpdbSettingController extends Controller
                 ['nama' => 'Ruang Komputer', 'ikon' => 'monitor'],
                 ['nama' => 'Ruang Keterampilan', 'ikon' => 'utensils'],
             ],
-            'ppdb_ekstrakurikuler' => [
-                ['nama' => 'Pramuka', 'ikon' => 'shield'],
-                ['nama' => 'Futsal', 'ikon' => 'dumbbell'],
-                ['nama' => 'Tapak Suci', 'ikon' => 'users'],
-                ['nama' => 'Tahfidz', 'ikon' => 'book'],
-                ['nama' => 'Tata Boga', 'ikon' => 'utensils'],
-            ],
+
             'ppdb_alur' => [
                 'Lihat informasi PPDB',
                 'Buat akun calon murid',
@@ -156,7 +150,7 @@ class PpdbSettingController extends Controller
             // Decode JSON if it's an array field
             if (in_array($key, [
                 'ppdb_hero_highlights', 'ppdb_gelombang', 'ppdb_promo',
-                'ppdb_persyaratan', 'ppdb_fasilitas', 'ppdb_ekstrakurikuler',
+                'ppdb_persyaratan', 'ppdb_fasilitas',
                 'ppdb_alur', 'ppdb_kontak',
             ])) {
                 $decoded = $val ? json_decode($val, true) : null;
@@ -178,7 +172,7 @@ class PpdbSettingController extends Controller
 
         $jsonKeys = [
             'ppdb_hero_highlights', 'ppdb_gelombang', 'ppdb_promo',
-            'ppdb_persyaratan', 'ppdb_fasilitas', 'ppdb_ekstrakurikuler',
+            'ppdb_persyaratan', 'ppdb_fasilitas',
             'ppdb_alur', 'ppdb_kontak',
         ];
 

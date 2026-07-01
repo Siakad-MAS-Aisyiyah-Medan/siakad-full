@@ -90,7 +90,7 @@ class ImportController extends Controller
         // Menyediakan satu baris kosong dengan key (header) yang benar
         $data = collect([
             [
-                'nip_nuptk' => '',
+                'nip' => '',
                 'nama' => '',
                 'lp' => '',
                 'agama' => '',

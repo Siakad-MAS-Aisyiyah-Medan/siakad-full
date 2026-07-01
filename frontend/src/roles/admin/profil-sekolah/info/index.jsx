@@ -253,10 +253,11 @@ export default function InfoProfilPage({ readOnly = false }) {
                   </div>
                 </div>
               </div>
-              <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <FormLabel required>Nama Sekolah</FormLabel>
                   <input name="nama_sekolah" value={formData.nama_sekolah || ''} onChange={handleChange} className="form-control" placeholder="Masukkan nama sekolah" required />
                 </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div>
                   <FormLabel required>Deskripsi Singkat / Tentang Kami</FormLabel>
                   <textarea 

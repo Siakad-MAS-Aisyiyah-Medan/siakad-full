@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Ekskul;
+
 use App\Models\Guru;
 use App\Models\JadwalPelajaran;
 use App\Models\Kelas;
@@ -53,7 +53,7 @@ class GuruService
 
             Guru::create([
                 'id_user' => $user->id_user,
-                'nip_nuptk' => $data['nip_nuptk'],
+                'nip' => $data['nip'],
                 'nama_guru' => $data['nama_guru'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
                 'agama' => $data['agama'],
@@ -103,7 +103,7 @@ class GuruService
             }
 
             $profilePayload = [
-                'nip_nuptk' => $data['nip_nuptk'],
+                'nip' => $data['nip'],
                 'nama_guru' => $data['nama_guru'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
                 'agama' => $data['agama'],
@@ -162,10 +162,5 @@ class GuruService
             );
         }
 
-        if (Ekskul::where('id_pembina', $userId)->exists()) {
-            throw new InvalidArgumentException(
-                'Guru tidak dapat dihapus karena masih menjadi pembina ekstrakurikuler.'
-            );
-        }
     }
 }

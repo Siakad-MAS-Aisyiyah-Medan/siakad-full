@@ -14,9 +14,6 @@ class JadwalPelajaran extends Model
         'id_kelas',
         'id_mapel',
         'id_guru',
-        'hari',
-        'id_waktu',
-        'ruangan',
         'tahun_ajaran',
         'semester',
     ];
@@ -34,10 +31,5 @@ class JadwalPelajaran extends Model
     public function guru()
     {
         return $this->belongsTo(User::class, 'id_guru', 'id_user');
-    }
-
-    public function waktu()
-    {
-        return $this->belongsTo(WaktuPelajaran::class, 'id_waktu', 'id_waktu');
     }
 }

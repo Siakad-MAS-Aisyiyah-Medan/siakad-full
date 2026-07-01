@@ -22,7 +22,7 @@ class BiodataController extends Controller
 
             if ($role === 'guru') {
                 $validated = $request->validate([
-                    'nip_nuptk' => 'nullable|string|max:50',
+                    'nip' => 'nullable|string|max:50',
                     'nama_guru' => 'required|string|max:255',
                     'jenis_kelamin' => 'nullable|string|in:L,P',
                     'tgl_lahir' => 'nullable|date',
@@ -35,8 +35,8 @@ class BiodataController extends Controller
                     $profile = new Guru(['id_user' => $user->id_user]);
                 }
                 $profile->fill($validated);
-                if (! $profile->nip_nuptk) {
-                    $profile->nip_nuptk = $user->username ?: '-';
+                if (! $profile->nip) {
+                    $profile->nip = $user->username ?: '-';
                 }
                 if (! $profile->jenis_kelamin) {
                     $profile->jenis_kelamin = 'L';
