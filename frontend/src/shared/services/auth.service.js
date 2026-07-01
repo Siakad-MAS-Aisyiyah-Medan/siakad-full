@@ -169,7 +169,7 @@ export function getMenuItems() {
     if (item.label === 'Data PPDB Baru') return false;
     if (item.label === 'Pengaturan Akun') return false;
     if (item.path && item.path.endsWith('/pengaturan')) return false;
-    if (role === 'siswa' && item.path === '/siswa/profil-saya') return false;
+    if (item.path && item.path.endsWith('/profil-saya')) return false;
     if (role === 'calon_siswa' && item.path === '/calon-murid/pengumuman') return false;
     if (item.permission) return hasPermission(item.permission);
     return true;

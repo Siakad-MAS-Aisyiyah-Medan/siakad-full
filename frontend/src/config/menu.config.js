@@ -15,7 +15,6 @@ export const menuByRole = {
   ],
   kepsek: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/kepala-sekolah/dashboard', permission: 'view_dashboard_kepsek' },
-    { iconKey: 'User', label: 'Profil Pribadi', path: '/kepala-sekolah/profil-saya', permission: 'manage_profil_pribadi' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/kepala-sekolah/pengumuman', permission: 'view_pengumuman' },
     { iconKey: 'Users', label: 'Data Guru', path: '/kepala-sekolah/data-guru', permission: 'view_data_guru' },
     { iconKey: 'GraduationCap', label: 'Data Murid', path: '/kepala-sekolah/data-murid', permission: 'view_data_siswa' },
@@ -26,7 +25,6 @@ export const menuByRole = {
   ],
   guru: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/guru/dashboard', permission: 'view_dashboard_guru' },
-    { iconKey: 'User', label: 'Profil Pribadi', path: '/guru/profil-saya', permission: 'manage_profil_pribadi' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/guru/pengumuman', permission: 'view_pengumuman' },
     { iconKey: 'Users', label: 'Data Murid yang Diajar', path: '/guru/murid', permission: 'view_murid_diajar' },
     { iconKey: 'BookOpen', label: 'Data Kelas yang Diajar', path: '/guru/kelas', permission: 'view_kelas_diajar' },
