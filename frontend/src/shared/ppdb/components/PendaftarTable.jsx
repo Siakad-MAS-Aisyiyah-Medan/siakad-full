@@ -82,16 +82,6 @@ export default function PendaftarTable({ ppdb, readOnly = false }) {
                           <Eye size={14} />
                           Detail
                         </Link>
-                        {!readOnly && statusLabel(row.status || row.ppdb_status) === 'Sudah Mengirim' && (
-                          <>
-                            <button type="button" onClick={() => terima(row.id || row.id_pendaftaran)} className="btn-icon" title="Terima" style={{ color: '#16a34a', borderColor: '#bbf7d0', background: '#f0fdf4' }}>
-                              <CheckCircle2 size={15} />
-                            </button>
-                            <button type="button" onClick={() => tolak(row.id || row.id_pendaftaran)} className="btn-icon delete" title="Tolak">
-                              <XCircle size={15} />
-                            </button>
-                          </>
-                        )}
                       </div>
                     </td>
                   </tr>
