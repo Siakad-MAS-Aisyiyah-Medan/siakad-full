@@ -167,6 +167,8 @@ export function getMenuItems() {
     if (item.label === 'Riwayat Absensi') return false;
     if (item.label === 'Nilai Pribadi') return false;
     if (item.label === 'Data PPDB Baru') return false;
+    if (item.label === 'Pengaturan Akun') return false;
+    if (item.path && item.path.endsWith('/pengaturan')) return false;
     if (role === 'calon_siswa' && item.path === '/calon-murid/pengumuman') return false;
     if (item.permission) return hasPermission(item.permission);
     return true;
