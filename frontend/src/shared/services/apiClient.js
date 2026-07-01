@@ -23,7 +23,9 @@ apiClient.get = async (url, config = {}) => {
     // SWR: Fetch fresh data in background silently
     originalGet(url, config)
       .then(res => GET_CACHE.set(cacheKey, res.data))
-      .catch(() => {});
+      .catch((err) => {
+        console.error(`[API SWR ERROR] Background fetch failed for ${url}`, err?.response?.data || err.message);
+      });
       
     // Return cached data immediately
     return {
@@ -74,6 +76,24 @@ apiClient.interceptors.response.use(
   (error) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url ?? '';
+    const method = error.config?.method?.toUpperCase() || 'UNKNOWN';
+    const requestData = error.config?.data;
+    const errorData = error.response?.data || error.message;
+
+    console.groupCollapsed(
+      `%c[API ERROR] ${status || 'NETWORK'} | ${method} ${requestUrl}`,
+      'color: white; background: #ef4444; font-weight: bold; padding: 2px 6px; border-radius: 4px;'
+    );
+    console.error('Response Data:', errorData);
+    if (requestData) {
+      try {
+        console.error('Request Payload:', JSON.parse(requestData));
+      } catch (e) {
+        console.error('Request Payload:', requestData);
+      }
+    }
+    console.error('Full Error Object:', error);
+    console.groupEnd();
 
     if (status === 401 && !isPublicAuthRequest(requestUrl)) {
       clearSession();
