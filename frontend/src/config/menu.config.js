@@ -36,7 +36,6 @@ export const menuByRole = {
   ],
   siswa: [
     { iconKey: 'LayoutDashboard', label: 'Dashboard', path: '/siswa/dashboard', permission: 'view_dashboard_siswa' },
-    { iconKey: 'User', label: 'Profil Pribadi', path: '/siswa/profil-saya', permission: 'manage_profil_pribadi' },
     { iconKey: 'Bell', label: 'Pengumuman Sekolah', path: '/siswa/pengumuman', permission: 'view_pengumuman' },
     { iconKey: 'BookOpen', label: 'Data Kelas yang Dimasuki', path: '/siswa/kelas', permission: 'view_kelas_pribadi' },
     { iconKey: 'ClipboardList', label: 'Mata Pelajaran', path: '/siswa/mapel', permission: 'view_mapel' },
