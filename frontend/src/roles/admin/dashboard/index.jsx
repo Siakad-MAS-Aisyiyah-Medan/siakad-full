@@ -92,14 +92,7 @@ export default function AdminDashboard() {
   return (
     <AdminPageShell>
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
-        <div className="animate-fade-in">
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#064e3b', letterSpacing: '-0.02em' }}>
-            Dashboard
-          </h1>
-          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.25rem' }}>
-            Selamat datang di panel administrasi SIAKAD
-          </p>
-        </div>
+
 
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat, i) => (

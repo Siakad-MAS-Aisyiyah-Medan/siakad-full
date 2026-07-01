@@ -82,9 +82,7 @@ export default function GuruDashboard() {
   return (
     <MainLayout role="guru" name={name}>
       <div className="mx-auto flex max-w-[1160px] flex-col gap-6 px-5 py-6">
-        <div className="animate-fade-in">
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#064e3b', letterSpacing: '-0.02em' }}>Dashboard</h1>
-        </div>
+
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <StatCard label="Total Murid" value={stats.total_murid} icon={GraduationCap} gradient="linear-gradient(135deg, #059669 0%, #10b981 100%)" shadow="rgba(5, 150, 105, 0.3)" delay={0.1} />
