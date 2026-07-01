@@ -21,15 +21,15 @@ import { apiConfig } from '@/config/api.config';
 
 function ViewField({ label, value, multiline = false, icon: Icon }) {
   return (
-    <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', overflow: 'hidden' }}>
       {Icon && (
         <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '0.2rem' }}>
           <Icon size={20} />
         </div>
       )}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
-        <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', whiteSpace: multiline ? 'pre-line' : 'normal', fontWeight: 500 }}>
+        <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', whiteSpace: multiline ? 'pre-line' : 'normal', fontWeight: 500, wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           {value || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Belum ada data</span>}
         </p>
       </div>
