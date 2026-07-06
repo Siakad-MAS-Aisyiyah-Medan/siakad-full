@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\BerkasPendaftaran;
 use App\Models\Pendaftaran;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -194,14 +193,9 @@ class PpdbService
         return $pendaftaran->fresh(['berkas']);
     }
 
-    public function uploadBerkas(User $user, string $jenis, UploadedFile $file): BerkasPendaftaran
+    public function uploadBerkas(User $user, string $jenis, UploadedFile $file): array
     {
-        $this->berkasService->upload($user, $jenis, $file);
-        $pendaftaran = $this->state->getOwnedOrFail($user);
-
-        return BerkasPendaftaran::where('pendaftaran_id', $pendaftaran->id_pendaftaran)
-            ->where('jenis_berkas', PpdbBerkasService::normalizeJenis($jenis))
-            ->firstOrFail();
+        return $this->berkasService->upload($user, $jenis, $file);
     }
 
     public function submit(User $user): Pendaftaran

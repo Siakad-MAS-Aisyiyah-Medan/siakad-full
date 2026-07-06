@@ -239,7 +239,7 @@ class PpdbBerkasService
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
         return [
-            'id' => clone $row ? $row->id : null,
+            'id' => $row ? $row->id : null,
             'jenis_berkas' => $jenis,
             'label' => $label,
             'status' => 'valid', 

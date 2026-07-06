@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Pendaftaran extends Model
@@ -88,9 +89,9 @@ class Pendaftaran extends Model
         return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 
-    public function berkas()
+    public function berkas(): HasMany
     {
-        return $this->hasMany(BerkasPendaftaran::class, 'pendaftaran_id', 'id_pendaftaran');
+        return $this->hasMany(PendaftaranDokumen::class, 'pendaftaran_id', 'id_pendaftaran');
     }
 
     public function keteranganPribadi(): HasOne

@@ -288,15 +288,10 @@ class PendaftaranController extends Controller
             }
         }
 
-        // Validasi kelengkapan berkas
-        $uploaded = $pendaftaran->berkas()->pluck('jenis_berkas')->toArray();
-        foreach (\App\Services\PpdbBerkasService::allJenisKeys() as $jenis) {
-            $normalized = \App\Services\PpdbBerkasService::normalizeJenis($jenis);
-            if (! in_array($normalized, $uploaded, true)) {
-                $label = \App\Services\PpdbBerkasService::JENIS[$jenis] ?? $jenis;
-
-                return ApiResponse::error("Berkas {$label} wajib diunggah sebelum submit.", 422);
-            }
+        try {
+            $this->berkasService->assertAllRequiredUploaded($pendaftaran->load('dokumen'));
+        } catch (InvalidArgumentException $e) {
+            return ApiResponse::error($e->getMessage(), 422);
         }
 
         $pendaftaran->ppdb_status = 'diajukan';
@@ -318,7 +313,7 @@ class PendaftaranController extends Controller
         $this->auditAdmin('calon_siswa.ppdb.submit', $pendaftaran, ['no_registrasi' => $pendaftaran->no_registrasi]);
 
         return ApiResponse::success(
-            PpdbResource::applicant($pendaftaran->fresh(['berkas']))->resolve(),
+            PpdbResource::applicant($pendaftaran->fresh(['dokumen']))->resolve(),
             'Pendaftaran berhasil diajukan'
         );
     }

@@ -196,5 +196,13 @@ class UseCaseIntegrationTest extends TestCase
             'jenis_berkas' => 'pas_foto',
             'file' => UploadedFile::fake()->createWithContent('pengganti.png', $png),
         ])->assertUnprocessable();
+
+        Sanctum::actingAs(User::where('username', 'admin')->firstOrFail());
+        $this->getJson('/api/admin/ppdb')
+            ->assertOk()
+            ->assertJsonPath('data.0.nama_lengkap', 'Calon Murid Uji');
+        $this->getJson('/api/admin/ppdb/stats')
+            ->assertOk()
+            ->assertJsonPath('data.total', 1);
     }
 }

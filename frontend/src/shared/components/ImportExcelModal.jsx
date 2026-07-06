@@ -76,24 +76,33 @@ export default function ImportExcelModal({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem' }}>
           <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: 0, letterSpacing: '-0.02em' }}>{title}</h3>
           <button 
+            type="button"
             onClick={onClose} 
             style={{ 
-              background: '#f1f5f9', 
+              background: 'transparent', 
               border: 'none', 
               cursor: 'pointer', 
-              color: '#64748b', 
+              color: '#94a3b8', 
               width: '32px', 
-              height: '32px', 
+              height: '32px',
+              padding: '0',
               borderRadius: '50%', 
               display: 'flex', 
               alignItems: 'center', 
               justify: 'center', 
-              transition: 'all 0.2s' 
+              transition: 'all 0.2s ease' 
             }}
-            onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
-            onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = '#f1f5f9';
+              e.currentTarget.style.color = '#0f172a';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = '#94a3b8';
+            }}
+            aria-label="Tutup"
           >
-            <X size={18} />
+            <X size={20} strokeWidth={2.5} />
           </button>
         </div>
 

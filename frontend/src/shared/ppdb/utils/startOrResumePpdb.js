@@ -42,9 +42,12 @@ export async function startOrResumePpdb() {
       stepIndex,
     };
   } catch (err) {
+    const parsed = extractApiError(err);
+
     return {
       ok: false,
-      error: extractApiError(err),
+      error: parsed.message || 'Pendaftaran belum dapat dilanjutkan.',
+      fieldErrors: parsed.fieldErrors || {},
     };
   }
 }

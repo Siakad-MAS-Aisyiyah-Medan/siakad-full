@@ -100,28 +100,50 @@ class PpdbResource extends JsonResource
 
     private function berkasUrls(): array
     {
-        if (! $this->relationLoaded('berkas')) {
+        if (! $this->relationLoaded('dokumen') && ! $this->relationLoaded('berkas')) {
             return [];
         }
 
-        return $this->berkas->map(function ($b) {
-            $jenis = PpdbBerkasService::normalizeJenis($b->jenis_berkas);
-            $label = PpdbBerkasService::JENIS[$jenis] ?? $b->jenis_berkas;
+        $dokumen = $this->dokumen;
+        if (! $dokumen && $this->relationLoaded('berkas')) {
+            $dokumen = $this->berkas->first();
+        }
 
-            return [
-                'id' => $b->id,
+        if (! $dokumen) {
+            return [];
+        }
+
+        $columns = [
+            'ijazah_atau_skl' => 'file_ijazah',
+            'stk' => 'file_stk',
+            'pas_foto' => 'file_pas_photo',
+            'nisn' => 'file_nisn',
+            'kartu_keluarga' => 'file_kk',
+            'ktp_orang_tua' => 'file_ktp_ortua',
+        ];
+
+        $items = [];
+
+        foreach ($columns as $jenis => $column) {
+            $filePath = $dokumen->{$column} ?? null;
+            if (! $filePath) {
+                continue;
+            }
+
+            $label = PpdbBerkasService::JENIS[$jenis] ?? $jenis;
+
+            $items[] = [
+                'id' => $dokumen->id,
                 'jenis_berkas' => $jenis,
                 'label' => $label,
-                'file_path' => $b->file_path,
-                'url' => Storage::disk('public')->url($b->file_path),
-                'status_verifikasi' => $b->status_verifikasi,
-                'status' => match ($b->status_verifikasi) {
-                    'diterima', 'valid' => 'valid',
-                    'ditolak' => 'ditolak',
-                    default => 'menunggu_verifikasi',
-                },
-                'catatan' => $b->catatan,
+                'file_path' => $filePath,
+                'url' => Storage::disk('public')->url($filePath),
+                'status_verifikasi' => 'valid',
+                'status' => 'valid',
+                'catatan' => $dokumen->catatan_dokumen,
             ];
-        })->values()->all();
+        }
+
+        return $items;
     }
 }

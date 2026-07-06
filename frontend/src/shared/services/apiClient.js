@@ -88,7 +88,7 @@ apiClient.interceptors.response.use(
     if (requestData) {
       try {
         console.error('Request Payload:', JSON.parse(requestData));
-      } catch (e) {
+      } catch {
         console.error('Request Payload:', requestData);
       }
     }
