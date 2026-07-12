@@ -45,6 +45,7 @@ class NilaiController extends Controller
                 'meta.id_mapel' => 'required|exists:mata_pelajaran,id_mapel',
                 'meta.tahun_ajaran' => 'required|string|max:20',
                 'meta.semester' => 'required|in:Ganjil,Genap',
+                'meta.komponen_nilai' => 'nullable|in:nilai_tugas,nilai_uts,nilai_uas,nilai_praktik,nilai_sikap',
                 'items' => 'required|array|min:1',
                 'items.*.id_user_siswa' => 'required|exists:users,id_user',
                 'items.*.nilai_tugas' => 'nullable|integer|min:0|max:100',

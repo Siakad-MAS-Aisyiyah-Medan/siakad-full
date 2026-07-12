@@ -67,19 +67,45 @@ class NilaiService
     {
         $meta = $payload['meta'];
         $items = $payload['items'] ?? [];
+        $singleComponent = $meta['komponen_nilai'] ?? null;
+        $allowedComponents = ['nilai_tugas', 'nilai_uts', 'nilai_uas', 'nilai_praktik', 'nilai_sikap'];
 
         $this->assertGuruCanInput($guruId, (int) $meta['id_mapel']);
 
-        return DB::transaction(function () use ($guruId, $meta, $items) {
+        if ($singleComponent !== null && ! in_array($singleComponent, $allowedComponents, true)) {
+            throw new InvalidArgumentException('Komponen nilai tidak valid.');
+        }
+
+        return DB::transaction(function () use ($guruId, $meta, $items, $singleComponent, $allowedComponents) {
             $saved = [];
 
             foreach ($items as $row) {
+                $existing = Nilai::query()
+                    ->where('id_user_siswa', $row['id_user_siswa'])
+                    ->where('id_mapel', $meta['id_mapel'])
+                    ->where('semester', $meta['semester'])
+                    ->where('tahun_ajaran', $meta['tahun_ajaran'])
+                    ->first();
+
+                $input = [];
+                foreach ($allowedComponents as $component) {
+                    if ($singleComponent !== null) {
+                        $input[$component] = $component === $singleComponent
+                            ? ($row[$component] ?? null)
+                            : $existing?->{$component};
+                    } else {
+                        $input[$component] = array_key_exists($component, $row)
+                            ? $row[$component]
+                            : $existing?->{$component};
+                    }
+                }
+
                 $calculated = $this->calculator->calculate([
-                    'nilai_tugas' => $row['nilai_tugas'] ?? 0,
-                    'nilai_uts' => $row['nilai_uts'] ?? 0,
-                    'nilai_uas' => $row['nilai_uas'] ?? 0,
-                    'nilai_praktik' => $row['nilai_praktik'] ?? null,
-                    'nilai_sikap' => $row['nilai_sikap'] ?? null,
+                    'nilai_tugas' => $input['nilai_tugas'],
+                    'nilai_uts' => $input['nilai_uts'],
+                    'nilai_uas' => $input['nilai_uas'],
+                    'nilai_praktik' => $input['nilai_praktik'],
+                    'nilai_sikap' => $input['nilai_sikap'],
                 ]);
 
                 $nilai = Nilai::updateOrCreate(

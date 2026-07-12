@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Imports\SiswaImport;
 use App\Models\Kelas;
 use App\Models\Mapel;
+use App\Models\Nilai;
 use App\Models\Role;
 use App\Models\Siswa;
 use App\Models\User;
@@ -215,6 +216,107 @@ class UseCaseIntegrationTest extends TestCase
             'nis' => '20261999',
             'no_hp_wali' => '81234560019',
             'no_hp' => '81234560019',
+        ]);
+    }
+
+    public function test_guru_can_update_only_selected_score_component_without_overwriting_others(): void
+    {
+        $guru = User::create([
+            'name' => 'Guru Nilai Partial',
+            'username' => 'guru-nilai-partial',
+            'email' => 'guru-nilai-partial@example.test',
+            'password' => Hash::make('password'),
+            'role' => 'guru',
+            'status_aktif' => true,
+            'status_akun' => 'aktif',
+        ]);
+        $guru->guru()->create([
+            'nip' => '887766554433221100',
+            'nama_guru' => 'Guru Nilai Partial',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => 'Medan',
+            'no_hp' => '081288776655',
+            'status' => 'aktif',
+        ]);
+
+        $kelas = Kelas::create([
+            'nama_kelas' => 'XI-PARTIAL',
+            'tingkat' => 'XI',
+            'jurusan' => 'IPA',
+            'tahun_ajaran' => '2026/2027',
+            'status' => 'aktif',
+        ]);
+
+        $mapel = Mapel::create([
+            'nama_mapel' => 'Mapel Partial',
+            'tingkat' => 'XI',
+            'id_guru' => $guru->id_user,
+        ]);
+
+        $murid = User::create([
+            'name' => 'Murid Partial',
+            'username' => '20261888',
+            'email' => '20261888@siswa.siakad.sch.id',
+            'password' => Hash::make('password'),
+            'role' => 'siswa',
+            'status_aktif' => true,
+            'status_akun' => 'aktif',
+        ]);
+        $murid->siswa()->create([
+            'id_kelas' => $kelas->id_kelas,
+            'nisn' => '9988776655',
+            'nis' => '20261888',
+            'nama_siswa' => 'Murid Partial',
+            'tempat_lahir' => 'Medan',
+            'tgl_lahir' => '2008-01-01',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => 'Medan',
+            'nama_wali' => 'Wali Partial',
+            'no_hp_wali' => '081200001888',
+        ]);
+
+        Nilai::create([
+            'id_user_siswa' => $murid->id_user,
+            'id_mapel' => $mapel->id_mapel,
+            'id_guru_input' => $guru->id_user,
+            'semester' => 'Ganjil',
+            'tahun_ajaran' => '2026/2027',
+            'nilai_tugas' => 80,
+            'nilai_uts' => 70,
+            'nilai_uas' => 90,
+            'nilai_akhir' => 80,
+            'nilai_angka' => 80,
+            'predikat' => 'B',
+        ]);
+
+        Sanctum::actingAs($guru);
+
+        $this->postJson('/api/guru/nilai/bulk', [
+            'meta' => [
+                'id_kelas' => $kelas->id_kelas,
+                'id_mapel' => $mapel->id_mapel,
+                'tahun_ajaran' => '2026/2027',
+                'semester' => 'Ganjil',
+                'komponen_nilai' => 'nilai_uts',
+            ],
+            'items' => [
+                [
+                    'id_user_siswa' => $murid->id_user,
+                    'nilai_uts' => 95,
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('nilai', [
+            'id_user_siswa' => $murid->id_user,
+            'id_mapel' => $mapel->id_mapel,
+            'semester' => 'Ganjil',
+            'tahun_ajaran' => '2026/2027',
+            'nilai_tugas' => 80,
+            'nilai_uts' => 95,
+            'nilai_uas' => 90,
         ]);
     }
 

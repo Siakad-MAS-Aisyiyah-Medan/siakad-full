@@ -14,6 +14,15 @@ import { buildDefaultNilaiContexts } from '../guruTeachingUtils';
 
 const STORAGE_KEY_PREFIX = 'guru_nilai_contexts_v3_';
 const SEMESTER_OPTIONS = ['Ganjil', 'Genap'];
+const NILAI_COMPONENT_OPTIONS = [
+  { value: 'nilai_tugas', label: 'Tugas' },
+  { value: 'nilai_uts', label: 'UTS' },
+  { value: 'nilai_uas', label: 'UAS' },
+];
+
+function getNilaiComponentLabel(value) {
+  return NILAI_COMPONENT_OPTIONS.find((item) => item.value === value)?.label || 'Nilai';
+}
 
 function getStorageKey(userId) {
   return `${STORAGE_KEY_PREFIX}${userId || 'default'}`;
@@ -131,20 +140,48 @@ function NilaiContextForm({
   );
 }
 
-function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange, onSave }) {
+function NilaiInputView({ context, siswaRows, loading, saving, activeComponent, onComponentChange, onBack, onChange, onSave }) {
+  const activeLabel = getNilaiComponentLabel(activeComponent);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <PageHeader 
-        title="Isi Daftar Nilai"
-        subtitle="Masukkan nilai untuk setiap murid pada mata pelajaran yang dipilih."
+        title={`Input Nilai ${activeLabel}`}
+        subtitle="Pilih satu komponen nilai, lalu isi nilai murid untuk komponen tersebut."
       />
 
       <div className="glass" style={{ borderRadius: '16px', padding: '1.25rem 1.5rem', border: '1px solid var(--color-border)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', alignItems: 'end' }}>
           <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Tahun Ajaran</div><strong>{context.tahun_ajaran}</strong></div>
           <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Semester</div><strong>{context.semester}</strong></div>
           <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Kelas</div><strong>{context.nama_kelas}</strong></div>
           <div><div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Mata Pelajaran</div><strong>{context.nama_mapel}</strong></div>
+          <div>
+            <div style={{ color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>Komponen Nilai</div>
+            <div style={{ display: 'inline-flex', padding: '4px', border: '1px solid var(--color-border)', borderRadius: '10px', background: '#f8fafc', gap: '4px' }}>
+              {NILAI_COMPONENT_OPTIONS.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => onComponentChange(item.value)}
+                  style={{
+                    height: '32px',
+                    minWidth: '64px',
+                    padding: '0 0.75rem',
+                    border: '1px solid transparent',
+                    borderRadius: '8px',
+                    background: activeComponent === item.value ? '#fff' : 'transparent',
+                    color: activeComponent === item.value ? 'var(--color-primary-dark)' : 'var(--color-text-muted)',
+                    fontWeight: 700,
+                    boxShadow: activeComponent === item.value ? '0 1px 4px rgba(15, 23, 42, 0.12)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -155,7 +192,8 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
               <th rowSpan="2">No</th>
               <th rowSpan="2">NISN</th>
               <th rowSpan="2">Nama Murid</th>
-              <th colSpan="3" style={{ textAlign: 'center' }}>Nilai</th>
+              <th colSpan="3" style={{ textAlign: 'center' }}>Nilai Tersimpan</th>
+              <th rowSpan="2" style={{ minWidth: '180px' }}>{activeLabel}</th>
             </tr>
             <tr>
               <th>Tugas</th>
@@ -166,13 +204,13 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   Memuat daftar murid...
                 </td>
               </tr>
             ) : siswaRows.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
                   Tidak ada murid di kelas ini. Pastikan admin telah menambahkan murid ke kelas ini.
                 </td>
               </tr>
@@ -184,17 +222,20 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
                   <td style={{ fontWeight: 600 }}>{row.nama_siswa || '-'}</td>
                   {['nilai_tugas', 'nilai_uts', 'nilai_uas'].map((field) => (
                     <td key={field}>
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={row[field] !== null && row[field] !== undefined ? row[field] : ''}
-                        onChange={(event) => onChange(row.id_user_siswa, field, event.target.value)}
-                        className="form-control"
-                        style={{ minWidth: '120px' }}
-                      />
+                      {row[field] !== null && row[field] !== undefined && row[field] !== '' ? row[field] : '-'}
                     </td>
                   ))}
+                  <td>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={row[activeComponent] !== null && row[activeComponent] !== undefined ? row[activeComponent] : ''}
+                      onChange={(event) => onChange(row.id_user_siswa, activeComponent, event.target.value)}
+                      className="form-control"
+                      style={{ minWidth: '140px' }}
+                    />
+                  </td>
                 </tr>
               ))
             )}
@@ -207,7 +248,7 @@ function NilaiInputView({ context, siswaRows, loading, saving, onBack, onChange,
           Kembali
         </button>
         <button type="button" className="btn-primary" onClick={onSave} disabled={saving}>
-          {saving ? 'Menyimpan...' : 'Simpan'}
+          {saving ? 'Menyimpan...' : `Simpan ${activeLabel}`}
         </button>
       </div>
     </div>
@@ -233,6 +274,7 @@ export default function GuruNilaiPage() {
   });
   const [activeContext, setActiveContext] = useState(null);
   const [siswaRows, setSiswaRows] = useState([]);
+  const [activeComponent, setActiveComponent] = useState('nilai_uts');
   const [loading, setLoading] = useState(true);
   const [inputLoading, setInputLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -463,14 +505,11 @@ export default function GuruNilaiPage() {
           id_mapel: Number(activeContext.id_mapel),
           tahun_ajaran: activeContext.tahun_ajaran,
           semester: activeContext.semester,
+          komponen_nilai: activeComponent,
         },
         items: siswaRows.map((row) => ({
           id_user_siswa: row.id_user_siswa,
-          nilai_tugas: row.nilai_tugas === '' ? null : Number(row.nilai_tugas),
-          nilai_uts: row.nilai_uts === '' ? null : Number(row.nilai_uts),
-          nilai_uas: row.nilai_uas === '' ? null : Number(row.nilai_uas),
-          nilai_praktik: null,
-          nilai_sikap: null,
+          [activeComponent]: row[activeComponent] === '' ? null : Number(row[activeComponent]),
         })),
       });
 
@@ -479,7 +518,7 @@ export default function GuruNilaiPage() {
       );
       setContexts(nextRows);
       persistContexts(userId, nextRows);
-      toastSuccess('Berhasil', 'Nilai murid berhasil disimpan.');
+      toastSuccess('Berhasil', `Nilai ${getNilaiComponentLabel(activeComponent)} berhasil disimpan.`);
       setView('list');
       setActiveContext(null);
     } catch (error) {
@@ -595,6 +634,8 @@ export default function GuruNilaiPage() {
             siswaRows={siswaRows}
             loading={inputLoading}
             saving={saving}
+            activeComponent={activeComponent}
+            onComponentChange={setActiveComponent}
             onBack={() => {
               setView('list');
               setActiveContext(null);
