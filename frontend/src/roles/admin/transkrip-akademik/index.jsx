@@ -392,7 +392,7 @@ export default function AdminTranskripAkademikPage() {
                   </td>
                 </tr>
               ) : filteredMurid.length > 0 ? (
-                filteredMurid.slice(0, 15).map((item, idx) => (
+                filteredMurid.map((item, idx) => (
                   <tr key={item.id_user}>
                     <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>{idx + 1}</td>
                     <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{item.siswa?.nama_siswa || '-'}</td>
@@ -435,7 +435,7 @@ export default function AdminTranskripAkademikPage() {
         </div>
 
         <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-          Menampilkan {Math.min(filteredMurid.length, 15)} dari {filteredMurid.length} murid
+          Total {filteredMurid.length} murid
         </div>
       </div>
     </AdminPageShell>
