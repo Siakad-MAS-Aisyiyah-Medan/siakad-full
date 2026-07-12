@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PendaftaranResource;
 use App\Http\Resources\PpdbResource;
 use App\Http\Resources\UserResource;
-
 use App\Models\Pendaftaran;
 use App\Models\ProfilSekolah;
 use App\Models\SystemSetting;
@@ -13,6 +12,7 @@ use App\Models\User;
 use App\Services\Account\AccountRegistrationService;
 use App\Services\EnrollmentService;
 use App\Services\PendaftaranStateService;
+use App\Services\PpdbBerkasService;
 use App\Utils\ApiResponse;
 use App\Utils\AuditsAdminActions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -30,7 +30,7 @@ class PendaftaranController extends Controller
 
     public function __construct(
         private PendaftaranStateService $state,
-        private \App\Services\PpdbBerkasService $berkasService,
+        private PpdbBerkasService $berkasService,
         private AccountRegistrationService $auth,
         private EnrollmentService $enrollment
     ) {}
@@ -526,7 +526,7 @@ class PendaftaranController extends Controller
 
     public function calonPpdbUploadBerkas(Request $request)
     {
-        $jenis = implode(',', \App\Services\PpdbBerkasService::allJenisKeys());
+        $jenis = implode(',', PpdbBerkasService::allJenisKeys());
         $maxKb = (int) config('ppdb.berkas.max_size_kb', 2048);
 
         $validated = $request->validate([
@@ -991,7 +991,7 @@ class PendaftaranController extends Controller
         $total = Pendaftaran::count();
         $accepted = Pendaftaran::whereIn('ppdb_status', ['diterima', 'accepted', 'menjadi_murid'])->count();
         $rejected = Pendaftaran::whereIn('ppdb_status', ['ditolak', 'rejected'])->count();
-        
+
         $belum_mengirim = Pendaftaran::where('ppdb_status', 'draft')->count();
         $sudah_mengirim = Pendaftaran::whereIn('ppdb_status', ['submitted', 'diajukan', 'terverifikasi', 'verified'])->count();
         $revisi = Pendaftaran::whereIn('ppdb_status', ['revisi', 'dikembalikan'])->count();
@@ -1052,7 +1052,19 @@ class PendaftaranController extends Controller
 
     private function adminFind(int $id): Pendaftaran
     {
-        return Pendaftaran::with(['user', 'berkas'])->findOrFail($id);
+        $pendaftaran = Pendaftaran::with(['user', 'berkas', 'dokumen'])->findOrFail($id);
+
+        $dokumen = $pendaftaran->dokumen;
+        if ($dokumen) {
+            $pendaftaran->file_ijazah ??= $dokumen->file_ijazah;
+            $pendaftaran->file_stk ??= $dokumen->file_stk;
+            $pendaftaran->file_pas_photo ??= $dokumen->file_pas_photo;
+            $pendaftaran->file_nisn ??= $dokumen->file_nisn;
+            $pendaftaran->file_kk ??= $dokumen->file_kk;
+            $pendaftaran->file_ktp_ortua ??= $dokumen->file_ktp_ortua;
+        }
+
+        return $pendaftaran;
     }
 
     public function adminPpdbVerifikasi($id)

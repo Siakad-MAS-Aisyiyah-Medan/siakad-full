@@ -123,6 +123,25 @@ function FileLink({ label, path }) {
   );
 }
 
+const BERKAS_FILE_MAP = {
+  kartu_keluarga: 'file_kk',
+  nisn: 'file_nisn',
+  pas_foto: 'file_pas_photo',
+  ijazah_atau_skl: 'file_ijazah',
+  stk: 'file_stk',
+  ktp_orang_tua: 'file_ktp_ortua',
+};
+
+function resolveBerkasPath(data, jenis) {
+  const legacyField = BERKAS_FILE_MAP[jenis];
+  if (data?.[legacyField]) return data[legacyField];
+
+  const items = Array.isArray(data?.berkas) ? data.berkas : [];
+  const item = items.find((entry) => entry?.jenis_berkas === jenis);
+
+  return item?.file_path || item?.path_file || item?.url || item?.preview_url || null;
+}
+
 import PageHeader from '@/shared/components/PageHeader';
 
 export default function AdminDetailPendaftar({ readOnly = false }) {
@@ -299,12 +318,12 @@ export default function AdminDetailPendaftar({ readOnly = false }) {
 
             <SectionCard title="Berkas Pendaftaran" icon={FolderOpen}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', rowGap: '2rem' }}>
-                <FileLink label="Kartu Keluarga (KK)" path={data.file_kk} />
-                <FileLink label="Akta Kelahiran / Surat Tanda Kelahiran" path={data.file_stk} />
-                <FileLink label="Pas Photo" path={data.file_pas_photo} />
-                <FileLink label="Ijazah Terakhir" path={data.file_ijazah} />
-                <FileLink label="Kartu NISN" path={data.file_nisn} />
-                <FileLink label="KTP Orang Tua" path={data.file_ktp_ortua} />
+                <FileLink label="Kartu Keluarga (KK)" path={resolveBerkasPath(data, 'kartu_keluarga')} />
+                <FileLink label="Akta Kelahiran" path={resolveBerkasPath(data, 'nisn')} />
+                <FileLink label="Pas Foto" path={resolveBerkasPath(data, 'pas_foto')} />
+                <FileLink label="Ijazah / STTB SMP" path={resolveBerkasPath(data, 'ijazah_atau_skl')} />
+                <FileLink label="Rapor Semester 1-5" path={resolveBerkasPath(data, 'stk')} />
+                <FileLink label="Surat Keterangan Lulus" path={resolveBerkasPath(data, 'ktp_orang_tua')} />
               </div>
             </SectionCard>
 

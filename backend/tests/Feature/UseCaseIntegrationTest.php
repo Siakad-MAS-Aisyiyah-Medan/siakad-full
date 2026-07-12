@@ -343,5 +343,12 @@ class UseCaseIntegrationTest extends TestCase
         $this->getJson('/api/admin/ppdb/stats')
             ->assertOk()
             ->assertJsonPath('data.total', 1);
+
+        $pendaftaran = $candidate->pendaftaran()->firstOrFail();
+        $this->getJson("/api/admin/ppdb/{$pendaftaran->id_pendaftaran}")
+            ->assertOk()
+            ->assertJsonPath('data.file_kk', fn ($path) => is_string($path) && str_contains($path, 'kartu_keluarga'))
+            ->assertJsonPath('data.file_pas_photo', fn ($path) => is_string($path) && str_contains($path, 'pas_foto'))
+            ->assertJsonPath('data.berkas.0.pendaftaran_id', $pendaftaran->id_pendaftaran);
     }
 }
