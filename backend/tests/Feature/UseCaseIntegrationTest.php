@@ -9,6 +9,7 @@ use App\Services\PermissionService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -149,6 +150,25 @@ class UseCaseIntegrationTest extends TestCase
             'status_akun' => 'aktif',
             'status_aktif' => true,
         ]);
+    }
+
+    public function test_admin_with_short_locked_username_can_update_profile_password(): void
+    {
+        $admin = User::where('username', 'admin')->firstOrFail();
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/akun/profile', [
+            'name' => 'Administrator',
+            'email' => $admin->email,
+            'username' => 'admin',
+            'current_password' => 'password',
+            'new_password' => 'Admin123',
+            'new_password_confirmation' => 'Admin123',
+        ])->assertOk();
+
+        $admin->refresh();
+        $this->assertSame('admin', $admin->username);
+        $this->assertTrue(Hash::check('Admin123', $admin->password));
     }
 
     public function test_personal_profile_update_maps_role_specific_fields(): void

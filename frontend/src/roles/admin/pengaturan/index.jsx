@@ -115,6 +115,10 @@ export default function PengaturanSistemPage() {
       toastError('Gagal', 'Konfirmasi password tidak cocok.');
       return;
     }
+    if (form.new_password && !form.current_password) {
+      toastError('Gagal', 'Password saat ini wajib diisi untuk mengganti password.');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -135,7 +139,11 @@ export default function PengaturanSistemPage() {
       setIsEditing(false);
       toastSuccess('Berhasil', 'Profil berhasil diperbarui.');
     } catch (error) {
-      const msg = error.response?.data?.message || 'Terjadi kesalahan saat menyimpan profil.';
+      const fieldErrors = error.response?.data?.errors;
+      const firstFieldError = fieldErrors
+        ? Object.values(fieldErrors).flat().find(Boolean)
+        : null;
+      const msg = firstFieldError || error.response?.data?.message || 'Terjadi kesalahan saat menyimpan profil.';
       toastError('Gagal', msg);
     } finally {
       setSaving(false);

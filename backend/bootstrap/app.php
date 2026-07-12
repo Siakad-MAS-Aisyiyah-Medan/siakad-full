@@ -84,4 +84,15 @@ $app = $builder->create();
 // PENGATURAN EKSTREM: Memindahkan storage ke folder Temp bawaan Windows
 $app->useStoragePath(sys_get_temp_dir().DIRECTORY_SEPARATOR.'siakad_storage');
 
+foreach ([
+    $app->storagePath('framework/cache/data'),
+    $app->storagePath('framework/sessions'),
+    $app->storagePath('framework/views'),
+    $app->storagePath('logs'),
+] as $runtimePath) {
+    if (! is_dir($runtimePath)) {
+        @mkdir($runtimePath, 0755, true);
+    }
+}
+
 return $app;

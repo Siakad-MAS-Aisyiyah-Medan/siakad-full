@@ -297,7 +297,6 @@ class AkunController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|min:10|max:255|unique:users,username,'.$user->id_user.',id_user',
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
             'current_password' => 'nullable|string',
             'new_password' => 'nullable|string|min:6|confirmed',
@@ -322,7 +321,6 @@ class AkunController extends Controller
         }
 
         $user->name = $validated['name'];
-        $user->username = $validated['username'];
         $user->email = $validated['email'];
         $user->save();
 
