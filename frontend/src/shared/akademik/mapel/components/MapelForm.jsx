@@ -18,6 +18,12 @@ export default function MapelForm({ view, formData, guruData, kelasData = [], lo
     onChange({ target: { name: 'id_kelas', value: newValue } });
   };
 
+  const activeGuruData = guruData.filter(g => {
+    const profile = g.guru || g.profile || {};
+    const isAktif = profile.status !== 'nonaktif';
+    return isAktif || g.id_user === formData.id_guru;
+  });
+
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader 
@@ -36,7 +42,7 @@ export default function MapelForm({ view, formData, guruData, kelasData = [], lo
               <EditRow label="Guru Pengampu">
                 <select name="id_guru" value={formData.id_guru || ''} onChange={onChange} className="form-control" required>
                   <option value="">Pilih guru mata pelajaran</option>
-                  {guruData.map((guru) => (
+                  {activeGuruData.map((guru) => (
                     <option key={guru.id_user} value={guru.id_user}>{guruLabel(guru)}</option>
                   ))}
                 </select>
@@ -76,7 +82,7 @@ export default function MapelForm({ view, formData, guruData, kelasData = [], lo
                 <FormLabel required>Guru Pengampu</FormLabel>
                 <select name="id_guru" value={formData.id_guru || ''} onChange={onChange} className="form-control" disabled={readOnly} required>
                   <option value="">Pilih guru mata pelajaran</option>
-                  {guruData.map((guru) => (
+                  {activeGuruData.map((guru) => (
                     <option key={guru.id_user} value={guru.id_user}>{guruLabel(guru)}</option>
                   ))}
                 </select>

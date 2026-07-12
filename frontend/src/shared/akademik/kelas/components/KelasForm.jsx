@@ -6,6 +6,12 @@ import PageHeader from '@/shared/components/PageHeader';
 export default function KelasForm({ view, formData, guruData, tahunAjaranData = [], loading, onChange, onSubmit, onCancel, readOnly = false }) {
   const isEdit = view === 'edit' && !readOnly;
 
+  const activeGuruData = guruData.filter(g => {
+    const profile = g.guru || g.profile || {};
+    const isAktif = profile.status !== 'nonaktif';
+    return isAktif || g.id_user === formData.id_wali_kelas;
+  });
+
   return (
     <div className="admin-page-wrapper animate-fade-in">
       <PageHeader 
@@ -45,7 +51,7 @@ export default function KelasForm({ view, formData, guruData, tahunAjaranData = 
               <EditRow label="Wali Kelas">
                 <select name="id_wali_kelas" value={formData.id_wali_kelas || ''} onChange={onChange} className="form-control">
                   <option value="">Pilih wali kelas</option>
-                  {guruData.map((guru) => (
+                  {activeGuruData.map((guru) => (
                     <option key={guru.id_user} value={guru.id_user}>{guruLabel(guru)}</option>
                   ))}
                 </select>
@@ -95,7 +101,7 @@ export default function KelasForm({ view, formData, guruData, tahunAjaranData = 
                 <FormLabel>Wali Kelas</FormLabel>
                 <select name="id_wali_kelas" value={formData.id_wali_kelas || ''} onChange={onChange} className="form-control" disabled={readOnly}>
                   <option value="">Pilih wali kelas</option>
-                  {guruData.map((guru) => (
+                  {activeGuruData.map((guru) => (
                     <option key={guru.id_user} value={guru.id_user}>{guruLabel(guru)}</option>
                   ))}
                 </select>
