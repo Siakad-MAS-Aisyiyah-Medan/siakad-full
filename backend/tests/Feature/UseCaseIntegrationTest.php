@@ -332,6 +332,22 @@ class UseCaseIntegrationTest extends TestCase
             ->assertJsonPath('data.redirect_path', '/siswa/dashboard');
     }
 
+    public function test_kepsek_can_login_with_profile_nip_when_kepsek_access_is_selected(): void
+    {
+        $kepsek = User::where('username', 'kepsek')->firstOrFail();
+        $nip = $kepsek->kepalaSekolah?->nip;
+
+        $this->assertNotEmpty($nip);
+
+        $this->postJson('/api/login', [
+            'login' => $nip,
+            'password' => 'password',
+            'role' => 'kepsek',
+        ])->assertOk()
+            ->assertJsonPath('data.user.role', 'kepsek')
+            ->assertJsonPath('data.redirect_path', '/kepala-sekolah/dashboard');
+    }
+
     public function test_guru_can_update_only_selected_score_component_without_overwriting_others(): void
     {
         $guru = User::create([

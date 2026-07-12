@@ -11,6 +11,7 @@ export async function login(credentials) {
   const response = await apiClient.post('/login', {
     login: credentials.login ?? credentials.username ?? credentials.email ?? '',
     password: credentials.password,
+    role: credentials.role ?? credentials.access ?? '',
   });
   return unwrapData(response);
 }

@@ -80,11 +80,13 @@ class AuthController extends Controller
             'login' => 'required|string|max:255',
             'password' => 'required|string',
             'username' => 'sometimes|string|max:255',
+            'role' => 'nullable|in:admin,kepsek,guru,siswa,calon_siswa',
         ]);
 
         $result = $this->processLogin(
             $validated['login'],
-            $validated['password']
+            $validated['password'],
+            $validated['role'] ?? null
         );
 
         if (isset($result['error'])) {
@@ -143,20 +145,33 @@ class AuthController extends Controller
      *
      * @return array{data: array}|array{error: string, code: int}
      */
-    private function processLogin(string $login, string $password): array
+    private function processLogin(string $login, string $password, ?string $role = null): array
     {
         $login = trim($login);
         $loginCandidates = $this->loginLookupCandidates($login);
 
         $user = User::query()
+            ->with(['admin', 'kepalaSekolah', 'guru', 'siswa'])
+            ->when($role, fn ($query) => $query->where('role', $role))
             ->where(function ($query) use ($login, $loginCandidates) {
                 $query->whereIn('username', $loginCandidates)
                     ->orWhere('email', $login)
+                    ->orWhereHas('admin', function ($adminQuery) use ($loginCandidates) {
+                        $adminQuery->whereIn('nip', $loginCandidates);
+                    })
+                    ->orWhereHas('kepalaSekolah', function ($kepsekQuery) use ($loginCandidates) {
+                        $kepsekQuery->whereIn('nip', $loginCandidates);
+                    })
+                    ->orWhereHas('guru', function ($guruQuery) use ($loginCandidates) {
+                        $guruQuery->whereIn('nip', $loginCandidates);
+                    })
                     ->orWhereHas('siswa', function ($siswaQuery) use ($loginCandidates) {
                         $siswaQuery->whereIn('nisn', $loginCandidates)
                             ->orWhereIn('nis', $loginCandidates);
                     });
             })
+            ->get()
+            ->sortBy(fn (User $candidate) => $this->loginMatchPriority($candidate, $login, $loginCandidates, $role))
             ->first();
 
         if (! $user) {
@@ -235,6 +250,26 @@ class AuthController extends Controller
         }
 
         return array_values(array_unique($candidates));
+    }
+
+    private function loginMatchPriority(User $user, string $login, array $loginCandidates, ?string $role): int
+    {
+        if ($role !== null) {
+            return 0;
+        }
+
+        $matches = fn ($value): bool => $value !== null && in_array((string) $value, $loginCandidates, true);
+
+        return match (true) {
+            (string) $user->email === $login => 0,
+            (string) $user->username === $login => 1,
+            $matches($user->username) => 2,
+            $matches($user->siswa?->nisn), $matches($user->siswa?->nis) => 3,
+            $matches($user->guru?->nip) => 4,
+            $matches($user->kepalaSekolah?->nip) => 5,
+            $matches($user->admin?->nip) => 6,
+            default => 99,
+        };
     }
 
     /**

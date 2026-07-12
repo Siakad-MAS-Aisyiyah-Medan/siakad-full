@@ -58,7 +58,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const result = await login({ login: username.trim(), password });
+      const result = await login({ login: username.trim(), password, role: access });
       const selected = ACCESS_OPTIONS.find((item) => item.value === access);
       if (!selected?.roles.includes(result.user.role)) {
         throw new Error(`Akun ini tidak memiliki akses sebagai ${selected?.label}.`);
