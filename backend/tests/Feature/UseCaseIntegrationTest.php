@@ -258,6 +258,44 @@ class UseCaseIntegrationTest extends TestCase
             ->assertJsonPath('data.user.role', 'siswa');
     }
 
+    public function test_imported_student_can_login_when_excel_drops_leading_zero_from_nisn(): void
+    {
+        $kelas = Kelas::create([
+            'nama_kelas' => 'XI-LOGIN-ZERO',
+            'tingkat' => 'XI',
+            'jurusan' => 'IPA',
+            'tahun_ajaran' => '2026/2027',
+            'status' => 'aktif',
+        ]);
+
+        (new SiswaImport($kelas->id_kelas))->import([
+            [
+                'NISN' => 987654321,
+                'NIS' => '20262002',
+                'nama' => 'Murid Login Nol Depan',
+                'tempat_lahir' => 'Medan',
+                'tgl_lahir' => '27/02/2006',
+                'lp' => 'L',
+                'agama' => 'Islam',
+                'alamat' => 'Medan',
+                'nama_wali' => 'Wali Login',
+                'no_hp_wali' => '81234562002',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('siswa', [
+            'nisn' => '987654321',
+            'nis' => '20262002',
+        ]);
+
+        $this->postJson('/api/login', [
+            'login' => '0987654321',
+            'password' => 'admin123',
+        ])->assertOk()
+            ->assertJsonPath('data.user.role', 'siswa')
+            ->assertJsonPath('data.redirect_path', '/siswa/dashboard');
+    }
+
     public function test_guru_can_update_only_selected_score_component_without_overwriting_others(): void
     {
         $guru = User::create([

@@ -146,14 +146,15 @@ class AuthController extends Controller
     private function processLogin(string $login, string $password): array
     {
         $login = trim($login);
+        $loginCandidates = $this->loginLookupCandidates($login);
 
         $user = User::query()
-            ->where(function ($query) use ($login) {
-                $query->where('username', $login)
+            ->where(function ($query) use ($login, $loginCandidates) {
+                $query->whereIn('username', $loginCandidates)
                     ->orWhere('email', $login)
-                    ->orWhereHas('siswa', function ($siswaQuery) use ($login) {
-                        $siswaQuery->where('nisn', $login)
-                            ->orWhere('nis', $login);
+                    ->orWhereHas('siswa', function ($siswaQuery) use ($loginCandidates) {
+                        $siswaQuery->whereIn('nisn', $loginCandidates)
+                            ->orWhereIn('nis', $loginCandidates);
                     });
             })
             ->first();
@@ -214,6 +215,26 @@ class AuthController extends Controller
                 'redirect_path' => $redirectPath,
             ],
         ];
+    }
+
+    private function loginLookupCandidates(string $login): array
+    {
+        $candidates = [$login];
+        $compact = preg_replace('/[\s\-.]+/', '', $login);
+
+        if ($compact !== null && $compact !== '') {
+            $candidates[] = $compact;
+
+            if (ctype_digit($compact)) {
+                $withoutLeadingZero = ltrim($compact, '0');
+                $withoutLeadingZero = $withoutLeadingZero === '' ? '0' : $withoutLeadingZero;
+
+                $candidates[] = $withoutLeadingZero;
+                $candidates[] = str_pad($withoutLeadingZero, 10, '0', STR_PAD_LEFT);
+            }
+        }
+
+        return array_values(array_unique($candidates));
     }
 
     /**
