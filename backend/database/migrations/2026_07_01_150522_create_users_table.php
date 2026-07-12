@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id_user');
             $table->string('name')->nullable();
             $table->string('username')->unique();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'kepsek', 'guru', 'siswa', 'calon_siswa']);
             $table->boolean('status_aktif')->default(true);

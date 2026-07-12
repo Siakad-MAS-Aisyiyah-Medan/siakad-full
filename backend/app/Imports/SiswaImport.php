@@ -53,7 +53,7 @@ class SiswaImport
                 $user = User::create([
                     'name' => $row['nama'],
                     'username' => $nis,
-                    'email' => $nis.'@siswa.siakad.sch.id',
+                    'email' => null,
                     'password' => Hash::make('admin123'),
                     'role' => 'siswa',
                     'status_aktif' => true,

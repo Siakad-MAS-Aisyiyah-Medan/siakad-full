@@ -39,7 +39,7 @@ class GuruService
         return DB::transaction(function () use ($data) {
             $user = User::create([
                 'username' => $data['username'],
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'password' => $data['password'],
                 'status_aktif' => true,
             ]);
@@ -81,7 +81,7 @@ class GuruService
 
             $user->fill([
                 'username' => $data['username'],
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'status_aktif' => $data['status_aktif'] ?? $user->status_aktif,
             ]);
             $user->role = $data['role'];

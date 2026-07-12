@@ -105,9 +105,9 @@ export default function PengaturanSistemPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!form.name?.trim() || !form.email?.trim()) {
+    if (!form.name?.trim()) {
       import('@/shared/hooks/useConfirm').then(({ toastValidation }) => {
-        toastValidation('Periksa Kembali', 'Nama Lengkap dan Alamat Email wajib diisi.');
+        toastValidation('Periksa Kembali', 'Nama Lengkap wajib diisi.');
       });
       return;
     }
@@ -125,7 +125,7 @@ export default function PengaturanSistemPage() {
       const payload = {
         name: form.name,
         username: form.username,
-        email: form.email,
+        email: form.email?.trim() || null,
       };
       if (form.new_password) {
         payload.current_password = form.current_password;
@@ -211,10 +211,10 @@ export default function PengaturanSistemPage() {
                 </div>
               </div>
               <div>
-                <FormLabel required>Alamat Email</FormLabel>
+                <FormLabel>Alamat Email</FormLabel>
                 <div style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><Mail size={18} /></div>
-                  <input type="email" name="email" value={form.email} onChange={handleChange} className="form-control" style={{ paddingLeft: '2.75rem' }} placeholder="Alamat Email" required />
+                  <input type="email" name="email" value={form.email} onChange={handleChange} className="form-control" style={{ paddingLeft: '2.75rem' }} placeholder="Opsional, bisa diisi nanti" />
                 </div>
               </div>
               <div>

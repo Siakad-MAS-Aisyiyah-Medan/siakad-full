@@ -119,12 +119,11 @@ export function useGuru() {
         const payload = new FormData();
         const fallbackId = 'guru_' + Date.now().toString().slice(-6);
         const generatedUsername = formData.username || formData.nip_nuptk || formData.no_hp || fallbackId;
-        const generatedEmail = formData.email || `${generatedUsername}@mas.sch.id`;
         const defaultPassword = `admin123`;
         const normalized = {
           ...formData,
           username: generatedUsername,
-          email: generatedEmail,
+          email: formData.email || '',
           password: formData.password || defaultPassword,
         };
         normalized.nip = normalized.nip_nuptk;

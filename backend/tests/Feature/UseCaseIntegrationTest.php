@@ -110,6 +110,37 @@ class UseCaseIntegrationTest extends TestCase
         ]);
     }
 
+    public function test_user_management_hides_system_generated_email_addresses(): void
+    {
+        $admin = User::where('username', 'admin')->firstOrFail();
+        Sanctum::actingAs($admin);
+
+        User::create([
+            'name' => 'Murid Email Sistem',
+            'username' => '20263001',
+            'email' => '20263001@siswa.siakad.sch.id',
+            'password' => Hash::make('admin123'),
+            'role' => 'siswa',
+            'status_aktif' => true,
+            'status_akun' => 'aktif',
+        ])->siswa()->create([
+            'id_kelas' => null,
+            'nisn' => '7766554433',
+            'nis' => '20263001',
+            'nama_siswa' => 'Murid Email Sistem',
+            'tempat_lahir' => 'Medan',
+            'tgl_lahir' => '2008-01-01',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => 'Medan',
+            'nama_wali' => 'Wali Email',
+            'no_hp_wali' => '081200003001',
+        ]);
+
+        $response = $this->getJson('/api/akun?search=20263001')->assertOk();
+        $this->assertNull($response->json('data.users.0.email'));
+    }
+
     public function test_guru_murid_diajar_uses_student_nisn_not_login_username(): void
     {
         $guru = User::create([
@@ -216,6 +247,11 @@ class UseCaseIntegrationTest extends TestCase
             'nis' => '20261999',
             'no_hp_wali' => '81234560019',
             'no_hp' => '81234560019',
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'username' => '20261999',
+            'email' => null,
         ]);
     }
 

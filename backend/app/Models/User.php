@@ -25,6 +25,12 @@ class User extends Authenticatable
 
     public const STATUS_AKUN = ['aktif', 'pending', 'nonaktif', 'diblokir'];
 
+    private const SYSTEM_EMAIL_DOMAINS = [
+        '@siswa.siakad.sch.id',
+        '@guru.siakad.sch.id',
+        '@mas.sch.id',
+    ];
+
     protected $fillable = [
         'name',
         'username',
@@ -53,6 +59,26 @@ class User extends Authenticatable
     public function admin()
     {
         return $this->hasOne(Admin::class, 'id_user', 'id_user');
+    }
+
+    public static function isSystemGeneratedEmail(?string $email): bool
+    {
+        if ($email === null || trim($email) === '') {
+            return false;
+        }
+
+        foreach (self::SYSTEM_EMAIL_DOMAINS as $domain) {
+            if (str_ends_with(strtolower($email), $domain)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function displayEmail(): ?string
+    {
+        return self::isSystemGeneratedEmail($this->email) ? null : $this->email;
     }
 
     public function kepalaSekolah()

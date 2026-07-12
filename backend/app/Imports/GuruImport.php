@@ -45,7 +45,7 @@ class GuruImport
                 $user = User::create([
                     'name' => $row['nama'],
                     'username' => $nip,
-                    'email' => $nip.'@guru.siakad.sch.id',
+                    'email' => null,
                     'password' => Hash::make('admin123'),
                     'role' => 'guru',
                     'status_aktif' => true,

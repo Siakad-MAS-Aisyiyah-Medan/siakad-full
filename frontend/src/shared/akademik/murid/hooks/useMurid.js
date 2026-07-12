@@ -228,7 +228,7 @@ export function useMurid() {
         const payload = {
           ...formData,
           username: generatedUsername,
-          email: formData.email || `${generatedUsername}@mas.sch.id`,
+          email: formData.email || '',
           password: formData.password || defaultPassword,
         };
         

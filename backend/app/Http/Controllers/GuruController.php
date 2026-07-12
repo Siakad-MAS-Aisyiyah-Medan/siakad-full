@@ -39,7 +39,7 @@ class GuruController extends Controller
     {
         $validated = $request->validate([
             'username' => 'required|unique:users,username',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'password' => 'required|min:8',
             'nama_guru' => 'required|string|max:255',
             'nip' => 'required|string|min:10|max:50|unique:guru,nip',
@@ -67,7 +67,7 @@ class GuruController extends Controller
     {
         $validated = $request->validate([
             'username' => 'required|unique:users,username,'.$id.',id_user',
-            'email' => 'required|email|unique:users,email,'.$id.',id_user',
+            'email' => 'nullable|email|unique:users,email,'.$id.',id_user',
             'password' => 'nullable|min:8',
             'nama_guru' => 'required|string|max:255',
             'nip' => 'required|string|min:10|max:50|unique:guru,nip,'.$id.',id_user',
@@ -134,7 +134,7 @@ class GuruController extends Controller
             $user = User::create([
                 'name' => $data['nama_guru'],
                 'username' => $data['username'],
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'password' => $data['password'],
                 'role' => $data['role'],
                 'status_aktif' => true,
@@ -177,7 +177,7 @@ class GuruController extends Controller
             $user->fill([
                 'name' => $data['nama_guru'],
                 'username' => $data['username'],
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'status_aktif' => $data['status_aktif'] ?? $user->status_aktif,
             ]);
             $user->role = $data['role'];

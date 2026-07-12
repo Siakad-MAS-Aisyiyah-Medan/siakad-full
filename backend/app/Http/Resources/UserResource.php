@@ -13,7 +13,7 @@ class UserResource extends JsonResource
             'id_user' => $this->id_user,
             'name' => $this->name,
             'username' => $this->username,
-            'email' => $this->email,
+            'email' => $this->displayEmail(),
             'role' => $this->role,
             'status_aktif' => (bool) $this->status_aktif,
             'status_akun' => $this->status_akun ?? (($this->status_aktif ?? true) ? 'aktif' : 'nonaktif'),

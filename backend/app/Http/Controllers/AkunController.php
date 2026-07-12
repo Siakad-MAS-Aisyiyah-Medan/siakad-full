@@ -83,7 +83,7 @@ class AkunController extends Controller
                 'id' => $user->id_user,
                 'name' => $realName ?: '-',
                 'username' => $user->username,
-                'email' => $user->email,
+                'email' => $user->displayEmail(),
                 'role' => $user->role,
                 'status' => $user->status_akun ?? ($user->status_aktif ? 'aktif' : 'nonaktif'),
                 'nip_nisn' => $nipNisn,
@@ -115,7 +115,7 @@ class AkunController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|min:10|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|string|in:'.implode(',', User::ROLES),
             'status' => 'nullable|string|in:aktif,nonaktif',
@@ -124,7 +124,7 @@ class AkunController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'username' => $validated['username'],
-            'email' => $validated['email'],
+            'email' => $validated['email'] ?? null,
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'status_aktif' => ($validated['status'] ?? 'aktif') === 'aktif',
@@ -189,7 +189,7 @@ class AkunController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
+            'email' => 'nullable|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
             'role' => 'required|string|in:'.implode(',', User::ROLES),
             'status' => 'nullable|string|in:aktif,nonaktif',
             'no_hp' => 'nullable|string|max:20',
@@ -213,7 +213,7 @@ class AkunController extends Controller
         }
 
         $user->name = $validated['name'];
-        $user->email = $validated['email'];
+        $user->email = $validated['email'] ?? null;
         $user->role = $validated['role'];
         if ($request->filled('status')) {
             $user->status_akun = $validated['status'];
@@ -297,7 +297,7 @@ class AkunController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
+            'email' => 'nullable|string|email|max:255|unique:users,email,'.$user->id_user.',id_user',
             'current_password' => 'nullable|string',
             'new_password' => 'nullable|string|min:6|confirmed',
         ]);
@@ -321,7 +321,7 @@ class AkunController extends Controller
         }
 
         $user->name = $validated['name'];
-        $user->email = $validated['email'];
+        $user->email = $validated['email'] ?? null;
         $user->save();
 
         $this->auditAdmin('profile.update', $user, ['username' => $user->username]);

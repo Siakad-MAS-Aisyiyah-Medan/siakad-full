@@ -88,8 +88,8 @@ export default function HakAksesPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!formData.name.trim() || !formData.email.trim()) {
-      toastValidation('Periksa Kembali', 'Nama lengkap dan e-mail wajib diisi.');
+    if (!formData.name.trim()) {
+      toastValidation('Periksa Kembali', 'Nama lengkap wajib diisi.');
       return;
     }
 
@@ -109,7 +109,7 @@ export default function HakAksesPage() {
     try {
       const payload = {
         name: formData.name,
-        email: formData.email,
+        email: formData.email.trim() || null,
         role: formData.role,
         status: formData.status,
         no_hp: formData.no_hp,
@@ -123,7 +123,7 @@ export default function HakAksesPage() {
         await updateAdminAkun(editId, payload);
         toastSuccess('Berhasil', 'Data akun berhasil diperbarui.');
       } else {
-        const baseUsername = formData.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '') || 'admin';
+        const baseUsername = formData.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'akun';
         payload.username = formData.nip_nisn.trim() || `${baseUsername}${Math.floor(1000 + Math.random() * 9000)}`;
         await createAdminAkun(payload);
         toastSuccess('Berhasil', 'Akun baru berhasil ditambahkan.');
@@ -257,7 +257,7 @@ export default function HakAksesPage() {
                         </td>
                         <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{akun.nip_nisn || akun.username || '-'}</td>
                         <td style={{ fontWeight: 500 }}>{akun.name}</td>
-                        <td>{akun.email}</td>
+                        <td>{akun.email || '-'}</td>
                         <td>
                           <span style={{
                             display: 'inline-flex',
@@ -384,14 +384,13 @@ export default function HakAksesPage() {
                   />
                 </div>
                 <div>
-                  <FormLabel required>E-mail</FormLabel>
+                  <FormLabel>E-mail</FormLabel>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
-                    placeholder="Masukkan e-mail"
+                    placeholder="Opsional, bisa diatur pengguna nanti"
                     className="form-control"
-                    required
                   />
                 </div>
 
