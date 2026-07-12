@@ -70,6 +70,40 @@ class UseCaseIntegrationTest extends TestCase
         $this->deleteJson('/api/pengumuman/1')->assertForbidden();
     }
 
+    public function test_admin_can_create_teacher_account(): void
+    {
+        Sanctum::actingAs(User::where('username', 'admin')->firstOrFail());
+
+        $this->postJson('/api/guru', [
+            'username' => '0909009099021099090',
+            'email' => 'guru-baru@example.test',
+            'password' => 'admin123',
+            'nama_guru' => 'Guru Baru',
+            'nip' => '0909009099021099090',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => 'Medan',
+            'no_hp' => '082200000001',
+            'role' => 'guru',
+            'status' => 'aktif',
+        ])->assertCreated()
+            ->assertJsonPath('data.role', 'guru')
+            ->assertJsonPath('data.guru.nip', '0909009099021099090');
+
+        $this->assertDatabaseHas('users', [
+            'username' => '0909009099021099090',
+            'email' => 'guru-baru@example.test',
+            'role' => 'guru',
+            'status_akun' => 'aktif',
+        ]);
+
+        $this->assertDatabaseHas('guru', [
+            'nip' => '0909009099021099090',
+            'nama_guru' => 'Guru Baru',
+            'status' => 'aktif',
+        ]);
+    }
+
     public function test_admin_cannot_change_own_role_or_status_from_user_management(): void
     {
         $admin = User::where('username', 'admin')->firstOrFail();

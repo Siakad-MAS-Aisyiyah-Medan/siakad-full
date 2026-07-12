@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Guru;
 use App\Models\JadwalPelajaran;
 use App\Models\Kelas;
@@ -137,10 +136,10 @@ class GuruController extends Controller
                 'username' => $data['username'],
                 'email' => $data['email'],
                 'password' => $data['password'],
+                'role' => $data['role'],
                 'status_aktif' => true,
+                'status_akun' => $data['status'],
             ]);
-            $user->role = $data['role'];
-            $user->save();
 
             $fotoPath = null;
             if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {

@@ -71,7 +71,7 @@ export function useGuru() {
       email: guru.email,
       password: '',
       nama_guru: profile.nama_guru || '',
-      nip_nuptk: profile.nip_nuptk || '',
+      nip_nuptk: profile.nip || profile.nip_nuptk || '',
       jenis_kelamin: profile.jenis_kelamin || 'L',
       agama: profile.agama || 'Islam',
       alamat: profile.alamat || '',
@@ -127,6 +127,9 @@ export function useGuru() {
           email: generatedEmail,
           password: formData.password || defaultPassword,
         };
+        normalized.nip = normalized.nip_nuptk;
+        delete normalized.nip_nuptk;
+
         Object.keys(normalized).forEach(key => {
           if (normalized[key] !== null && normalized[key] !== '') {
             payload.append(key, normalized[key]);
@@ -137,11 +140,17 @@ export function useGuru() {
         toastSuccess('Berhasil', 'Data berhasil disimpan');
       } else {
         const payload = new FormData();
-        Object.keys(formData).forEach(key => {
+        const normalized = {
+          ...formData,
+          nip: formData.nip_nuptk,
+        };
+        delete normalized.nip_nuptk;
+
+        Object.keys(normalized).forEach(key => {
           if (key === 'password' && !formData.password) return; // skip empty password on edit
           if (key === 'foto' && !(formData.foto instanceof File)) return;
-          if (formData[key] !== null && formData[key] !== '') {
-            payload.append(key, formData[key]);
+          if (normalized[key] !== null && normalized[key] !== '') {
+            payload.append(key, normalized[key]);
           }
         });
 
@@ -151,7 +160,11 @@ export function useGuru() {
       await loadGuru();
       setView('list');
     } catch (error) {
-      toastError('Gagal', error.response?.data?.message || 'Terjadi kesalahan saat memproses data.');
+      const fieldErrors = error.response?.data?.errors;
+      const firstFieldError = fieldErrors
+        ? Object.values(fieldErrors).flat().find(Boolean)
+        : null;
+      toastError('Gagal', firstFieldError || error.response?.data?.message || 'Terjadi kesalahan saat memproses data.');
     } finally {
       setLoading(false);
     }
