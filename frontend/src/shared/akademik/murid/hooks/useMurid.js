@@ -72,7 +72,9 @@ export function useMurid() {
       return (
         m.username?.toLowerCase().includes(q) ||
         m.email?.toLowerCase().includes(q) ||
-        nama.toLowerCase().includes(q)
+        nama.toLowerCase().includes(q) ||
+        (m.siswa?.no_hp || '').toLowerCase().includes(q) ||
+        (m.siswa?.no_hp_wali || '').toLowerCase().includes(q)
       );
     });
   }, [muridData, searchQuery]);
@@ -172,7 +174,7 @@ export function useMurid() {
       tempat_lahir: s.tempat_lahir || '',
       tanggal_lahir: s.tanggal_lahir || s.tgl_lahir || '',
       alamat: s.alamat || '',
-      no_hp: s.no_hp || '',
+      no_hp: s.no_hp || s.no_hp_wali || '',
       tahun_masuk: s.tahun_masuk || new Date().getFullYear(),
       tahun_lulus: s.tahun_lulus || '',
       id_kelas: s.id_kelas || '',

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Permission;
+use App\Imports\SiswaImport;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\Role;
@@ -182,6 +183,39 @@ class UseCaseIntegrationTest extends TestCase
             'semester' => 'Ganjil',
         ]))->assertOk()
             ->assertJsonPath('data.siswa.0.nisn', '65148415');
+    }
+
+    public function test_student_import_copies_excel_phone_to_visible_student_phone(): void
+    {
+        $kelas = Kelas::create([
+            'nama_kelas' => 'XI-IMPORT',
+            'tingkat' => 'XI',
+            'jurusan' => 'IPA',
+            'tahun_ajaran' => '2026/2027',
+            'status' => 'aktif',
+        ]);
+
+        (new SiswaImport($kelas->id_kelas))->import([
+            [
+                'NISN' => '6514841500',
+                'NIS' => '20261999',
+                'nama' => 'Murid Import Phone',
+                'tempat_lahir' => 'Medan',
+                'tgl_lahir' => '27/02/2006',
+                'lp' => 'L',
+                'agama' => 'Islam',
+                'alamat' => 'Medan',
+                'nama_wali' => 'Wali Import',
+                'no_hp_wali' => '81234560019',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('siswa', [
+            'nisn' => '6514841500',
+            'nis' => '20261999',
+            'no_hp_wali' => '81234560019',
+            'no_hp' => '81234560019',
+        ]);
     }
 
     public function test_admin_cannot_change_own_role_or_status_from_user_management(): void

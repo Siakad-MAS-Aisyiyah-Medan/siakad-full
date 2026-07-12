@@ -38,6 +38,7 @@ class SiswaImport
 
                 $nis = $row['nis'];
                 $nisn = $row['nisn'] ?? '-';
+                $noHp = $row['no_hp'] ?? $row['no_hp_wali'] ?? '-';
 
                 // Cek apakah NIS atau NISN sudah ada
                 if (Siswa::where('nis', $nis)->orWhere('nisn', $nisn)->exists()) {
@@ -86,7 +87,8 @@ class SiswaImport
                     'agama' => $row['agama'] ?? 'Islam',
                     'alamat' => $row['alamat'] ?? '-',
                     'nama_wali' => $row['nama_wali'] ?? '-',
-                    'no_hp_wali' => $row['no_hp_wali'] ?? '-',
+                    'no_hp_wali' => $row['no_hp_wali'] ?? $noHp,
+                    'no_hp' => $noHp,
                 ]);
                 $rowIndex++;
             }
