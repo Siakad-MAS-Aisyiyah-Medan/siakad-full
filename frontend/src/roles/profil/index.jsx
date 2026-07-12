@@ -66,7 +66,7 @@ export default function ProfilBiodataPage() {
       if (role === 'kepsek') {
         payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin, tgl_lahir: form.tgl_lahir || null };
       } else if (role === 'guru') {
-        payload = { nama_guru: form.nama_lengkap, nip_nuptk: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin, tgl_lahir: form.tgl_lahir || null };
+        payload = { nama_guru: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp, alamat: form.alamat, jenis_kelamin: form.jenis_kelamin, tgl_lahir: form.tgl_lahir || null };
       } else if (role === 'admin') {
         payload = { nama_lengkap: form.nama_lengkap, nip: form.nip, no_hp: form.no_hp };
       } else if (role === 'siswa') {
@@ -141,7 +141,7 @@ export default function ProfilBiodataPage() {
     if (role === 'guru') {
       return {
         nama: profile.nama_guru,
-        nomor: profile.nip_nuptk,
+        nomor: profile.nip || profile.nip_nuptk,
         nomorLabel: 'NIP',
         alamat: profile.alamat,
         noHp: profile.no_hp,
