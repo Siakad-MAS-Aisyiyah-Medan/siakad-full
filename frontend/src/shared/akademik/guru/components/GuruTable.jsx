@@ -19,7 +19,7 @@ export default function GuruTable({
       const profile = item.guru || item.profile || {};
       return {
         'Nama Guru': profile.nama_guru || '-',
-        'NIP/NUPTK': profile.nip_nuptk || '-',
+        'NIP/NUPTK': profile.nip || profile.nip_nuptk || '-',
         'Jenis Kelamin': profile.jenis_kelamin === 'L' ? 'Laki-Laki' : profile.jenis_kelamin === 'P' ? 'Perempuan' : '-',
         'No. Handphone': profile.no_hp || '-',
         'Alamat': profile.alamat || '-',
@@ -118,7 +118,7 @@ export default function GuruTable({
                   <tr key={user.id_user}>
                     <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
                     <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)', whiteSpace: 'nowrap', minWidth: '180px' }}>{profile.nama_guru || '-'}</td>
-                    <td style={{ whiteSpace: 'nowrap' }}>{profile.nip_nuptk || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{profile.nip || profile.nip_nuptk || '-'}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{profile.jenis_kelamin === 'L' ? 'Laki-laki' : profile.jenis_kelamin === 'P' ? 'Perempuan' : '-'}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{profile.no_hp || '-'}</td>
                     <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.alamat || '-'}</td>
