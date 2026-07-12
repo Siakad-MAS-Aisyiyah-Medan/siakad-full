@@ -150,7 +150,11 @@ class AuthController extends Controller
         $user = User::query()
             ->where(function ($query) use ($login) {
                 $query->where('username', $login)
-                    ->orWhere('email', $login);
+                    ->orWhere('email', $login)
+                    ->orWhereHas('siswa', function ($siswaQuery) use ($login) {
+                        $siswaQuery->where('nisn', $login)
+                            ->orWhere('nis', $login);
+                    });
             })
             ->first();
 
