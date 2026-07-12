@@ -9,12 +9,12 @@ export const CALON_MURID_NAV = [
 
 /** Jenis berkas untuk halaman upload (key = jenis_berkas API) */
 export const UPLOAD_BERKAS_ITEMS = [
-  { key: 'ijazah_atau_skl', label: 'Foto Copy Ijazah/SKHUN (2 Lembar)' },
-  { key: 'stk', label: 'STK Asli dan Foto Copy (Dilegalisir) (2 Lembar)' },
-  { key: 'pas_foto', label: 'Pas Photo 3x4 cm (Pakai Jilbab) (4 Lembar)' },
+  { key: 'ijazah_atau_skl', label: 'Ijazah/SKHUN' },
+  { key: 'stk', label: 'STK Dilegalisir' },
+  { key: 'pas_foto', label: 'Pas Foto 3x4' },
   { key: 'nisn', label: 'NISN' },
-  { key: 'kartu_keluarga', label: 'FC Kartu Keluarga (1 Lembar)' },
-  { key: 'ktp_orang_tua', label: 'FC KTP Orang Tua (1 Lembar)' },
+  { key: 'kartu_keluarga', label: 'Kartu Keluarga' },
+  { key: 'ktp_orang_tua', label: 'KTP Orang Tua' },
 ];
 
 /** Alias jenis lama (kompatibilitas) */
