@@ -227,10 +227,17 @@ function NilaiInputView({ context, siswaRows, loading, saving, activeComponent, 
                   ))}
                   <td>
                     <input
-                      type="number"
-                      min={0}
-                      max={100}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={row[activeComponent] !== null && row[activeComponent] !== undefined ? row[activeComponent] : ''}
+                      onFocus={(event) => {
+                        if (row[activeComponent] === 0 || row[activeComponent] === '0') {
+                          onChange(row.id_user_siswa, activeComponent, '');
+                          return;
+                        }
+                        event.target.select();
+                      }}
                       onChange={(event) => onChange(row.id_user_siswa, activeComponent, event.target.value)}
                       className="form-control"
                       style={{ minWidth: '140px' }}
@@ -480,10 +487,15 @@ export default function GuruNilaiPage() {
   };
 
   const handleNilaiChange = (idUserSiswa, field, value) => {
+    const digitsOnly = String(value).replace(/\D/g, '');
+    const normalizedValue = digitsOnly === ''
+      ? ''
+      : Math.min(Number(digitsOnly), 100);
+
     setSiswaRows((prev) =>
       prev.map((item) =>
         item.id_user_siswa === idUserSiswa
-          ? { ...item, [field]: value === '' ? '' : Number(value) }
+          ? { ...item, [field]: normalizedValue }
           : item
       )
     );
