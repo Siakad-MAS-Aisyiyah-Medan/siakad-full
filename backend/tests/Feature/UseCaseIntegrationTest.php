@@ -3,12 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\Permission;
+use App\Models\Kelas;
+use App\Models\Mapel;
 use App\Models\Role;
+use App\Models\Siswa;
 use App\Models\User;
 use App\Services\PermissionService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
@@ -102,6 +106,82 @@ class UseCaseIntegrationTest extends TestCase
             'nama_guru' => 'Guru Baru',
             'status' => 'aktif',
         ]);
+    }
+
+    public function test_guru_murid_diajar_uses_student_nisn_not_login_username(): void
+    {
+        $guru = User::create([
+            'name' => 'Guru NISN Test',
+            'username' => 'guru-nisn-test',
+            'email' => 'guru-nisn-test@example.test',
+            'password' => Hash::make('password'),
+            'role' => 'guru',
+            'status_aktif' => true,
+            'status_akun' => 'aktif',
+        ]);
+        $guru->guru()->create([
+            'nip' => '998877665544332211',
+            'nama_guru' => 'Guru NISN Test',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => 'Medan',
+            'no_hp' => '081299887766',
+            'status' => 'aktif',
+        ]);
+
+        $kelas = Kelas::create([
+            'nama_kelas' => 'XI-NISN',
+            'tingkat' => 'XI',
+            'jurusan' => 'IPA',
+            'tahun_ajaran' => '2026/2027',
+            'status' => 'aktif',
+        ]);
+
+        $mapel = Mapel::create([
+            'nama_mapel' => 'Mapel NISN Test',
+            'tingkat' => 'XI',
+            'id_guru' => $guru->id_user,
+        ]);
+        DB::table('kelas_mapel')->insert([
+            'id_kelas' => $kelas->id_kelas,
+            'id_mapel' => $mapel->id_mapel,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $murid = User::create([
+            'name' => 'Murid NISN Test',
+            'username' => '20261099',
+            'email' => '20261099@siswa.siakad.sch.id',
+            'password' => Hash::make('password'),
+            'role' => 'siswa',
+            'status_aktif' => true,
+            'status_akun' => 'aktif',
+        ]);
+        Siswa::create([
+            'id_user' => $murid->id_user,
+            'id_kelas' => $kelas->id_kelas,
+            'nisn' => '65148415',
+            'nis' => '20261099',
+            'nama_siswa' => 'Murid NISN Test',
+            'tempat_lahir' => 'Medan',
+            'tgl_lahir' => '2006-02-27',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => 'Medan',
+            'nama_wali' => 'Wali Test',
+            'no_hp_wali' => '081234567890',
+        ]);
+
+        Sanctum::actingAs($guru);
+
+        $this->getJson('/api/guru/murid-diajar?'.http_build_query([
+            'id_kelas' => $kelas->id_kelas,
+            'id_mapel' => $mapel->id_mapel,
+            'tahun_ajaran' => '2026/2027',
+            'semester' => 'Ganjil',
+        ]))->assertOk()
+            ->assertJsonPath('data.siswa.0.nisn', '65148415');
     }
 
     public function test_admin_cannot_change_own_role_or_status_from_user_management(): void

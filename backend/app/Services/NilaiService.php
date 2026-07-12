@@ -38,7 +38,7 @@ class NilaiService
             return [
                 'id_user_siswa' => $siswa->id_user,
                 'nama_siswa' => $siswa->nama_siswa,
-                'nisn' => $siswa->user?->username,
+                'nisn' => $siswa->nisn ?: $siswa->user?->username,
                 'jenis_kelamin' => $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : ($siswa->jenis_kelamin === 'P' ? 'Perempuan' : null),
                 'id_nilai' => $nilai?->id_nilai,
                 'nilai_tugas' => $nilai?->nilai_tugas,
@@ -141,7 +141,7 @@ class NilaiService
         return [
             'siswa' => [
                 'nama_siswa' => $siswa?->nama_siswa,
-                'nisn' => $siswa?->user?->username,
+                'nisn' => $siswa?->nisn ?: $siswa?->user?->username,
                 'kelas' => $siswa?->kelas?->nama_kelas,
             ],
             'semester' => $semester,

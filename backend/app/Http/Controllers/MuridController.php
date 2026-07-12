@@ -141,7 +141,9 @@ class MuridController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('siswa', fn ($s) => $s->where('nama_siswa', 'like', "%{$search}%"))
+                    ->orWhereHas('siswa', fn ($s) => $s
+                        ->where('nama_siswa', 'like', "%{$search}%")
+                        ->orWhere('nisn', 'like', "%{$search}%"))
                     ->orWhereHas('pendaftaran', fn ($p) => $p->where('nama_lengkap', 'like', "%{$search}%"));
             });
         }

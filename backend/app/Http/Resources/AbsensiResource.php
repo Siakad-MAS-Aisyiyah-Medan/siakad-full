@@ -27,7 +27,7 @@ class AbsensiResource extends JsonResource
             'siswa' => $this->whenLoaded('siswa', fn () => [
                 'id_user' => $this->siswa?->id_user,
                 'nama' => $this->siswa?->siswa?->nama_siswa,
-                'nisn' => $this->siswa?->username,
+                'nisn' => $this->siswa?->siswa?->nisn ?: $this->siswa?->username,
             ]),
             'kelas' => $this->whenLoaded('kelas', fn () => [
                 'id_kelas' => $this->kelas?->id_kelas,

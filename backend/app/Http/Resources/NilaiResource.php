@@ -27,7 +27,7 @@ class NilaiResource extends JsonResource
             'siswa' => $this->whenLoaded('siswa', fn () => [
                 'id_user' => $this->siswa?->id_user,
                 'nama_siswa' => $this->siswa?->siswa?->nama_siswa,
-                'nisn' => $this->siswa?->username,
+                'nisn' => $this->siswa?->siswa?->nisn ?: $this->siswa?->username,
             ]),
             'mapel' => $this->whenLoaded('mapel', fn () => [
                 'id_mapel' => $this->mapel?->id_mapel,

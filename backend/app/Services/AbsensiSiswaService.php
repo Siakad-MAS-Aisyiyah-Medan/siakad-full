@@ -37,7 +37,7 @@ class AbsensiSiswaService
             return [
                 'id_user_siswa' => $siswa->id_user,
                 'nama_siswa' => $siswa->nama_siswa,
-                'nisn' => $siswa->user?->username,
+                'nisn' => $siswa->nisn ?: $siswa->user?->username,
                 'jenis_kelamin' => $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : ($siswa->jenis_kelamin === 'P' ? 'Perempuan' : null),
                 'status' => $absen?->status,
                 'keterangan' => $absen?->keterangan,

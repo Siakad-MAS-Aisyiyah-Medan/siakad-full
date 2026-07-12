@@ -62,7 +62,9 @@ class LaporanService
             $s = $filters['search'];
             $query->where(function ($q) use ($s) {
                 $q->where('username', 'like', "%{$s}%")
-                    ->orWhereHas('siswa', fn ($sq) => $sq->where('nama_siswa', 'like', "%{$s}%"));
+                    ->orWhereHas('siswa', fn ($sq) => $sq
+                        ->where('nama_siswa', 'like', "%{$s}%")
+                        ->orWhere('nisn', 'like', "%{$s}%"));
             });
         }
         if (isset($filters['status_aktif'])) {
@@ -73,7 +75,7 @@ class LaporanService
 
         $items = $paginator->getCollection()->map(fn (User $u) => [
             'id_user' => $u->id_user,
-            'nisn' => $u->username,
+            'nisn' => $u->siswa?->nisn ?: $u->username,
             'nama_siswa' => $u->siswa?->nama_siswa,
             'kelas' => $u->siswa?->kelas?->nama_kelas,
             'id_kelas' => $u->siswa?->id_kelas,
