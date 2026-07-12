@@ -123,6 +123,20 @@ class BiodataController extends Controller
                     $profile->no_hp = '-';
                 }
                 $profile->save();
+
+                $guruProfile = $user->guru ?: new Guru(['id_user' => $user->id_user]);
+                $guruProfile->fill([
+                    'nip' => $profile->nip,
+                    'nama_guru' => $profile->nama_kepsek,
+                    'jenis_kelamin' => $profile->jenis_kelamin,
+                    'tgl_lahir' => $profile->tgl_lahir,
+                    'alamat' => $profile->alamat,
+                    'no_hp' => $profile->no_hp,
+                    'agama' => $guruProfile->agama ?: '-',
+                    'status' => $guruProfile->status ?: 'aktif',
+                    'foto' => $profile->foto ?: $guruProfile->foto,
+                ]);
+                $guruProfile->save();
             } elseif ($role === 'admin') {
                 $validated = $request->validate([
                     'nip' => 'nullable|string|max:50',

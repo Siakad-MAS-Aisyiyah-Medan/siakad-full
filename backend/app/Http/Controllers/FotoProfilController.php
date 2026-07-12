@@ -74,7 +74,7 @@ class FotoProfilController extends Controller
             return $user->siswa;
         }
         if ($role === 'kepsek') {
-            return $user->kepalaSekolah;
+            return $user->kepalaSekolah ?: $user->guru;
         }
         if ($role === 'admin') {
             return $user->admin;

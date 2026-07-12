@@ -62,3 +62,78 @@ Artisan::command('siakad:restore-admin {login=admin} {--password=} {--force-pass
 
     return self::SUCCESS;
 })->purpose('Pulihkan akun administrator produksi yang role/status-nya berubah');
+
+Artisan::command('siakad:reset-password {login} {password} {--role=} {--force-password}', function () {
+    $login = trim((string) $this->argument('login'));
+    $password = (string) $this->argument('password');
+    $role = $this->option('role') !== null && $this->option('role') !== ''
+        ? (string) $this->option('role')
+        : null;
+
+    if (! $this->option('force-password') && strlen($password) < 8) {
+        $this->error('Password minimal 8 karakter. Gunakan --force-password hanya untuk kondisi darurat.');
+
+        return self::FAILURE;
+    }
+
+    if ($role !== null && ! in_array($role, User::ROLES, true)) {
+        $this->error('Role tidak valid. Gunakan salah satu: '.implode(', ', User::ROLES).'.');
+
+        return self::FAILURE;
+    }
+
+    $compact = preg_replace('/[\s\-.]+/', '', $login);
+    $loginCandidates = [$login];
+    if ($compact !== null && $compact !== '') {
+        $loginCandidates[] = $compact;
+
+        if (ctype_digit($compact)) {
+            $withoutLeadingZero = ltrim($compact, '0') ?: '0';
+            $loginCandidates[] = $withoutLeadingZero;
+            $loginCandidates[] = str_pad($withoutLeadingZero, 10, '0', STR_PAD_LEFT);
+        }
+    }
+    $loginCandidates = array_values(array_unique($loginCandidates));
+
+    $users = User::query()
+        ->with(['admin', 'kepalaSekolah', 'guru', 'siswa'])
+        ->when($role, fn ($query) => $query->where('role', $role))
+        ->where(function ($query) use ($login, $loginCandidates) {
+            $query->whereIn('username', $loginCandidates)
+                ->orWhere('email', $login)
+                ->orWhereHas('admin', fn ($admin) => $admin->whereIn('nip', $loginCandidates))
+                ->orWhereHas('kepalaSekolah', fn ($kepsek) => $kepsek->whereIn('nip', $loginCandidates))
+                ->orWhereHas('guru', fn ($guru) => $guru->whereIn('nip', $loginCandidates))
+                ->orWhereHas('siswa', fn ($siswa) => $siswa
+                    ->whereIn('nisn', $loginCandidates)
+                    ->orWhereIn('nis', $loginCandidates));
+        })
+        ->get();
+
+    if ($users->isEmpty()) {
+        $this->error("Akun '{$login}' tidak ditemukan.");
+
+        return self::FAILURE;
+    }
+
+    if ($users->count() > 1 && $role === null) {
+        $this->error("Ditemukan lebih dari satu akun untuk '{$login}'. Jalankan ulang dengan --role=admin|kepsek|guru|siswa|calon_siswa.");
+        foreach ($users as $match) {
+            $this->line("- {$match->username} | {$match->name} | {$match->role}");
+        }
+
+        return self::FAILURE;
+    }
+
+    /** @var User $user */
+    $user = $users->first();
+    $user->forceFill([
+        'password' => Hash::make($password),
+        'status_akun' => 'aktif',
+        'status_aktif' => true,
+    ])->save();
+
+    $this->info("Password akun '{$user->username}' ({$user->name}, role {$user->role}) berhasil direset dan akun diaktifkan.");
+
+    return self::SUCCESS;
+})->purpose('Reset password akun berdasarkan username, email, NIP, NISN, atau NIS');

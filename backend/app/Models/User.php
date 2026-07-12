@@ -138,7 +138,7 @@ class User extends Authenticatable
     {
         return match ($role) {
             'admin' => ['admin'],
-            'kepsek' => ['kepalaSekolah'],
+            'kepsek' => ['kepalaSekolah', 'guru'],
             'guru' => ['guru'],
             'siswa' => ['siswa.kelas.waliKelas'],
             'calon_siswa' => ['pendaftaran'],
@@ -165,7 +165,7 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             'admin' => $this->admin,
-            'kepsek' => $this->kepalaSekolah,
+            'kepsek' => $this->kepalaSekolah ?: $this->guru,
             'guru' => $this->guru,
             'siswa' => $this->siswa,
             'calon_siswa' => $this->pendaftaran,
@@ -190,6 +190,14 @@ class User extends Authenticatable
         // Calon siswa boleh login tanpa data PPDB; pendaftaran dibuat saat POST /ppdb/start.
         if ($this->role === 'calon_siswa') {
             return true;
+        }
+
+        if ($this->role === 'kepsek') {
+            if ($this->relationLoaded('kepalaSekolah') || $this->relationLoaded('guru')) {
+                return $this->kepalaSekolah !== null || $this->guru !== null;
+            }
+
+            return $this->kepalaSekolah()->exists() || $this->guru()->exists();
         }
 
         $relation = $this->expectedProfileRelation();

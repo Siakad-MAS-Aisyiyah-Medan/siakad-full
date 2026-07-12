@@ -23,6 +23,25 @@ function InfoCard({ label, value, icon: Icon }) {
   );
 }
 
+function formatDateDisplay(value) {
+  if (!value) return '-';
+
+  const raw = String(value);
+  const datePart = raw.slice(0, 10);
+  const match = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) return raw;
+
+  const [, year, month, day] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
+}
+
 export default function ProfilBiodataPage() {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState('');
@@ -133,7 +152,7 @@ export default function ProfilBiodataPage() {
         nomorLabel: 'NISN',
         alamat: profile.alamat,
         noHp: profile.no_hp || profile.no_hp_wali,
-        tanggalLahir: profile.tgl_lahir || profile.tanggal_lahir,
+        tanggalLahir: formatDateDisplay(profile.tgl_lahir || profile.tanggal_lahir),
         kelas: profile.kelas?.nama_kelas || profile.nama_kelas || 'X IPA 1',
       };
     }
@@ -145,18 +164,18 @@ export default function ProfilBiodataPage() {
         nomorLabel: 'NIP',
         alamat: profile.alamat,
         noHp: profile.no_hp,
-        tanggalLahir: profile.tanggal_lahir || profile.tgl_lahir || '-',
+        tanggalLahir: formatDateDisplay(profile.tanggal_lahir || profile.tgl_lahir),
         kelas: profile.role_label || 'Guru',
       };
     }
 
     return {
-      nama: profile.nama_kepsek || profile.nama_admin || (role === 'kepsek' ? 'Kepala Sekolah' : 'Administrator'),
+      nama: profile.nama_kepsek || profile.nama_guru || profile.nama_admin || (role === 'kepsek' ? 'Kepala Sekolah' : 'Administrator'),
       nomor: profile.nip || profile.nip_nuptk,
       nomorLabel: 'NIP',
       alamat: profile.alamat,
       noHp: profile.no_hp,
-      tanggalLahir: profile.tanggal_lahir || '-',
+      tanggalLahir: formatDateDisplay(profile.tanggal_lahir || profile.tgl_lahir),
       kelas: role === 'kepsek' ? 'Kepala Sekolah' : 'Administrator',
     };
   }, [profile, role]);

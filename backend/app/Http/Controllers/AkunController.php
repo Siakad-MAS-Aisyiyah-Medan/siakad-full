@@ -61,11 +61,12 @@ class AkunController extends Controller
                 if (empty(trim($realName))) {
                     $realName = $user->guru->nama_guru ?? '-';
                 }
-            } elseif ($user->role === 'kepsek' && $user->kepalaSekolah) {
-                $nipNisn = $user->kepalaSekolah->nip ?? '-';
-                $noHp = $user->kepalaSekolah->no_hp ?? '-';
+            } elseif ($user->role === 'kepsek' && ($user->kepalaSekolah || $user->guru)) {
+                $kepsekProfile = $user->kepalaSekolah ?: $user->guru;
+                $nipNisn = $kepsekProfile->nip ?? '-';
+                $noHp = $kepsekProfile->no_hp ?? '-';
                 if (empty(trim($realName))) {
-                    $realName = $user->kepalaSekolah->nama_kepsek ?? '-';
+                    $realName = $kepsekProfile->nama_kepsek ?? $kepsekProfile->nama_guru ?? '-';
                 }
             } elseif ($user->role === 'siswa' && $user->siswa) {
                 $nipNisn = $user->siswa->nisn ?? '-';
@@ -234,8 +235,13 @@ class AkunController extends Controller
                 $user->admin->update(['no_hp' => $phone]);
             } elseif ($user->role === 'guru' && $user->guru) {
                 $user->guru->update(['no_hp' => $phone]);
-            } elseif ($user->role === 'kepsek' && $user->kepalaSekolah) {
-                $user->kepalaSekolah->update(['no_hp' => $phone]);
+            } elseif ($user->role === 'kepsek') {
+                if ($user->kepalaSekolah) {
+                    $user->kepalaSekolah->update(['no_hp' => $phone]);
+                }
+                if ($user->guru) {
+                    $user->guru->update(['no_hp' => $phone]);
+                }
             } elseif ($user->role === 'siswa' && $user->siswa) {
                 $user->siswa->update(['no_hp_wali' => $phone]);
             }

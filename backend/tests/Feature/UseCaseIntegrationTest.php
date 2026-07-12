@@ -348,6 +348,28 @@ class UseCaseIntegrationTest extends TestCase
             ->assertJsonPath('data.redirect_path', '/kepala-sekolah/dashboard');
     }
 
+    public function test_reset_password_command_can_target_kepsek_by_profile_nip(): void
+    {
+        $kepsek = User::where('username', 'kepsek')->firstOrFail();
+        $nip = $kepsek->kepalaSekolah?->nip;
+
+        $this->assertNotEmpty($nip);
+
+        $this->artisan('siakad:reset-password', [
+            'login' => $nip,
+            'password' => 'Kepsek123',
+            '--role' => 'kepsek',
+        ])->assertSuccessful();
+
+        $this->postJson('/api/login', [
+            'login' => $nip,
+            'password' => 'Kepsek123',
+            'role' => 'kepsek',
+        ])->assertOk()
+            ->assertJsonPath('data.user.role', 'kepsek')
+            ->assertJsonPath('data.redirect_path', '/kepala-sekolah/dashboard');
+    }
+
     public function test_guru_can_update_only_selected_score_component_without_overwriting_others(): void
     {
         $guru = User::create([
@@ -568,6 +590,45 @@ class UseCaseIntegrationTest extends TestCase
             'id_user' => $kepsek->id_user,
             'nama_kepsek' => 'Kepala Sekolah Baru',
             'alamat' => 'Medan',
+        ]);
+    }
+
+    public function test_kepsek_profile_falls_back_to_existing_guru_biodata(): void
+    {
+        $guru = User::where('username', 'guru')->firstOrFail();
+        $guruProfile = $guru->guru;
+
+        $guru->forceFill(['role' => 'kepsek'])->save();
+        $guru->kepalaSekolah()->delete();
+
+        Sanctum::actingAs($guru);
+
+        $this->getJson('/api/me')
+            ->assertOk()
+            ->assertJsonPath('data.user.role', 'kepsek')
+            ->assertJsonPath('data.profile.nama_guru', $guruProfile->nama_guru)
+            ->assertJsonPath('data.profile.nip', $guruProfile->nip)
+            ->assertJsonPath('data.profile.no_hp', $guruProfile->no_hp);
+
+        $this->putJson('/api/biodata/profile', [
+            'nama_lengkap' => 'Kepala Guru Baru',
+            'nip' => '1987654321',
+            'jenis_kelamin' => 'L',
+            'tgl_lahir' => '1980-02-03',
+            'alamat' => 'Medan Baru',
+            'no_hp' => '081299988877',
+        ])->assertOk()->assertJsonPath('data.nama_kepsek', 'Kepala Guru Baru');
+
+        $this->assertDatabaseHas('kepala_sekolah', [
+            'id_user' => $guru->id_user,
+            'nama_kepsek' => 'Kepala Guru Baru',
+            'nip' => '1987654321',
+        ]);
+
+        $this->assertDatabaseHas('guru', [
+            'id_user' => $guru->id_user,
+            'nama_guru' => 'Kepala Guru Baru',
+            'nip' => '1987654321',
         ]);
     }
 
