@@ -2,11 +2,15 @@ import './App.css';
 import { AppProviders } from './providers/AppProviders';
 import AppRouter from './routes/AppRoutes';
 
+import GlobalErrorBoundary from './shared/components/GlobalErrorBoundary';
+
 function App() {
   return (
-    <AppProviders>
-      <AppRouter />
-    </AppProviders>
+    <GlobalErrorBoundary>
+      <AppProviders>
+        <AppRouter />
+      </AppProviders>
+    </GlobalErrorBoundary>
   );
 }
 
