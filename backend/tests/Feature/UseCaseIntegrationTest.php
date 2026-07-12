@@ -263,6 +263,14 @@ class UseCaseIntegrationTest extends TestCase
         Sanctum::actingAs($candidate);
 
         $this->postJson('/api/ppdb/start')->assertCreated()->assertJsonPath('data.ppdb_status', 'draft');
+        $this->getJson('/api/ppdb/berkas')
+            ->assertOk()
+            ->assertJsonPath('data.items.0.label', 'Foto Copy Ijazah/SKHUN (2 Lembar)')
+            ->assertJsonPath('data.items.1.label', 'STK Asli dan Foto Copy (Dilegalisir) (2 Lembar)')
+            ->assertJsonPath('data.items.2.label', 'Pas Photo 3x4 cm (Pakai Jilbab) (4 Lembar)')
+            ->assertJsonPath('data.items.3.label', 'NISN')
+            ->assertJsonPath('data.items.4.label', 'FC Kartu Keluarga (1 Lembar)')
+            ->assertJsonPath('data.items.5.label', 'FC KTP Orang Tua (1 Lembar)');
         $this->putJson('/api/ppdb/step/keterangan-pribadi', [
             'nama_lengkap' => 'Calon Murid Uji',
             'tempat_lahir' => 'Medan',

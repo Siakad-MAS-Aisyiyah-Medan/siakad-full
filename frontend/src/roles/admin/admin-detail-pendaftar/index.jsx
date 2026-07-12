@@ -318,12 +318,12 @@ export default function AdminDetailPendaftar({ readOnly = false }) {
 
             <SectionCard title="Berkas Pendaftaran" icon={FolderOpen}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', rowGap: '2rem' }}>
-                <FileLink label="Kartu Keluarga (KK)" path={resolveBerkasPath(data, 'kartu_keluarga')} />
-                <FileLink label="Akta Kelahiran" path={resolveBerkasPath(data, 'nisn')} />
-                <FileLink label="Pas Foto" path={resolveBerkasPath(data, 'pas_foto')} />
-                <FileLink label="Ijazah / STTB SMP" path={resolveBerkasPath(data, 'ijazah_atau_skl')} />
-                <FileLink label="Rapor Semester 1-5" path={resolveBerkasPath(data, 'stk')} />
-                <FileLink label="Surat Keterangan Lulus" path={resolveBerkasPath(data, 'ktp_orang_tua')} />
+                <FileLink label="Foto Copy Ijazah/SKHUN (2 Lembar)" path={resolveBerkasPath(data, 'ijazah_atau_skl')} />
+                <FileLink label="STK Asli dan Foto Copy (Dilegalisir) (2 Lembar)" path={resolveBerkasPath(data, 'stk')} />
+                <FileLink label="Pas Photo 3x4 cm (Pakai Jilbab) (4 Lembar)" path={resolveBerkasPath(data, 'pas_foto')} />
+                <FileLink label="NISN" path={resolveBerkasPath(data, 'nisn')} />
+                <FileLink label="FC Kartu Keluarga (1 Lembar)" path={resolveBerkasPath(data, 'kartu_keluarga')} />
+                <FileLink label="FC KTP Orang Tua (1 Lembar)" path={resolveBerkasPath(data, 'ktp_orang_tua')} />
               </div>
             </SectionCard>
 

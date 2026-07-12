@@ -6,7 +6,6 @@ use App\Models\Pendaftaran;
 use App\Models\PendaftaranDokumen;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -18,12 +17,12 @@ class PpdbBerkasService
 {
     /** @var array<string, string> key => label */
     public const JENIS = [
-        'ijazah_atau_skl' => 'Ijazah / STTB SMP',
-        'stk' => 'Rapor Semester 1-5',
-        'pas_foto' => 'Pas Foto',
-        'nisn' => 'Akta Kelahiran',
-        'kartu_keluarga' => 'Kartu Keluarga',
-        'ktp_orang_tua' => 'Surat Keterangan Lulus',
+        'ijazah_atau_skl' => 'Foto Copy Ijazah/SKHUN (2 Lembar)',
+        'stk' => 'STK Asli dan Foto Copy (Dilegalisir) (2 Lembar)',
+        'pas_foto' => 'Pas Photo 3x4 cm (Pakai Jilbab) (4 Lembar)',
+        'nisn' => 'NISN',
+        'kartu_keluarga' => 'FC Kartu Keluarga (1 Lembar)',
+        'ktp_orang_tua' => 'FC KTP Orang Tua (1 Lembar)',
     ];
 
     /** Alias jenis lama → baru (kompatibilitas data) */
@@ -98,7 +97,7 @@ class PpdbBerkasService
         $this->assertAllowedFile($file, $jenis);
 
         $disk = config('ppdb.berkas.storage_disk', 'public');
-        
+
         $dokumen = PendaftaranDokumen::firstOrCreate(
             ['pendaftaran_id' => $pendaftaran->id_pendaftaran]
         );
@@ -242,7 +241,7 @@ class PpdbBerkasService
             'id' => $row ? $row->id : null,
             'jenis_berkas' => $jenis,
             'label' => $label,
-            'status' => 'valid', 
+            'status' => 'valid',
             'status_verifikasi' => 'valid',
             'url' => $url,
             'preview_url' => $url,

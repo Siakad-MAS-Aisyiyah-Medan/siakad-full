@@ -167,13 +167,13 @@ export const PPDB_STATUS_LABELS = {
 };
 
 export const BERKAS_LABELS = {
-  ijazah_atau_skl: 'Ijazah / SKHUN',
-  stk: 'STK',
-  pas_foto: 'Pas Foto',
+  ijazah_atau_skl: 'Foto Copy Ijazah/SKHUN (2 Lembar)',
+  stk: 'STK Asli dan Foto Copy (Dilegalisir) (2 Lembar)',
+  pas_foto: 'Pas Photo 3x4 cm (Pakai Jilbab) (4 Lembar)',
   nisn: 'NISN',
-  kartu_keluarga: 'Kartu Keluarga (KK)',
-  ktp_orang_tua: 'KTP Orang Tua',
-  foto: 'Pas Foto',
-  rapor: 'STK',
+  kartu_keluarga: 'FC Kartu Keluarga (1 Lembar)',
+  ktp_orang_tua: 'FC KTP Orang Tua (1 Lembar)',
+  foto: 'Pas Photo 3x4 cm (Pakai Jilbab) (4 Lembar)',
+  rapor: 'STK Asli dan Foto Copy (Dilegalisir) (2 Lembar)',
   akta_kelahiran: 'NISN',
 };

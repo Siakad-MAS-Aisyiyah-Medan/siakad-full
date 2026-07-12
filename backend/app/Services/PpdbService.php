@@ -107,13 +107,12 @@ class PpdbService
             ],
             'persyaratan' => [
                 'Mengisi formulir pendaftaran online',
-                'Fotokopi akta kelahiran',
-                'Fotokopi kartu keluarga',
-                'Fotokopi KTP orang tua',
-                'Pas foto 3×4 sebanyak 4 lembar',
-                'Fotokopi ijazah/SKL legalisir',
-                'Fotokopi KIP (jika ada)',
+                'Foto Copy Ijazah/SKHUN: 2 lembar',
+                'STK asli dan foto copy (dilegalisir): 2 lembar',
+                'Pas photo 3x4 cm (pakai jilbab): 4 lembar',
                 'NISN',
+                'FC Kartu Keluarga: 1 lembar',
+                'FC KTP Orang Tua: 1 lembar',
             ],
             'fasilitas' => [
                 ['nama' => 'Ruang Kelas Luas', 'ikon' => 'building'],

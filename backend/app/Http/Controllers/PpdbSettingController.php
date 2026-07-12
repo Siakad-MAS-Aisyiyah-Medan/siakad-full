@@ -12,6 +12,16 @@ class PpdbSettingController extends Controller
 {
     use AuditsAdminActions;
 
+    private const OFFICIAL_PPDB_PERSYARATAN = [
+        'Mengisi formulir pendaftaran online',
+        'Foto Copy Ijazah/SKHUN: 2 lembar',
+        'STK asli dan foto copy (dilegalisir): 2 lembar',
+        'Pas photo 3x4 cm (pakai jilbab): 4 lembar',
+        'NISN',
+        'FC Kartu Keluarga: 1 lembar',
+        'FC KTP Orang Tua: 1 lembar',
+    ];
+
     /**
      * Get all PPDB settings
      */
@@ -97,16 +107,7 @@ class PpdbSettingController extends Controller
                     'ikon' => 'monitor',
                 ],
             ],
-            'ppdb_persyaratan' => [
-                'Mengisi formulir pendaftaran online',
-                'Fotokopi akta kelahiran',
-                'Fotokopi kartu keluarga',
-                'Fotokopi KTP orang tua',
-                'Pas foto 3×4 sebanyak 4 lembar',
-                'Fotokopi ijazah/SKL legalisir',
-                'Fotokopi KIP (jika ada)',
-                'NISN',
-            ],
+            'ppdb_persyaratan' => self::OFFICIAL_PPDB_PERSYARATAN,
             'ppdb_fasilitas' => [
                 ['nama' => 'Ruang Kelas Luas', 'ikon' => 'building'],
                 ['nama' => 'Ruang Perpustakaan', 'ikon' => 'library'],
@@ -155,12 +156,25 @@ class PpdbSettingController extends Controller
             ])) {
                 $decoded = $val ? json_decode($val, true) : null;
                 $settings[$key] = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : ($defaults[$key] ?? null);
+                if ($key === 'ppdb_persyaratan') {
+                    $settings[$key] = $this->normalizePersyaratan($settings[$key]);
+                }
             } else {
                 $settings[$key] = $val ?: ($defaults[$key] ?? null);
             }
         }
 
         return ApiResponse::success($settings, 'Pengaturan PPDB berhasil diambil');
+    }
+
+    private function normalizePersyaratan(array $items): array
+    {
+        $joined = implode(' ', $items);
+        if (str_contains($joined, 'Fotokopi akta kelahiran') || str_contains($joined, 'Fotokopi KIP')) {
+            return self::OFFICIAL_PPDB_PERSYARATAN;
+        }
+
+        return $items;
     }
 
     /**

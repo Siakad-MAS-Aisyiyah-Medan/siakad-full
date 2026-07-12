@@ -688,6 +688,23 @@ class PendaftaranController extends Controller
         };
 
         $profil = ProfilSekolah::first();
+        $officialPersyaratan = [
+            'Mengisi formulir pendaftaran online',
+            'Foto Copy Ijazah/SKHUN: 2 lembar',
+            'STK asli dan foto copy (dilegalisir): 2 lembar',
+            'Pas photo 3x4 cm (pakai jilbab): 4 lembar',
+            'NISN',
+            'FC Kartu Keluarga: 1 lembar',
+            'FC KTP Orang Tua: 1 lembar',
+        ];
+        $normalizePersyaratan = function (array $items) use ($officialPersyaratan) {
+            $joined = implode(' ', $items);
+            if (str_contains($joined, 'Fotokopi akta kelahiran') || str_contains($joined, 'Fotokopi KIP')) {
+                return $officialPersyaratan;
+            }
+
+            return $items;
+        };
 
         return [
             'nama_sekolah' => $profil?->nama_sekolah ?: 'MAS Aisyiyah Medan',
@@ -754,16 +771,7 @@ class PendaftaranController extends Controller
                     'ikon' => 'monitor',
                 ],
             ]),
-            'persyaratan' => $getJson('ppdb_persyaratan', [
-                'Mengisi formulir pendaftaran online',
-                'Fotokopi akta kelahiran',
-                'Fotokopi kartu keluarga',
-                'Fotokopi KTP orang tua',
-                'Pas foto 3×4 sebanyak 4 lembar',
-                'Fotokopi ijazah/SKL legalisir',
-                'Fotokopi KIP (jika ada)',
-                'NISN',
-            ]),
+            'persyaratan' => $normalizePersyaratan($getJson('ppdb_persyaratan', $officialPersyaratan)),
             'fasilitas' => $getJson('ppdb_fasilitas', [
                 ['nama' => 'Ruang Kelas Luas', 'ikon' => 'building'],
                 ['nama' => 'Ruang Perpustakaan', 'ikon' => 'library'],
