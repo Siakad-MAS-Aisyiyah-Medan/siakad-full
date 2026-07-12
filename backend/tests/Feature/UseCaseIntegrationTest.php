@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
+use App\Services\PermissionService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -64,6 +67,88 @@ class UseCaseIntegrationTest extends TestCase
 
         $this->postJson('/api/kelas', [])->assertForbidden();
         $this->deleteJson('/api/pengumuman/1')->assertForbidden();
+    }
+
+    public function test_admin_cannot_change_own_role_or_status_from_user_management(): void
+    {
+        $admin = User::where('username', 'admin')->firstOrFail();
+        Sanctum::actingAs($admin);
+
+        $this->putJson("/api/akun/{$admin->id_user}", [
+            'name' => $admin->name ?: 'Administrator',
+            'email' => $admin->email,
+            'role' => 'kepsek',
+            'status' => 'aktif',
+        ])->assertForbidden();
+
+        $this->putJson("/api/akun/{$admin->id_user}", [
+            'name' => $admin->name ?: 'Administrator',
+            'email' => $admin->email,
+            'role' => 'admin',
+            'status' => 'nonaktif',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('users', [
+            'id_user' => $admin->id_user,
+            'role' => 'admin',
+            'status_akun' => 'aktif',
+        ]);
+    }
+
+    public function test_last_active_admin_cannot_be_removed_by_delegated_user_manager(): void
+    {
+        $manageUsers = Permission::where('key', 'manage_users')->firstOrFail();
+        Role::where('key', 'kepsek')->firstOrFail()->permissions()->syncWithoutDetaching([$manageUsers->id_permission]);
+        app(PermissionService::class)->clearCache();
+
+        $admin = User::where('username', 'admin')->firstOrFail();
+        Sanctum::actingAs(User::where('username', 'kepsek')->firstOrFail());
+
+        $this->putJson("/api/akun/{$admin->id_user}", [
+            'name' => $admin->name ?: 'Administrator',
+            'email' => $admin->email,
+            'role' => 'kepsek',
+            'status' => 'aktif',
+        ])->assertUnprocessable()
+            ->assertJsonPath('message', 'Minimal harus ada satu akun administrator aktif.');
+
+        $this->putJson("/api/akun/{$admin->id_user}", [
+            'name' => $admin->name ?: 'Administrator',
+            'email' => $admin->email,
+            'role' => 'admin',
+            'status' => 'nonaktif',
+        ])->assertUnprocessable()
+            ->assertJsonPath('message', 'Minimal harus ada satu akun administrator aktif.');
+
+        $this->deleteJson("/api/akun/{$admin->id_user}")
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Minimal harus ada satu akun administrator aktif.');
+
+        $this->assertDatabaseHas('users', [
+            'id_user' => $admin->id_user,
+            'role' => 'admin',
+            'status_akun' => 'aktif',
+        ]);
+    }
+
+    public function test_restore_admin_command_recovers_demoted_admin_account(): void
+    {
+        $admin = User::where('username', 'admin')->firstOrFail();
+        $admin->forceFill([
+            'role' => 'kepsek',
+            'status_akun' => 'nonaktif',
+            'status_aktif' => false,
+        ])->save();
+
+        $this->artisan('siakad:restore-admin', ['login' => 'admin'])
+            ->assertSuccessful();
+
+        $this->assertDatabaseHas('users', [
+            'id_user' => $admin->id_user,
+            'role' => 'admin',
+            'status_akun' => 'aktif',
+            'status_aktif' => true,
+        ]);
     }
 
     public function test_personal_profile_update_maps_role_specific_fields(): void

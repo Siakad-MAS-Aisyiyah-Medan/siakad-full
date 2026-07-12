@@ -16,6 +16,7 @@ import {
 import AdminPageShell from '@/shared/components/AdminPageShell';
 import { confirmAction, toastError, toastSuccess, toastValidation } from '@/shared/hooks/useConfirm';
 import { createAdminAkun, deleteAdminAkun, fetchAdminAkunList, updateAdminAkun } from '@/shared/services/akun.service';
+import { getStoredUser } from '@/shared/services/auth.service';
 import PageHeader from '@/shared/components/PageHeader';
 import CustomSelect from '@/shared/components/CustomSelect';
 
@@ -44,6 +45,8 @@ export default function HakAksesPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const currentUser = getStoredUser();
+  const isEditingOwnAccount = view === 'edit' && Number(editId) === Number(currentUser?.id_user);
 
   const loadAkun = useCallback(async (page = currentPage, search = searchQuery, role = filterRole) => {
     setIsLoading(true);
@@ -244,57 +247,68 @@ export default function HakAksesPage() {
                     </td>
                   </tr>
                 ) : akunData.length > 0 ? (
-                  akunData.map((akun, idx) => (
-                    <tr key={akun.id}>
-                      <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
-                        {((currentPage - 1) * (pagination.per_page || 10)) + idx + 1}
-                      </td>
-                      <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{akun.nip_nisn || akun.username || '-'}</td>
-                      <td style={{ fontWeight: 500 }}>{akun.name}</td>
-                      <td>{akun.email}</td>
-                      <td>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '50px',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          background: getRoleColor(akun.role).bg,
-                          color: getRoleColor(akun.role).text,
-                          border: `1px solid ${getRoleColor(akun.role).border}`,
-                        }}>
-                          <UserRoundCog size={11} />
-                          {formatRole(akun.role)}
-                        </span>
-                      </td>
-                      <td>
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '50px',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          background: akun.status === 'aktif' ? 'var(--color-primary-soft)' : '#fef2f2',
-                          color: akun.status === 'aktif' ? 'var(--color-primary-dark)' : '#991b1b',
-                          border: `1px solid ${akun.status === 'aktif' ? 'var(--color-primary-light)' : '#fecaca'}`,
-                        }}>
-                          {akun.status === 'aktif' ? 'Aktif' : 'Nonaktif'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="actions-cell">
-                          <button type="button" onClick={() => handleEdit(akun)} className="btn-icon edit" title="Edit">
-                            <Pencil size={15} />
-                          </button>
-                          <button type="button" onClick={() => handleDelete(akun.id)} className="btn-icon delete" title="Hapus">
-                            <Trash2 size={15} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  akunData.map((akun, idx) => {
+                    const isOwnAccount = Number(akun.id) === Number(currentUser?.id_user);
+
+                    return (
+                      <tr key={akun.id}>
+                        <td style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                          {((currentPage - 1) * (pagination.per_page || 10)) + idx + 1}
+                        </td>
+                        <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{akun.nip_nisn || akun.username || '-'}</td>
+                        <td style={{ fontWeight: 500 }}>{akun.name}</td>
+                        <td>{akun.email}</td>
+                        <td>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '50px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            background: getRoleColor(akun.role).bg,
+                            color: getRoleColor(akun.role).text,
+                            border: `1px solid ${getRoleColor(akun.role).border}`,
+                          }}>
+                            <UserRoundCog size={11} />
+                            {formatRole(akun.role)}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '50px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            background: akun.status === 'aktif' ? 'var(--color-primary-soft)' : '#fef2f2',
+                            color: akun.status === 'aktif' ? 'var(--color-primary-dark)' : '#991b1b',
+                            border: `1px solid ${akun.status === 'aktif' ? 'var(--color-primary-light)' : '#fecaca'}`,
+                          }}>
+                            {akun.status === 'aktif' ? 'Aktif' : 'Nonaktif'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="actions-cell">
+                            <button type="button" onClick={() => handleEdit(akun)} className="btn-icon edit" title="Edit">
+                              <Pencil size={15} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(akun.id)}
+                              className="btn-icon delete"
+                              title={isOwnAccount ? 'Akun sendiri tidak dapat dihapus' : 'Hapus'}
+                              disabled={isOwnAccount}
+                              style={isOwnAccount ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
@@ -397,6 +411,7 @@ export default function HakAksesPage() {
                   <CustomSelect
                     value={formData.role}
                     onChange={(val) => setFormData(p => ({ ...p, role: val }))}
+                    disabled={isEditingOwnAccount}
                     options={[
                       { value: 'admin', label: 'Administrator' },
                       { value: 'kepsek', label: 'Kepala Sekolah' },
@@ -420,6 +435,7 @@ export default function HakAksesPage() {
                   <CustomSelect
                     value={formData.status}
                     onChange={(val) => setFormData(p => ({ ...p, status: val }))}
+                    disabled={isEditingOwnAccount}
                     options={[
                       { value: 'aktif', label: 'Aktif' },
                       { value: 'nonaktif', label: 'Nonaktif' }
@@ -541,4 +557,3 @@ function getRoleColor(role) {
   };
   return map[role] || { bg: '#f8fafc', text: '#475569', border: '#e2e8f0' };
 }
-

@@ -158,6 +158,13 @@ class AkunController extends Controller
             ], 403);
         }
 
+        if ($this->isActiveAdmin($user) && $this->activeAdminCount() <= 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Minimal harus ada satu akun administrator aktif.',
+            ], 422);
+        }
+
         // We can optionally delete related profile data here if needed,
         // or rely on database cascading/soft deletes.
         $prefix = match ($user->role) {
@@ -187,6 +194,23 @@ class AkunController extends Controller
             'status' => 'nullable|string|in:aktif,nonaktif',
             'no_hp' => 'nullable|string|max:20',
         ]);
+
+        if (auth()->id() == $user->id_user && (
+            $validated['role'] !== $user->role
+            || ($request->filled('status') && $validated['status'] !== ($user->status_akun ?? ($user->status_aktif ? 'aktif' : 'nonaktif')))
+        )) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak dapat mengubah role atau status akun Anda sendiri dari manajemen pengguna.',
+            ], 403);
+        }
+
+        if ($this->wouldRemoveActiveAdmin($user, $validated['role'], $validated['status'] ?? null)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Minimal harus ada satu akun administrator aktif.',
+            ], 422);
+        }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
@@ -231,6 +255,40 @@ class AkunController extends Controller
             'message' => 'Akun berhasil diperbarui',
             'data' => $user,
         ]);
+    }
+
+    private function wouldRemoveActiveAdmin(User $user, string $nextRole, ?string $nextStatus): bool
+    {
+        if (! $this->isActiveAdmin($user)) {
+            return false;
+        }
+
+        $nextStatus ??= $user->status_akun ?? ($user->status_aktif ? 'aktif' : 'nonaktif');
+
+        if ($nextRole === 'admin' && $nextStatus === 'aktif') {
+            return false;
+        }
+
+        return $this->activeAdminCount() <= 1;
+    }
+
+    private function isActiveAdmin(User $user): bool
+    {
+        return $user->role === 'admin' && $user->isAkunAktif();
+    }
+
+    private function activeAdminCount(): int
+    {
+        return User::query()
+            ->where('role', 'admin')
+            ->where(function ($query) {
+                $query->where('status_akun', 'aktif')
+                    ->orWhere(function ($query) {
+                        $query->whereNull('status_akun')
+                            ->where('status_aktif', true);
+                    });
+            })
+            ->count();
     }
 
     public function updateProfile(Request $request): JsonResponse
