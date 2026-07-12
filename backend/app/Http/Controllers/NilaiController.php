@@ -47,9 +47,9 @@ class NilaiController extends Controller
                 'meta.semester' => 'required|in:Ganjil,Genap',
                 'items' => 'required|array|min:1',
                 'items.*.id_user_siswa' => 'required|exists:users,id_user',
-                'items.*.nilai_tugas' => 'required|integer|min:0|max:100',
-                'items.*.nilai_uts' => 'required|integer|min:0|max:100',
-                'items.*.nilai_uas' => 'required|integer|min:0|max:100',
+                'items.*.nilai_tugas' => 'nullable|integer|min:0|max:100',
+                'items.*.nilai_uts' => 'nullable|integer|min:0|max:100',
+                'items.*.nilai_uas' => 'nullable|integer|min:0|max:100',
                 'items.*.nilai_praktik' => 'nullable|integer|min:0|max:100',
                 'items.*.nilai_sikap' => 'nullable|integer|min:0|max:100',
             ]);

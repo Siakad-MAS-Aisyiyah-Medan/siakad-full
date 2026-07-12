@@ -6,9 +6,15 @@ class NilaiCalculationService
 {
     public function calculate(array $input): array
     {
-        $tugas = (int) ($input['nilai_tugas'] ?? 0);
-        $uts = (int) ($input['nilai_uts'] ?? 0);
-        $uas = (int) ($input['nilai_uas'] ?? 0);
+        $tugas = array_key_exists('nilai_tugas', $input) && $input['nilai_tugas'] !== null && $input['nilai_tugas'] !== ''
+            ? (int) $input['nilai_tugas']
+            : null;
+        $uts = array_key_exists('nilai_uts', $input) && $input['nilai_uts'] !== null && $input['nilai_uts'] !== ''
+            ? (int) $input['nilai_uts']
+            : null;
+        $uas = array_key_exists('nilai_uas', $input) && $input['nilai_uas'] !== null && $input['nilai_uas'] !== ''
+            ? (int) $input['nilai_uas']
+            : null;
         $praktik = array_key_exists('nilai_praktik', $input) && $input['nilai_praktik'] !== null && $input['nilai_praktik'] !== ''
             ? (int) $input['nilai_praktik']
             : null;
@@ -16,30 +22,30 @@ class NilaiCalculationService
             ? (int) $input['nilai_sikap']
             : null;
 
-        foreach ([$tugas, $uts, $uas] as $n) {
-            $this->assertRange($n);
+        foreach ([$tugas, $uts, $uas, $praktik, $sikap] as $n) {
+            if ($n !== null) {
+                $this->assertRange($n);
+            }
         }
-        if ($praktik !== null) {
-            $this->assertRange($praktik);
-        }
-        if ($sikap !== null) {
-            $this->assertRange($sikap);
-        }
+
+        $calcTugas = $tugas ?? 0;
+        $calcUts = $uts ?? 0;
+        $calcUas = $uas ?? 0;
 
         if ($praktik !== null) {
             $weights = config('nilai.weights.with_praktik');
             $nilaiAkhir = (int) round(
-                $tugas * $weights['tugas']
-                + $uts * $weights['uts']
-                + $uas * $weights['uas']
+                $calcTugas * $weights['tugas']
+                + $calcUts * $weights['uts']
+                + $calcUas * $weights['uas']
                 + $praktik * $weights['praktik']
             );
         } else {
             $weights = config('nilai.weights.default');
             $nilaiAkhir = (int) round(
-                $tugas * $weights['tugas']
-                + $uts * $weights['uts']
-                + $uas * $weights['uas']
+                $calcTugas * $weights['tugas']
+                + $calcUts * $weights['uts']
+                + $calcUas * $weights['uas']
             );
         }
 

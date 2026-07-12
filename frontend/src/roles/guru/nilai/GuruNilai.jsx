@@ -466,9 +466,9 @@ export default function GuruNilaiPage() {
         },
         items: siswaRows.map((row) => ({
           id_user_siswa: row.id_user_siswa,
-          nilai_tugas: row.nilai_tugas === '' ? 0 : Number(row.nilai_tugas),
-          nilai_uts: row.nilai_uts === '' ? 0 : Number(row.nilai_uts),
-          nilai_uas: row.nilai_uas === '' ? 0 : Number(row.nilai_uas),
+          nilai_tugas: row.nilai_tugas === '' ? null : Number(row.nilai_tugas),
+          nilai_uts: row.nilai_uts === '' ? null : Number(row.nilai_uts),
+          nilai_uas: row.nilai_uas === '' ? null : Number(row.nilai_uas),
           nilai_praktik: null,
           nilai_sikap: null,
         })),
