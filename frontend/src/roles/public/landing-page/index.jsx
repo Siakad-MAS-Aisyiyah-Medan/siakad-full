@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLandingNav } from '@/roles/public/landing-page/hooks/useLandingNav';
 import { useReveal } from '@/roles/public/landing-page/hooks/useReveal';
 import LandingNavbar from '@/roles/public/landing-page/components/LandingNavbar';
@@ -13,6 +13,7 @@ import '@/roles/public/landing-page/landing.css';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     activeSection,
     menuOpen,
@@ -22,6 +23,27 @@ const LandingPage = () => {
   } = useLandingNav();
 
   useReveal();
+
+  useEffect(() => {
+    const returnScrollY = location.state?.returnScrollY;
+    const sectionId = location.state?.scrollToSection;
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      if (Number.isFinite(returnScrollY)) {
+        window.scrollTo({ top: returnScrollY, behavior: 'auto' });
+        return;
+      }
+
+      if (sectionId) {
+        document.getElementById(sectionId)?.scrollIntoView({
+          behavior: 'auto',
+          block: 'start',
+        });
+      }
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [location.key, location.state]);
 
   const [profil, setProfil] = useState(null);
 

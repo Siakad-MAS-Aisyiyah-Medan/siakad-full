@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarDays } from 'lucide-react';
 import { getPublicNewsDetail } from '@/shared/services/publicNews.service';
 import LandingNavbar from '@/roles/public/landing-page/components/LandingNavbar';
@@ -10,6 +10,7 @@ import '@/roles/public/landing-page/landing.css';
 export default function PublicNewsDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -37,13 +38,31 @@ export default function PublicNewsDetail() {
     }
   };
 
+  const handleBack = () => {
+    if (location.state?.source === 'home') {
+      navigate('/home', {
+        state: {
+          scrollToSection: 'berita',
+          returnScrollY: location.state.returnScrollY,
+        },
+      });
+      return;
+    }
+
+    navigate('/pengumuman');
+  };
+
+  const handleNavbarNavigation = (sectionId) => {
+    navigate('/home', { state: { scrollToSection: sectionId } });
+  };
+
   return (
     <div className="landing-page" style={{ minHeight: '100vh', background: 'var(--color-surface)' }}>
-      <LandingNavbar activeSection="berita" onScrollToSection={() => navigate('/home')} />
+      <LandingNavbar activeSection="berita" onScrollToSection={handleNavbarNavigation} />
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '100px 24px 40px' }}>
         <button
           type="button"
-          onClick={() => navigate('/pengumuman')}
+          onClick={handleBack}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.75rem',
             padding: '12px 24px', borderRadius: '12px',

@@ -67,7 +67,7 @@ export default function PublicNewsList() {
           {loading ? (
             <div style={{ gridColumn: '1/-1', padding: '48px 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>Memuat pengumuman terbaru...</div>
           ) : filteredNews.length > 0 ? (
-            filteredNews.slice(0, 8).map((item) => (
+            filteredNews.map((item) => (
               <article key={item.id} style={{ borderRadius: '18px', border: '1px solid var(--color-border)', background: '#fff', padding: '20px', transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column' }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.05)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
@@ -86,7 +86,9 @@ export default function PublicNewsList() {
                 <div style={{ marginTop: 'auto' }}>
                   <button
                     type="button"
-                    onClick={() => navigate(`/pengumuman/${item.id}`)}
+                    onClick={() => navigate(`/pengumuman/${item.id}`, {
+                      state: { source: 'announcements' },
+                    })}
                     style={{ marginTop: '20px', display: 'inline-flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '12px', borderRadius: '12px', border: '1px solid var(--color-border)', padding: '12px 20px', fontSize: '1rem', color: 'var(--color-text-dark)', background: '#fff', cursor: 'pointer', transition: 'all 0.2s ease' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-soft)'; e.currentTarget.style.color = 'var(--color-primary-dark)'; e.currentTarget.style.borderColor = 'var(--color-primary-light)'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = 'var(--color-text-dark)'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}

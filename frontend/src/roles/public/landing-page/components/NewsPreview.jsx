@@ -20,7 +20,7 @@ export default function NewsPreview() {
     const fetchNews = async () => {
       try {
         const response = await getPublicNews();
-        setNews((response.data || []).slice(0, 3));
+        setNews(response.data || []);
       } finally {
         setLoading(false);
       }
@@ -78,7 +78,12 @@ export default function NewsPreview() {
                   <p style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{stripHtml(item.isi)}</p>
                   <button
                     type="button"
-                    onClick={() => navigate(`/pengumuman/${item.id}`)}
+                    onClick={() => navigate(`/pengumuman/${item.id}`, {
+                      state: {
+                        source: 'home',
+                        returnScrollY: window.scrollY,
+                      },
+                    })}
                     className="lp-link-btn"
                   >
                     Baca Selengkapnya <ArrowRight size={16} />
