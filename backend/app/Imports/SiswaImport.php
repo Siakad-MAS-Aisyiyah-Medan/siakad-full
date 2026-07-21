@@ -24,8 +24,7 @@ class SiswaImport
         try {
             $rowIndex = 2;
             foreach ($rows as $row) {
-                // Pastikan key array lowercase agar sesuai dengan kode
-                $row = array_change_key_case($row, CASE_LOWER);
+                $row = $this->normalizeHeaders($row);
 
                 // Lewati baris kosong atau jika diisi strip (-)
                 if (
@@ -33,15 +32,48 @@ class SiswaImport
                     empty(trim($row['nama'] ?? '')) || trim($row['nama']) === '-'
                 ) {
                     $rowIndex++;
+
                     continue;
                 }
 
                 $nis = $row['nis'];
                 $nisn = $row['nisn'] ?? '-';
-                $noHp = $row['no_hp'] ?? $row['no_hp_wali'] ?? '-';
+                $noHp = $this->firstFilledValue($row, [
+                    'no_hp',
+                    'no_hp_wali',
+                    'nomor_hp',
+                    'nomor_hp_wali',
+                    'no_hp_ortu',
+                    'nomor_hp_ortu',
+                    'no_telepon',
+                    'nomor_telepon',
+                    'hp',
+                ]);
+
+                if ($noHp === null) {
+                    throw new Exception(
+                        'Baris '.$rowIndex.': Nomor HP tidak ditemukan. Gunakan header no_hp atau no_hp_wali dan pastikan nilainya terisi.'
+                    );
+                }
 
                 // Cek apakah NIS atau NISN sudah ada
-                if (Siswa::where('nis', $nis)->orWhere('nisn', $nisn)->exists()) {
+                $existingSiswa = Siswa::where('nis', $nis)->orWhere('nisn', $nisn)->first();
+                if ($existingSiswa) {
+                    $sameStudent = (string) $existingSiswa->nis === (string) $nis
+                        && ($nisn === '-' || (string) $existingSiswa->nisn === (string) $nisn);
+
+                    if ($sameStudent && $this->isPlaceholderPhone($existingSiswa->no_hp)) {
+                        $existingSiswa->update([
+                            'no_hp' => $noHp,
+                            'no_hp_wali' => $this->isPlaceholderPhone($existingSiswa->no_hp_wali)
+                                ? $noHp
+                                : $existingSiswa->no_hp_wali,
+                        ]);
+                        $rowIndex++;
+
+                        continue;
+                    }
+
                     throw new Exception('Baris '.$rowIndex.": NIS ($nis) atau NISN ($nisn) sudah terdaftar di sistem.");
                 }
 
@@ -97,5 +129,43 @@ class SiswaImport
             DB::rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Samakan variasi header Excel seperti "No. HP", "NO HP", dan spasi tersembunyi.
+     */
+    private function normalizeHeaders(array $row): array
+    {
+        $normalized = [];
+
+        foreach ($row as $key => $value) {
+            $key = preg_replace('/^\x{FEFF}/u', '', trim((string) $key));
+            $key = mb_strtolower($key);
+            $key = preg_replace('/[^\pL\pN]+/u', '_', $key);
+            $normalized[trim($key, '_')] = $value;
+        }
+
+        return $normalized;
+    }
+
+    private function firstFilledValue(array $row, array $keys): ?string
+    {
+        foreach ($keys as $key) {
+            if (! array_key_exists($key, $row)) {
+                continue;
+            }
+
+            $value = trim((string) $row[$key]);
+            if ($value !== '' && $value !== '-') {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function isPlaceholderPhone(mixed $value): bool
+    {
+        return $value === null || trim((string) $value) === '' || trim((string) $value) === '-';
     }
 }

@@ -5,6 +5,7 @@ import ImportExcelModal from '@/shared/components/ImportExcelModal';
 import { useMurid } from '@/shared/akademik/murid/hooks/useMurid';
 import { useState } from 'react';
 import apiClient from '@/shared/services/apiClient';
+import { toastSuccess, toastError } from '@/shared/hooks/useConfirm';
 
 export default function MuridPage({ readOnly = false }) {
   const {
@@ -44,7 +45,7 @@ export default function MuridPage({ readOnly = false }) {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert('Gagal mengunduh template: ' + (err.response?.data?.message || err.message));
+      toastError('Gagal', 'Gagal mengunduh template: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -61,7 +62,7 @@ export default function MuridPage({ readOnly = false }) {
       });
       setIsImportModalOpen(false);
       if (refreshData) refreshData();
-      alert('Berhasil mengimport data siswa');
+      toastSuccess('Berhasil', 'Berhasil mengimport data siswa');
     } catch (err) {
       setImportError(err.response?.data?.message || err.message);
     } finally {

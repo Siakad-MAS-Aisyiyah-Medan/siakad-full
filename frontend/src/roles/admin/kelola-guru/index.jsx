@@ -5,6 +5,7 @@ import ImportExcelModal from '@/shared/components/ImportExcelModal';
 import { useGuru } from '@/shared/akademik/guru/hooks/useGuru';
 import { useState } from 'react';
 import apiClient from '@/shared/services/apiClient';
+import { toastSuccess, toastError } from '@/shared/hooks/useConfirm';
 
 export default function GuruPage({ readOnly = false }) {
   const {
@@ -43,7 +44,7 @@ export default function GuruPage({ readOnly = false }) {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert('Gagal mengunduh template: ' + (err.response?.data?.message || err.message));
+      toastError('Gagal', 'Gagal mengunduh template: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -59,7 +60,7 @@ export default function GuruPage({ readOnly = false }) {
       });
       setIsImportModalOpen(false);
       if (refreshData) refreshData();
-      alert('Berhasil mengimport data guru');
+      toastSuccess('Berhasil', 'Berhasil mengimport data guru');
     } catch (err) {
       setImportError(err.response?.data?.message || err.message);
     } finally {

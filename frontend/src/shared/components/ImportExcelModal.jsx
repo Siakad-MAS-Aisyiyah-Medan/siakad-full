@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { UploadCloud, X, Download, AlertCircle } from 'lucide-react';
+import { toastValidation } from '@/shared/hooks/useConfirm';
 
 export default function ImportExcelModal({
   isOpen,
@@ -48,7 +49,7 @@ export default function ImportExcelModal({
     e.preventDefault();
     if (!file) return;
     if (requiresClass && !selectedClass) {
-      alert("Silakan pilih kelas terlebih dahulu");
+      toastValidation("Peringatan", "Silakan pilih kelas terlebih dahulu");
       return;
     }
     onSubmit(file, selectedClass);

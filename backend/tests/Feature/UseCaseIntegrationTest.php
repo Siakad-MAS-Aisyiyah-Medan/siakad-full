@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Models\Permission;
 use App\Imports\SiswaImport;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\Nilai;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Siswa;
 use App\Models\User;
@@ -252,6 +252,82 @@ class UseCaseIntegrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => '20261999',
             'email' => null,
+        ]);
+    }
+
+    public function test_student_import_normalizes_phone_header_variations(): void
+    {
+        $kelas = Kelas::create([
+            'nama_kelas' => 'XI-IMPORT-HEADER',
+            'tingkat' => 'XI',
+            'jurusan' => 'IPA',
+            'tahun_ajaran' => '2026/2027',
+            'status' => 'aktif',
+        ]);
+
+        (new SiswaImport($kelas->id_kelas))->import([
+            [
+                'NISN' => '6514841501',
+                'NIS' => '20261998',
+                'nama' => 'Murid Header Phone',
+                'No. HP Wali ' => '081234560020',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('siswa', [
+            'nis' => '20261998',
+            'no_hp_wali' => '081234560020',
+            'no_hp' => '081234560020',
+        ]);
+    }
+
+    public function test_reimport_repairs_placeholder_student_phone(): void
+    {
+        $kelas = Kelas::create([
+            'nama_kelas' => 'XI-IMPORT-REPAIR',
+            'tingkat' => 'XI',
+            'jurusan' => 'IPA',
+            'tahun_ajaran' => '2026/2027',
+            'status' => 'aktif',
+        ]);
+
+        $user = User::create([
+            'name' => 'Murid Repair Phone',
+            'username' => '20261997',
+            'email' => null,
+            'password' => 'admin123',
+            'role' => 'siswa',
+            'status_aktif' => true,
+            'status_akun' => 'aktif',
+        ]);
+        $user->siswa()->create([
+            'nisn' => '6514841502',
+            'nis' => '20261997',
+            'nama_siswa' => 'Murid Repair Phone',
+            'tempat_lahir' => '-',
+            'tgl_lahir' => '2000-01-01',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'alamat' => '-',
+            'nama_wali' => '-',
+            'no_hp_wali' => '-',
+            'no_hp' => '-',
+            'id_kelas' => $kelas->id_kelas,
+        ]);
+
+        (new SiswaImport($kelas->id_kelas))->import([
+            [
+                'NISN' => '6514841502',
+                'NIS' => '20261997',
+                'nama' => 'Murid Repair Phone',
+                'Nomor HP' => '081234560021',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('siswa', [
+            'nis' => '20261997',
+            'no_hp_wali' => '081234560021',
+            'no_hp' => '081234560021',
         ]);
     }
 
