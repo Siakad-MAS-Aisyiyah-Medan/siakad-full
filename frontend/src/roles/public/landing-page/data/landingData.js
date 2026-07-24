@@ -1,7 +1,7 @@
 import { Book, Users, GraduationCap, Calendar } from 'lucide-react';
 
 export const SCHOOL_NAME = 'MAS Aisyiyah Medan';
-export const SCHOOL_TAGLINE = 'Madrasah Aliyah Aisyiyah Medan';
+export const SCHOOL_TAGLINE = 'Madrasah Aliyah Swasta Aisyiyah Medan';
 
 export const NAV_ITEMS = [
   { id: 'home', label: 'Beranda' },

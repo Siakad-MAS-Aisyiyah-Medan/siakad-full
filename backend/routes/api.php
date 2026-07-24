@@ -8,7 +8,7 @@ require __DIR__.'/api/siswa.php';
 require __DIR__.'/api/kepsek.php';
 require __DIR__.'/api/calon-siswa.php';
 
-// Route Publik (Tidak butuh login)
+// Route Publik
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfilSekolahController;
 use Illuminate\Support\Facades\Route;

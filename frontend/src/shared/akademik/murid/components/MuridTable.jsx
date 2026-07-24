@@ -19,7 +19,6 @@ export default function MuridTable({
     const dataToExport = data.map(item => {
       const isAktif = item.status_aktif !== false;
       const nama = item.siswa?.nama_siswa || item.pendaftaran?.nama_lengkap || '-';
-      const noHp = item.siswa?.no_hp || item.siswa?.no_hp_wali || item.pendaftaran?.no_hp || item.pendaftaran?.no_hp_wali || '-';
       const jenisKelamin = item.siswa?.jenis_kelamin || item.pendaftaran?.jenis_kelamin;
       const jkelLabel = jenisKelamin === 'L' ? 'Laki-Laki' : jenisKelamin === 'P' ? 'Perempuan' : '-';
 
@@ -30,7 +29,6 @@ export default function MuridTable({
         'Tahun Masuk': item.siswa?.tahun_masuk || item.pendaftaran?.tahun_masuk || '-',
         'Tahun Keluar': item.siswa?.tahun_lulus || '-',
         'Status': isAktif ? 'Aktif' : 'Nonaktif',
-        'No. HP': noHp,
         'Alamat': item.siswa?.alamat || item.pendaftaran?.alamat || '-',
       };
     });
@@ -82,7 +80,7 @@ export default function MuridTable({
             <tr>
               <th style={{ paddingLeft: '2rem' }}>No</th>
               <th>Nama Murid</th>
-              <th>No HP</th>
+              <th>NISN</th>
               <th>Tahun Masuk</th>
               <th>Tahun Lulus</th>
               <th>Status</th>
@@ -103,12 +101,12 @@ export default function MuridTable({
               data.map((murid, idx) => {
                 const isAktif = murid.status_aktif !== false;
                 const nama = murid.siswa?.nama_siswa || murid.pendaftaran?.nama_lengkap || '-';
-                const noHp = murid.siswa?.no_hp || murid.siswa?.no_hp_wali || murid.pendaftaran?.no_hp || murid.pendaftaran?.no_hp_wali || '-';
+                const nisn = murid.siswa?.nisn || murid.pendaftaran?.nisn || '-';
                 return (
                   <tr key={murid.id_user}>
                     <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
                     <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)', whiteSpace: 'nowrap', minWidth: '180px' }}>{nama}</td>
-                    <td style={{ whiteSpace: 'nowrap' }}>{noHp}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{nisn}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.tahun_masuk || murid.pendaftaran?.tahun_masuk || '-'}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.tahun_lulus || '-'}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>

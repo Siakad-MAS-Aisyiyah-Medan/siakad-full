@@ -27,7 +27,7 @@ export const ROUTE_PERMISSIONS = {
   '/kepsek/dashboard': 'view_dashboard_kepsek',
   '/kepsek/data': 'view_data_siswa',
   '/kepsek/ppdb': 'view_data_ppdb',
-
+    
   '/guru/dashboard': 'view_dashboard_guru',
   '/guru/profil-saya': 'manage_profil_pribadi',
   '/guru/pengumuman': 'view_pengumuman',

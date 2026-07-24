@@ -22,3 +22,5 @@ Route::middleware(['auth:sanctum', 'permission:manage_nilai_siswa'])->group(func
     Route::get('/guru/nilai/form', [NilaiController::class, 'guruFormData']);
     Route::post('/guru/nilai/bulk', [NilaiController::class, 'guruBulkStore']);
 });
+
+

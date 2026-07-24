@@ -73,8 +73,8 @@ export function useMurid() {
         m.username?.toLowerCase().includes(q) ||
         m.email?.toLowerCase().includes(q) ||
         nama.toLowerCase().includes(q) ||
-        (m.siswa?.no_hp || '').toLowerCase().includes(q) ||
-        (m.siswa?.no_hp_wali || '').toLowerCase().includes(q)
+        (m.siswa?.nisn || '').toLowerCase().includes(q) ||
+        (m.pendaftaran?.nisn || '').toLowerCase().includes(q)
       );
     });
   }, [muridData, searchQuery]);

@@ -16,7 +16,7 @@ class SiakadSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Seed Admin
+        // 1. Admin
         $adminUser = User::firstOrCreate(
             ['username' => 'admin'],
             [
@@ -34,7 +34,7 @@ class SiakadSeeder extends Seeder
             'no_hp' => '081234567890',
         ]);
 
-        // 2. Seed Kepala Sekolah
+        // 2. Kepala Sekolah
         $kepsekUser = User::firstOrCreate(
             ['username' => 'kepsek'],
             [
@@ -52,7 +52,7 @@ class SiakadSeeder extends Seeder
             'no_hp' => '081298765432',
         ]);
 
-        // 3. Seed Guru
+        // 3. Guru
         $guruUser = User::firstOrCreate(
             ['username' => 'guru'],
             [
@@ -73,7 +73,7 @@ class SiakadSeeder extends Seeder
             'no_hp' => '082133445566',
         ]);
 
-        // 4. Seed Siswa
+        // 4. Siswa
         $siswaUser = User::firstOrCreate(
             ['username' => 'siswa'],
             [
