@@ -144,6 +144,8 @@ class MuridController extends Controller
                     ->orWhereHas('siswa', fn ($s) => $s
                         ->where('nama_siswa', 'like', "%{$search}%")
                         ->orWhere('nisn', 'like', "%{$search}%"))
+                    ->orWhereHas('siswa.kelas', fn ($k) => $k
+                        ->where('nama_kelas', 'like', "%{$search}%"))
                     ->orWhereHas('pendaftaran', fn ($p) => $p->where('nama_lengkap', 'like', "%{$search}%"));
             });
         }

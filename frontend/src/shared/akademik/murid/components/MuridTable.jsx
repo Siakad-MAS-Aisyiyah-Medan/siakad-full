@@ -26,7 +26,7 @@ export default function MuridTable({
         'Nama Murid': nama,
         'NISN': item.siswa?.nisn || item.pendaftaran?.nisn || '-',
         'Jenis Kelamin': jkelLabel,
-        'Tahun Masuk': item.siswa?.tahun_masuk || item.pendaftaran?.tahun_masuk || '-',
+        'Kelas': item.siswa?.kelas?.nama_kelas || '-',
         'Tahun Keluar': item.siswa?.tahun_lulus || '-',
         'Status': isAktif ? 'Aktif' : 'Nonaktif',
         'Alamat': item.siswa?.alamat || item.pendaftaran?.alamat || '-',
@@ -81,7 +81,7 @@ export default function MuridTable({
               <th style={{ paddingLeft: '2rem' }}>No</th>
               <th>Nama Murid</th>
               <th>NISN</th>
-              <th>Tahun Masuk</th>
+              <th>Kelas</th>
               <th>Tahun Lulus</th>
               <th>Status</th>
               {!readOnly ? <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Aksi</th> : null}
@@ -107,7 +107,7 @@ export default function MuridTable({
                     <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, paddingLeft: '2rem' }}>{idx + 1}</td>
                     <td style={{ fontWeight: 600, color: 'var(--color-primary-dark)', whiteSpace: 'nowrap', minWidth: '180px' }}>{nama}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{nisn}</td>
-                    <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.tahun_masuk || murid.pendaftaran?.tahun_masuk || '-'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.kelas?.nama_kelas || '-'}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{murid.siswa?.tahun_lulus || '-'}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>
                       <span style={{

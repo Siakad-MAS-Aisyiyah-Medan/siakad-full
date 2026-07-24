@@ -74,7 +74,8 @@ export function useMurid() {
         m.email?.toLowerCase().includes(q) ||
         nama.toLowerCase().includes(q) ||
         (m.siswa?.nisn || '').toLowerCase().includes(q) ||
-        (m.pendaftaran?.nisn || '').toLowerCase().includes(q)
+        (m.pendaftaran?.nisn || '').toLowerCase().includes(q) ||
+        (m.siswa?.kelas?.nama_kelas || '').toLowerCase().includes(q)
       );
     });
   }, [muridData, searchQuery]);
